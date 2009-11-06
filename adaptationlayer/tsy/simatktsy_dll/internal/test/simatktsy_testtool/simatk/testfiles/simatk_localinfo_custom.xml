@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!-- MOD_1003.001_SIM_ATK_TSY_[PROVIDE LOCAL INFORMATION - Local Info, Limited Service] -->
+<!-- MOD_1003.002_SIM_ATK_TSY_[PROVIDE LOCAL INFORMATION - UTRAN Measurement Results] -->
+
+
+<isc-test-control id="1003">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <input id="10001">
+        <name>PROACTIVE COMMAND: PROVIDE LOCAL INFORMATION, Command Qualifier: local info</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,0D,D0,09,81,03,01,26,00,82,02,81,82,90,00</message>
+    </input>
+    
+    <input id="10201">
+        <name>PROACTIVE COMMAND: PROVIDE LOCAL INFORMATION, UTRAN NMR, Reserved Measurement Qualifier value</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,26,02,82,02,81,82,69,01,FF,90,00</message>
+    </input>
+
+    <input id="10202">
+        <name>PROACTIVE COMMAND: PROVIDE LOCAL INFORMATION, UTRAN NMR, Intra-frequency measurements</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,26,02,82,02,81,82,69,01,01,90,00</message>
+    </input>
+
+    <input id="10203">
+        <name>PROACTIVE COMMAND: PROVIDE LOCAL INFORMATION, UTRAN NMR, Inter-frequency measurements</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,26,02,82,02,81,82,69,01,02,90,00</message>
+    </input>
+
+    <input id="10204">
+        <name>PROACTIVE COMMAND: PROVIDE LOCAL INFORMATION, UTRAN NMR, Inter-RAT (GSM) measurements</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,26,02,82,02,81,82,69,01,03,90,00</message>
+    </input>
+
+
+<!-- NET SERVER -->
+<!-- ********** -->
+
+    <input id="30001">
+        <name>NET_CELL_INFO_GET_RESP; NET_LIMITED_SERVICE</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,00,1A,20,01,00,41,00,01,46,14,00,B4,A4,5A,23,29,00,00,00,01,54,F5,30,01,02,00,00,00</message>
+    </input>
+
+    <input id="30002">
+        <name>NET_CELL_INFO_GET_RESP; NET_LIMITED_SERVICE</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,00,1A,20,01,00,41,00,01,46,14,00,B4,A4,5A,23,29,00,00,00,01,54,F5,30,01,02,00,00,00</message>
+    </input>
+
+    <input id="30003">
+        <name>NET_CELL_INFO_GET_RESP; NET_LIMITED_SERVICE</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,00,1A,20,01,00,41,00,01,46,14,00,B4,A4,5A,23,29,00,00,00,01,54,F5,30,01,02,00,00,00</message>
+    </input>
+
+    <input id="30201">
+        <name>NET_CELL_INFO_IND; CellId 1, LAC 1, Network mode Utran</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,00,1A,20,01,00,42,00,01,47,14,00,01,00,00,00,01,00,00,00,01,00,F1,10,00,00,00,00,00</message>
+    </input>
+
+    <input id="30202">
+        <name>NET_NEIGHBOUR_CELLS_RESP; NET_SIM_INTRA_FREQ_NMR</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,00,1a,01,41,02,1b,00,01,3d,14,0f,00,80,00,c0,01,05,3d,75,f4,66,26,07,3e,3a,55,30,00</message>
+    </input>
+
+    <input id="30203">
+        <name>NET_NEIGHBOUR_CELLS_RESP; NET_SIM_INTER_FREQ_NMR</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,0e,00,01,41,00,1b,00,01,3d,08,02,00,80,fe,00,00,00,00</message>
+    </input>
+
+    <input id="30204">
+        <name>NET_NEIGHBOUR_CELLS_RESP; NET_SIM_INTER_RAT_NMR</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,00,0e,01,41,01,1b,00,01,3d,08,03,00,80,20,f0,00</message>
+    </input>
+
+    <input id="30205">
+        <name>NET_CELL_INFO_IND; CellId 1, LAC 1, Network mode GSM</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,00,1A,20,01,00,42,00,01,46,14,00,01,00,00,00,01,00,00,00,01,00,F1,10,00,00,00,00,00</message>
+    </input>
+
+    <input id="30206">
+        <name>NET_NEIGHBOUR_CELLS_RESP; NET_CAUSE_COMMUNICATION_ERROR</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,06,00,8a,35,cc,1b,01,00,00,00</message>
+    </input>
+
+
+<!-- SIM SESSION END -->
+<!-- *************** -->
+
+    <input id="90004">
+        <name>SIM Session End</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+        <!-- Transaction Id's (9:th byte) must match with Terminal responses transaction id -->
+    </input>
+
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+
+
+<!-- NET SERVER -->
+<!-- ********** -->
+
+<!-- USED BY: 27.22.4.15 -->
+    <output id="20001">
+        <name>NET_CELL_INFO_GET_REQ</name>
+        <direction>dos</direction>
+        <message>00,00,00,C8,00,04,00,00,00,40</message>
+           <mask>00,00,00,FF,00,FF,FF,00,FF,FF</mask>
+    </output>
+
+    <output id="20202">
+        <name>NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTRA_FREQ_NMR</name>
+        <direction>dos</direction>
+        <message>00,00,00,C8,00,05,00,00,C5,1A,02</message>
+           <mask>00,00,00,FF,00,FF,FF,00,00,FF,FF</mask>
+    </output>
+
+    <output id="20203">
+        <name>NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTER_FREQ_NMR</name>
+        <direction>dos</direction>
+        <message>00,00,00,C8,00,05,00,00,C5,1A,03</message>
+           <mask>00,00,00,FF,00,FF,FF,00,00,FF,FF</mask>
+    </output>
+
+    <output id="20204">
+        <name>NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTER_RAT_NMR</name>
+        <direction>dos</direction>
+        <message>00,00,00,C8,00,05,00,00,C5,1A,04</message>
+           <mask>00,00,00,FF,00,FF,FF,00,00,FF,FF</mask>
+    </output>
+
+     
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <output id="40001">
+        <name>TERMINAL RESPONSE: limited service</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1E,00,08,00,11,00,00,00,15,81,03,01,26,00,82,02,82,81,83,01,06,93,07,54,F5,30,00,B4,23,29,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40201">
+        <name>TERMINAL RESPONSE: Reserved Measurement Qualifier value</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,26,02,82,02,82,81,03,01,32,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40202">
+        <name>TERMINAL RESPONSE: PROVIDE LOCAL INFORMATION; NET_SIM_INTRA_FREQ_NMR</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,26,00,08,00,11,00,00,00,1D,81,03,01,26,02,82,02,82,81,83,01,00,96,0f,80,00,c0,01,05,3d,75,f4,66,26,07,3e,3a,55,30,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40203">
+        <name>TERMINAL RESPONSE: PROVIDE LOCAL INFORMATION; NET_SIM_INTER_FREQ_NMR</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,26,02,82,02,82,81,83,01,00,96,02,80,fe,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40204">
+        <name>TERMINAL RESPONSE: PROVIDE LOCAL INFORMATION; NET_SIM_INTER_RAT_NMR</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,11,81,03,01,26,02,82,02,82,81,83,01,00,96,03,80,20,f0,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40205">
+        <name>TERMINAL RESPONSE: ME in GSM Network; ME unable to process command, No service</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0D,81,03,01,26,02,82,02,82,81,03,02,20,04,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+<!-- USED BY: 27.22.4.15 -->
+    <step id="10001" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10001"/>
+    </step>
+
+    <step id="10201" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10201"/>
+    </step>
+
+    <step id="10202" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10202"/>
+    </step>
+
+    <step id="10203" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10203"/>
+    </step>
+
+    <step id="10204" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10204"/>
+    </step>
+
+
+<!-- NET SERVER REQ -->
+<!-- ************** -->
+
+<!-- USED BY: 27.22.4.15 -->
+    <step id="20001" type="intercept">
+        <name>NET_CELL_INFO_GET_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20001"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="20202" type="intercept">
+        <name>NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTRA_FREQ_NMR</name>
+        <channel id="0x07"/>
+        <output-ref id="20202"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="20203" type="intercept">
+        <name>NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTER_FREQ_NMR</name>
+        <channel id="0x07"/>
+        <output-ref id="20203"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="20204" type="intercept">
+        <name>NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTER_RAT_NMR</name>
+        <channel id="0x07"/>
+        <output-ref id="20204"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+
+<!-- NET SERVER RESP -->
+<!-- *************** -->
+
+<!-- USED BY: 27.22.4.15 -->
+    <step id="30001" type="simulate">
+        <name>NET_CELL_INFO_GET_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="30001"/>
+        <flags>0x40</flags>
+    </step>
+
+    <step id="30002" type="simulate">
+        <name>NET_CELL_INFO_GET_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="30002"/>
+        <flags>0x40</flags>
+    </step>
+
+    <step id="30003" type="simulate">
+        <name>NET_CELL_INFO_GET_RESP, NET_LIMITED_SERVICE</name>
+        <channel id="0x07"/>
+        <input-ref id="30003"/>
+        <flags>0x40</flags>
+    </step>
+
+    <step id="30201" type="simulate">
+        <name>NET_CELL_INFO_IND, UTRAN</name>
+        <channel id="0x07"/>
+        <input-ref id="30201"/>
+        <flags>0x40</flags>
+    </step>
+
+    <step id="30202" type="simulate">
+        <name>NET_NEIGHBOUR_CELLS_RESP; NET_SIM_INTRA_FREQ_NMR</name>
+        <channel id="0x07"/>
+        <input-ref id="30202"/>
+        <flags>0x40</flags>
+    </step>
+
+    <step id="30203" type="simulate">
+        <name>NET_NEIGHBOUR_CELLS_RESP; NET_SIM_INTER_FREQ_NMR</name>
+        <channel id="0x07"/>
+        <input-ref id="30203"/>
+        <flags>0x40</flags>
+    </step>
+
+    <step id="30204" type="simulate">
+        <name>NET_NEIGHBOUR_CELLS_RESP; NET_SIM_INTER_RAT_NMR</name>
+        <channel id="0x07"/>
+        <input-ref id="30204"/>
+        <flags>0x40</flags>
+    </step>
+
+    <step id="30205" type="simulate">
+        <name>NET_CELL_INFO_IND, GSM</name>
+        <channel id="0x07"/>
+        <input-ref id="30205"/>
+        <flags>0x40</flags>
+    </step>
+
+    <step id="30206" type="simulate">
+        <name>NET_NEIGHBOUR_CELLS_RESP; NET_CAUSE_COMMUNICATION_ERROR</name>
+        <channel id="0x07"/>
+        <input-ref id="30206"/>
+        <flags>0x40</flags>
+    </step>
+
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <step id="40001" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40001"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40201" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40201"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40202" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40202"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40203" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40203"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40204" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40204"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40205" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40205"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+</steps>
+
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+    <case id="101">
+        <name>three commands in a row (Local Info , Limited Service)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="20001"/> <!-- Receive NET_CELL_INFO_GET_REQ -->
+            <step-ref id="30001"/> <!-- Send NET_CELL_INFO_GET_RESP, NET_NO_COVERAGE -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM session end -->
+
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="20001"/> <!-- Receive NET_CELL_INFO_GET_REQ -->
+            <step-ref id="30002"/> <!-- Send NET_CELL_INFO_GET_RESP, NET_NO_COVERAGE -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM session end -->
+
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="20001"/> <!-- Receive NET_CELL_INFO_GET_REQ -->
+            <step-ref id="30003"/> <!-- Send NET_CELL_INFO_GET_RESP, NET_NO_COVERAGE -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM session end -->
+
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="201">
+        <name>UTRAN NMR, reserver Measurement Qualifier value</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+
+            <step-ref id="30201"/> <!-- NET_CELL_INFO_IND -->
+            
+            <step-ref id="10201"/> <!-- Send PCMD  -->
+
+            <step-ref id="40201"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM session end -->
+
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="202">
+        <name>UTRAN NMR, NET_SIM_INTRA_FREQ_NMR</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+
+            <step-ref id="30201"/> <!-- NET_CELL_INFO_IND -->
+
+            <step-ref id="10202"/> <!-- Send PCMD  -->
+
+            <step-ref id="20202"/> <!-- NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTRA_FREQ_NMR -->
+            <step-ref id="30202"/> <!-- NET_NEIGHBOUR_CELLS_RESP; NET_SIM_INTRA_FREQ_NMR -->
+
+            <step-ref id="40202"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM session end -->
+
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="203">
+        <name>UTRAN NMR, NET_SIM_INTER_FREQ_NMR</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+
+            <step-ref id="30201"/> <!-- NET_CELL_INFO_IND -->
+
+            <step-ref id="10203"/> <!-- Send PCMD  -->
+
+            <step-ref id="20203"/> <!-- NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTER_FREQ_NMR -->
+            <step-ref id="30203"/> <!-- NET_NEIGHBOUR_CELLS_RESP; NET_SIM_INTER_FREQ_NMR -->
+
+            <step-ref id="40203"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM session end -->
+
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="204">
+        <name>UTRAN NMR, NET_SIM_INTER_RAT_NMR</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+
+            <step-ref id="30201"/> <!-- NET_CELL_INFO_IND -->
+
+            <step-ref id="10204"/> <!-- Send PCMD  -->
+
+            <step-ref id="20204"/> <!-- NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTER_RAT_NMR -->
+            <step-ref id="30204"/> <!-- NET_NEIGHBOUR_CELLS_RESP; NET_SIM_INTER_RAT_NMR -->
+
+            <step-ref id="40204"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM session end -->
+
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="205">
+        <name>UTRAN NMR, ME in GSM network</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+
+            <step-ref id="30205"/> <!-- NET_CELL_INFO_IND -->
+
+            <step-ref id="10202"/> <!-- Send PCMD  -->
+
+            <step-ref id="40205"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM session end -->
+
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="206">
+        <name>UTRAN NMR, NET_SIM_INTRA_FREQ_NMR, Me not currently in service</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+
+            <step-ref id="30201"/> <!-- NET_CELL_INFO_IND -->
+
+            <step-ref id="10202"/> <!-- Send PCMD  -->
+
+            <step-ref id="20202"/> <!-- NET_NEIGHBOUR_CELLS_REQ; NET_SIM_INTRA_FREQ_NMR -->
+            <step-ref id="30206"/> <!-- NET_NEIGHBOUR_CELLS_RESP; NET_CAUSE_COMMUNICATION_ERROR -->
+
+            <step-ref id="40205"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM session end -->
+
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+</cases>
+
+</isc-test-control>

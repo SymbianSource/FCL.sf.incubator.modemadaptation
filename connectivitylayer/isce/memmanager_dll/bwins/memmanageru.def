@@ -1,0 +1,4 @@
+EXPORTS
+	?AllocBlock@MemApi@@SAAAVTDes8@@G@Z @ 1 NONAME ; class TDes8 & MemApi::AllocBlock(unsigned short)
+	?DeallocBlock@MemApi@@SAXAAVTDes8@@@Z @ 2 NONAME ; void MemApi::DeallocBlock(class TDes8 &)
+

@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<AutogenXml Version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://rdsuite.europe.nokia.com/products/autogen/files/autogen_xml.xsd">
+<ResourceIsi Name="S60 WLAN" PhonetName="PN_SOS_WLAN_EXTENDED" PhonetId="66528" SupportsCommonMessages="true" Version="001.000">
+<ProjectInfo>
+</ProjectInfo>
+<VersionHistory>
+<VersionInfo Version="001.000" Status="NonDraft" Date="" Editor="">
+<Reason>First version of document.</Reason>
+<Reference>ADB for xxxxxxx., NON-DRAFT</Reference>
+<Description>
+<Para>Parturition.</Para>
+</Description>
+</VersionInfo>
+</VersionHistory>
+<Tables>
+<FtdTable>
+<FtdValue Name="FTD_SB_WLAN_OWN_MAC_ADDR" Id="17" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_HW_VERSION" Id="18" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_FW_VERSION" Id="19" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_SSID" Id="20" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_AP_MAC_ADDR" Id="21" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_CHANNEL" Id="22" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_RSSI" Id="23" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_RATES_11B" Id="24" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_RATES_11G" Id="25" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_CAPABILITY_LSB" Id="26" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_CAPABILITY_MSB" Id="27" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_AV_TX_RATE" Id="28" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_AV_RX_RATE" Id="29" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_UL_THROUGHPUT" Id="30" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_DL_THROUGHPUT" Id="31" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_UL_BYTES" Id="32" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_DL_BYTES" Id="33" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_BLACKLIST_ADDR_1" Id="34" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_BLACKLIST_ADDR_2" Id="35" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_BLACKLIST_ADDR_3" Id="36" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_BLACKLIST_ADDR_4" Id="37" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_SEC_MODE" Id="38" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_REG_DOMAIN" Id="39" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_CONNECTION_STATE" Id="40" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_TX_POWER" Id="43" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_POWER_SAVE" Id="44" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_TX_FRAMES" Id="45" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_RX_UC_FRAMES" Id="46" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_RX_MC_FRAMES" Id="47" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_TX_ERRORS" Id="48" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_TX_RETRANS" Id="49" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_RX_CRC_ERRORS" Id="50" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_CONNECTIONS" Id="51" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_CONNECTION_FAILS" Id="52" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_ROAMINGS" Id="53" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_COVERAGE_LOSSES" Id="54" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_RESET_COUNTERS" Id="55" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_RD_CONTROL_SET" Id="56" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_RD_CONTROL_GET" Id="57" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_ROAM_TIME_TOTAL" Id="58" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_ROAM_TIME_DATA_PATH" Id="59" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+<FtdValue Name="FTD_SB_WLAN_ROAM_CAUSE" Id="60" Size="8">
+<SupportedModes>
+<Mode>RD</Mode>
+</SupportedModes>
+<Number Name="Data" Size="8" Signed="false">
+<Presentation Type="Decimal" />
+</Number>
+</FtdValue>
+</FtdTable>
+</Tables>
+</ResourceIsi>
+</AutogenXml>

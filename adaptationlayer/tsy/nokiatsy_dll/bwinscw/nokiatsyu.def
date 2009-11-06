@@ -1,0 +1,6 @@
+EXPORTS
+	?GetPhoNetReceiver@CMmMessageRouter@@QAEPAVCMmPhoNetReceiver@@XZ @ 1 NONAME ; class CMmPhoNetReceiver * CMmMessageRouter::GetPhoNetReceiver(void)
+	?GetPhoNetSender@CMmMessageRouter@@QAEPAVCMmPhoNetSender@@XZ @ 2 NONAME ; class CMmPhoNetSender * CMmMessageRouter::GetPhoNetSender(void)
+	?NewL@CMmMessageRouter@@SAPAV1@PAVMmMessageManagerCallback@@@Z @ 3 NONAME ; class CMmMessageRouter * CMmMessageRouter::NewL(class MmMessageManagerCallback *)
+	?SetOperinfoApac@CMmStaticUtility@@SAXH@Z @ 4 NONAME ; void CMmStaticUtility::SetOperinfoApac(int)
+

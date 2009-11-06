@@ -1,0 +1,3 @@
+EXPORTS
+	NewL__16CTsySatMessagingP11CMmPhoneTsyP20CMmMessageRouterBaseGt4TBuf1i128 @ 1 NONAME ; CTsySatMessaging::NewL(CMmPhoneTsy *, CMmMessageRouterBase *, TBuf<128>)
+

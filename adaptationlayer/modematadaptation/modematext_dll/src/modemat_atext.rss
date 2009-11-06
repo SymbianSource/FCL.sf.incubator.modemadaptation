@@ -1,0 +1,99 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: 
+*
+*/
+
+
+
+#include <ecom/registryinfov2.rh>
+#include <atext_interfaceuid.h>
+
+// Declares info for two implementations
+RESOURCE REGISTRY_INFO theInfo
+  {
+  resource_format_version = RESOURCE_FORMAT_VERSION_2;
+  // UID for the DLL
+  dll_uid = 0x2001FCB2;
+  // Declare array of interface info
+  interfaces = 
+    {
+    INTERFACE_INFO
+      {
+      // UID of interface that is implemented
+      interface_uid = 0x2001CBEE; //ATEXT_INTERFACE_DUN_UID;
+      implementations = 
+        {
+        IMPLEMENTATION_INFO
+          {
+          implementation_uid = 0x2001FCB3;
+          version_no = 1;
+          display_name = "Modem AT EXT";
+          default_data = "PATS0|PATS1|PATS2|PATS3|PATS4|PATS5|PATS6|PATS7|PATS8|PATS10|PATS12|PATS25|PATE|PATE0|PATE1|PATQ|PATQ0|PATQ1|PATV|PATV0|PATV1|PATX|PATX0|PATX1|PATX2|PATX3|PATX4|PATX5|PAT&C|PAT&C0|PAT&C1|PAT&D|PAT&D0|PAT&D1|PAT&D2|PAT&D3|PAT+IFC|PAT+ILRR|PATS25";
+          opaque_data = "";
+          rom_only = 0;
+          },
+        IMPLEMENTATION_INFO
+          {
+          implementation_uid = 0x20022E86;
+          version_no = 1;
+          display_name = "Modem AT EXT";
+          default_data = "PAT&S|PAT&S0|PAT&S1|PAT&K|PAT&K0|PAT&K3|PAT&K4|PATZ|PATZ0|PATZ1|PAT&F|PAT&F0|PATI|PAT+GMI|PAT+GMM|PAT+GMR|PAT+GSN|PAT+GCAP|PAT&V|PAT&V0|PAT&V1|PAT&V2|PAT&W|PAT&W0|PAT&W1|PAT&Y|PAT&Y0|PAT&Y1|PAT+CGMI|PAT+CGMM|PAT+CGMR|PAT+CGSN|PAT+CSCS|PAT+CIMI";
+          opaque_data = "";
+          rom_only = 0;
+          },
+        IMPLEMENTATION_INFO
+          {
+          implementation_uid = 0x20022E87;
+          version_no = 1;
+          display_name = "Modem AT EXT";
+          default_data = "PAT+WS46|PATA|PATH|PATH0|PATO|PATO0|PATT|PATP|PAT+DS|PAT+DR|PATB|PATB0|PATB1|PATB2|PAT+CSTA|PAT+CHUP|PAT+CR|PAT+CEER|PAT+CRC|PAT+CSNS|PAT+CVHU|PAT+CREG|PAT+COPS|PAT+CLIP|PAT+CLIR|PAT+COLP|PAT+CCFC|PAT+CCWA|PAT+CHLD|PAT+CLCC|PAT+CSSN|PAT+CPAS";
+          opaque_data = "";
+          rom_only = 0;
+          },
+        IMPLEMENTATION_INFO
+          {
+          implementation_uid = 0x20022E88;
+          version_no = 1;
+          display_name = "Modem AT EXT";
+          default_data = "PAT+CSQ|PAT+CMEE|PAT+CSMS|PAT+CPMS|PAT+CMGF|PAT+CSCA|PAT+CSMP|PAT+CSDH|PAT+CSAS|PAT+CRES|PAT+CMGS|PAT+CMGC|PAT+CMMS|PAT+CGSMS|PAT+FCLASS|PAT+VTS|PAT+CGDCONT|PAT+CGEQREQ|PAT+CGEQMIN|PAT+CGEQNEG|PAT+CGREG|PAT+CGATT|PAT+CGACT|PAT+CGDATA|PAT+CGDSCONT";
+          opaque_data = "";
+          rom_only = 0;
+          },
+        IMPLEMENTATION_INFO
+          {
+          implementation_uid = 0x20022E89;
+          version_no = 1;
+          display_name = "Modem AT EXT";
+          default_data = "PAT+CGTFT|PAT+CGCMOD|PAT+CBCIE|PAT*NAUTODISC|PAT*NRLP|PAT*NSYNCSEQ|PAT*NVTMODE|PAT*NTRACE|PAT*NNET|PAT*NOKIAFBUS|PAT*NPTTLOGIN|PAT*NPTTLOGOFF|PAT*NPTTATTACH|PAT*NPTTDETACH|PAT*NPTT|PAT*NTESTSYSTEM|PAT*NLOGGING|PAT*NBALOCK|PAT*NCHLOCK|PAT*NCELLBARR";
+          opaque_data = "";
+          rom_only = 0;
+          },
+        IMPLEMENTATION_INFO
+          {
+          implementation_uid = 0x20022E8A;
+          version_no = 1;
+          display_name = "Modem AT EXT";
+          default_data = "PAT*NEOTD|PAT*NTESTAUDIO|PAT*NSECLOCK|PAT*NSYSLOCK|PAT*NUMAMODE|PAT*NSMSROUTE|PAT|PATD*";
+          opaque_data = "";
+          rom_only = 0;
+          }
+        };
+      }
+    };
+  }
+
+//
+// End of file
+

@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!-- MOD_1005.001_SIM_ATK_TSY_[REFRESH - USIM application reset] -->
+<!-- MOD_1005.002_SIM_ATK_TSY_[REFRESH - 3G Session reset] -->
+<!-- MOD_1005.003_SIM_ATK_TSY_[REFRESH - Empty File List TLV with TLV length zero] -->
+
+
+<isc-test-control id="1005">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <!-- USIM Application Reset -->
+    <input id="10001">
+        <name>PCMD Refresh, USIM Application Reset</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,00,00,00,10,00,55,00,0D,D0,09,81,03,01,01,05,82,02,81,82,90,00</message>
+    </input>
+
+    <!-- 3G Session Reset -->
+    <input id="10002">
+        <name>PCMD Refresh, 3G Session Reset</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,00,00,00,10,00,55,00,16,D0,12,81,03,01,01,06,82,02,81,82,92,07,01,3F,00,7F,10,6F,42,90,00</message>
+    </input>
+
+    <!-- USIM Initialization and Full File Change Notification -->
+    <input id="10003">
+        <name>PCMD Refresh, USIM Initialization and Full File Change Notification</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,00,00,00,10,00,55,00,0F,D0,0B,81,03,01,01,00,82,02,81,82,12,00,90,00</message>
+    </input>
+
+<!-- SIM SERVER RESPONSES -->
+<!-- ******************** -->
+
+    <!-- USED BY: USIM application reset -->
+    <input id="30001">
+        <name>SIM_ATK_RESP(REFRESH, SIM_STA_OK)</name>
+        <direction>sos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E3,05,01,00,00,00,00</message>
+    </input>
+
+    <!-- USED BY: 3G Session reset -->
+    <input id="30002">
+        <name>SIM_ATK_RESP(REFRESH, SIM_STA_OK)</name>
+        <direction>sos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E3,06,01,00,00,00,00</message>
+    </input>
+
+    <!-- USED BY: USIM Initialization and Full File Change Notification -->
+    <input id="30003">
+        <name>SIM_ATK_RESP(REFRESH, SIM_STA_OK)</name>
+        <direction>sos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E3,03,01,00,00,00,00</message>
+    </input>
+
+<!-- SIM SESSION END -->
+<!-- *************** -->
+
+    <input id="90004">
+        <name>ATK_SW_DATA_NTF: PROACTIVE SIM SESSION ENDED</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+    </input>
+
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+
+<!-- SIM SERVER REQUESTS -->
+<!-- ******************* -->
+
+    <!-- USED BY: USIM Application reset -->
+    <output id="20001">
+        <name>SIM_ATK_REQ(REFRESH, USIM application reset)</name>
+        <direction>dos</direction>
+    <!--         header  |RES|   header|tr|MES|srv|c |poll int|  -->        
+    <!--          info   |   |LEN  info|ID| ID|typ|id| |fillers  -->        
+        <message>00,00,00,09,00,00,00,00,00,E2,05,00,00,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,00,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- USED BY: 3G Session reset -->
+    <output id="20002">
+        <name>SIM_ATK_REQ(REFRESH, 3G Session reset)</name>
+        <direction>dos</direction>
+    <!--         header  |RES|   header|tr|MES|srv|c |poll int|  -->        
+    <!--          info   |   |LEN  info|ID| ID|typ|id| |fillers  -->        
+        <message>00,00,00,09,00,00,00,00,00,E2,06,00,00,00,00,01,01,93,00,10,00,00,00,06,3F,00,7F,10,6F,42,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- USED BY: USIM Initialization and Full File Change Notification -->
+    <output id="20003">
+        <name>SIM_ATK_REQ(REFRESH, USIM Initialization and Full File Change Notification)</name>
+        <direction>dos</direction>
+    <!--         header  |RES|   header|tr|MES|srv|c |poll int|  -->        
+    <!--          info   |   |LEN  info|ID| ID|typ|id| |fillers  -->        
+        <message>00,00,00,09,00,00,00,00,00,E2,03,00,00,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,00,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <!-- USED BY: USIM application reset -->
+    <output id="40001">
+        <name>terminal response</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,00,00,11,00,00,00,0C,81,03,01,01,05,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- USED BY: 3G Session reset -->
+    <output id="40002">
+        <name>terminal response</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,00,00,11,00,00,00,0C,81,03,01,01,06,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- USED BY: USIM Initialization and Full File Change Notification -->
+    <output id="40003">
+        <name>terminal response</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,00,00,11,00,00,00,0C,81,03,01,01,00,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <!-- USED BY: USIM Application reset -->
+    <step id="10001" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10001"/>
+    </step>
+
+    <!-- USED BY: 3G Session reset -->
+    <step id="10002" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10002"/>
+    </step>
+
+    <!-- USED BY: USIM Initialization and Full File Change Notification -->
+    <step id="10003" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10003"/>
+    </step>
+
+<!-- SIM SERVER REQUESTS -->
+<!-- ******************* -->
+
+    <!-- USED BY: USIM Application reset -->
+    <step id="20001" type="intercept">
+        <name>Intercept SIM_ATK_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20001"/>
+    </step>
+
+    <!-- USED BY: 3G Session reset -->
+    <step id="20002" type="intercept">
+        <name>Intercept SIM_ATK_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20002"/>
+    </step>
+
+    <!-- USED BY: USIM Initialization and Full File Change Notification -->
+    <step id="20003" type="intercept">
+        <name>Intercept SIM_ATK_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20003"/>
+    </step>
+
+<!-- SIM SERVER RESPONSES -->
+<!-- ******************** -->
+
+    <!-- USED BY: USIM Application reset -->
+    <step id="30001" type="simulate">
+        <name>Send SIM_ATK_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="30001"/>
+    </step>
+
+    <!-- USED BY: 3G Session reset -->
+    <step id="30002" type="simulate">
+        <name>Send SIM_ATK_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="30002"/>
+    </step>
+
+    <!-- USED BY: USIM Initialization and Full File Change Notification -->
+    <step id="30003" type="simulate">
+        <name>Send SIM_ATK_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="30003"/>
+    </step>
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <!-- USED BY: USIM Application Reset-->
+    <step id="40001" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40001"/>
+        <flags>0x40</flags>
+    </step>
+
+    <!-- USED BY: 3G Session Reset -->
+    <step id="40002" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40002"/>
+        <flags>0x40</flags>
+    </step>
+
+    <!-- USED BY: USIM Initialization and Full File Change Notification -->
+    <step id="40003" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40003"/>
+        <flags>0x40</flags>
+    </step>
+
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+        <flags>1</flags>
+    </step>
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+</steps>
+
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+    <!-- Custom Seq 1 -->
+    <case id="101">
+        <name>USIM application reset</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="20001"/> <!-- Receive SIM_ATK_REQ -->
+            <step-ref id="30001"/> <!-- Send SIM_ATK_RESP -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+
+    <!-- Custom Seq 2 -->
+    <case id="102">
+        <name>3G Session reset</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10002"/> <!-- Send PCMD -->
+            <step-ref id="20002"/> <!-- Receive SIM_ATK_REQ -->
+            <step-ref id="30002"/> <!-- Send SIM_ATK_RESP -->
+            <step-ref id="40002"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+
+    <!-- Custom Seq 3 -->
+    <case id="103">
+        <name>USIM Initialization and Full File Change Notification</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10003"/> <!-- Send PCMD -->
+            <step-ref id="20003"/> <!-- Receive SIM_ATK_REQ -->
+            <step-ref id="30003"/> <!-- Send SIM_ATK_RESP -->
+            <step-ref id="40003"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+
+</cases>
+
+</isc-test-control>

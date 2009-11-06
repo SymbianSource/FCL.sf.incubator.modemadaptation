@@ -1,0 +1,922 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!-- MOD_0032.00X_SIM_ATK_TSY_[EVENT DOWNLOAD] -->
+
+
+<isc-test-control id="32">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+    <input id="10001">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, MT Call</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,00,90,00</message>
+    </input>
+
+    <input id="10002">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, Call Connected</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,01,90,00</message>
+    </input>
+
+    <input id="10003">
+        <name>PROACTIVE COMMAND: SET UP CALL, Call Connected, ME supporting SET UP CALL</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,25,D0,21,81,03,01,10,00,82,02,81,83,05,0D,2B,30,31,32,33,34,30,31,32,33,34,35,36,86,07,91,10,32,04,21,43,65,90,00</message>
+    </input>
+
+    <input id="10004">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, Call Disconnected</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,02,90,00</message>
+    </input>
+
+    <input id="10005">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, Location Status</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,03,90,00</message>
+    </input>
+
+    <input id="10006">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, User Activity</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,04,90,00</message>
+    </input>
+
+    <input id="10007">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, Idle Screen Available</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,05,90,00</message>
+    </input>
+
+    <input id="10008">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, Language Selection</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,07,90,00</message>
+    </input>
+
+    <input id="10009">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, Browser termination event</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,08,90,00</message>
+    </input>
+
+    <input id="10010">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, Data Available</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,09,90,00</message>
+    </input>
+
+    <input id="10011">
+        <name>PROACTIVE COMMAND: OPEN CHANNEL, used in 27.22.7.10 Data available event and 27.22.7.11 Channel Status event</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,46,D0,42,81,03,01,40,01,82,02,81,82,35,07,02,02,04,05,05,10,02,39,02,03,E8,47,0A,06,54,65,73,74,47,70,02,72,73,0D,08,F4,55,73,65,72,4C,6F,67,0D,08,F4,55,73,65,72,50,77,64,3C,03,01,AD,9C,3E,05,21,01,01,01,01,90,00</message>
+    </input>
+
+    <input id="10012">
+        <name>PROACTIVE COMMAND: SEND DATA, used in 27.22.7.10 Data available event</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,17,D0,13,81,03,01,43,01,82,02,81,21,B6,08,00,01,02,03,04,05,06,07,90,00</message>
+    </input>
+
+    <input id="10013">
+        <name>PROACTIVE COMMAND: SET UP EVENT LIST, Channel Status Event</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,05,00,82,02,81,82,99,01,0A,90,00</message>
+    </input>
+
+
+<!-- CALL SERVER -->
+<!-- *********** -->
+    <input id="20001">
+        <name>CALL_MODEM_MESSAGE_IND; CALL_MODEM_MESSAGE_SETUP; CALL_MODEM_MSG_DIRECT_RECEIVED: No number</name>
+        <direction>sos</direction>
+        <message>00,00,00,c9,00,00,00,00,00,50,01,01,49,08,01,02,00,00,00,00</message>
+    </input>
+
+    <input id="20002">
+        <name>CALL_MODEM_MESSAGE_IND; CALL_MODEM_MESSAGE_SETUP; CALL_MODEM_MSG_DIRECT_RECEIVED: Address 9876</name>
+        <direction>sos</direction>
+        <message>00,00,00,c9,00,00,00,00,00,50,01,02,49,08,01,02,00,00,00,00,4a,08,04,01,a3,89,67,00</message>
+    </input>
+
+    <input id="20003">
+        <name>CALL_MODEM_MESSAGE_IND; CALL_MODEM_MSG_CONNECT; CALL_MODEM_MSG_DIRECT_SENT</name>
+        <direction>sos</direction>
+        <message>00,00,00,c9,00,00,00,00,00,50,01,01,49,08,02,01,80,00,00,00</message>
+    </input>
+
+    <input id="20004">
+        <name>CALL_MODEM_MESSAGE_IND; CALL_MODEM_MSG_CONNECT; CALL_MODEM_MSG_DIRECT_RECEIVED</name>
+        <direction>sos</direction>
+        <message>00,00,00,c9,00,00,00,00,00,50,01,01,49,08,02,02,80,00,00,00</message>
+    </input>
+
+    <input id="20005">
+        <name>CALL_MODEM_MESSAGE_IND; CALL_MODEM_MSG_RELEASE; CALL_MODEM_MSG_DIRECT_RECEIVED</name>
+        <direction>sos</direction>
+        <message>00,00,00,c9,00,00,00,00,00,50,01,01,49,08,03,02,00,00,00,00</message>
+    </input>
+
+    <input id="20006">
+        <name>CALL_MODEM_MESSAGE_IND; CALL_MODEM_MSG_RELEASE; CALL_MODEM_MSG_DIRECT_SENT; Normal call clearing</name>
+        <direction>sos</direction>
+        <message>00,00,00,c9,00,00,00,00,00,50,01,02,49,08,03,01,80,00,00,00,bf,08,02,e0,90,00,00,00</message>
+    </input>
+
+    <input id="20007">
+        <name>CALL_MODEM_MESSAGE_IND; CALL_MODEM_MSG_RELEASE; CALL_MODEM_MSG_DIRECT_RECEIVED; Normal call clearing</name>
+        <direction>sos</direction>
+        <message>00,00,00,c9,00,00,00,00,00,50,01,02,49,08,03,02,00,00,00,00,bf,08,02,e0,90,00,00,00</message>
+    </input>
+
+    <input id="20008">
+        <name>CALL_MODEM_MESSAGE_IND; CALL_MODEM_MSG_RELEASE; CALL_MODEM_MSG_DIRECT_INTERNAL; Radio Link failure</name>
+        <direction>sos</direction>
+        <message>00,00,00,c9,00,00,00,00,00,50,01,01,49,08,03,03,80,00,00,00</message>
+    </input>
+
+
+<!-- NET SERVER -->
+<!-- ********** -->
+    <input id="30001">
+        <name>NET_CELL_INFO_IND: NET_WCDMA_CELL_INFO; NET_NO_COVERAGE, LAC 1, CELL 1</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,00,1A,20,01,00,42,00,01,47,14,00,01,00,00,00,01,00,00,00,01,00,F1,10,02,00,00,00,00</message>
+    </input>
+
+    <input id="30002">
+        <name>NET_CELL_INFO_IND: NET_WCDMA_CELL_INFO; NET_SERVICE, LAC 2, CELL 2</name>
+        <direction>sos</direction>
+        <message>00,00,00,C8,00,1A,20,01,00,42,00,01,47,14,00,02,00,00,00,02,00,00,00,01,00,F1,10,00,00,00,00,00</message>
+    </input>
+
+
+<!-- SIM SESSION END -->
+<!-- *************** -->
+    <input id="90004">
+        <name>SIM Session End</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+        <!-- Transaction Id's (9:th byte) must match with Terminal responses transaction id -->
+    </input>
+
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+
+
+<!-- ENVELOPES -->
+<!-- ********* -->
+    <output id="60001">
+        <name>ENVELOPE: EVENT DOWNLOAD MT CALL 1.1.1</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,12,00,00,C9,12,00,0C,D6,0A,19,01,00,82,02,83,81,1C,01,00</message>                                                             
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60002">
+        <name>ENVELOPE: EVENT DOWNLOAD MT CALL 1.1.2</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,1A,00,00,C9,12,00,11,D6,0F,19,01,00,82,02,83,81,1C,01,00,86,03,81,89,67,00,00,00</message>                                                            
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60003">
+        <name>ENVELOPE: EVENT DOWNLOAD CALL CONNECTED 1.1.1</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,12,00,00,C9,12,00,0C,D6,0A,19,01,01,82,02,82,81,1C,01,80</message>                                                            
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60004">
+        <name>ENVELOPE: EVENT DOWNLOAD CALL CONNECTED 1.1.2</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,12,00,00,C9,12,00,0C,D6,0A,19,01,01,82,02,83,81,1C,01,80</message>                                                           
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60005">
+        <name>ENVELOPE: EVENT DOWNLOAD CALL DISCONNECTED 1.1.1</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,12,00,00,C9,12,00,0C,D6,0A,19,01,02,82,02,83,81,1C,01,00</message>                                                        
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60006">
+        <name>ENVELOPE: EVENT DOWNLOAD CALL DISCONNECTED 1.1.2C</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C9,12,00,10,D6,0E,19,01,02,82,02,82,81,1C,01,80,9A,02,E0,90</message>    
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF</mask>
+    </output>
+
+    <output id="60007">
+        <name>ENVELOPE: EVENT DOWNLOAD CALL DISCONNECTED 1.1.3B</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C9,12,00,10,D6,0E,19,01,02,82,02,83,81,1C,01,00,9A,02,E0,90</message>                                                       
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF</mask>
+    </output>
+
+    <output id="60008">
+        <name>ENVELOPE: EVENT DOWNLOAD CALL DISCONNECTED 1.1.4A</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C9,12,00,0E,D6,0C,19,01,02,82,02,82,81,1C,01,80,9A,00,00,00</message>                                                        
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF</mask>
+    </output>
+
+    <output id="60009">
+        <name>ENVELOPE: EVENT DOWNLOAD LOCATION STATUS 1.1.1</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,12,00,00,C9,12,00,0C,D6,0A,19,01,03,82,02,82,81,1B,01,02</message>                                                        
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60010">
+        <name>ENVELOPE: EVENT DOWNLOAD LOCATION STATUS 1.1.2</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,1E,00,00,C9,12,00,15,D6,13,19,01,03,82,02,82,81,1B,01,00,13,07,00,F1,10,00,02,00,02,00,00,00</message>                                                       
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60011">
+        <name>ENVELOPE: EVENT DOWNLOAD USER ACTIVITY</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,12,00,00,C9,12,00,09,D6,07,19,01,04,02,02,82,81,00,00,00</message>                                                              
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60012">
+        <name>ENVELOPE: EVENT DOWNLOAD IDLE SCREEN AVAILABLE</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,12,00,00,C9,12,00,09,D6,07,19,01,05,02,02,82,81,00,00,00</message>                                                              
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60013">
+        <name>ENVELOPE: EVENT DOWNLOAD LANGUAGE SELECTION</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C9,12,00,0D,D6,0B,19,01,07,82,02,82,81,2D,02,64,65,00,00,00</message>                                                                                                    
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,7F,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="60014">
+        <name>ENVELOPE: EVENT DOWNLOAD BROWSER TERMINATION</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,12,00,00,C9,12,00,0C,D6,0A,99,01,08,82,02,82,81,B4,01,00</message>                                                                                                  
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,7F,FF,7F,FF,FF</mask>
+    </output>
+
+    <output id="60015">
+        <name>ENVELOPE: EVENT DOWNLOAD DATA AVAILABLE</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C9,12,00,10,D6,0E,99,01,09,82,02,82,81,B8,02,81,00,B7,01,08</message>                                                                                                  
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,7F,FF,7F,FF,FF,FF,7F,FF,FF</mask>
+    </output>
+
+    <output id="60016">
+        <name>ENVELOPE: EVENT DOWNLOAD CHANNEL STATUS</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C9,12,00,0D,D6,0B,99,01,0A,82,02,82,81,B8,02,01,05,00,00,00</message>                                                                                                
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,FF,7F,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+    <output id="40001">
+        <name>TERMINAL RESPONSE: SET UP EVENT LIST, Command performed successfully</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,05,00,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40002">
+        <name>TERMINAL RESPONSE: OPEN CHANNEL, Command performed successfully</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,26,00,08,00,11,00,00,00,1D,81,03,01,40,01,82,02,82,81,83,01,00,38,02,81,00,35,07,02,02,04,05,05,10,02,39,02,03,E8,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40003">
+        <name>TERMINAL RESPONSE: SEND DATA, Command performed successfully</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,43,01,82,02,82,81,83,01,00,B7,01,FF,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40004">
+        <name>TERMINAL RESPONSE: SET UP CALL, Command performed successfully</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,00,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+    <step id="10001" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10001"/>
+    </step>
+
+    <step id="10002" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10002"/>
+    </step>
+
+    <step id="10003" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10003"/>
+    </step>
+
+    <step id="10004" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10004"/>
+    </step>
+
+    <step id="10005" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10005"/>
+    </step>
+
+    <step id="10006" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10006"/>
+    </step>
+
+    <step id="10007" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10007"/>
+    </step>
+
+    <step id="10008" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10008"/>
+    </step>
+
+    <step id="10009" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10009"/>
+    </step>
+
+    <step id="10010" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10010"/>
+    </step>
+
+    <step id="10011" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10011"/>
+    </step>
+
+    <step id="10012" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10012"/>
+    </step>
+
+    <step id="10013" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10013"/>
+    </step>
+
+
+<!-- CALL SERVER -->
+<!-- *********** -->
+    <step id="20001" type="simulate">
+        <name>Send CALL_MODEM_MESSAGE_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="20001"/>
+    </step>
+
+    <step id="20002" type="simulate">
+        <name>Send CALL_MODEM_MESSAGE_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="20002"/>
+    </step>
+
+    <step id="20003" type="simulate">
+        <name>Send CALL_MODEM_MESSAGE_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="20003"/>
+    </step>
+
+    <step id="20004" type="simulate">
+        <name>Send CALL_MODEM_MESSAGE_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="20004"/>
+    </step>
+
+    <step id="20005" type="simulate">
+        <name>Send CALL_MODEM_MESSAGE_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="20005"/>
+    </step>
+
+    <step id="20006" type="simulate">
+        <name>Send CALL_MODEM_MESSAGE_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="20006"/>
+    </step>
+
+    <step id="20007" type="simulate">
+        <name>Send CALL_MODEM_MESSAGE_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="20007"/>
+    </step>
+
+    <step id="20008" type="simulate">
+        <name>Send CALL_MODEM_MESSAGE_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="20008"/>
+    </step>
+
+
+<!-- NET SERVER -->
+<!-- ********** -->
+    <step id="30001" type="simulate">
+        <name>Send NET_CELL_INFO_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="30001"/>
+    </step>
+
+    <step id="30002" type="simulate">
+        <name>Send NET_CELL_INFO_IND</name>
+        <channel id="0x07"/>
+        <input-ref id="30002"/>
+    </step>
+
+
+<!-- ENVELOPES -->
+<!-- ********* -->
+    <step id="60001" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60001"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60002" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60002"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60003" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60003"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60004" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60004"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60005" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60005"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60006" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60006"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60007" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60007"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60008" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60008"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60009" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60009"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60010" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60010"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60011" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60012" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60012"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60013" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60013"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60014" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60014"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60015" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60015"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="60016" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="60016"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+    <step id="40001" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40001"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40002" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40002"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40003" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40003"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40004" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40004"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+        <flags>1</flags>
+    </step>
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+    <step id="90005" type="sleep">
+        <name>Sleep for one second</name>
+        <timeout>1000</timeout>
+        <block>false</block>
+    </step>
+
+    <step id="90006" type="sleep">
+        <name>Sleep for one second, receive boot up messages</name>
+        <timeout>1000</timeout>
+        <block>false</block>
+        <flags>1</flags>
+    </step>    
+
+</steps>
+
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+    <case id="101">
+        <name>EVENT DOWNLOAD -MT Call event</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="20001"/> <!-- CALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60001"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="20002"/> <!-- CALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60002"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="102">
+        <name>EVENT DOWNLOAD -CALL CONNECTED</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10002"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+
+            <step-ref id="20003"/> <!-- CALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60003"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="20004"/> <!-- CALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60004"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="103">
+        <name>EVENT DOWNLOAD -CALL CONNECTED, ME supporting SET UP CALL</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10002"/> <!-- Send PCMD, SET UP EVENT LIST -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="10003"/> <!-- Send PCMD, SET UP CALL-->
+            <step-ref id="40004"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="20004"/> <!-- CALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60004"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="104">
+        <name>EVENT DOWNLOAD -CALL DISCONNECTED</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10004"/> <!-- Send PCMD, SET UP EVENT LIST -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="20005"/> <!-- CALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60005"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="20005"/> <!-- CALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60005"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="20006"/> <!-- CALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60006"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="20007"/> <!-- CCALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60007"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="20008"/> <!-- CALL_MODEM_MESSAGE_IND -->
+            <step-ref id="60008"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="105">
+        <name>EVENT DOWNLOAD -LOCATION STATUS</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10005"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="30001"/> <!-- NET_CELL_INFO_IND -->
+            <step-ref id="60009"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="30002"/> <!-- NET_CELL_INFO_IND -->
+            <step-ref id="60010"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="106">
+        <name>EVENT DOWNLOAD -USER ACTIVITY</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10006"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+
+            <step-ref id="60011"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90005"/> <!-- Sleep 1 second, check that no extra envelope is sent -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="107">
+        <name>EVENT DOWNLOAD -IDLE SCREEN AVAILABLE</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10007"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+
+            <step-ref id="60012"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90005"/> <!-- Sleep 1 second, check that no extra envelope is sent -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="108">
+        <name>EVENT DOWNLOAD -LANGUAGE SELECTION</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10008"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+
+            <step-ref id="60013"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="109">
+        <name>EVENT DOWNLOAD - Browser termination</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10009"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+
+            <step-ref id="60014"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="110">
+        <name>EVENT DOWNLOAD - Data available</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10010"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+
+            <step-ref id="10011"/> <!-- Send PCMD -->
+            <step-ref id="40002"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="10012"/> <!-- Send PCMD -->
+            <step-ref id="40003"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="60015"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="111">
+        <name>EVENT DOWNLOAD - Channel Status on a link dropped</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10013"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+
+            <step-ref id="10011"/> <!-- Send PCMD -->
+            <step-ref id="40002"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="60016"/> <!-- Receive Envelope -->
+            <step-ref id="90004"/> <!-- SIM Session End -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+</cases>
+
+</isc-test-control>

@@ -1,0 +1,32 @@
+EXPORTS
+	??0TIsiReceiveC@@QAE@ABVTDesC8@@@Z @ 1 NONAME ; TIsiReceiveC::TIsiReceiveC(class TDesC8 const &)
+	??0TIsiSend@@QAE@AAVTDes8@@@Z @ 2 NONAME ; TIsiSend::TIsiSend(class TDes8 &)
+	??0TIsiSend@@QAE@AAVTDes8@@I@Z @ 3 NONAME ; TIsiSend::TIsiSend(class TDes8 &, unsigned int)
+	??0TIsiSubBlock@@QAE@AAVTDes8@@GW4TSubBlockType@@@Z @ 4 NONAME ; TIsiSubBlock::TIsiSubBlock(class TDes8 &, unsigned short, enum TSubBlockType)
+	??4TIsi@@QAEAAV0@ABV0@@Z @ 5 NONAME ; class TIsi & TIsi::operator=(class TIsi const &)
+	?Complete@TIsiSend@@QAEAAVTDes8@@XZ @ 6 NONAME ; class TDes8 & TIsiSend::Complete(void)
+	?CompleteSubBlock@TIsiSubBlock@@QAEAAVTDes8@@XZ @ 7 NONAME ; class TDes8 & TIsiSubBlock::CompleteSubBlock(void)
+	?CopyData@TIsiSend@@QAEXIABVTDesC8@@@Z @ 8 NONAME ; void TIsiSend::CopyData(unsigned int, class TDesC8 const &)
+	?CopyFromBigEndian@TIsiUtility@@SAXABVTDesC8@@AAVTDes16@@@Z @ 9 NONAME ; void TIsiUtility::CopyFromBigEndian(class TDesC8 const &, class TDes16 &)
+	?CopyToBigEndian@TIsiUtility@@SAXABVTDesC16@@AAVTDes8@@@Z @ 10 NONAME ; void TIsiUtility::CopyToBigEndian(class TDesC16 const &, class TDes8 &)
+	?FindSubBlockOffsetById@TIsiReceiveC@@QBEHIIW4TSubBlockType@@AAI@Z @ 11 NONAME ; int TIsiReceiveC::FindSubBlockOffsetById(unsigned int, unsigned int, enum TSubBlockType, unsigned int &) const
+	?FindSubBlockOffsetByIndex@TIsiReceiveC@@QBEHIIW4TSubBlockType@@AAI@Z @ 12 NONAME ; int TIsiReceiveC::FindSubBlockOffsetByIndex(unsigned int, unsigned int, enum TSubBlockType, unsigned int &) const
+	?Get16bit@TIsiReceiveC@@QBEGI@Z @ 13 NONAME ; unsigned short TIsiReceiveC::Get16bit(unsigned int) const
+	?Get32bit@TIsiReceiveC@@QBEKI@Z @ 14 NONAME ; unsigned long TIsiReceiveC::Get32bit(unsigned int) const
+	?Get8bit@TIsiReceiveC@@QBEEI@Z @ 15 NONAME ; unsigned char TIsiReceiveC::Get8bit(unsigned int) const
+	?GetBuffer@TIsiReceiveC@@QBE?BVTPtrC8@@XZ @ 16 NONAME ; class TPtrC8 const TIsiReceiveC::GetBuffer(void) const
+	?GetData@TIsiReceiveC@@QBE?BVTPtrC8@@IH@Z @ 17 NONAME ; class TPtrC8 const TIsiReceiveC::GetData(unsigned int, int) const
+	?Set16bit@TIsiSend@@QAEXIG@Z @ 18 NONAME ; void TIsiSend::Set16bit(unsigned int, unsigned short)
+	?Set32bit@TIsiSend@@QAEXIK@Z @ 19 NONAME ; void TIsiSend::Set32bit(unsigned int, unsigned long)
+	?Set8bit@TIsiSend@@QAEXIE@Z @ 20 NONAME ; void TIsiSend::Set8bit(unsigned int, unsigned char)
+	?GetExtendedResourceId@TIsiReceiveC@@QBEKXZ @ 21 NONAME ; unsigned long TIsiReceiveC::GetExtendedResourceId(void) const
+	?GetReceiverDevice@TIsiReceiveC@@QBEEXZ @ 22 NONAME ; unsigned char TIsiReceiveC::GetReceiverDevice(void) const
+	?GetReceiverObject@TIsiReceiveC@@QBEGXZ @ 23 NONAME ; unsigned short TIsiReceiveC::GetReceiverObject(void) const
+	?GetSenderDevice@TIsiReceiveC@@QBEEXZ @ 24 NONAME ; unsigned char TIsiReceiveC::GetSenderDevice(void) const
+	?GetSenderObject@TIsiReceiveC@@QBEGXZ @ 25 NONAME ; unsigned short TIsiReceiveC::GetSenderObject(void) const
+	?SetExtendedResourceId@TIsiSend@@QAEXK@Z @ 26 NONAME ; void TIsiSend::SetExtendedResourceId(unsigned long)
+	?SetReceiverDevice@TIsiSend@@QAEXE@Z @ 27 NONAME ; void TIsiSend::SetReceiverDevice(unsigned char)
+	?SetReceiverObject@TIsiSend@@QAEXG@Z @ 28 NONAME ; void TIsiSend::SetReceiverObject(unsigned short)
+	?SetSenderDevice@TIsiSend@@QAEXE@Z @ 29 NONAME ; void TIsiSend::SetSenderDevice(unsigned char)
+	?SetSenderObject@TIsiSend@@QAEXG@Z @ 30 NONAME ; void TIsiSend::SetSenderObject(unsigned short)
+

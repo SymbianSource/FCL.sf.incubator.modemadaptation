@@ -1,0 +1,22 @@
+EXPORTS
+	__as__4TIsiRC4TIsi @ 1 NONAME R3UNUSED ; TIsi::operator=(TIsi const &)
+	Complete__8TIsiSend @ 2 NONAME R3UNUSED ; TIsiSend::Complete(void)
+	CopyData__8TIsiSendUiRC6TDesC8 @ 3 NONAME R3UNUSED ; TIsiSend::CopyData(unsigned int, TDesC8 const &)
+	CopyFromBigEndian__11TIsiUtilityRC6TDesC8R6TDes16 @ 4 NONAME R3UNUSED ; TIsiUtility::CopyFromBigEndian(TDesC8 const &, TDes16 &)
+	CopyToBigEndian__11TIsiUtilityRC7TDesC16R5TDes8 @ 5 NONAME R3UNUSED ; TIsiUtility::CopyToBigEndian(TDesC16 const &, TDes8 &)
+	FindSubBlockOffsetById__C12TIsiReceiveCUiUi13TSubBlockTypeRUi @ 6 NONAME ; TIsiReceiveC::FindSubBlockOffsetById(unsigned int, unsigned int, TSubBlockType, unsigned int &) const
+	FindSubBlockOffsetByIndex__C12TIsiReceiveCUiUi13TSubBlockTypeRUi @ 7 NONAME ; TIsiReceiveC::FindSubBlockOffsetByIndex(unsigned int, unsigned int, TSubBlockType, unsigned int &) const
+	Get16bit__C12TIsiReceiveCUi @ 8 NONAME R3UNUSED ; TIsiReceiveC::Get16bit(unsigned int) const
+	Get32bit__C12TIsiReceiveCUi @ 9 NONAME R3UNUSED ; TIsiReceiveC::Get32bit(unsigned int) const
+	Get8bit__C12TIsiReceiveCUi @ 10 NONAME R3UNUSED ; TIsiReceiveC::Get8bit(unsigned int) const
+	GetBuffer__C12TIsiReceiveC @ 11 NONAME R3UNUSED ; TIsiReceiveC::GetBuffer(void) const
+	GetData__C12TIsiReceiveCUii @ 12 NONAME R3UNUSED ; TIsiReceiveC::GetData(unsigned int, int) const
+	Set16bit__8TIsiSendUiUs @ 13 NONAME R3UNUSED ; TIsiSend::Set16bit(unsigned int, unsigned short)
+	Set32bit__8TIsiSendUiUl @ 14 NONAME R3UNUSED ; TIsiSend::Set32bit(unsigned int, unsigned long)
+	Set8bit__8TIsiSendUiUc @ 15 NONAME R3UNUSED ; TIsiSend::Set8bit(unsigned int, unsigned char)
+	__12TIsiReceiveCRC6TDesC8 @ 16 NONAME R3UNUSED ; TIsiReceiveC::TIsiReceiveC(TDesC8 const &)
+	__12TIsiSubBlockR5TDes8Us13TSubBlockType @ 17 NONAME ; TIsiSubBlock::TIsiSubBlock(TDes8 &, unsigned short, TSubBlockType)
+	__8TIsiSendR5TDes8 @ 18 NONAME R3UNUSED ; TIsiSend::TIsiSend(TDes8 &)
+	__8TIsiSendR5TDes8Ui @ 19 NONAME R3UNUSED ; TIsiSend::TIsiSend(TDes8 &, unsigned int)
+	CompleteSubBlock__12TIsiSubBlock @ 20 NONAME R3UNUSED ; TIsiSubBlock::CompleteSubBlock(void)
+

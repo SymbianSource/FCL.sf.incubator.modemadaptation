@@ -1,0 +1,160 @@
+/*
+* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:   ?Description
+*
+*/
+
+
+
+#include <non_foundation_paths.hrh>
+
+PRJ_PLATFORMS
+// specify the platforms your component needs to be built for here
+// defaults to WINS MARM so you can ignore this if you just build these
+DEFAULT
+
+PRJ_TESTEXPORTS
+// NOTE: If using ARS requirements all export operations should be done under this.
+// 'abld test export'
+
+PRJ_EXPORTS
+// Specify the source file followed by its destination here
+// copy will be used to copy the source file to its destination
+// If there's no destination then the source file will be copied
+// to the same name in /epoc32/include
+// Example: 
+/*
+/agnmodel/inc/AGMCOMON.H
+*/
+
+// INI
+../TestFiles/SimAtkTests.ini /epoc32/winscw/c/TestFramework/SimAtkTests.ini
+../TestFiles/SimAtkSimData.ini /epoc32/winscw/c/TestFramework/SimAtkSimData.ini
+
+// CFG's in alphabetical order
+../TestFiles/SimAtk_CallControl.cfg /epoc32/winscw/c/TestFramework/SimAtk_CallControl.cfg
+../TestFiles/SimAtk_CallControl_GPRS_custom.cfg /epoc32/winscw/c/TestFramework/SimAtk_CallControl_GPRS_custom.cfg
+../TestFiles/SimAtk_CloseChannel.cfg /epoc32/winscw/c/TestFramework/SimAtk_CloseChannel.cfg
+../TestFiles/SimAtk_DisplayText.cfg /epoc32/winscw/c/TestFramework/SimAtk_DisplayText.cfg
+../TestFiles/SimAtk_DisplayText_custom.cfg /epoc32/winscw/c/TestFramework/SimAtk_DisplayText_custom.cfg
+../TestFiles/SimAtk_EventDownload.cfg /epoc32/winscw/c/TestFramework/SimAtk_EventDownload.cfg
+../TestFiles/SimAtk_EventDownload_custom.cfg /epoc32/winscw/c/TestFramework/SimAtk_EventDownload_custom.cfg
+../TestFiles/SimAtk_GetChannelStatus.cfg /epoc32/winscw/c/TestFramework/SimAtk_GetChannelStatus.cfg
+../TestFiles/SimAtk_GetInkey.cfg /epoc32/winscw/c/TestFramework/SimAtk_GetInkey.cfg
+../TestFiles/SimAtk_GetInput.cfg /epoc32/winscw/c/TestFramework/SimAtk_GetInput.cfg
+../TestFiles/SimAtk_GetInput_custom.cfg /epoc32/winscw/c/TestFramework/SimAtk_GetInput_custom.cfg
+../TestFiles/SimAtk_Icons_custom.cfg /epoc32/winscw/c/TestFramework/SimAtk_Icons_custom.cfg
+../TestFiles/simatk_MoreTime.cfg /epoc32/winscw/c/TestFramework/Simatk_MoreTime.cfg
+../TestFiles/simatk_MoSmsControl.cfg /epoc32/winscw/c/TestFramework/Simatk_MoSmsControl.cfg
+../TestFiles/simatk_MoSmsControl_custom.cfg /epoc32/winscw/c/TestFramework/Simatk_MoSmsControl_custom.cfg
+../TestFiles/simatk_OpenChannel.cfg /epoc32/winscw/c/TestFramework/Simatk_OpenChannel.cfg
+../TestFiles/simatk_PlayTone.cfg /epoc32/winscw/c/TestFramework/Simatk_PlayTone.cfg
+../TestFiles/SimAtk_PollInterval.cfg /epoc32/winscw/c/TestFramework/SimAtk_PollInterval.cfg
+../TestFiles/SimAtk_PollingOff.cfg /epoc32/winscw/c/TestFramework/SimAtk_PollingOff.cfg
+../TestFiles/SimAtk_PollingOff_custom.cfg /epoc32/winscw/c/TestFramework/SimAtk_PollingOff_custom.cfg
+../TestFiles/SimAtk_LanguageNotification.cfg /epoc32/winscw/c/TestFramework/SimAtk_LanguageNotification.cfg
+../TestFiles/SimAtk_LaunchBrowser.cfg /epoc32/winscw/c/TestFramework/SimAtk_LaunchBrowser.cfg
+../TestFiles/SimAtk_LocalInfo.cfg /epoc32/winscw/c/TestFramework/SimAtk_LocalInfo.cfg
+../TestFiles/SimAtk_LocalInfo_custom.cfg /epoc32/winscw/c/TestFramework/SimAtk_LocalInfo_custom.cfg
+../TestFiles/SimAtk_ReceiveData.cfg /epoc32/winscw/c/TestFramework/Simatk_ReceiveData.cfg
+../TestFiles/simatk_Refresh.cfg /epoc32/winscw/c/TestFramework/Simatk_Refresh.cfg
+../TestFiles/simatk_Refresh_custom.cfg /epoc32/winscw/c/TestFramework/Simatk_Refresh_custom.cfg
+../TestFiles/simatk_SelectItem.cfg /epoc32/winscw/c/TestFramework/Simatk_SelectItem.cfg
+../TestFiles/simatk_SelectItem_custom.cfg /epoc32/winscw/c/TestFramework/Simatk_SelectItem_custom.cfg
+../TestFiles/simatk_SendData.cfg /epoc32/winscw/c/TestFramework/Simatk_SendData.cfg
+../TestFiles/SimAtk_SendDtmf.cfg /epoc32/winscw/c/TestFramework/SimAtk_SendDtmf.cfg
+../TestFiles/simatk_SendSm.cfg /epoc32/winscw/c/TestFramework/Simatk_SendSm.cfg
+../TestFiles/simatk_SendSm_custom.cfg /epoc32/winscw/c/TestFramework/Simatk_SendSm_custom.cfg
+../TestFiles/simatk_SendSs.cfg /epoc32/winscw/c/TestFramework/Simatk_SendSs.cfg
+../TestFiles/simatk_SendUssd.cfg /epoc32/winscw/c/TestFramework/Simatk_SendUssd.cfg
+../TestFiles/SimAtk_SetUpEventList.cfg /epoc32/winscw/c/TestFramework/SimAtk_SetUpEventList.cfg
+../TestFiles/simatk_SetUpMenu.cfg /epoc32/winscw/c/TestFramework/Simatk_SetUpMenu.cfg
+../TestFiles/simatk_SetUpCall.cfg /epoc32/winscw/c/TestFramework/SimAtk_SetUpCall.cfg
+../TestFiles/simatk_SmsCbDataDownload.cfg /epoc32/winscw/c/TestFramework/SimAtk_SmsCbDataDownload.cfg
+../TestFiles/simatk_SmsPpDataDownload.cfg /epoc32/winscw/c/TestFramework/SimAtk_SmsPpDataDownload.cfg
+../TestFiles/simatk_TimerManagement.cfg /epoc32/winscw/c/TestFramework/Simatk_TimerManagement.cfg
+../TestFiles/simatk_TimerManagement_custom.cfg /epoc32/winscw/c/TestFramework/Simatk_TimerManagement_custom.cfg
+../TestFiles/simatk_TimerExpiration.cfg /epoc32/winscw/c/TestFramework/Simatk_TimerExpiration.cfg
+../TestFiles/simatk_tlvcheck_custom.cfg /epoc32/winscw/c/TestFramework/simatk_tlvcheck_custom.cfg
+../TestFiles/SimAtk_SetUpIdleModeText.cfg /epoc32/winscw/c/TestFramework/SimAtk_SetUpIdleModeText.cfg
+
+
+// XML's in alphabetical order
+../TestFiles/SimAtk_CallControl.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_CallControl.xml
+../TestFiles/SimAtk_CallControl_GPRS_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_CallControl_GPRS_custom.xml
+../TestFiles/SimAtk_CloseChannel.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_CloseChannel.xml
+../TestFiles/SimAtk_DisplayText.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_DisplayText.xml
+../TestFiles/SimAtk_DisplayText_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_DisplayText_custom.xml
+../TestFiles/SimAtk_EventDownload.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_EventDownload.xml
+../TestFiles/SimAtk_EventDownload_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_EventDownload_custom.xml
+../TestFiles/SimAtk_GetChannelStatus.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_GetChannelStatus.xml
+../TestFiles/SimAtk_GetInkey.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_GetInkey.xml
+../TestFiles/SimAtk_GetInput.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_GetInput.xml
+../TestFiles/SimAtk_GetInput_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_GetInput_custom.xml
+../TestFiles/SimAtk_Icons_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_Icons_custom.xml
+../TestFiles/simatk_MoreTime.xml /epoc32/winscw/c/TestFramework/isctestcontrol/Simatk_MoreTime.xml
+../TestFiles/simatk_MoSmsControl.xml /epoc32/winscw/c/TestFramework/isctestcontrol/Simatk_MoSmsControl.xml
+../TestFiles/simatk_MoSmsControl_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/Simatk_MoSmsControl_custom.xml
+../TestFiles/simatk_OpenChannel.xml /epoc32/winscw/c/TestFramework/isctestcontrol/Simatk_OpenChannel.xml
+../TestFiles/simatk_PlayTone.xml /epoc32/winscw/c/TestFramework/isctestcontrol/Simatk_PlayTone.xml
+../TestFiles/SimAtk_PollInterval.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_PollInterval.xml
+../TestFiles/SimAtk_PollingOff.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_PollingOff.xml
+../TestFiles/SimAtk_PollingOff_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_PollingOff_custom.xml
+../TestFiles/SimAtk_LanguageNotification.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_LanguageNotification.xml
+../TestFiles/SimAtk_LaunchBrowser.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_LaunchBrowser.xml
+../TestFiles/SimAtk_LocalInfo.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_LocalInfo.xml
+../TestFiles/SimAtk_LocalInfo_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_LocalInfo_custom.xml
+../TestFiles/simatk_ReceiveData.xml /epoc32/winscw/c/TestFramework/isctestcontrol/Simatk_ReceiveData.xml
+../TestFiles/simatk_Refresh.xml /epoc32/winscw/c/TestFramework/isctestcontrol/Simatk_Refresh.xml
+../TestFiles/simatk_Refresh_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/Simatk_Refresh_custom.xml
+../TestFiles/SimAtk_SelectItem.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SelectItem.xml
+../TestFiles/SimAtk_SelectItem_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SelectItem_custom.xml
+../TestFiles/SimAtk_SendData.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SendData.xml
+../TestFiles/SimAtk_SendDtmf.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SendDtmf.xml
+../TestFiles/SimAtk_SendSm.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SendSm.xml
+../TestFiles/SimAtk_SendSm_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SendSm_custom.xml
+../TestFiles/SimAtk_SendSs.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SendSs.xml
+../TestFiles/SimAtk_SendUssd.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SendUssd.xml
+../TestFiles/SimAtk_SetUpEventList.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SetUpEventList.xml
+../TestFiles/SimAtk_SetUpMenu.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SetUpMenu.xml
+../TestFiles/simatk_SetUpCall.xml /epoc32/winscw/c/TestFramework/isctestcontrol/simatk_SetUpCall.xml
+../TestFiles/simatk_SmsCbDataDownload.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SmsCbDataDownload.xml
+../TestFiles/simatk_SmsPpDataDownload.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SmsPpDataDownload.xml
+../TestFiles/SimAtk_TimerManagement.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_TimerManagement.xml
+../TestFiles/SimAtk_TimerManagement_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_TimerManagement_custom.xml
+../TestFiles/SimAtk_TimerExpiration.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_TimerExpiration.xml
+../TestFiles/simatk_tlvcheck_custom.xml /epoc32/winscw/c/TestFramework/isctestcontrol/simatk_tlvcheck_custom.xml
+../TestFiles/SimAtk_SetUpIdleModeText.xml /epoc32/winscw/c/TestFramework/isctestcontrol/SimAtk_SetUpIdleModeText.xml
+
+PRJ_TESTMMPFILES
+// NOTE: If using ARS requirements .mmp file operation should be done under this.
+// 'abld test build'
+
+PRJ_MMPFILES
+// Specify the .mmp files required for building the important component
+// releasables.
+//
+// Specify "tidy" if the component you need to build doesn't need to be
+// released. Specify "ignore" if the MMP file exists but should be
+// ignored.
+// Example:
+/*
+/agnmodel/group/agnmodel.mmp
+#if defined(MARM)
+/agnmodel/group/agsvexe.mmp
+#endif
+*/
+SimAtk.mmp
+
+//  End of File

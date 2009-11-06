@@ -1,0 +1,4 @@
+EXPORTS
+	?LibEntryL@@YAPAVCScriptBase@@AAVCTestModuleIf@@@Z @ 1 NONAME ; class CScriptBase * __cdecl LibEntryL(class CTestModuleIf &)
+	?RouteCompletion@CVoice@@UAEXHPAVCMmDataPackage@@H@Z @ 2 NONAME ; void CVoice::RouteCompletion(int, class CMmDataPackage *, int)
+

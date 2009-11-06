@@ -1,0 +1,985 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<isc-test-control id="1">
+
+  <!-- Channels that are opened during startup and closed when test environment exits -->
+  <channels>
+  </channels>
+
+  <!-- Test inputs are declared here -->
+  <inputs>
+
+   <input id="1000">
+    <name>SMS_MESSAGE_SEND_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,0E,08,35,03,03,00,00,2F,00,00,01,00,1A,00,10,00,0A,0A,0A,0A,0A,0A,0A,00,00,00,00</message>
+   </input>
+
+   <input id="1001">
+    <name>SMS_RECEIVED_MSG_IND Class 1 SMS</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,36,08,35,00,43,00,02,00,82,00,10,02,08,07,91,53,48,45,04,00,05,00,00,00,1C,00,24,1C,00,04,0C,91,53,58,30,56,15,05,00,11,70,20,80,31,44,30,08,07,F4,F2,9C,9E,06,C5,00,00,00,00,00</message>
+   </input>
+
+   <input id="1002">
+    <name>SMS_RECEIVE_MESSAGE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,06,08,35,00,42,01,01,00,29,00,08,00,00,00,00</message>
+   </input>
+
+   <input id="1003">
+    <name>SMS_RECEIVED_MSG_REPORT_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,06,08,35,09,3C,00,00</message>
+   </input>
+
+   <input id="1004">
+    <name>SMS_RECEIVED_MSG_IND Class 2 SMS</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,32,08,35,00,43,00,02,00,82,00,10,02,08,07,91,53,48,45,04,00,00,00,00,00,1C,00,20,18,00,04,0C,91,53,58,30,56,15,05,41,12,70,20,72,51,20,74,08,05,63,B6,4C,26,03,00,00    </message>
+   </input>
+
+   <input id="1005">
+    <name>UICC_RESP</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,07,01,B1,00,00,11,00,00</message>
+   </input>
+
+   <input id="1006">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,40,0D,25,00,00,00,02,01,00,1C,00,10,00,07,02,00,82,05,21,02,00,B0,02,00</message>
+   </input>
+
+   <input id="1007">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 1</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,3E,0D,23,00,00,00,02,01,00,0F,00,2C,00,00,00,22,03,08,07,91,53,48,45,04,00,00,04,0C,91,53,58,30,56,15,05,41,12,70,20,72,51,20,74,08,05,63,B6,4C,26,03,00,00</message>
+   </input>
+
+   <input id="1008">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,3E,0D,23,00,00,00,02,01,00,0F,00,2C,00,00,00,00</message>
+   </input>
+
+   <input id="1009">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_UPDATE_LINEAR_FIXED</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,3F,0D,24,00,00,00,02,00</message>
+   </input>
+
+   <input id="1010">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 1</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,41,0D,23,00,00,00,02,01,00,0F,00,2C,00,00,00,22,03,08,07,91,53,48,45,04,00,00,04,0C,91,53,58,30,56,15,05,41,12,70,20,72,51,20,74,08,05,63,B6,4C,26,03,00,00</message>
+   </input>
+
+   <input id="1011">
+    <name>UICC_CARD_IND(UICC_CARD_DISCONNECTED)</name>
+    <direction>sos</direction>
+    <message>00,00,10,8c,00,06,20,01,00,05,c0,02</message>
+   </input>
+
+   <input id="1012">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2 UICC_STATUS_CARD_DISCONNECTED</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,41,0D,23,22,00,00,02,00</message>
+   </input>
+
+   <input id="1013">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2 UICC_STATUS_CARD_DISCONNECTED</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,3E,0D,23,22,00,00,02,00</message>
+   </input>
+
+   <input id="1014">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO UICC_STATUS_CARD_DISCONNECTED</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,40,0D,25,22,00,00,02,00</message>
+   </input>
+
+   <input id="1015">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO UICC_STATUS_CARD_DISCONNECTED</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,40,0D,25,22,00,00,02,00</message>
+   </input>
+
+   <input id="1016">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,40,0D,25,00,00,00,02,01,00,1C,00,10,00,07,02,00,82,05,21,02,00,B0,03,00</message>
+   </input>
+
+   <input id="1017">
+    <name>SMS_RECEIVED_MSG_REPORT_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,06,08,35,0A,3C,00,00</message>
+   </input>
+
+   <input id="1018">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,3E,0D,23,00,00,00,02,01,00,0F,00,2C,00,00,00,22,03,08,07,91,53,48,45,04,00,00,04,0C,91,53,58,30,56,15,05,41,12,70,20,72,51,20,74,08,05,63,B6,4C,26,03,00,00</message>
+   </input>
+
+   <input id="1019">
+    <name>SMS_PARAMETERS_READ_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,09,00,42,07,33,07,BD,52,01,01,00,01,02,0C,91,53,58,30,56,15,05,00,00,00,00,07,91,53,48,45,04,00,05,00,00,00,00,01,04,00,00,00,4E,00,54,00,4E,00,00</message>
+   </input>
+
+   <input id="1020">
+    <name>SMS_PARAMETERS_READ_RESP 2</name>
+    <direction>sos</direction>
+    <message>1E,10,00,09,00,42,07,33,07,BD,52,01,02,FF,FF,FF,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,CC,01,00,00,00,00</message>
+   </input>
+
+   <input id="1021">
+    <name>SMS_MESSAGE_SEND_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,0E,08,35,03,03,01,e8,00,00,00,00</message>
+   </input>
+
+   <input id="1022">
+    <name>SMS_RECEIVE_MESSAGE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,06,08,35,00,42,02,01,00,29,00,08,00,00,00,00</message>
+   </input>
+
+   <input id="1023">
+    <name>SMS_SETTINGS_UPDATE_RESP </name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,06,08,35,00,31,00,00</message>
+   </input>
+
+   <input id="1024">
+    <name>UPDATE_PARAMETER (SIM_SMS_RESP) </name>
+    <direction>sos</direction>
+    <message>1E,10,00,09,00,06,08,35,08,BD,53,01</message>
+   </input>
+
+   <input id="1025">
+    <name>SMS_MESSAGE_SEND_RESP SAT ORIGINATED</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,0E,08,35,04,03,00,00,2F,00,00,01,00,1A,00,10,00,0A,0A,0A,0A,0A,0A,0A,00,00,00,00</message>
+   </input>
+
+   <input id="1026">
+    <name>SMS_MESSAGE_SEND_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,0E,08,35,05,03,00,00,2F,00,00,01,00,1A,00,10,00,0A,0A,0A,0A,0A,0A,0A,00,00,00,00</message>
+   </input>
+
+   <input id="1027">
+    <name>UICC_APPL_CMD_RESP(READ TRANSPARENT EFust)</name>
+    <direction>sos</direction>
+    <message>00,00,00,8c,00,1e,00,01,32,0d,21,00,00,00,02,01,00,0f,00,14,00,00,00,0b,00,00,00,00,00,00,00,00,08,00,00,00</message>
+   </input>
+
+   <input id="1028">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 3</name>
+    <direction>sos</direction>
+    <message>00,00,00,8C,00,1E,00,00,3E,0D,23,00,00,00,02,01,00,0F,00,2C,00,00,00,00</message>
+   </input>
+
+   <input id="1029">
+    <name>SMS_RECEIVED_MSG_REPORT_RESP internal NACK</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,06,08,35,0E,3C,00,00</message>
+   </input>
+
+   <input id="1030">
+    <name>SMS_RECEIVE_MESSAGE_RESP Resume</name>
+    <direction>sos</direction>
+    <message>1E,10,00,02,00,06,08,35,06,42,01,01,00,29,00,08,00,00,00,00</message>
+   </input>
+
+ </inputs>
+
+
+  <!-- Test outputs are declared here -->
+
+  <outputs>
+
+  <output id="1100">
+    <name>intercept SMS_MESSAGE_SEND_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,C2,00,00,03,02,00,00,00,00,00,05,00,16,00,08,35,10,00,02,00,82,00,10,01,08,0B,A1,40,45,14,30,70,F6,00,00,00,82,00,10,02,08,07,91,53,48,45,04,00,64,00,00,00,08,00,08,01,A7,00,00,00,20,00,88,00,7F,00,91,F4,F2,9C,0E,6A,97,E7,F3,F0,B9,0C,32,BF,EB,72,10,0D,A4,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,81,D8,65,F7,99,8E,EE,C5,68,39,00 </message>
+    <mask>00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1101">
+    <name>intercept SMS_RECEIVE_MESSAGE_REQ  Activate</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,06,00,00,00,41,01,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1102">
+    <name>intercept SMS_RECEIVED_MSG_REPORT_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,12,00,00,09,3B,00,00,00,00,00,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1103">
+    <name>intercept SMS_RECEIVE_MESSAGE_REQ Deactivate</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,06,00,00,00,41,02,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1104">
+    <name>UICC_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,8C,00,06,00,00,07,00,B1</message>
+    <mask>00,00,00,FF,00,00,00,00,FF,FF,FF</mask>
+  </output>
+
+  <output id="1105">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_FILE_INFO</name>
+    <direction>dos</direction>
+    <message>15,00,10,8c,00,1a,00,07,40,0c,25,00,00,00,00,01,00,0d,00,10,6f,3c,00,00,04,00,3f,00,7f,ff,00,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1106">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 1</name>
+    <direction>dos</direction>
+    <message>15,00,10,8c,00,2a,00,07,3e,0c,23,00,00,00,00,03,00,1f,00,08,00,00,00,00,00,13,00,08,01,00,00,00,00,0d,00,10,6f,3c,00,00,04,00,3f,00,7f,ff,00,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1107">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 2</name>
+    <direction>dos</direction>
+    <message>15,00,10,8c,00,2a,00,07,3e,0c,23,00,00,00,00,03,00,1f,00,08,00,00,00,00,00,13,00,08,02,00,00,00,00,0d,00,10,6f,3c,00,00,04,00,3f,00,7f,ff,00,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1108">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_UPDATE_LINEAR_FIXED</name>
+    <direction>dos</direction>
+    <message>00,00,00,8C,00,E2,00,00,3F,0C,24,00,00,00,00,04,00,1F,00,08,00,00,00,00,00,13,00,08,01,00,00,00,00,0D,00,10,6F,3C,00,00,04,00,3f,00,7f,ff,00,00,00,0F,00,B8,00,00,00,B0,03,08,07,91,53,48,45,04,00,00,04,0C,91,53,58,30,56,15,05,41,12,70,20,72,51,20,74,08,05,63,B6,4C,26,03,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1109">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 1</name>
+    <direction>dos</direction>
+    <message>00,00,00,8C,00,2A,00,00,41,0C,23,00,00,00,00,03,00,1F,00,08,00,00,00,00,00,13,00,08,01,00,00,00,00,0D,00,10,6F,3C,00,00,04,00,3f,00,7f,ff,00,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1110">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_UPDATE_LINEAR_FIXED</name>
+    <direction>dos</direction>
+    <message>00,00,00,8C,00,E2,00,00,3F,0C,24,00,00,00,00,04,00,1F,00,08,00,00,00,00,00,13,00,08,02,00,00,00,00,0D,00,10,6F,3C,00,00,04,00,3f,00,7f,ff,00,00,00,0F,00,B8,00,00,00,B0,03,08,07,91,53,48,45,04,00,64,24,0B,91,40,45,14,30,70,F6,00,00,10,80,71,41,73,14,80,91,F4,F2,9C,0E,6A,97,E7,F3,F0,B9,0C,32,BF,E5,A0,69,73,0A,A2,96,E7,74,D0,30,3C,2F,83,A8,C3,D6,B4,39,6D,C1,62,36,31,88,8E,4E,CF,41,ED,F2,7C,1E,3E,97,41,E9,39,68,4E,7F,CB,CB,64,50,DA,0D,32,A7,E5,73,3A,28,6C,0F,A7,D9,65,31,BB,0C,9A,B3,DF,74,90,38,0F,3A,A7,ED,69,F7,19,34,67,BF,E9,20,77,BD,2D,2E,CB,41,E1,39,A8,15,53,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,81,D8,65,F7,99,8E,EE,C5,68,39,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1111">
+    <name>intercept SMS_RECEIVED_MSG_REPORT_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,12,00,00,0A,3B,01,16,00,00,00,01,00,19,00,08,00,00,00,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1112">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 2</name>
+    <direction>dos</direction>
+    <message>15,00,10,8c,00,2a,00,07,41,0c,23,00,00,00,00,03,00,1f,00,08,00,00,00,00,00,13,00,08,02,00,00,00,00,0d,00,10,6f,3c,00,00,04,00,3f,00,7f,ff,00,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1113">
+    <name>intercept SMS_PARAMETERS_READ_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,06,00,00,07,BC,52,01</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1114">
+    <name>intercept SMS_PARAMETERS_READ_REQ 2</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,06,00,00,07,BC,52,02</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1115">
+    <name>intercept SMS_SETTINGS_UPDATE_REQ 2</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,0E,00,00,00,30,02,01,00,23,00,08,00,01,00,00</message>
+       <mask>00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1116">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 3</name>
+    <direction>dos</direction>
+    <message>15,00,10,8c,00,2a,00,07,3e,0c,23,00,00,00,00,03,00,1f,00,08,00,00,00,00,00,13,00,08,03,00,00,00,00,0d,00,10,6f,3c,00,00,04,00,3f,00,7f,ff,00,00</message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1117">
+    <name>intercept SMS_MESSAGE_SEND_REQ SAT ORIGINATED</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,CA,00,00,04,02,00,00,00,00,00,06,00,16,00,08,35,10,00,02,00,82,00,10,01,08,0B,A1,40,45,14,30,70,F6,00,00,00,82,00,10,02,08,07,91,53,48,45,04,00,64,00,00,00,08,00,08,01,A7,00,00,00,20,00,88,00,7F,00,91,F4,F2,9C,0E,6A,97,E7,F3,F0,B9,0C,32,BF,EB,72,10,0D,A4,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,81,D8,65,F7,99,8E,EE,C5,68,39,00,00,87,00,08,01,00,00,00 </message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+  <output id="1118">
+    <name>intercept SMS_MESSAGE_SEND_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,02,00,CA,00,00,05,02,00,00,00,00,00,06,00,16,00,08,35,10,00,02,00,82,00,10,01,08,0B,A1,40,45,14,30,70,F6,00,00,00,82,00,10,02,08,07,91,53,48,45,04,00,64,00,00,00,08,00,08,01,A7,00,00,00,20,00,88,00,7F,00,91,F4,F2,9C,0E,6A,97,E7,F3,F0,B9,0C,32,BF,EB,72,10,0D,A4,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,A9,54,2A,95,4A,A5,52,81,D8,65,F7,99,8E,EE,C5,68,39,00,00,87,00,08,01,00,00,00 </message>
+       <mask>00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+  </output>
+
+   <output id="1119">
+    <name>UICC_APPL_CMD_REQ (read EFust)</name>
+    <direction>dos</direction>
+    <message>00,00,00,8C,00,2A,00,00,32,0C,21,00,00,00,00,03,00,1F,00,08,00,00,00,00,00,12,00,08,00,00,00,00,00,0D,00,10,6F,38,00,00,04,00,3F,00,7F,FF,00,00</message>
+       <mask>00,00,00,ff,00,00,00,00,ff,ff,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+   </output>
+
+ </outputs>
+
+
+  <!-- Test filters are declared here -->
+  <filters>
+  </filters>
+
+
+  <!-- Test steps are declared here -->
+  <steps>
+
+
+   <step id="11000" type="simulate">
+    <name>SMS_MESSAGE_SEND_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1000"/>
+   </step>
+
+   <step id="11001" type="simulate">
+    <name>SMS_RECEIVED_MSG_IND Class 1 SMS</name>
+    <channel id="0x07"/>
+    <input-ref id="1001"/>
+   </step>
+
+   <step id="11002" type="simulate">
+    <name>SMS_RECEIVE_MESSAGE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1002"/>
+   </step>
+
+   <step id="11003" type="simulate">
+    <name>SMS_RECEIVED_MSG_REPORT_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1003"/>
+   </step>
+
+   <step id="11004" type="simulate">
+    <name>SMS_RECEIVED_MSG_IND Class 2 SMS</name>
+    <channel id="0x07"/>
+    <input-ref id="1004"/>
+   </step>
+
+   <step id="11005" type="simulate">
+    <name>UICC_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1005"/>
+   </step>
+
+   <step id="11006" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO</name>
+    <channel id="0x07"/>
+    <input-ref id="1006"/>
+   </step>
+
+   <step id="11007" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 1</name>
+    <channel id="0x07"/>
+    <input-ref id="1007"/>
+   </step>
+
+   <step id="11008" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2</name>
+    <name>SIM_ST_SMS_WRITE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1008"/>
+   </step>
+
+   <step id="11009" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_UPDATE_LINEAR_FIXED</name>
+    <channel id="0x07"/>
+    <input-ref id="1009"/>
+   </step>
+
+   <step id="11010" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 1</name>
+    <channel id="0x07"/>
+    <input-ref id="1010"/>
+   </step>
+
+   <step id="11011" type="simulate">
+    <name>UICC_CARD_IND(UICC_CARD_DISCONNECTED)</name>
+    <channel id="0x07"/>
+    <input-ref id="1011"/>
+   </step>
+
+   <step id="11012" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2 UICC_STATUS_CARD_DISCONNECTED</name>
+    <channel id="0x07"/>
+    <input-ref id="1012"/>
+   </step>
+
+   <step id="11013" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2 UICC_STATUS_CARD_DISCONNECTED</name>
+    <channel id="0x07"/>
+    <input-ref id="1013"/>
+   </step>
+
+   <step id="11014" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO UICC_STATUS_CARD_DISCONNECTED</name>
+    <channel id="0x07"/>
+    <input-ref id="1014"/>
+   </step>
+
+   <step id="11015" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO UICC_STATUS_CARD_DISCONNECTED</name>
+    <channel id="0x07"/>
+    <input-ref id="1015"/>
+   </step>
+
+   <step id="11016" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO</name>
+    <channel id="0x07"/>
+    <input-ref id="1016"/>
+   </step>
+
+   <step id="11017" type="simulate">
+    <name>SMS_RECEIVED_MSG_REPORT_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1017"/>
+   </step>
+
+   <step id="11018" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2</name>
+    <channel id="0x07"/>
+    <input-ref id="1018"/>
+   </step>
+
+   <step id="11019" type="simulate">
+    <name>READ_PARAMETER (SIM_SMS_RESP)</name>
+    <channel id="0x07"/>
+    <input-ref id="1019"/>
+   </step>
+
+   <step id="11020" type="simulate">
+    <name>READ_PARAMETER (SIM_SMS_RESP) 2</name>
+    <channel id="0x07"/>
+    <input-ref id="1020"/>
+   </step>
+
+   <step id="11021" type="simulate">
+    <name>SMS_MESSAGE_SEND_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1021"/>
+   </step>
+
+   <step id="11022" type="simulate">
+    <name>SMS_MESSAGE_RECEIVE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1022"/>
+   </step>
+
+   <step id="11023" type="simulate">
+    <name>SMS_SETTINGS_UPDATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1023"/>
+   </step>
+
+   <step id="11024" type="simulate">
+    <name>UPDATE_PARAMETER (SIM_SMS_RESP)</name>
+    <channel id="0x07"/>
+    <input-ref id="1024"/>
+   </step>
+
+   <step id="11025" type="simulate">
+    <name>SMS_MESSAGE_SEND_RESP SAT ORIGINATED</name>
+    <channel id="0x07"/>
+    <input-ref id="1025"/>
+   </step>
+
+   <step id="11026" type="simulate">
+    <name>SMS_MESSAGE_SEND_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1026"/>
+   </step>
+
+    <step id="11027" type="simulate">
+      <name>UICC_APPL_CMD_RESP(READ TRANSPARENT EFust) </name>
+      <channel id="0x07"/>
+      <input-ref id="1027"/>
+    </step>
+
+   <step id="11028" type="simulate">
+    <name>UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 3</name>
+    <name>SIM_ST_SMS_WRITE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1028"/>
+   </step>
+
+   <step id="11100" type="intercept">
+    <name>intercept SMS_MESSAGE_SEND_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1100"/>
+   </step>
+
+   <step id="11101" type="intercept">
+    <name>intercept SMS_RECEIVE_MESSAGE_REQ  Activate</name>
+    <channel id="0x07"/>
+    <output-ref id="1101"/>
+   </step>
+
+   <step id="11102" type="intercept">
+    <name>intercept SMS_RECEIVED_MSG_REPORT_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1102"/>
+   </step>
+
+   <step id="11103" type="intercept">
+    <name>intercept SMS_RECEIVE_MESSAGE_REQ  Deactivate</name>
+    <channel id="0x07"/>
+    <output-ref id="1103"/>
+   </step>
+
+   <step id="11104" type="intercept">
+    <name>intercept UICC_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1104"/>
+   </step>
+
+   <step id="11105" type="intercept">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_FILE_INFO</name>
+    <channel id="0x07"/>
+    <output-ref id="1105"/>
+   </step>
+
+   <step id="11106" type="intercept">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 1</name>
+    <channel id="0x07"/>
+    <output-ref id="1106"/>
+   </step>
+
+   <step id="11107" type="intercept">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 2</name>
+    <channel id="0x07"/>
+    <output-ref id="1107"/>
+   </step>
+
+   <step id="11108" type="intercept">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_UPDATE_LINEAR_FIXED</name>
+    <channel id="0x07"/>
+    <output-ref id="1108"/>
+   </step>
+
+   <step id="11109" type="intercept">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 1</name>
+    <channel id="0x07"/>
+    <output-ref id="1109"/>
+   </step>
+
+   <step id="11110" type="intercept">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_UPDATE_LINEAR_FIXED</name>
+    <channel id="0x07"/>
+    <output-ref id="1110"/>
+   </step>
+
+   <step id="11111" type="intercept">
+    <name>intercept SMS_RECEIVED_MSG_REPORT_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1111"/>
+   </step>
+
+   <step id="11112" type="intercept">
+    <name>UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 2</name>
+    <channel id="0x07"/>
+    <output-ref id="1112"/>
+   </step>
+
+   <step id="11113" type="intercept">
+    <name>intercept SMS_PARAMETERS_READ_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1113"/>
+   </step>
+
+   <step id="11114" type="intercept">
+    <name>intercept SMS_PARAMETERS_READ_REQ 2</name>
+    <channel id="0x07"/>
+    <output-ref id="1114"/>
+   </step>
+
+   <step id="11115" type="intercept">
+    <name>intercept SMS_SETTINGS_UPDATE_REQ 2</name>
+    <channel id="0x07"/>
+    <output-ref id="1115"/>
+   </step>
+
+   <step id="11116" type="intercept">
+    <name>intercept UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 3</name>
+    <channel id="0x07"/>
+    <output-ref id="1116"/>
+   </step>
+
+   <step id="11117" type="intercept">
+    <name>intercept SMS_MESSAGE_SEND_REQ SAT ORIGINATED</name>
+    <channel id="0x07"/>
+    <output-ref id="1117"/>
+   </step>
+
+   <step id="11118" type="intercept">
+    <name>intercept SMS_MESSAGE_SEND_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1118"/>
+   </step>
+
+    <step id="11119" type="intercept">
+      <name>UICC_APPL_CMD_REQ (read EFust)</name>
+      <channel id="0x07"/>
+      <output-ref id="1119"/>
+    </step>
+
+    <!-- Open channel steps are used to attach the ISC test controller to an existing ISC channel -->
+    <step id="2001" type="open-channel">
+      <name>Open TSY channel</name>
+      <channel id="0x07"/>
+    </step>
+
+    <!-- Close channel steps are used to detach the ISC test controller from an existing ISC channel -->
+    <step id="2002" type="close-channel">
+      <name>Close TSY channel</name>
+      <channel id="0x07"/>
+    </step>
+
+    <!-- Synchronization step is used to synchronize with -->
+    <!-- the test cases of the adaptation test environment -->
+    <step id="2003" type="sync">
+      <name>Sync ( ignore messages )</name>
+      <flags>1</flags>
+    </step>
+
+  </steps>
+
+
+  <!-- Test step groups are declared here. Step groups must not have same ID's as steps -->
+
+  <!-- Intercept steps can be grouped to receive messages in undetermined order. -->
+  <groups>
+  </groups>
+
+  <!-- Test cases are declared here -->
+
+  <!-- step-ref elements are used to reference the test steps of the test case -->
+  <cases>
+
+
+   <case id="101">
+    <name>SendSMSMessage</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11100"/> <!-- SMS_MESSAGE_SEND_REQ intercept -->
+     <step-ref id="11000"/> <!-- SMS_MESSAGE_SEND_RESP simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="102">
+    <name>ActivateSMSRouting</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11101"/> <!-- SMS_RECEIVE_MESSAGE_REQ  Activate intercept -->
+     <step-ref id="11002"/> <!-- SMS_RECEIVE_MESSAGE_RESP simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="103">
+    <name>ReceiveSMSMessage Class 1</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11001"/> <!-- SMS_RECEIVED_MSG_IND simulate class 1 SMS is sent here -->
+     <step-ref id="11102"/> <!-- SMS_RECEIVED_MSG_REPORT_REQ intercept -->
+     <step-ref id="11003"/> <!-- SMS_RECEIVED_MSG_REPORT_RESP simulate -->
+     <step-ref id="11103"/> <!-- SMS_RECEIVE_MESSAGE_REQ  Deactivate intercept -->
+     <step-ref id="11022"/> <!-- SMS_RECEIVE_MESSAGE_RESP simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="104">
+    <name>ReceiveSMSMessage Class 2</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11004"/> <!-- SMS_RECEIVED_MSG_IND simulate class 2 SMS is sent here -->
+     <step-ref id="11108"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_UPDATE_LINEAR_FIXED intercept -->
+     <step-ref id="11009"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_UPDATE_LINEAR_FIXED simulate -->
+     <step-ref id="11109"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 1 intercept -->
+     <step-ref id="11010"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 1 simulate -->
+     <step-ref id="11102"/> <!-- SMS_RECEIVED_MSG_REPORT_REQ intercept -->
+     <step-ref id="11003"/> <!-- SMS_RECEIVED_MSG_REPORT_RESP simulate -->
+     <step-ref id="11103"/> <!-- SMS_RECEIVE_MSG_REQ Deactivate intercept -->
+     <step-ref id="11022"/> <!-- SMS_RECEIVE_MSG_RESP simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="105">
+    <name>Sim Status REQ/RESP</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11104"/> <!-- UICC_REQ intercept -->
+     <step-ref id="11005"/> <!-- UICC_RESP simulate -->
+     <step-ref id="11119"/> <!-- UICC_APPL_CMD_REQ (READ TRANSPARENT)-->
+     <step-ref id="11027"/> <!-- simulate UICC_APPL_CMD_RESP (READ TRANSPARENT)-->
+     <step-ref id="11105"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_FILE_INFO intercept -->
+     <step-ref id="11006"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO simulate -->
+     <step-ref id="11106"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 1 intercept -->
+     <step-ref id="11007"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 1 simulate -->
+     <step-ref id="11107"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 2 intercept -->
+     <step-ref id="11008"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2 simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="106">
+    <name>SMS Cacheing interrupted / case 1</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11104"/> <!-- UICC_REQ intercept -->
+     <step-ref id="11005"/> <!-- UICC_RESP simulate -->
+     <step-ref id="11119"/> <!-- UICC_APPL_CMD_REQ (READ TRANSPARENT)-->
+     <step-ref id="11027"/> <!-- simulate UICC_APPL_CMD_RESP (READ TRANSPARENT)-->
+     <step-ref id="11105"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_FILE_INFO intercept -->
+     <step-ref id="11006"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO simulate -->
+     <step-ref id="11106"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 1 intercept -->
+     <step-ref id="11007"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 1 simulate -->
+     <step-ref id="11107"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 2 intercept -->
+     <step-ref id="11011"/> <!-- UICC_CARD_IND(UICC_CARD_DISCONNECTED) simulate -->
+     <step-ref id="11013"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2 UICC_STATUS_CARD_DISCONNECTED simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="107">
+    <name>SMS Cacheing interrupted / case 2</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11104"/> <!-- UICC_REQ intercept -->
+     <step-ref id="11005"/> <!-- UICC_RESP simulate -->
+     <step-ref id="11011"/> <!-- UICC_CARD_IND(UICC_CARD_DISCONNECTED) simulate -->
+     <step-ref id="11119"/> <!-- UICC_APPL_CMD_REQ (READ TRANSPARENT)-->
+     <step-ref id="11027"/> <!-- simulate UICC_APPL_CMD_RESP (READ TRANSPARENT)-->
+     <step-ref id="11105"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_FILE_INFO intercept -->
+     <step-ref id="11014"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO UICC_STATUS_CARD_DISCONNECTED simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="109">
+    <name>SMS Cacheing interrupted / case 3.1</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11104"/> <!-- UICC_REQ intercept -->
+     <step-ref id="11005"/> <!-- UICC_RESP simulate -->
+     <step-ref id="11119"/> <!-- UICC_APPL_CMD_REQ (READ TRANSPARENT)-->
+     <step-ref id="11027"/> <!-- simulate UICC_APPL_CMD_RESP (READ TRANSPARENT)-->
+     <step-ref id="11105"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_FILE_INFO intercept -->
+     <step-ref id="11006"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO simulate -->
+     <step-ref id="11106"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 1 intercept -->
+     <step-ref id="11007"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 1 simulate -->
+     <step-ref id="11107"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 2 intercept -->
+     <step-ref id="11008"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2 simulate -->
+     <step-ref id="11110"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_UPDATE_LINEAR_FIXED intercept -->
+     <step-ref id="11009"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_UPDATE_LINEAR_FIXED simulate -->
+     <step-ref id="11112"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 2 intercept -->
+     <step-ref id="11011"/> <!-- UICC_CARD_IND(UICC_CARD_DISCONNECTED) simulate -->
+     <step-ref id="11012"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2 UICC_STATUS_CARD_DISCONNECTED simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="110">
+    <name>MemoryCapacityExceed</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11111"/> <!-- SMS_RECEIVED_MSG_REPORT_REQ intercept -->
+     <step-ref id="11017"/> <!-- SMS_RECEIVED_MSG_REPORT_RESP simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="111">
+    <name>Read SMS Parameters from SIM</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11112"/> <!-- SIM_ST_SMS_GET_NUM_OF_LOC (SIM_SMS_REQ) -->
+     <step-ref id="11018"/> <!-- SIM_ST_SMS_GET_NUM_OF_LOC (SIM_SMS_RESP) -->
+     <step-ref id="11113"/> <!-- READ_PARAMETER (SIM_SMS_REQ) -->
+     <step-ref id="11019"/> <!-- READ_PARAMETER (SIM_SMS_RESP) -->
+     <step-ref id="11114"/> <!-- READ_PARAMETER (SIM_SMS_REQ) -->
+     <step-ref id="11020"/> <!-- READ_PARAMETER (SIM_SMS_RESP) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="112">
+    <name>SendSMSMessage barred network</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11021"/> <!-- SMS_MESSAGE_SEND_RESP simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="113">
+    <name>SMS settings update</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11115"/> <!-- SMS_SETTINGS_UPDATE_REQ  intercept -->
+     <step-ref id="11023"/> <!-- SMS_SETTINGS_UPDATE_RESP  simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="114">
+    <name>SMS store parameters</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11116"/> <!-- SIM_SMS_REQ(UPDATE_PARAMETER)  intercept -->
+     <step-ref id="11024"/> <!-- UPDATE_PARAMETER (SIM_SMS_RESP)  simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="115">
+    <name>SendSMSMessage Sat Originated</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11117"/> <!-- SMS_MESSAGE_SEND_REQ SAT ORIGINATED intercept -->
+     <step-ref id="11025"/> <!-- SMS_MESSAGE_SEND_RESP SAT ORIGINATED simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="116">
+    <name>This is dummy case to start NTSY</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="117">
+    <name>SendSMSMessage 117</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11118"/> <!-- SMS_MESSAGE_SEND_REQ intercept -->
+     <step-ref id="11026"/> <!-- SMS_MESSAGE_SEND_RESP simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="118">
+    <name>Read SMS messages</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11104"/> <!-- UICC_REQ intercept -->
+     <step-ref id="11005"/> <!-- UICC_RESP simulate -->
+     <step-ref id="11119"/> <!-- UICC_APPL_CMD_REQ (READ TRANSPARENT)-->
+     <step-ref id="11027"/> <!-- simulate UICC_APPL_CMD_RESP (READ TRANSPARENT)-->
+     <step-ref id="11105"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_FILE_INFO intercept -->
+     <step-ref id="11016"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_FILE_INFO simulate -->
+     <step-ref id="11106"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 1 intercept -->
+     <step-ref id="11007"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 1 simulate -->
+     <step-ref id="11107"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 2 intercept -->
+     <step-ref id="11018"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 2 simulate -->
+     <step-ref id="11116"/> <!-- UICC_APPL_CMD_REQ UICC_APPL_READ_LINEAR_FIXED 3 intercept -->
+     <step-ref id="11028"/> <!-- UICC_APPL_CMD_RESP UICC_APPL_READ_LINEAR_FIXED 3 simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="119">
+    <name>3 MT SMs NACKed</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <!-- NACKed by client -->
+     <step-ref id="11001"/> <!-- SMS_RECEIVED_MSG_IND Class 1 SMS -->
+     <step-ref id="11111"/> <!-- SMS_RECEIVED_MSG_REPORT_REQ intercept -->
+     <step-ref id="11017"/> <!-- SMS_RECEIVED_MSG_REPORT_RESP simulate -->
+     <!-- NACKed by NTSY -->
+     <step-ref id="11001"/> <!-- SMS_RECEIVED_MSG_IND Class 1 SMS -->
+     <step-ref id="11120"/> <!-- intercept SMS_RECEIVED_MSG_REPORT_REQ internal NACK -->
+     <step-ref id="11029"/> <!-- SMS_RECEIVED_MSG_REPORT_RESP simulate -->
+     <!-- NACKed by NTSY -->
+     <step-ref id="11001"/> <!-- SMS_RECEIVED_MSG_IND Class 1 SMS -->
+     <step-ref id="11121"/> <!-- intercept SMS_RECEIVED_MSG_REPORT_REQ internal NACK -->
+     <step-ref id="11029"/> <!-- SMS_RECEIVED_MSG_REPORT_RESP simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="120">
+    <name>Storage status update and 1 MT SM ACK</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11120"/> <!-- intercept SMS_RECEIVE_MESSAGE_REQ  Resume -->
+     <step-ref id="11030"/> <!-- SMS_RECEIVE_MESSAGE_RESP Resume -->
+     <step-ref id="11001"/> <!-- SMS_RECEIVED_MSG_IND Class 1 SMS -->
+     <step-ref id="11102"/> <!-- intercept SMS_RECEIVED_MSG_REPORT_REQ -->
+     <step-ref id="11003"/> <!-- SMS_RECEIVED_MSG_REPORT_RESP simulate -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+  </cases>
+
+</isc-test-control>

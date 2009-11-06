@@ -1,0 +1,7 @@
+EXPORTS
+	??0RDpTest@@QAE@XZ @ 1 NONAME ; public: __thiscall RDpTest::RDpTest(void)
+	??1RDpTest@@QAE@XZ @ 2 NONAME ; public: __thiscall RDpTest::~RDpTest(void)
+	?Close@RDpTest@@QAEHXZ @ 3 NONAME ; public: int __thiscall RDpTest::Close(void)
+	?Open@RDpTest@@QAEHXZ @ 4 NONAME ; public: int __thiscall RDpTest::Open(void)
+	?StartThread@@YAHXZ @ 5 NONAME ; int __cdecl StartThread(void)
+

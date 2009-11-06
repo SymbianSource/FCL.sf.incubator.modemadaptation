@@ -1,0 +1,49 @@
+/*
+* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:   ?Description
+*
+*/
+
+
+
+#include <non_foundation_paths.hrh>
+
+PRJ_EXPORTS
+ConsoleUI.set          /epoc32/winscw/c/TestFramework/ConsoleUI.set
+
+PRJ_MMPFILES
+
+// STIF_NokiaTsy_test_tool testclasses
+
+#if defined(NCP_COMMON_S60_VERSION_SUPPORT ) && ( NCP_COMMON_S60_VERSION_SUPPORT == S60_VERSION_32 )
+#include "../core/group/bld.inf"
+#else
+#include "../core_exports_to_roots/group/bld.inf"
+#endif
+
+#include "../notify/group/bld.inf"
+#include "../nwe/group/bld.inf"
+#include "../voice/group/bld.inf"
+#include "../sms/group/bld.inf"
+#include "../sim/group/bld.inf"
+#include "../misc/group/bld.inf"
+#include "../miscphone/group/bld.inf"
+#include "../cbs/group/bld.inf"
+#include "../security/group/bld.inf"
+#include "../ss/group/bld.inf"
+#include "../pdi/group/bld.inf"
+#include "../wim/group/bld.inf"
+#include "../uicc/group/bld.inf"
+
+//  End of File

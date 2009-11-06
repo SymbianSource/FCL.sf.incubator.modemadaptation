@@ -1,0 +1,36 @@
+EXPORTS
+	_ZN11TIsiUtility15CopyToBigEndianERK7TDesC16R5TDes8 @ 1 NONAME
+	_ZN11TIsiUtility17CopyFromBigEndianERK6TDesC8R6TDes16 @ 2 NONAME
+	_ZN12TIsiReceiveCC1ERK6TDesC8 @ 3 NONAME
+	_ZN12TIsiReceiveCC2ERK6TDesC8 @ 4 NONAME
+	_ZN12TIsiSubBlock16CompleteSubBlockEv @ 5 NONAME
+	_ZN12TIsiSubBlockC1ER5TDes8t13TSubBlockType @ 6 NONAME
+	_ZN12TIsiSubBlockC2ER5TDes8t13TSubBlockType @ 7 NONAME
+	_ZN4TIsiaSERKS_ @ 8 NONAME
+	_ZN8TIsiSend7Set8bitEjh @ 9 NONAME
+	_ZN8TIsiSend8CompleteEv @ 10 NONAME
+	_ZN8TIsiSend8CopyDataEjRK6TDesC8 @ 11 NONAME
+	_ZN8TIsiSend8Set16bitEjt @ 12 NONAME
+	_ZN8TIsiSend8Set32bitEjm @ 13 NONAME
+	_ZN8TIsiSendC1ER5TDes8 @ 14 NONAME
+	_ZN8TIsiSendC1ER5TDes8j @ 15 NONAME
+	_ZN8TIsiSendC2ER5TDes8 @ 16 NONAME
+	_ZN8TIsiSendC2ER5TDes8j @ 17 NONAME
+	_ZNK12TIsiReceiveC22FindSubBlockOffsetByIdEjj13TSubBlockTypeRj @ 18 NONAME
+	_ZNK12TIsiReceiveC25FindSubBlockOffsetByIndexEjj13TSubBlockTypeRj @ 19 NONAME
+	_ZNK12TIsiReceiveC7Get8bitEj @ 20 NONAME
+	_ZNK12TIsiReceiveC7GetDataEji @ 21 NONAME
+	_ZNK12TIsiReceiveC8Get16bitEj @ 22 NONAME
+	_ZNK12TIsiReceiveC8Get32bitEj @ 23 NONAME
+	_ZNK12TIsiReceiveC9GetBufferEv @ 24 NONAME
+	_ZN8TIsiSend15SetSenderDeviceEh @ 25 NONAME
+	_ZN8TIsiSend15SetSenderObjectEt @ 26 NONAME
+	_ZN8TIsiSend17SetReceiverDeviceEh @ 27 NONAME
+	_ZN8TIsiSend17SetReceiverObjectEt @ 28 NONAME
+	_ZN8TIsiSend21SetExtendedResourceIdEm @ 29 NONAME
+	_ZNK12TIsiReceiveC15GetSenderDeviceEv @ 30 NONAME
+	_ZNK12TIsiReceiveC15GetSenderObjectEv @ 31 NONAME
+	_ZNK12TIsiReceiveC17GetReceiverDeviceEv @ 32 NONAME
+	_ZNK12TIsiReceiveC17GetReceiverObjectEv @ 33 NONAME
+	_ZNK12TIsiReceiveC21GetExtendedResourceIdEv @ 34 NONAME
+

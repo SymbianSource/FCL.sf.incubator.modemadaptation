@@ -1,0 +1,4 @@
+EXPORTS
+	_ZN10MLinkMuxIf8RegisterEP10MMuxLinkIfhh @ 1 NONAME
+	_ZN9MTrxMuxIf8RegisterEP9MMuxTrxIfh @ 2 NONAME
+

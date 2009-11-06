@@ -1,0 +1,107 @@
+/*
+* Copyright (c) 2002-2006 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:   ?Description
+*
+*/
+
+
+
+#include <non_foundation_paths.hrh>
+// Internal flags
+#include    "../../group/support.h"
+
+#ifdef LEGACY_SUPPORT
+// Set macro for cpp/h files
+MACRO    LEGACY   
+#endif // LEGACY_SUPPORT
+
+#ifndef LEGACY_SUPPORT
+#include <platform_paths.hrh>
+#endif // LEGACY_SUPPORT
+
+TARGET          simatk.dll
+TARGETTYPE      dll
+// TODO: Get correct UIDs
+UID             0x1000008D 0x101FB3E3
+FEATUREVARIANT
+
+CAPABILITY	ALL -TCB
+VENDORID 	0x101FB657
+
+//TARGETPATH      ?target_path
+DEFFILE     simatku.def
+
+// Sorted by alphabetical order (decides wiev order in CW)
+SOURCEPATH  ../src
+// Abstract base classes
+SOURCE      satbase.cpp
+SOURCE      satcommandbase.cpp
+SOURCE      satmenubase.cpp
+// Inherits CSatBase
+SOURCE      satcallcontrol.cpp
+SOURCE      satmosmscontrol.cpp
+// Inherits CCommandBase
+SOURCE      commandclosechannel.cpp
+SOURCE      commanddisplaytext.cpp
+SOURCE      commandgetchannelstatus.cpp
+SOURCE      commandgetinkey.cpp
+SOURCE      commandgetinput.cpp
+SOURCE      commandlanguagenotification.cpp
+SOURCE      commandlaunchbrowser.cpp
+SOURCE      commandlocalinfo.cpp
+SOURCE      commandopenchannel.cpp
+SOURCE      commandplaytone.cpp
+SOURCE      commandreceivedata.cpp
+SOURCE      commandrefresh.cpp
+SOURCE      commandselectitem.cpp
+SOURCE      commandsenddata.cpp
+SOURCE      commandsenddtmf.cpp
+SOURCE      commandsendsm.cpp
+SOURCE      commandsendss.cpp
+SOURCE      commandsendussd.cpp
+SOURCE      commandsetupcall.cpp
+SOURCE      commandsetupeventlist.cpp
+SOURCE      commandsetupmenu.cpp
+SOURCE      commandsetupidlemodetext.cpp
+
+// Main class
+SOURCE      simatk.cpp
+SOURCE      simatkblocks.cpp
+// Helper classes
+SOURCE      satsimsessionend.cpp
+SOURCE      satfile.cpp
+SOURCE      saticon.cpp
+
+USERINCLUDE     ../../Core/inc
+USERINCLUDE     ../inc 
+
+#ifndef LEGACY_SUPPORT
+// Dependencies from other components
+OS_LAYER_SYSTEMINCLUDE
+#else
+SYSTEMINCLUDE   /epoc32/include 
+#endif // LEGACY_SUPPORT
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
+
+LIBRARY         euser.lib
+LIBRARY         stiftestinterface.lib
+LIBRARY         simatkcore.lib
+LIBRARY         etel.lib
+LIBRARY         etelmm.lib
+LIBRARY         etelsat.lib
+LIBRARY         isctestcontrolclient.lib
+LIBRARY         efsrv.lib
+
+
+// End of File

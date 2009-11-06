@@ -1,0 +1,3 @@
+EXPORTS
+	?LibEntryL@@YAPAVCScriptBase@@AAVCTestModuleIf@@@Z @ 1 NONAME ; class CScriptBase * __cdecl LibEntryL(class CTestModuleIf &)	
+        ?RouteCompletion@CSMS@@UAEXHPAVCMmDataPackage@@H@Z @ 2 NONAME ; void CSMS::RouteCompletion(int, class CMmDataPackage *, int)

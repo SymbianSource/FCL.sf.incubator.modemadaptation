@@ -1,0 +1,5 @@
+EXPORTS
+	?LibEntryL@@YAPAVCScriptBase@@AAVCTestModuleIf@@@Z @ 1 NONAME ; class CScriptBase * LibEntryL(class CTestModuleIf &)
+	?RouteCompletion@CUICC@@UAEXHPAVCMmDataPackage@@H@Z @ 2 NONAME ; void CUICC::RouteCompletion(int, class CMmDataPackage *, int)
+	
+

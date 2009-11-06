@@ -1,0 +1,2199 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!--
+MOD_1008.001_SIM_ATK_TSY_[TIMER MANAGEMENT - 9.1.2.21.1 Single timer]
+MOD_1008.002_SIM_ATK_TSY_[TIMER MANAGEMENT - 9.1.2.21.2 Multiple timers]
+MOD_1008.003_SIM_ATK_TSY_[TIMER MANAGEMENT - 9.1.2.21.3 Refresh]
+MOD_1008.004_SIM_ATK_TSY_[TIMER MANAGEMENT - 9.1.2.21.4 When SIM Application Toolkit is busy]
+MOD_1008.005_SIM_ATK_TSY_[TIMER MANAGEMENT - 9.1.2.21.5 Maximum timer value]
+MOD_1008.006_SIM_ATK_TSY_[TIMER MANAGEMENT - 9.1.2.21.6 Bad cases]
+-->
+
+
+<isc-test-control id="1008">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+<!-- 9.1.2.21.1 TIMER MANAGEMENT, single timer -->
+
+    <!-- Subcase 1 -->
+    <input id="11011">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,00,00,10,90,00</message>
+    </input>
+
+    <!-- Subcase 2 -->
+    <input id="11021">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,00,00,20,90,00</message>
+    </input>
+
+    <input id="11022">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,00,00,03,90,00</message>
+    </input>
+
+    <input id="11023">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,00,70,34,90,00</message>
+    </input>
+
+    <!-- Subcase 3 -->
+    <input id="11031">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 8</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,08,A5,03,42,00,00,90,00</message>
+    </input>
+
+    <input id="11032">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 8</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,08,A5,03,00,10,00,90,00</message>
+    </input>
+
+    <input id="11033">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 8</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,08,A5,03,00,00,50,90,00</message>
+    </input>
+
+    <!-- Subcase 4 -->
+    <input id="11041">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Query timer 8</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,27,02,82,02,81,82,A4,01,08,90,00</message>
+    </input>
+    
+    <!-- Subcase 5 -->
+    <input id="11051">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 3</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,03,A5,03,00,10,10,90,00</message>
+    </input>
+
+    <input id="11052">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Deactivate timer 3</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,27,01,82,02,81,82,A4,01,03,90,00</message>
+    </input>
+
+<!-- 9.1.2.21.2 TIMER MANAGEMENT, multiple timers -->
+
+    <!-- Subcase 1 -->
+    <input id="12011">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 8</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,08,A5,03,10,00,00,90,00</message>
+    </input>
+
+    <input id="12012">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 7</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,07,A5,03,10,00,00,90,00</message>
+    </input>
+
+    <input id="12013">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 6</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,06,A5,03,10,00,00,90,00</message>
+    </input>
+
+    <input id="12014">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 5</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,05,A5,03,10,00,00,90,00</message>
+    </input>
+
+    <input id="12015">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 3</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,03,A5,03,10,00,00,90,00</message>
+    </input>
+
+    <input id="12016">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 2</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,02,A5,03,10,00,00,90,00</message>
+    </input>
+
+    <input id="12017">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,10,00,00,90,00</message>
+    </input>
+
+    <input id="12018">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Get current value timer 2</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,27,02,82,02,81,82,A4,01,02,90,00</message>
+    </input>
+
+    <!-- Subcase 2 -->
+    <input id="12021">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Get current value timer 4</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,27,02,82,02,81,82,A4,01,04,90,00</message>
+    </input>
+
+    <!-- Subcase 3 -->
+    <input id="12031">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Deactivate timer 4</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,27,01,82,02,81,82,A4,01,04,90,00</message>
+    </input>
+    
+    <!-- Subcase 4 -->
+    <input id="12041">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 4</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,04,A5,03,10,00,00,90,00</message>
+    </input>
+
+    <!-- Subcase 5 -->
+    <input id="12051">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,00,10,00,90,00</message>
+    </input>
+
+    <input id="12052">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 2</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,02,A5,03,00,10,00,90,00</message>
+    </input>
+
+    <input id="12053">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 3</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,03,A5,03,00,10,00,90,00</message>
+    </input>
+
+    <input id="12054">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 4</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,04,A5,03,00,10,00,90,00</message>
+    </input>
+
+    <input id="12055">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 5</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,05,A5,03,00,10,00,90,00</message>
+    </input>
+
+    <input id="12056">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 6</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,06,A5,03,00,10,00,90,00</message>
+    </input>
+
+    <input id="12057">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 7</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,07,A5,03,00,10,00,90,00</message>
+    </input>
+
+    <input id="12058">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 8</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,08,A5,03,00,10,00,90,00</message>
+    </input>
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <input id="13011">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,00,00,50,90,00</message>
+    </input>
+
+    <input id="13012">
+        <name>PROACTIVE COMMAND: REFRESH SIM Initialisation and Full File Change Notification</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,0D,D0,09,81,03,01,01,00,82,02,81,82,90,00</message>
+    </input>
+
+    <!-- Subcase 2 -->
+    <input id="13021">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,00,50,00,90,00</message>
+    </input>
+
+    <input id="13022">
+        <name>PROACTIVE COMMAND: REFRESH SIM Reset</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,0D,D0,09,81,03,01,01,04,82,02,81,82,90,00</message>
+    </input>
+
+    <input id="13023">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Get current value timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,27,02,82,02,81,82,A4,01,01,90,00</message>
+    </input>
+
+<!-- 9.1.2.21.4 TIMER MANAGEMENT when SIM Application Toolkit is busy -->
+
+    <!-- Subcase 1 -->
+    <input id="14011">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,00,00,20,90,00</message>
+    </input>
+
+    <input id="14012">
+        <name>PROACTIVE COMMAND: DISPLAY TEXT Display Text 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,1E,D0,1A,81,03,01,21,01,82,02,81,02,8D,0F,04,44,69,73,70,6C,61,79,20,54,65,78,74,20,31,90,00</message>
+    </input>
+
+    <input id="14013">
+        <name>PROACTIVE COMMAND: DISPLAY TEXT Display Text 2</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,1E,D0,1A,81,03,01,21,01,82,02,81,02,8D,0F,04,44,69,73,70,6C,61,79,20,54,65,78,74,20,32,90,00</message>
+    </input>
+
+    <!-- Subcase 2 -->
+    <input id="14021">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,00,00,50,90,00</message>
+    </input>
+
+<!-- 9.1.2.21.5 TIMER MANAGEMENT, maximum timer value -->
+
+    <!-- Subcase 1 -->
+    <input id="15011">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,01,A5,03,42,00,00,90,00</message>
+    </input>
+
+<!-- 9.1.2.21.6 TIMER MANAGEMENT, bad cases -->
+
+    <!-- Subcase 1 -->
+    <input id="16011">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,10,D0,0C,81,03,01,27,00,82,02,81,82,A4,01,01,90,00</message>
+    </input>
+
+    <!-- Subcase 2 -->
+    <input id="16021">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,03,82,02,81,82,A4,01,01,A5,03,00,00,50,90,00</message>
+    </input>
+
+    <!-- Subcase 3 -->
+    <input id="16031">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,03,A5,03,00,00,00,90,00</message>
+    </input>
+
+    <!-- Subcase 4 -->
+    <input id="16041">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,03,A5,03,42,10,10,90,00</message>
+    </input>
+
+    <!-- Subcase 5 -->
+    <input id="16051">
+        <name>PROACTIVE COMMAND: TIMER MANAGEMENT Start timer 1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,27,00,82,02,81,82,A4,01,80,A5,03,00,00,50,90,00</message>
+    </input>
+
+<!-- SIM_ATK_RESP -->
+<!-- *************** -->
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <input id="63011">
+        <name>SIM_ATK_RESP(REFRESH, SIM_STA_OK)</name>
+        <direction>sos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E3,03,01,00,00,00,00</message>
+    </input>
+
+    <!-- Subcase 2 -->
+    <input id="63021">
+        <name>SIM_ATK_RESP(REFRESH, SIM_STA_OK)</name>
+        <direction>sos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E3,04,01,00,00,00,00</message>
+    </input>
+
+<!-- ATK SW DATA NTF -->
+<!-- *************** -->
+
+    <input id="70001">
+        <name>Send SIM -> ME Normal ending</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+    </input>
+
+    <input id="70002">
+        <name>SIM -> ME SIM Application Toolkit is busy</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,C5,13,00,00,93,00,00,00</message>
+    </input>
+
+    <input id="70003">
+        <name>SIM -> ME Data to be fetched</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,C5,13,00,00,91,1C,00,00</message>
+    </input>
+
+    <input id="70004">
+        <name>SIM -> ME Data to be fetched</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,C5,13,00,00,91,0E,00,00</message>
+    </input>
+
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+    
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+<!-- 9.1.2.21.1 TIMER MANAGEMENT, single timer -->
+
+    <!-- Subcase 1,2 -->
+    <output id="21011">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 3 -->
+    <output id="21031">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,08,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 4 -->
+    <output id="21041">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT, Action in contradiction with the current timer state</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,27,02,02,02,82,81,03,01,24,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 5 -->
+    <output id="21051">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,03,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="21052">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1E,00,08,00,11,00,00,00,14,81,03,01,27,01,02,02,82,81,03,01,00,A4,01,03,25,03,00,10,10,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF,EF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 6 -->
+    <output id="21061">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT, Action in contradiction with the current timer state</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,27,01,02,02,82,81,03,01,24,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 9.1.2.21.2 TIMER MANAGEMENT, multiple timers -->
+
+    <!-- Subcase 1 -->
+    <output id="22011">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,08,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22012">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,07,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22013">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,06,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22014">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,05,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22015">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,03,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22016">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,02,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22017">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22018">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <!-- Ones second variation allowed -->
+        <message>1D,00,10,5A,00,1E,00,08,00,11,00,00,00,14,81,03,01,27,02,02,02,82,81,03,01,00,A4,01,02,25,03,00,95,95,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF,EF,FF,FF</mask>
+    </output>
+    
+    <!-- Subcase 2 -->
+    <output id="22021">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT, Action in contradiction with the current timer state</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,27,02,02,02,82,81,03,01,24,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+    
+    <!-- Subcase 3 -->
+    <output id="22031">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT, Action in contradiction with the current timer state</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,27,01,02,02,82,81,03,01,24,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+    
+    <!-- Subcase 4 -->
+    <output id="22041">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,04,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <!-- Subcase 5 -->
+    <output id="22051">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22052">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,02,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22053">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,03,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22054">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,04,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22055">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,05,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22056">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,06,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22057">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,07,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="22058">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,08,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <output id="23011">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="23012">
+        <name>TERMINAL RESPONSE: REFRESH</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,01,00,02,02,82,81,03,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 2 -->
+    <output id="23021">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="23022">
+        <name>TERMINAL RESPONSE: REFRESH Empty TR which is not passed to SIM</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,0A,00,00,00,11,00,00,00,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="23023">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT, Action in contradiction with the current timer state</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,27,02,02,02,82,81,03,01,24,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 9.1.2.21.4 TIMER MANAGEMENT when SIM Application Toolkit is busy -->
+
+    <!-- Subcase 1 -->
+    <output id="24011">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="24012">
+        <name>TERMINAL RESPONSE: DISPLAY TEXT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,21,01,02,02,82,81,03,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="24013">
+        <name>TERMINAL RESPONSE: DISPLAY TEXT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,21,01,02,02,82,81,03,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+    
+    <!-- Subcase 2 -->
+    <output id="24021">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 9.1.2.21.5 TIMER MANAGEMENT, maximum timer value -->
+
+    <!-- Subcase 1 -->
+    <output id="25011">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,27,00,02,02,82,81,03,01,00,A4,01,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- .1.2.21.6 TIMER MANAGEMENT, bad cases -->
+
+    <!-- Subcase 1 -->
+    <output id="26011">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT, Error, required values are missing</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,27,00,02,02,82,81,03,01,36,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 2 -->
+    <output id="26021">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT, Command type not understood by ME</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,27,03,02,02,82,81,03,01,31,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 3, 4, 5 -->
+    <output id="26031">
+        <name>TERMINAL RESPONSE: TIMER MANAGEMENT, Command data not understood by ME</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,27,00,02,02,82,81,03,01,32,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- ENVELOPES -->
+<!-- ********* -->
+
+<!-- 9.1.2.21.1 TIMER MANAGEMENT, single timer -->
+
+    <!-- Subcase 1 -->    
+    <output id="41011">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,10,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 2 -->    
+    <output id="41021">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,70,34,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 3 -->    
+    <output id="41031">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,08,25,03,00,00,50,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 9.1.2.21.2 TIMER MANAGEMENT, multiple timers -->
+
+    <!-- Subcase 5 -->    
+    <output id="42051">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,08,25,03,00,10,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="42052">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,07,25,03,00,10,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="42053">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,06,25,03,00,10,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="42054">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,05,25,03,00,10,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="42055">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,04,25,03,00,10,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="42056">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,03,25,03,00,10,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="42057">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,02,25,03,00,10,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="42058">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,10,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <output id="43011">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,50,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="43012">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,60,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 9.1.2.21.4 TIMER MANAGEMENT when SIM Application Toolkit is busy -->
+
+    <!-- Subcase 1 -->
+    <output id="44011">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,20,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,0F,FF,FF</mask>
+    </output>
+
+    <output id="44012">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,70,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,0F,FF,FF</mask>
+    </output>
+    
+    <!-- Subcase 2 -->
+    <output id="44021">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,50,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+        
+    <output id="44022">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,60,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+        
+    <output id="44023">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,70,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+        
+    <output id="44024">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,80,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+        
+    <output id="44025">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,00,00,90,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 9.1.2.21.5 TIMER MANAGEMENT, maximum timer value -->
+
+    <!-- Subcase 1 -->
+    <output id="45011">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,42,00,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="45012">
+        <name>ENVELOPE (Timer Expiration)</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,16,00,00,C5,12,00,0E,D7,0C,02,02,82,81,A4,01,01,25,03,42,00,10,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,7F,7F,FF,FF,7F,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+<!-- SIM_ATK_REQ -->
+<!-- *********** -->
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <output id="53011">
+        <name>SIM_ATK_REQ(REFRESH, SIM Initialization and Full File Change Notification)</name>
+        <direction>dos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E2,03,00,00,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,00,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <!-- Subcase 2 -->
+    <output id="53021">
+        <name>SIM_ATK_REQ(REFRESH, SIM Reset)</name>
+        <direction>dos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E2,04,00,00,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,00,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+<!-- 9.1.2.21.1 TIMER MANAGEMENT, single timer -->
+
+    <!-- Subcase 1 -->
+    <step id="11011" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11011"/>
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="11021" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11021"/>
+    </step>
+
+    <step id="11022" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11022"/>
+    </step>
+
+    <step id="11023" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11023"/>
+    </step>
+
+    <!-- Subcase 3 -->
+    <step id="11031" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11031"/>
+    </step>
+
+    <step id="11032" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11032"/>
+    </step>
+
+    <step id="11033" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11033"/>
+    </step>
+
+    <!-- Subcase 4 -->
+    <step id="11041" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11041"/>
+    </step>
+
+    <!-- Subcase 5 -->
+    <step id="11051" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11051"/>
+    </step>
+
+    <step id="11052" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="11052"/>
+    </step>
+
+<!-- 9.1.2.21.2 TIMER MANAGEMENT, multiple timers -->
+
+    <!-- Subcase 1 -->
+    <step id="12011" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12011"/>
+    </step>
+
+    <step id="12012" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12012"/>
+    </step>
+
+    <step id="12013" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12013"/>
+    </step>
+
+    <step id="12014" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12014"/>
+    </step>
+
+    <step id="12015" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12015"/>
+    </step>
+
+    <step id="12016" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12016"/>
+    </step>
+
+    <step id="12017" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12017"/>
+    </step>
+
+    <step id="12018" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12018"/>
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="12021" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12021"/>
+    </step>
+
+    <!-- Subcase 3 -->
+    <step id="12031" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12031"/>
+    </step>
+
+    <!-- Subcase 4 -->
+    <step id="12041" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12041"/>
+    </step>
+
+    <!-- Subcase 5 -->
+    <step id="12051" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12051"/>
+    </step>
+
+    <step id="12052" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12052"/>
+    </step>
+
+    <step id="12053" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12053"/>
+    </step>
+
+    <step id="12054" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12054"/>
+    </step>
+
+    <step id="12055" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12055"/>
+    </step>
+
+    <step id="12056" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12056"/>
+    </step>
+
+    <step id="12057" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12057"/>
+    </step>
+
+    <step id="12058" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="12058"/>
+    </step>
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <step id="13011" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="13011"/>
+    </step>
+
+    <step id="13012" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="13012"/>
+    </step>  
+
+    <!-- Subcase 2 -->
+    <step id="13021" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="13021"/>
+    </step>
+
+    <step id="13022" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="13022"/>
+    </step>  
+
+    <step id="13023" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="13023"/>
+    </step>  
+
+<!-- 9.1.2.21.4 TIMER MANAGEMENT when SIM Application Toolkit is busy -->
+
+    <!-- Subcase 1 -->
+    <step id="14011" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="14011"/>
+    </step>
+
+    <step id="14012" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="14012"/>
+    </step>  
+
+    <step id="14013" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="14013"/>
+    </step>
+    
+    <!-- Subcase 2 -->  
+    <step id="14021" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="14021"/>
+    </step>
+
+<!-- 9.1.2.21.5 TIMER MANAGEMENT, maximum timer value -->
+
+    <!-- Subcase 1 -->
+    <step id="15011" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="15011"/>
+    </step>
+
+<!-- 9.1.2.21.6 TIMER MANAGEMENT, bad cases -->
+
+    <!-- Subcase 1 -->
+    <step id="16011" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="16011"/>
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="16021" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="16021"/>
+    </step>
+
+    <!-- Subcase 3 -->
+    <step id="16031" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="16031"/>
+    </step>
+
+    <!-- Subcase 4 -->
+    <step id="16041" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="16041"/>
+    </step>
+
+    <!-- Subcase 5 -->
+    <step id="16051" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="16051"/>
+    </step>
+    
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+<!-- 9.1.2.21.1 TIMER MANAGEMENT, single timer -->
+
+    <!-- Subcase 1,2 -->
+    <step id="21011" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="21011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 3 -->
+    <step id="21031" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="21031"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 4 -->
+    <step id="21041" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="21041"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 5 -->
+    <step id="21051" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="21051"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="21052" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="21052"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 6 -->
+    <step id="21061" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="21061"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 9.1.2.21.2 TIMER MANAGEMENT, multiple timers -->
+
+    <!-- Subcase 1 -->
+    <step id="22011" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22012" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22012"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22013" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22013"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22014" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22014"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22015" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22015"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22016" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22016"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22017" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22017"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22018" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22018"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="22021" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22021"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 3 -->
+    <step id="22031" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22031"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 4 -->
+    <step id="22041" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22041"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 5 -->
+    <step id="22051" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22051"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22052" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22052"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22053" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22053"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22054" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22054"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22055" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22055"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22056" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22056"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22057" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22057"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="22058" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="22058"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <step id="23011" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="23011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="23012" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="23012"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="23021" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="23021"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="23022" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="23022"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="23023" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="23023"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 9.1.2.21.4 TIMER MANAGEMENT when SIM Application Toolkit is busy -->
+
+    <!-- Subcase 1 -->
+    <step id="24011" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="24011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="24012" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="24012"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="24013" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="24013"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="24021" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="24021"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 9.1.2.21.5 TIMER MANAGEMENT, maximum timer value -->
+
+    <!-- Subcase 1 -->
+    <step id="25011" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="25011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 9.1.2.21.6 TIMER MANAGEMENT, bad cases -->
+
+    <!-- Subcase 1 -->
+    <step id="26011" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="26011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="26021" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="26021"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 3, 4, 5 -->
+    <step id="26031" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="26031"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- ENVELOPES -->
+<!-- ********* -->
+
+<!-- 9.1.2.21.1 TIMER MANAGEMENT, single timer -->
+
+    <!-- Subcase 1 -->
+    <step id="41011" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="41011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="41021" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="41021"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 3 -->
+    <step id="41031" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="41031"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 9.1.2.21.2 TIMER MANAGEMENT, multiple timers -->
+
+    <!-- Subcase 5 -->
+    <step id="42051" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="42051"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="42052" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="42052"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="42053" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="42053"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="42054" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="42054"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="42055" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="42055"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="42056" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="42056"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="42057" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="42057"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="42058" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="42058"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <step id="43011" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="43011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="43012" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="43012"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 9.1.2.21.4 TIMER MANAGEMENT when SIM Application Toolkit is busy -->
+
+    <!-- Subcase 1 -->
+    <step id="44011" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="44011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="44012" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="44012"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="44021" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="44021"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="44022" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="44022"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="44023" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="44023"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="44024" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="44024"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="44025" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="44025"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 9.1.2.21.5 TIMER MANAGEMENT, maximum timer value -->
+
+    <!-- Subcase 1 -->
+    <step id="45011" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="45011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="45012" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="45012"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- SIM_ATK_REQ -->
+<!-- *********** -->
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <step id="53011" type="intercept">
+        <name>Intercept SIM_ATK_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="53011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="53021" type="intercept">
+        <name>Intercept SIM_ATK_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="53021"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- SIM_ATK_RESP -->
+<!-- ************ -->
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+
+    <!-- Subcase 1 -->
+    <step id="63011" type="simulate">
+        <name>Simulate SIM_ATK_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="63011"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+    <!-- Subcase 2 -->
+    <step id="63021" type="simulate">
+        <name>Simulate SIM_ATK_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="63021"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+<!-- ATK SW DATA NTF -->
+<!-- *************** -->
+
+    <step id="70001" type="simulate">
+        <name>SIM -> ME Normal ending</name>
+        <channel id="0x07"/>
+        <input-ref id="70001"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+    <step id="70002" type="simulate">
+        <name>SIM -> ME SIM Application Toolkit is busy</name>
+        <channel id="0x07"/>
+        <input-ref id="70002"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+    <step id="70003" type="simulate">
+        <name>SIM -> ME Data to be fetched</name>
+        <channel id="0x07"/>
+        <input-ref id="70003"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+    <step id="70004" type="simulate">
+        <name>SIM -> ME Data to be fetched</name>
+        <channel id="0x07"/>
+        <input-ref id="70004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+    </step>
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+    
+    <step id="90004" type="sleep">
+        <name>Sleep for 7 min, 42 seconds</name>
+        <timeout>462000</timeout>
+        <block>false</block>
+    </step>
+    
+    <step id="90005" type="sleep">
+        <name>Sleep for 65 seconds</name>
+        <timeout>65000</timeout>
+        <block>false</block>
+    </step>
+    
+    <step id="90006" type="sleep">
+        <name>Sleep for 1 second</name>
+        <timeout>1000</timeout>
+        <block>false</block>
+    </step>
+    
+    <step id="90007" type="sleep">
+        <name>Sleep for 58 seconds</name>
+        <timeout>58000</timeout>
+        <block>false</block>
+    </step>
+    
+    <step id="90008" type="sleep">
+        <name>Sleep for 4 seconds</name>
+        <timeout>4000</timeout>
+        <block>false</block>
+    </step>
+
+</steps>
+
+<!-- ****** -->
+<!-- GROUPS -->
+<!-- ****** -->
+<groups>
+<!-- 9.1.2.21.2 TIMER MANAGEMENT, multiple timers -->
+
+    <!-- Subcase 5 -->
+    <group id="42050">
+        <name>Intercept Envelopes</name>
+        <test-steps>
+            <step-ref id="42051"/> <!-- Receive ENVELOPE (Timer Expiration), Timer ID = 8 -->
+            <step-ref id="42052"/> <!-- Receive ENVELOPE (Timer Expiration), Timer ID = 7 -->
+            <step-ref id="42053"/> <!-- Receive ENVELOPE (Timer Expiration), Timer ID = 6 -->
+            <step-ref id="42054"/> <!-- Receive ENVELOPE (Timer Expiration), Timer ID = 5 -->
+            <step-ref id="42055"/> <!-- Receive ENVELOPE (Timer Expiration), Timer ID = 4 -->
+            <step-ref id="42056"/> <!-- Receive ENVELOPE (Timer Expiration), Timer ID = 3 -->
+            <step-ref id="42057"/> <!-- Receive ENVELOPE (Timer Expiration), Timer ID = 2 -->
+            <step-ref id="42058"/> <!-- Receive ENVELOPE (Timer Expiration), Timer ID = 1 -->
+        </test-steps>
+    </group>
+</groups>
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+<!-- 9.1.2.21.1 TIMER MANAGEMENT, single timer -->
+    <case id="101">
+        <name> 9.1.2.21.1 TIMER MANAGEMENT, single timer, subcase 1</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="11011"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 1 -->
+            <step-ref id="21011"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+
+            <step-ref id="41011"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->            
+        </test-steps>
+    </case>
+
+    <case id="102">
+        <name> 9.1.2.21.1 TIMER MANAGEMENT, single timer, subcase 2</name>
+        <timeout>480</timeout>
+        <test-steps>
+            <step-ref id="11021"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 1 -->
+            <step-ref id="21011"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->            
+
+            <step-ref id="11022"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 1 -->
+            <step-ref id="21011"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->            
+
+            <step-ref id="11023"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 1 -->
+            <step-ref id="21011"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+            
+            <step-ref id="90004"/> <!-- Sleep for 7 min, 42 seconds -->                        
+
+            <step-ref id="41021"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->            
+        </test-steps>
+    </case>
+
+    <case id="103">
+        <name> 9.1.2.21.1 TIMER MANAGEMENT, single timer, subcase 3</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="11031"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 8 -->
+            <step-ref id="21031"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->            
+
+            <step-ref id="11032"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 8 -->
+            <step-ref id="21031"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->            
+
+            <step-ref id="11033"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 8 -->
+            <step-ref id="21031"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+
+            <step-ref id="41031"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70004"/> <!-- Send SIM -> ME Data to be fetched -->            
+        </test-steps>
+    </case>
+
+    <case id="104">
+        <name> 9.1.2.21.1 TIMER MANAGEMENT, single timer, subcase 4</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="11041"/> <!-- Send TIMER MANAGEMENT PCMD, Query timer ID = 8 -->
+            <step-ref id="21041"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->            
+        </test-steps>
+    </case>
+
+    <case id="105">
+        <name> 9.1.2.21.1 TIMER MANAGEMENT, single timer, subcase 5</name>
+        <timeout>70</timeout>
+        <test-steps>
+            <step-ref id="11051"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 3 -->
+            <step-ref id="21051"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70004"/> <!-- Send SIM -> ME Data to be fetched -->            
+
+            <step-ref id="11052"/> <!-- Send TIMER MANAGEMENT PCMD, Deactivate timer ID = 3 -->
+            <step-ref id="21052"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+            
+            <step-ref id="90005"/> <!-- Sleep 65 seconds, no envelopes -->
+        </test-steps>
+    </case>
+
+    <case id="106">
+        <name> 9.1.2.21.1 TIMER MANAGEMENT, single timer, subcase 6</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="11052"/> <!-- Send TIMER MANAGEMENT PCMD, Deactivate timer ID = 3 -->
+            <step-ref id="21061"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+        </test-steps>
+    </case>
+
+<!-- 9.1.2.21.2 TIMER MANAGEMENT, multiple timers -->
+    <case id="201">
+        <name>9.1.2.21.2 TIMER MANAGEMENT, multiple timers, subcase 1</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <!-- Start Timers -->
+            <step-ref id="12011"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 8 -->
+            <step-ref id="22011"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12012"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 7 -->
+            <step-ref id="22012"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12013"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 6 -->
+            <step-ref id="22013"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12014"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 5 -->
+            <step-ref id="22014"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12015"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 3 -->
+            <step-ref id="22015"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12016"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 2 -->
+            <step-ref id="22016"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12017"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 1 -->
+            <step-ref id="22017"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70004"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <!-- Get current value -->
+            <step-ref id="90006"/> <!-- Sleep one second -->
+            
+            <step-ref id="12018"/> <!-- Send TIMER MANAGEMENT PCMD, Query timer ID = 1 -->
+            <step-ref id="22018"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70004"/> <!-- Send SIM -> ME Data to be fetched -->
+        </test-steps>
+    </case>
+
+    <case id="202">
+        <name>9.1.2.21.2 TIMER MANAGEMENT, multiple timers, subcase 2</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="12021"/> <!-- Send TIMER MANAGEMENT PCMD, Query timer ID = 4 -->
+            <step-ref id="22021"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70004"/> <!-- Send SIM -> ME Data to be fetched -->
+        </test-steps>
+    </case>        
+
+    <case id="203">
+        <name>9.1.2.21.2 TIMER MANAGEMENT, multiple timers, subcase 3</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="12031"/> <!-- Send TIMER MANAGEMENT PCMD, Deactivate timer ID = 4 -->
+            <step-ref id="22031"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+        </test-steps>
+    </case>        
+
+    <case id="204">
+        <name>9.1.2.21.2 TIMER MANAGEMENT, multiple timers, subcase 4</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="12041"/> <!-- Send TIMER MANAGEMENT PCMD, Deactivate timer ID = 4 -->
+            <step-ref id="22041"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+        </test-steps>
+    </case>        
+
+    <case id="205">
+        <name>9.1.2.21.2 TIMER MANAGEMENT, multiple timers, subcase 5</name>
+        <timeout>120</timeout>
+        <test-steps>
+            <step-ref id="12051"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 1 -->
+            <step-ref id="22051"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12052"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 2 -->
+            <step-ref id="22052"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12053"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 3 -->
+            <step-ref id="22053"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12054"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 4 -->
+            <step-ref id="22054"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12055"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 5 -->
+            <step-ref id="22055"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12056"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 6 -->
+            <step-ref id="22056"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12057"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 7 -->
+            <step-ref id="22057"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="12058"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 8 -->
+            <step-ref id="22058"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+
+            <step-ref id="90007"/> <!-- Sleep for 58 seconds -->
+            
+            <step-ref id="42050"/> <!-- Receive ENVELOPE (Timer Expiration) in undefined order -->
+            
+            <step-ref id="90008"/> <!-- Sleep four seconds, make sure no additional envelopes are received -->
+        </test-steps>
+    </case>
+
+<!-- 9.1.2.21.3 TIMER MANAGEMENT and Refresh -->
+    <case id="301">
+        <name>9.1.2.21.3 TIMER MANAGEMENT and Refresh, subcase 1</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="13011"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 1 -->
+            <step-ref id="23011"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+
+            <step-ref id="13012"/> <!-- Send REFRESH PCMD -->
+            <step-ref id="53011"/> <!-- Receive SIM_ATK_REQ(refresh, SIM Initialization and File Change Notification) -->
+            <step-ref id="43011"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70002"/> <!-- Send SIM Application Toolkit is busy -->
+            
+            <step-ref id="63011"/> <!-- Send SIM_ATK_RESP -->
+            <step-ref id="23012"/> <!-- Receive REFRESH TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+
+            <step-ref id="43012"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+
+            <step-ref id="90008"/> <!-- Sleep four seconds, make sure no additional envelopes are received -->
+        </test-steps>
+    </case>
+
+    <case id="302">
+        <name>9.1.2.21.3 TIMER MANAGEMENT and Refresh, subcase 2</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="13021"/> <!-- Send TIMER MANAGEMENT PCMD, Start timer ID = 1 -->
+            <step-ref id="23021"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+
+            <step-ref id="13022"/> <!-- Send REFRESH PCMD -->
+            <step-ref id="53021"/> <!-- Receive SIM_ATK_REQ(refresh, SIM Initialization and File Change Notification) -->
+            <step-ref id="63021"/> <!-- Send SIM_ATK_RESP -->
+            <step-ref id="23022"/> <!-- Receive REFRESH TERMINAL RESPONSE -->
+            
+            <step-ref id="90006"/> <!-- Sleep one second -->
+
+            <step-ref id="13023"/> <!-- Send TIMER MANAGEMENT PCMD, Query timer ID =  -->
+            <step-ref id="23023"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+
+            <step-ref id="90008"/> <!-- Sleep four seconds, make sure no additional envelopes are received -->
+        </test-steps>
+    </case>
+
+<!-- 9.1.2.21.4 TIMER MANAGEMENT when SIM Application Toolkit is busy -->
+    <case id="401">
+        <name>9.1.2.21.4 TIMER MANAGEMENT when SIM Application Toolkit is busy, subcase 1</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="14011"/> <!-- Send TIMER MANAGEMENT PCMD -->
+            <step-ref id="24011"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+            
+            <step-ref id="14012"/> <!-- Send DISPLAY TEXT PCMD -->
+                      
+            <step-ref id="44011"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70002"/> <!-- Send SIM Application Toolkit is busy -->
+            
+            <step-ref id="24012"/> <!-- Receive DISPLAY TEXT TR -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+
+            <step-ref id="14013"/> <!-- Send DISPLAY TEXT PCMD -->
+            <step-ref id="24013"/> <!-- Receive DISPLAY TEXT TR -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+
+            <step-ref id="44012"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+
+            <step-ref id="90008"/> <!-- Sleep four seconds, make sure no additional envelopes are received -->
+            
+        </test-steps>
+    </case>
+
+    <case id="402">
+        <name>9.1.2.21.4 TIMER MANAGEMENT when SIM Application Toolkit is busy, subcase 2</name>
+        <timeout>30</timeout>
+        <test-steps>
+            <step-ref id="14021"/> <!-- Send TIMER MANAGEMENT PCMD -->
+            <step-ref id="24021"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+            
+            <step-ref id="90008"/> <!-- Sleep four seconds -->
+            
+            <step-ref id="44021"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70002"/> <!-- Send SIM Application Toolkit is busy -->
+            
+            <step-ref id="44022"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70002"/> <!-- Send SIM Application Toolkit is busy -->
+            
+            <step-ref id="44023"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70002"/> <!-- Send SIM Application Toolkit is busy -->
+            
+            <step-ref id="44024"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70002"/> <!-- Send SIM Application Toolkit is busy -->
+            
+            <step-ref id="44025"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+            
+            <step-ref id="90008"/> <!-- Sleep four seconds, make sure no additional envelopes are received -->
+            
+        </test-steps>
+    </case>
+    
+<!-- 9.1.2.21.5 TIMER MANAGEMENT, maximum timer value -->
+    <case id="501">
+        <name>9.1.2.21.5 TIMER MANAGEMENT, maximum timer value, subcase 1</name>
+        <timeout>0</timeout>
+        <test-steps>
+            <step-ref id="15011"/> <!-- Send TIMER MANAGEMENT PCMD -->
+            <step-ref id="25011"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+            
+            <step-ref id="45011"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70002"/> <!-- Send SIM Application Toolkit is busy -->
+            
+            <step-ref id="45012"/> <!-- Receive ENVELOPE (Timer Expiration) -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+            
+            <step-ref id="90008"/> <!-- Sleep four seconds, make sure no additional envelopes are received -->
+            
+        </test-steps>
+    </case>
+    
+<!-- 9.1.2.21.6 TIMER MANAGEMENT, bad cases -->
+    <case id="601">
+        <name>9.1.2.21.6 TIMER MANAGEMENT, bad cases, subcase 1</name>
+        <timeout>0</timeout>
+        <test-steps>
+            <step-ref id="16011"/> <!-- Send TIMER MANAGEMENT PCMD -->
+            <step-ref id="26011"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+        </test-steps>
+    </case>
+
+    <case id="602">
+        <name>9.1.2.21.6 TIMER MANAGEMENT, bad cases, subcase 2</name>
+        <timeout>0</timeout>
+        <test-steps>
+            <step-ref id="16021"/> <!-- Send TIMER MANAGEMENT PCMD -->
+            <step-ref id="26021"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+        </test-steps>
+    </case>
+
+    <case id="603">
+        <name>9.1.2.21.6 TIMER MANAGEMENT, bad cases, subcase 3</name>
+        <timeout>0</timeout>
+        <test-steps>
+            <step-ref id="16031"/> <!-- Send TIMER MANAGEMENT PCMD -->
+            <step-ref id="26031"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+        </test-steps>
+    </case>
+
+    <case id="604">
+        <name>9.1.2.21.6 TIMER MANAGEMENT, bad cases, subcase 4</name>
+        <timeout>0</timeout>
+        <test-steps>
+            <step-ref id="16041"/> <!-- Send TIMER MANAGEMENT PCMD -->
+            <step-ref id="26031"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70003"/> <!-- Send SIM -> ME Data to be fetched -->
+        </test-steps>
+    </case>
+
+    <case id="605">
+        <name>9.1.2.21.6 TIMER MANAGEMENT, bad cases, subcase 5</name>
+        <timeout>0</timeout>
+        <test-steps>
+            <step-ref id="16051"/> <!-- Send TIMER MANAGEMENT PCMD -->
+            <step-ref id="26031"/> <!-- Receive TIMER MANAGEMENT TERMINAL RESPONSE -->
+            <step-ref id="70001"/> <!-- Send SIM -> ME Normal ending -->
+        </test-steps>
+    </case>
+
+</cases>
+
+</isc-test-control>

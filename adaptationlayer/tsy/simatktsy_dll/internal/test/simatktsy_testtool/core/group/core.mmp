@@ -1,0 +1,70 @@
+/*
+* Copyright (c) 2002-2006 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:   ?Description
+*
+*/
+
+
+
+#include <non_foundation_paths.hrh>
+// Internal flags
+#include    "../../group/support.h"
+
+#ifdef LEGACY_SUPPORT
+// Set macro for cpp/h files
+MACRO    LEGACY   
+#endif // LEGACY_SUPPORT
+
+#ifndef LEGACY_SUPPORT
+#include <platform_paths.hrh>
+#endif // LEGACY_SUPPORT
+
+TARGET          simatkcore.dll
+TARGETTYPE      dll
+UID             0x1000008D 0x101FB3E3
+FEATUREVARIANT
+
+CAPABILITY	ALL -TCB
+VENDORID 	0x101FB657
+
+DEFFILE         core.def
+
+SOURCEPATH      ../src
+SOURCE          core.cpp
+SOURCE          coreblocks.cpp
+
+USERINCLUDE	../../notify/inc
+USERINCLUDE     ../inc
+USERINCLUDE   	../../SimAtk/inc
+
+#ifndef LEGACY_SUPPORT
+// Dependencies from other components
+OS_LAYER_SYSTEMINCLUDE
+#else
+SYSTEMINCLUDE   /epoc32/include 
+#endif // LEGACY_SUPPORT
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
+
+LIBRARY         euser.lib
+LIBRARY         stiftestinterface.lib
+LIBRARY		etel.lib //For RTelServer
+LIBRARY		etelmm.lib
+LIBRARY		etelpckt.lib
+LIBRARY		simatknotify.lib
+LIBRARY		c32.lib //For RCommServer
+
+LANG			SC
+
+
+// End of File

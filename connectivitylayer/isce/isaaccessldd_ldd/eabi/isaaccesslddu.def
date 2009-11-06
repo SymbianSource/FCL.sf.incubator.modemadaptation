@@ -1,0 +1,14 @@
+EXPORTS
+	_Z19CreateLogicalDevicev @ 1 NONAME
+	_ZN14DISAUserDeviceC1Ev @ 2 NONAME
+	_ZN14DISAUserDeviceC2Ev @ 3 NONAME
+	_ZN14DISAUserDeviceD0Ev @ 4 NONAME
+	_ZN14DISAUserDeviceD1Ev @ 5 NONAME
+	_ZN14DISAUserDeviceD2Ev @ 6 NONAME
+	_ZN15DISAUserChannelC1Ev @ 7 NONAME
+	_ZN15DISAUserChannelC2Ev @ 8 NONAME
+	_ZTI14DISAUserDevice @ 9 NONAME ; #<TI>#
+	_ZTI15DISAUserChannel @ 10 NONAME ; #<TI>#
+	_ZTV14DISAUserDevice @ 11 NONAME ; #<VT>#
+	_ZTV15DISAUserChannel @ 12 NONAME ; #<VT>#
+

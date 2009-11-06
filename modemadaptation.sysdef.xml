@@ -1,0 +1,5 @@
+    <layer name="modemadaptation">
+        <module name="modemadaptation">
+                <unit name="modemadaptation_group" unitID="modemadaptation.group" bldFile="&corecom_path;/modemadaptation/group" mrp="" />
+       </module>
+    </layer>

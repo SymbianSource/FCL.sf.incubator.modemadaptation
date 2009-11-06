@@ -1,0 +1,2570 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<isc-test-control id="1">
+
+
+
+  <!-- Channels that are opened during startup and closed when test environment exits -->
+  <channels>
+  </channels>
+
+  <!-- Test inputs are declared here -->
+  <inputs>
+
+    <input id="1001">
+     <name>NET_MODEM_REG_STATUS_IND, NET_REG_STATUS_NOSERV_NOSIM</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,0A,07,33,00,02,00,01,00,04,06,02</message>
+    </input>
+
+    <input id="1002">
+     <name>NET_MODEM_REG_STATUS_IND, NET_REG_STATUS_NOSERV_SIM_REJECTED_BY_NW</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,26,07,33,00,02,00,03,00,04,0B,02,09,18,05,9A,00,00,31,99,42,F4,19,00,00,01,00,00,00,00,00,00,00,00,01,00,0F,04,02,00</message>
+    </input>
+
+    <input id="1006">
+     <name>SIM_CS_READ_RESP, 244 070</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,1E,07,2A,04,D5,01,4B,02,00,00,00,00,8A,00,08,03,00,00,00,00,70,00,0C,01,00,00,00,03,42,04,70</message>
+    </input>
+
+    <input id="1007">
+     <name>SIM_CS_READ_RESP, 100 010</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,1E,07,2A,04,D5,01,4B,02,00,00,00,00,8A,00,08,03,00,00,00,00,70,00,0C,01,00,00,00,03,01,00,10</message>
+    </input>
+
+    <input id="1008">
+     <name>SIM_CS_READ_RESP, 244 91</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,1E,07,2A,04,D5,01,4B,02,00,00,00,00,8A,00,08,03,00,00,00,00,70,00,0C,01,00,00,00,03,42,F4,19</message>
+    </input>
+
+    <input id="1009">
+     <name>SIM_CS_READ_RESP, 454 18</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,1E,07,2A,04,D5,01,4B,02,00,00,00,00,8A,00,08,03,00,00,00,00,70,00,0C,01,00,00,00,03,54,F4,81</message>
+    </input>
+
+    <input id="1010">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,06,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+    </input>
+
+    <input id="1011">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator "FIN 70"</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,06,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,07,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+    </input>
+
+    <input id="1012">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator "100 10"</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,06,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,01,F0,01,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+    </input>
+
+    <input id="1015">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,04,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+    </input>
+
+    <input id="1016">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator CSL, APAC_NAME</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,04,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,54,F4,81,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+    </input>
+
+    <input id="1017">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator CSL, APAC_NAME</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,06,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,54,F4,81,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+    </input>
+
+    <input id="1018">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,06,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,70,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+    </input>
+
+    <input id="1020">
+     <name>NET_MODEM_AVAILABLE_GET_RESP, SONERA elisa dna NOKIA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,46,07,33,04,04,00,08,01,04,02,01,01,04,03,02,01,04,03,03,01,04,03,04,0B,0C,42,F4,19,00,00,01,05,9A,00,00,0B,0C,42,F4,50,00,02,01,07,D0,00,00,0B,0C,42,F4,21,00,02,01,03,20,00,00,0B,0C,42,F4,70,00,02,01,1F,B9,00,00</message>
+    </input>
+
+    <input id="1023">
+     <name>NET_SET_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,33,04,08,00,02,00,04,00,01,09,18,13,8E,00,06,E0,BF,42,F4,19,02,00,01,02,01,00,00,00,06,01,00,01,00</message>
+    </input>
+
+    <input id="1025">
+     <name>GSS_CS_SERVICE_RESP set OK</name>
+     <direction>sos</direction>
+     <message>1E,10,00,32,00,0E,00,00,06,01,9D,01,12,08,00,00,00,00,00,10</message>
+    </input>
+
+    <input id="1026">
+     <name>GSS_CS_SERVICE_RESP get UMTS 2100</name>
+     <direction>sos</direction>
+     <message>1E,10,00,32,00,0E,00,00,06,01,9E,01,12,08,00,00,00,00,00,01</message>
+    </input>
+
+    <input id="1027">
+     <name>GSS_CS_SERVICE_RESP get DUAL ANY</name>
+     <direction>sos</direction>
+     <message>1E,10,00,32,00,12,00,00,06,01,9E,02,0B,04,00,00,12,08,00,00,FF,FF,FF,FF</message>
+    </input>
+
+    <input id="1028">
+     <name>GSS_CS_SERVICE_FAIL_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,32,00,06,00,00,06,02,9D,02</message>
+    </input>
+
+    <input id="1029">
+     <name>GSS_CS_SERVICE_RESP FORCED GSM</name>
+     <direction>sos</direction>
+     <message>1E,10,00,32,00,0E,00,00,06,01,9E,01,12,08,00,00,00,00,00,00</message>
+    </input>
+
+    <input id="1030">
+     <name>GSS_CS_SERVICE_RESP UMTS 850</name>
+     <direction>sos</direction>
+     <message>1E,10,00,32,00,0E,00,00,06,01,9E,02,13,04,00,00,12,08,00,00,00,00,00,10</message>
+    </input>
+
+    <input id="1031">
+     <name>GSS_CS_SERVICE_RESP FORCED UMTS</name>
+     <direction>sos</direction>
+     <message>1E,10,00,32,00,0E,00,00,06,01,9E,02,13,04,00,00,12,08,00,00,FF,FF,FF,FF</message>
+    </input>
+
+    <input id="1032">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,04,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+    </input>
+
+    <input id="1033">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA, HSUPA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,04,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,00,00,06,00,01,01,00</message>
+    </input>
+
+    <input id="1034">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA, HSDPA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,04,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,00,00,06,01,00,01,00</message>
+    </input>
+
+    <input id="1035">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA, HSDPA and HSUPA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,32,04,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,00,00,06,01,01,01,00</message>
+    </input>
+
+    <input id="1036">
+     <name>NET_NEIGHBOUR_CELLS_RESP 1</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,0E,00,00,06,1b,00,01,3f,00,00,58,00,02,8c,c9,01,c6,00,13,01,48,29,5d,02,00,00,00,29,5d,10,04,00,02,8c,c9,01,48,1a,14,81,00,00,00,ff,ff,ff,ff,01,49,1c,15,ff,00,00,00,ff,ff,ff,ff,01,78,14,11,ff,00,00,00,ff,ff,ff,ff,01,3b,20,17,ff,00,00,00,29,44,0d,01,00,02,8c,c9,01,48,1f,13,ff,00,00,00</message>
+    </input>
+
+    <input id="1037">
+     <name>NET_NEIGHBOUR_CELLS_RESP 2</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,0E,00,00,06,1b,00,01,3f,00,00,78,00,02,8c,c9,01,c6,00,13,01,48,29,5d,04,00,00,00,29,5d,10,04,00,02,8c,c9,01,48,1a,14,81,00,00,00,ff,ff,ff,ff,01,49,1c,15,ff,00,00,00,ff,ff,ff,ff,01,78,14,11,ff,00,00,00,ff,ff,ff,ff,01,3b,20,17,ff,00,00,00,29,44,0d,01,00,02,8c,c9,01,48,1f,13,ff,00,00,00,27,0f,0c,00,22,b8,0b,02,00,02,71,00,00,05,06,07,08,00,00,00,00,02,49,f0,00,09,0a,0b,0c,00,00,00</message>
+    </input>
+
+    <input id="1038">
+     <name>NET_NETWORK_SELECT_MODE_SET_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,06,08,34,04,1D,00,00</message>
+    </input>
+
+    <input id="1039">
+     <name>SIM_READ_CI_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,06,00,00,04,61,FA,30</message>
+    </input>
+
+    <input id="1040">
+     <name>SIM_READ_CI_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,06,00,00,00,61,FA,30</message>
+    </input>
+
+    <input id="1041">
+     <name>NET_CS_WAKEUP_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,04,00,00,06,10</message>
+    </input>
+
+    <input id="1042">
+     <name>NET_SET_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,06,00,00,06,08,00,00</message>
+    </input>
+
+    <input id="1043">
+     <name>NET_RAT_RESP, GSM RAT</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,0A,00,00,06,37,00,01,2C,04,01,00</message>
+    </input>
+
+    <input id="1044">
+     <name>GSS_CS_SERVICE_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,32,00,06,00,00,06,01,0E,00</message>
+    </input>
+
+    <input id="1047">
+     <name>MTC_RAT_QUERY_RESP, MTC_GSM_RAT</name>
+     <direction>sos</direction>
+     <message>1E,10,00,15,00,06,00,00,06,71,02,00</message>
+    </input>
+
+    <input id="1048">
+     <name>NET_TIME_IND</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,12,00,00,00,27,00,01,10,0C,08,02,03,14,18,00,00,64,00,00</message>
+    </input>
+
+    <input id="1049">
+     <name>NET_CIPHERING_IND</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,0E,00,00,00,20,01,01,29,08,01,01,01,00,00,00</message>
+    </input>
+
+    <input id="1050">
+     <name>SIM_READ_CI_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,06,00,00,01,61,FA,30</message>
+    </input>
+
+    <input id="1051">
+     <name>NET_AVAILABLE_CANCEL_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,06,00,00,04,06,00,00</message>
+    </input>
+
+    <input id="1052">
+     <name>NET_SET_CANCEL_RESP</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,06,00,00,04,0A,00,00</message>
+    </input>
+
+    <input id="1053">
+     <name>NET_MODEM_REG_STATUS_IND, Operator NOKIA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,33,00,02,00,02,00,04,00,01,09,18,20,94,00,09,24,7D,42,F4,70,02,00,01,02,01,00,00,00,08,01,01,01,00</message>
+    </input>
+
+    <input id="1059">
+     <name>SIM_CS_READ_RESP (with O2 HPLMN: 62,F2,80)</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,16,08,36,04,D5,01,01,01,00,00,00,00,70,00,0C,01,00,00,00,03,62,F2,80</message>
+    </input>
+
+    <input id="1060">
+     <name>NET_MODEM_REG_STATUS_IND (O2 current network Id in NET_MODEM_GSM_REG_INFO subblock)</name>
+     <direction>sos</direction>
+     <message>00,00,10,C8,00,22,20,01,00,02,00,02,00,04,01,02,09,18,00,00,00,00,00,00,62,F2,70,00,00,00,00,00,00,00,00,00,00,00,01,00</message>
+    </input>
+
+    <input id="1061">
+     <name>NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_CURRENT_CELL_INFO subblock)</name>
+     <direction>sos</direction>
+     <message>00,00,10,C8,00,22,20,01,00,02,00,02,00,04,01,02,39,18,00,00,00,00,00,00,62,F2,70,00,00,00,00,00,00,00,00,00,00,00,01,00</message>
+    </input>
+
+    <input id="1062">
+     <name>NET_MODEM_REG_STATUS_GET_RESP (with O2 current network in NET_MODEM_GSM_REG_INFO subblock)</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,0A,08,36,00,01,00,02,00,10,01,02,00,00,00,02,00,4f,00,32,01,00,01,00,09,18,00,01,00,00,00,01,62,f2,70,02,03,00,00,00,00,00,00,00,00,00,01,00</message>
+    </input>
+
+    <input id="1063">
+     <name>NET_MODEM_REG_STATUS_IND (non-O2 current network Id in NET_MODEM_GSM_REG_INFO subblock)</name>
+     <direction>sos</direction>
+     <message>00,00,10,C8,00,22,20,01,00,02,00,02,00,04,01,02,39,18,00,00,00,00,00,00,62,F3,70,00,00,00,00,00,00,00,00,00,00,00,01,00</message>
+    </input>
+
+    <input id="1064">
+     <name>NET_RAT_RESP(NET_CAUSE_OK)</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,0A,00,00,DC,37,00,01,2C,04,01,00</message>
+    </input>
+
+    <input id="1065">
+     <name>NET_SET_RESP(O2 network Id in NET_MODEM_GSM_REG_INFO subblock)</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,08,34,04,08,00,02,00,04,01,01,09,18,00,01,00,00,00,01,62,F2,70,02,03,00,00,00,00,00,00,00,00,00,01,00</message>
+    </input>
+
+    <input id="1070">
+     <name>NET_MODEM_AVAILABLE_GET_RESP, NET_CAUSE_REQUEST_INTERRUPTED</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,06,07,33,04,04,12,00</message>
+    </input>
+
+    <input id="1071">
+     <name>INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0"</name>
+     <direction>sos</direction>
+     <message>1E,10,00,1B,00,0E,07,1F,04,03,00,01,47,08,00,01,D6,00,00,00</message>
+    </input>
+
+    <input id="1072">
+     <name>INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "1"</name>
+     <direction>sos</direction>
+     <message>1E,10,00,1B,00,0E,07,1F,04,03,00,01,47,08,00,01,D6,01,00,00</message>
+    </input>
+
+    <input id="1073">
+     <name>INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "2"</name>
+     <direction>sos</direction>
+     <message>1E,10,00,1B,00,0E,07,1F,04,03,00,01,47,08,00,01,D6,02,00,00</message>
+    </input>
+
+    <input id="1074">
+     <name>INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "3"</name>
+     <direction>sos</direction>
+     <message>1E,10,00,1B,00,0E,07,1F,04,03,00,01,47,08,00,01,D6,03,00,00</message>
+    </input>
+
+    <input id="1075">
+     <name>PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, NOKIA, NOKIA)</name>
+     <direction>sos</direction>
+     <message>1E,10,00,23,00,52,07,1A,04,05,00,01,00,00,00,00,00,00,00,4C,00,00,00,40,00,F4,00,07,00,4E,00,4F,00,4B,00,49,00,41,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,4E,00,4F,00,4B,00,49,00,41,00,00,00,00,00,00,00,00,00,00</message>
+    </input>
+
+    <input id="1076">
+     <name>PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, TEST NETWORK OULU, NTN OULU)</name>
+     <direction>sos</direction>
+     <message>1E,10,00,23,00,52,07,1A,04,05,00,01,00,00,00,00,00,00,00,4C,00,00,00,40,00,F4,00,07,00,54,00,45,00,53,00,54,00,20,00,4E,00,45,00,54,00,57,00,4F,00,52,00,4B,00,20,00,4F,00,55,00,4C,00,55,00,00,00,00,00,00,00,4E,00,54,00,4E,00,20,00,4F,00,55,00,4C,00,55,00,00,00,00</message>
+    </input>
+
+    <input id="1077">
+     <name>PERM_PM_RECORD_READ_RESP, Error case PMM_RECORD_NOT_FOUND</name>
+     <direction>sos</direction>
+     <message>1E,10,00,23,00,06,07,1A,04,05,11,00</message>
+    </input>
+
+    <input id="1078">
+     <name>PERM_PM_RECORD_WRITE_RESP, Successful case</name>
+     <direction>sos</direction>
+     <message>1E,10,00,23,00,0A,07,1A,04,03,00,01,05,04,26,00</message>
+    </input>
+
+    <input id="1079">
+     <name>PERM_PM_RECORD_WRITE_RESP, Error case PMM_RECORD_NOT_FOUND</name>
+     <direction>sos</direction>
+     <message>1E,10,00,23,00,06,07,32,04,03,11,00</message>
+    </input>
+
+    <input id="1080">
+     <name>SIM_OPERATOR_RESP, READ_NAME SIM_SERV_DATA_NOT_AVAIL</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,38,07,2A,04,34,3E,24,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00</message>
+    </input>
+
+    <input id="1081">
+     <name>SIM_OPERATOR_RESP, READ_NAME NOKIA ONS NIMI</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,38,07,2A,04,34,3E,01,00,4E,00,4F,00,4B,00,49,00,41,00,20,00,4F,00,4E,00,53,00,20,00,4E,00,49,00,4D,00,49,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00</message>
+    </input>
+
+    <input id="1082">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_OPL SIM_SERV_DATA_NOT_AVAIL</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,0A,07,2A,04,34,13,24,00,00,00,00</message>
+    </input>
+
+    <input id="1083">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,12,07,2A,04,34,13,01,01,00,00,00,42,F4,70,00,00,FF,FE,02</message>
+    </input>
+
+    <input id="1084">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,0A,07,2A,04,34,14,24,01,00,00,00</message>
+    </input>
+
+    <input id="1085">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 LAC RIGHT, GSM 7-bit Default alphabet coding</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,1A,07,2A,04,34,14,01,01,01,00,00,00,85,00,10,01,09,81,CC,E0,10,24,4D,1E,91,54,00</message>
+    </input>
+
+    <input id="1086">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 2 COMMON, UCS2 coding</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,1E,07,2A,04,34,14,01,02,01,00,00,00,85,00,14,01,0D,98,00,43,00,4F,00,4D,00,4D,00,4F,00,4E,00</message>
+    </input>
+
+    <input id="1087">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 2 COMMON COMM, UCS2 coding</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,2E,07,2A,04,34,14,01,02,02,00,00,00,85,00,14,01,0D,98,00,43,00,4F,00,4D,00,4D,00,4F,00,4E,00,00,86,00,10,01,09,98,00,43,00,4F,00,4D,00,4D,00</message>
+    </input>
+
+    <input id="1088">
+     <name>NET_NITZ_NAME_IND (244, 7, TEST NETWORK OULU, NTN OULU), GSM 7-Bit Default alphabet coding</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,32,07,33,00,43,42,F4,70,00,00,02,48,18,12,00,43,10,81,D4,E2,94,0A,72,16,A9,D7,A7,74,09,7A,56,99,55,00,00,49,10,0A,00,45,08,80,4E,AA,13,F4,AC,32,AB,00,00</message>
+    </input>
+
+    <input id="1089">
+     <name>NET_NITZ_NAME_IND (244, 7, NOKIA, NOKIA), GSM 7-Bit Default alphabet coding</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,33,00,43,42,F4,70,00,00,02,48,0C,08,00,43,06,85,CE,E7,32,19,04,49,0C,08,00,45,06,85,CE,E7,32,19,04</message>
+    </input>
+
+    <input id="1090">
+     <name>NET_NITZ_NAME_IND (244, 7, Test NOKIA, T NOKIA), UCS2 coding</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,3C,07,33,00,43,42,F4,70,00,00,02,48,1C,17,00,01,15,90,00,54,00,65,00,73,00,74,00,20,00,4E,00,4F,00,4B,00,49,00,41,00,49,18,11,00,02,0F,90,00,54,00,20,00,4E,00,4F,00,4B,00,49,00,41,00,00,00</message>
+    </input>
+
+    <input id="1091">
+     <name>PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, , NTN OULU)</name>
+     <direction>sos</direction>
+     <message>1E,10,00,23,00,52,07,1A,04,05,00,01,00,00,00,00,00,00,00,4C,00,00,00,40,00,F4,00,07,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,4E,00,54,00,4E,00,20,00,4F,00,55,00,4C,00,55,00,00,00,00</message>
+    </input>
+
+    <input id="1092">
+     <name>NET_MODEM_REG_STATUS_IND, Operator NOKIA, NET_REG_STATUS_ROAM</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,33,00,02,00,02,00,04,01,02,09,18,1F,B9,00,00,70,9F,42,F4,70,00,01,01,00,01,00,00,00,00,00,00,00,00</message>
+    </input>
+
+    <input id="1093">
+     <name>NET_MODEM_REG_STATUS_IND, Operator SONERA, NET_REG_STATUS_ROAM</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,33,00,02,00,02,00,04,01,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,01,01,02,01,00,00,00,06,01,00,00,00</message>
+    </input>
+
+    <input id="1094">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,4A,07,2A,04,34,13,01,08,00,00,00,13,01,71,00,00,FF,FE,02,13,D0,DD,00,00,FF,FE,01,13,D1,DD,00,00,FF,FE,01,13,D2,DD,00,00,FF,FE,01,13,D3,DD,00,00,FF,FE,01,13,D4,DD,00,00,FF,FE,01,13,D5,DD,00,00,FF,FE,01,09,01,81,00,00,FF,FE,04</message>
+    </input>
+
+    <input id="1095">
+     <name>NET_MODEM_REG_STATUS_IND, Operator NOKIA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,33,00,02,00,02,00,04,00,02,09,18,1F,B9,00,00,70,9F,42,F4,70,00,00,01,00,01,00,00,00,00,00,00,01,00</message>
+    </input>
+
+    <input id="1096">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,33,06,01,00,02,00,04,00,02,09,18,1F,B9,00,00,70,9F,42,F4,70,00,00,01,00,01,00,00,00,00,00,00,01,00</message>
+    </input>
+
+    <input id="1097">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA, NET_REG_STATUS_ROAM</name>
+     <direction>sos</direction>
+     <message>1E,10,00,C8,00,22,07,33,06,01,00,02,00,04,01,02,09,18,1F,B9,00,00,70,9F,42,F4,70,00,01,01,00,01,00,00,00,00,00,00,00,00</message>
+    </input>
+
+    <input id="1098">
+     <name>SIM_STATUS_RESP, SIM READY</name>
+     <direction>sos</direction>
+     <message>1E,10,00,09,00,0A,07,2A,07,C1,00,01,01,00,00,00</message>
+    </input>
+
+    <input id="1099">
+     <name>PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, MAXIMUM-LENGTH-NAME$, ~MAX-NAME~)</name>
+     <direction>sos</direction>
+     <message>1E,10,00,23,00,52,07,1A,04,05,00,01,00,00,00,00,00,00,00,4C,00,00,00,40,00,F4,00,07,00,4D,00,41,00,58,00,49,00,4D,00,55,00,4D,00,2D,00,4C,00,45,00,4E,00,47,00,54,00,48,00,2D,00,4E,00,41,00,4D,00,45,00,24,00,7E,00,4D,00,41,00,58,00,2D,00,4E,00,41,00,4D,00,45,00,7E</message>
+    </input>
+
+  </inputs>
+
+
+  <!-- Test outputs are declared here -->
+
+  <outputs>
+
+    <output id="1300">
+     <name>GSS_CS_SERVICE_REQ set UMTS 850</name>
+     <direction>dos</direction>
+     <message>00,00,00,32,00,00,00,00,06,00,9D,01,12,08,00,00,00,00,00,10</message>
+     <mask>   00,00,00,ff,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1301">
+     <name>GSS_CS_SERVICE_REQ set UMTS 2100</name>
+     <direction>dos</direction>
+     <message>00,00,00,32,00,00,00,00,06,00,9D,01,12,08,00,00,00,00,00,01</message>
+     <mask>   00,00,00,ff,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1302">
+     <name>GSS_CS_SERVICE_REQ set DUAL ANY</name>
+     <direction>dos</direction>
+     <message>00,00,00,32,00,00,00,00,06,00,9D,01,12,08,00,00,FF,FF,FF,FF</message>
+     <mask>   00,00,00,ff,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1303">
+     <name>GSS_CS_SERVICE_REQ get band</name>
+     <direction>dos</direction>
+     <message>00,00,00,32,00,00,00,00,06,00,9E,00</message>
+     <mask>   00,00,00,ff,00,00,00,00,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1304">
+     <name>NET_MODEM_REG_STATUS_GET_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,04,00,00,04,00</message>
+     <mask>   00,00,00,00,00,00,00,00,00,ff</mask>
+    </output>
+
+    <output id="1305">
+     <name>NET_NEIGHBOUR_CELLS_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,05,00,00,06,1A,05</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+    </output>
+
+    <output id="1306">
+     <name>NET_NETWORK_SELECT_MODE_SET_REQ Manual</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,05,00,00,04,1C,01</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+    </output>
+
+    <output id="1307">
+     <name>NET_NETWORK_SELECT_MODE_SET_REQ Automatic</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,05,00,00,04,1C,02</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+    </output>
+
+    <output id="1308">
+     <name>SIM_CS_READ_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,09,00,0A,00,00,04,D4,01,02,00,8A,00,70</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1311">
+     <name>NET_MODEM_AVAILABLE_GET_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,0A,00,00,04,03,00,01,11,04,03,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1312">
+     <name>SIM_READ_CI_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,09,00,06,00,00,04,60,FA,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1313">
+     <name>SIM_READ_CI_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,09,00,06,00,00,00,60,FA,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1314">
+     <name>NET_CS_WAKEUP_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,04,00,00,06,0F</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff</mask>
+    </output>
+
+    <output id="1315">
+     <name>NET_SET_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,0A,00,00,06,07,00,01,02,04,04,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1316">
+     <name>NET_RAT_REQ, Supported RAT</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,05,00,00,06,36,01</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+    </output>
+
+    <output id="1317">
+     <name>GSS_CS_SERVICE_REQ, GSM</name>
+     <direction>dos</direction>
+     <message>00,00,00,32,00,0A,00,00,06,00,0E,01,0B,04,01,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1318">
+     <name>GSS_CS_SERVICE_REQ, UMTS</name>
+     <direction>dos</direction>
+     <message>00,00,00,32,00,0A,00,00,06,00,0E,01,0B,04,02,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1319">
+     <name>GSS_CS_SERVICE_REQ, DUAL</name>
+     <direction>dos</direction>
+     <message>00,00,00,32,00,0A,00,00,06,00,0E,01,0B,04,00,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1320">
+     <name>MTC_RAT_QUERY_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,15,00,06,00,00,06,0E,00,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1321">
+     <name>SIM_READ_CI_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,09,00,06,00,00,01,60,FA,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1322">
+     <name>NET_AVAILABLE_CANCEL_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,04,00,00,04,05</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff</mask>
+    </output>
+
+    <output id="1323">
+     <name>NET_SET_CANCEL_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,04,00,00,04,09</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff</mask>
+    </output>
+
+    <output id="1324">
+     <name>NET_MODEM_REG_STATUS_GET_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,04,00,00,04,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff</mask>
+    </output>
+
+    <output id="1325">
+     <name>NET_MODEM_REG_STATUS_GET_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,04,00,00,06,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff</mask>
+    </output>
+
+    <output id="1326">
+     <name>NET_SET_REQ, 244 91</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,12,00,00,04,07,00,02,0C,08,42,F4,19,02,00,00,02,04,01,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1327">
+     <name>SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1</name>
+     <direction>dos</direction>
+     <message>00,00,00,09,00,07,00,00,04,33,14,00,01</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1328">
+     <name>INFO_PP_READ_REQ, INFO_PP_EONS_FEAT</name>
+     <direction>dos</direction>
+     <message>00,00,00,1B,00,0E,00,00,04,02,00,01,47,08,00,01,D6,00,00,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,00,00</mask>
+    </output>
+
+    <output id="1329">
+     <name>PERM_PM_RECORD_READ_REQ, NITZ data</name>
+     <direction>dos</direction>
+     <message>00,00,00,23,00,12,00,00,04,04,01,7E,00,00,00,00,00,00,00,00,00,00,00,40</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1330">
+     <name>PERM_PM_RECORD_WRITE_REQ, NITZ data (244, 7, NOKIA, NOKIA)</name>
+     <direction>dos</direction>
+     <message>00,00,00,23,00,4E,00,00,04,02,01,7E,00,00,00,00,00,00,00,40,00,F4,00,07,00,4E,00,4F,00,4B,00,49,00,41,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,4E,00,4F,00,4B,00,49,00,41,00,00,00,00,00,00,00,00,00,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1331">
+     <name>PERM_PM_RECORD_WRITE_REQ, NITZ data (244, 7, TEST NETWORK OULU, NTN OULU)</name>
+     <direction>dos</direction>
+     <message>00,00,00,23,00,4E,00,00,04,02,01,7E,00,00,00,00,00,00,00,40,00,F4,00,07,00,54,00,45,00,53,00,54,00,20,00,4E,00,45,00,54,00,57,00,4F,00,52,00,4B,00,20,00,4F,00,55,00,4C,00,55,00,00,00,00,00,00,00,4E,00,54,00,4E,00,20,00,4F,00,55,00,4C,00,55,00,00,00,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1332">
+     <name>SIM_OPERATOR_REQ, READ_NAME</name>
+     <direction>dos</direction>
+     <message>00,00,00,09,00,06,00,00,04,33,3E,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1333">
+     <name>SIM_OPERATOR_REQ, SIM_ST_READ_OPL</name>
+     <direction>dos</direction>
+     <message>00,00,00,09,00,06,00,00,04,33,13,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1334">
+     <name>SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 2</name>
+     <direction>dos</direction>
+     <message>00,00,00,09,00,07,00,00,04,33,14,00,02</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1338">
+     <name>NET_SET_REQ(O2: 262 07)</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,12,00,00,04,07,00,02,0C,08,62,F2,70,02,00,00,02,04,01,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+    <output id="1339">
+     <name>NET_RAT_REQ</name>
+     <direction>dos</direction>
+     <message>00,00,00,C8,00,05,00,00,DC,36,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+    </output>
+
+    <output id="1340">
+     <name>PERM_PM_RECORD_WRITE_REQ, NITZ data (244, 7, Test NOKIA, T NOKIA)</name>
+     <direction>dos</direction>
+     <message>00,00,00,23,00,4E,00,00,04,02,01,7E,00,00,00,00,00,00,00,40,00,F4,00,07,00,54,00,65,00,73,00,74,00,20,00,4E,00,4F,00,4B,00,49,00,41,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,54,00,20,00,4E,00,4F,00,4B,00,49,00,41,00,00,00,00,00,00</message>
+     <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+    </output>
+
+
+  </outputs>
+
+
+  <!-- Test filters are declared here -->
+  <filters>
+
+  </filters>
+
+
+  <!-- Test steps are declared here -->
+  <steps>
+
+    <!-- simulated messsages are declared here -->
+
+    <step id="11001" type="simulate">
+     <name>NET_MODEM_REG_STATUS_IND, NET_REG_STATUS_NOSERV_NOSIM</name>
+     <channel id="0x07"/>
+     <input-ref id="1001"/>
+    </step>
+
+    <step id="11002" type="simulate">
+     <name>NET_MODEM_REG_STATUS_IND, NET_REG_STATUS_NOSERV_SIM_REJECTED_BY_NW</name>
+     <channel id="0x07"/>
+     <input-ref id="1002"/>
+    </step>
+
+    <step id="11006" type="simulate">
+     <name>SIM_CS_READ_RESP, 244 070</name>
+     <channel id="0x07"/>
+     <input-ref id="1006"/>
+    </step>
+
+    <step id="11007" type="simulate">
+     <name>SIM_CS_READ_RESP, 100 010</name>
+     <channel id="0x07"/>
+     <input-ref id="1007"/>
+    </step>
+
+    <step id="11008" type="simulate">
+     <name>SIM_CS_READ_RESP, 244 91</name>
+     <channel id="0x07"/>
+     <input-ref id="1008"/>
+    </step>
+
+    <step id="11009" type="simulate">
+     <name>SIM_CS_READ_RESP, 454 10</name>
+     <channel id="0x07"/>
+     <input-ref id="1009"/>
+    </step>
+
+    <step id="11010" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA</name>
+     <channel id="0x07"/>
+     <input-ref id="1010"/>
+    </step>
+
+    <step id="11011" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator "FIN 70"</name>
+     <channel id="0x07"/>
+     <input-ref id="1011"/>
+    </step>
+
+    <step id="11012" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator "100 10"</name>
+     <channel id="0x07"/>
+     <input-ref id="1012"/>
+    </step>
+
+    <step id="11015" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA</name>
+     <channel id="0x07"/>
+     <input-ref id="1015"/>
+    </step>
+
+    <step id="11016" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator CSL, APAC_NAME</name>
+     <channel id="0x07"/>
+     <input-ref id="1016"/>
+    </step>
+
+    <step id="11017" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator CSL, APAC_NAME</name>
+     <channel id="0x07"/>
+     <input-ref id="1017"/>
+    </step>
+
+    <step id="11018" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA</name>
+     <channel id="0x07"/>
+     <input-ref id="1018"/>
+    </step>
+
+    <step id="11020" type="simulate">
+     <name>NET_MODEM_AVAILABLE_GET_RESP, SONERA elisa dna NOKIA</name>
+     <channel id="0x07"/>
+     <input-ref id="1020"/>
+    </step>
+
+    <step id="11023" type="simulate">
+     <name>NET_SET_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1023"/>
+    </step>
+
+    <step id="11025" type="simulate">
+     <name>GSS_CS_SERVICE_RESP set OK</name>
+     <channel id="0x07"/>
+     <input-ref id="1025"/>
+    </step>
+
+    <step id="11026" type="simulate">
+     <name>GSS_CS_SERVICE_RESP UMTS 2100</name>
+     <channel id="0x07"/>
+     <input-ref id="1026"/>
+    </step>
+
+    <step id="11027" type="simulate">
+     <name>GSS_CS_SERVICE_RESP get DUAL ANY</name>
+     <channel id="0x07"/>
+     <input-ref id="1027"/>
+    </step>
+
+    <step id="11028" type="simulate">
+     <name>GSS_CS_SERVICE_FAIL_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1028"/>
+    </step>
+
+    <step id="11029" type="simulate">
+     <name>GSS_CS_SERVICE_RESP Forced GSM</name>
+     <channel id="0x07"/>
+     <input-ref id="1029"/>
+    </step>
+
+    <step id="11030" type="simulate">
+     <name>GSS_CS_SERVICE_RESP UMTS 850</name>
+     <channel id="0x07"/>
+     <input-ref id="1030"/>
+    </step>
+
+    <step id="11031" type="simulate">
+     <name>GSS_CS_SERVICE_RESP Forced UMTS</name>
+     <channel id="0x07"/>
+     <input-ref id="1031"/>
+    </step>
+
+    <step id="11032" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA</name>
+     <channel id="0x07"/>
+     <input-ref id="1032"/>
+    </step>
+
+    <step id="11033" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA, HSUPA</name>
+     <channel id="0x07"/>
+     <input-ref id="1033"/>
+    </step>
+
+    <step id="11034" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA, HSDPA</name>
+     <channel id="0x07"/>
+     <input-ref id="1034"/>
+    </step>
+
+    <step id="11035" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA, HSDPA and HSUPA</name>
+     <channel id="0x07"/>
+     <input-ref id="1035"/>
+    </step>
+
+    <step id="11036" type="simulate">
+     <name>NET_NEIGHBOUR_CELLS_RESP 1</name>
+     <channel id="0x07"/>
+     <input-ref id="1036"/>
+    </step>
+
+    <step id="11037" type="simulate">
+     <name>NET_NEIGHBOUR_CELLS_RESP 2</name>
+     <channel id="0x07"/>
+     <input-ref id="1037"/>
+    </step>
+
+    <step id="11038" type="simulate">
+     <name>NET_NETWORK_SELECT_MODE_SET_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1038"/>
+    </step>
+
+    <step id="11039" type="simulate">
+     <name>SIM_READ_CI_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1039"/>
+    </step>
+
+    <step id="11040" type="simulate">
+     <name>SIM_READ_CI_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1040"/>
+    </step>
+
+    <step id="11041" type="simulate">
+     <name>NET_CS_WAKEUP_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1041"/>
+    </step>
+
+    <step id="11042" type="simulate">
+     <name>NET_SET_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1042"/>
+    </step>
+
+    <step id="11043" type="simulate">
+     <name>NET_RAT_RESP, GSM RAT</name>
+     <channel id="0x07"/>
+     <input-ref id="1043"/>
+    </step>
+
+    <step id="11044" type="simulate">
+     <name>GSS_CS_SERVICE_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1044"/>
+    </step>
+
+    <step id="11047" type="simulate">
+     <name>MTC_RAT_QUERY_RESP, MTC_GSM_RAT</name>
+     <channel id="0x07"/>
+     <input-ref id="1047"/>
+    </step>
+
+    <step id="11048" type="simulate">
+     <name>NET_TIME_IND</name>
+     <channel id="0x07"/>
+     <input-ref id="1048"/>
+    </step>
+
+    <step id="11049" type="simulate">
+     <name>NET_CIPHERING_IND</name>
+     <channel id="0x07"/>
+     <input-ref id="1049"/>
+    </step>
+
+    <step id="11050" type="simulate">
+     <name>SIM_READ_CI_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1050"/>
+    </step>
+
+    <step id="11051" type="simulate">
+     <name>NET_AVAILABLE_CANCEL_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1051"/>
+    </step>
+
+    <step id="11052" type="simulate">
+     <name>NET_SET_CANCEL_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1052"/>
+    </step>
+
+    <step id="11053" type="simulate">
+     <name>NET_MODEM_REG_STATUS_IND, Operator NOKIA</name>
+     <channel id="0x07"/>
+     <input-ref id="1053"/>
+    </step>
+
+    <step id="11059" type="simulate">
+     <name>SIM_CS_READ_RESP(O2 HPLMN)</name>
+     <channel id="0x07"/>
+     <input-ref id="1059"/>
+    </step>
+
+    <step id="11060" type="simulate">
+     <name>NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_GSM_REG_INFO subblock)</name>
+     <channel id="0x07"/>
+     <input-ref id="1060"/>
+    </step>
+
+    <step id="11061" type="simulate">
+     <name>NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_CURRENT_CELL_INFO subblock)</name>
+     <channel id="0x07"/>
+     <input-ref id="1061"/>
+    </step>
+
+    <step id="11062" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP (with O2 current network in NET_MODEM_GSM_REG_INFO subblock)</name>
+     <channel id="0x07"/>
+     <input-ref id="1062"/>
+    </step>
+
+    <step id="11063" type="simulate">
+     <name>NET_MODEM_REG_STATUS_IND (with non-O2 current network in NET_MODEM_GSM_REG_INFO subblock)</name>
+     <channel id="0x07"/>
+     <input-ref id="1063"/>
+    </step>
+
+    <step id="11064" type="simulate">
+     <name>NET_RAT_RESP</name>
+     <channel id="0x07"/>
+     <input-ref id="1064"/>
+    </step>
+
+    <step id="11065" type="simulate">
+     <name>NET_SET_RESP(O2 network Id in NET_MODEM_GSM_REG_INFO subblock)</name>
+     <channel id="0x07"/>
+     <input-ref id="1065"/>
+    </step>
+
+    <step id="11070" type="simulate">
+     <name>NET_MODEM_AVAILABLE_GET_RESP, NET_CAUSE_REQUEST_INTERRUPTED</name>
+     <channel id="0x07"/>
+     <input-ref id="1070"/>
+    </step>
+
+    <step id="11071" type="simulate">
+     <name>INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0"</name>
+     <channel id="0x07"/>
+     <input-ref id="1071"/>
+    </step>
+
+    <step id="11072" type="simulate">
+     <name>INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "1"</name>
+     <channel id="0x07"/>
+     <input-ref id="1072"/>
+    </step>
+
+    <step id="11073" type="simulate">
+     <name>INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "2"</name>
+     <channel id="0x07"/>
+     <input-ref id="1073"/>
+    </step>
+
+    <step id="11074" type="simulate">
+     <name>INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "3"</name>
+     <channel id="0x07"/>
+     <input-ref id="1074"/>
+    </step>
+
+    <step id="11075" type="simulate">
+     <name>PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, NOKIA, NOKIA)</name>
+     <channel id="0x07"/>
+     <input-ref id="1075"/>
+    </step>
+
+    <step id="11076" type="simulate">
+     <name>PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, TEST NETWORK OULU, NTN OULU)</name>
+     <channel id="0x07"/>
+     <input-ref id="1076"/>
+    </step>
+
+    <step id="11077" type="simulate">
+     <name>PERM_PM_RECORD_READ_RESP, Error case PMM_RECORD_NOT_FOUND</name>
+     <channel id="0x07"/>
+     <input-ref id="1077"/>
+    </step>
+
+    <step id="11078" type="simulate">
+     <name>PERM_PM_RECORD_WRITE_RESP, Successful case</name>
+     <channel id="0x07"/>
+     <input-ref id="1078"/>
+    </step>
+
+    <step id="11079" type="simulate">
+     <name>PERM_PM_RECORD_WRITE_RESP, Error case PMM_RECORD_NOT_FOUND</name>
+     <channel id="0x07"/>
+     <input-ref id="1079"/>
+    </step>
+
+    <step id="11080" type="simulate">
+     <name>SIM_OPERATOR_RESP, READ_NAME SIM_SERV_DATA_NOT_AVAIL</name>
+     <channel id="0x07"/>
+     <input-ref id="1080"/>
+    </step>
+
+    <step id="11081" type="simulate">
+     <name>SIM_OPERATOR_RESP, READ_NAME NOKIA ONS NIMI</name>
+     <channel id="0x07"/>
+     <input-ref id="1081"/>
+    </step>
+
+    <step id="11082" type="simulate">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_OPL SIM_SERV_DATA_NOT_AVAIL</name>
+     <channel id="0x07"/>
+     <input-ref id="1082"/>
+    </step>
+
+    <step id="11083" type="simulate">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available</name>
+     <channel id="0x07"/>
+     <input-ref id="1083"/>
+    </step>
+
+    <step id="11084" type="simulate">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL</name>
+     <channel id="0x07"/>
+     <input-ref id="1084"/>
+    </step>
+
+    <step id="11085" type="simulate">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 LAC RIGHT, GSM 7-bit Default alphabet coding</name>
+     <channel id="0x07"/>
+     <input-ref id="1085"/>
+    </step>
+
+    <step id="11086" type="simulate">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 2 COMMON, UCS2 coding</name>
+     <channel id="0x07"/>
+     <input-ref id="1086"/>
+    </step>
+
+    <step id="11087" type="simulate">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 2 COMMON COMM, UCS2 coding</name>
+     <channel id="0x07"/>
+     <input-ref id="1087"/>
+    </step>
+
+    <step id="11088" type="simulate">
+     <name>NET_NITZ_NAME_IND (244, 7, TEST NETWORK OULU, NTN OULU), GSM 7-Bit Default alphabet coding</name>
+     <channel id="0x07"/>
+     <input-ref id="1088"/>
+    </step>
+
+    <step id="11089" type="simulate">
+     <name>NET_NITZ_NAME_IND (244, 7, NOKIA, NOKIA), GSM 7-Bit Default alphabet coding</name>
+     <channel id="0x07"/>
+     <input-ref id="1089"/>
+    </step>
+
+    <step id="11090" type="simulate">
+     <name>NET_NITZ_NAME_IND (244, 7, Test NOKIA, T NOKIA), UCS2 coding</name>
+     <channel id="0x07"/>
+     <input-ref id="1090"/>
+    </step>
+
+    <step id="11091" type="simulate">
+     <name>PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, , NTN OULU)</name>
+     <channel id="0x07"/>
+     <input-ref id="1091"/>
+    </step>
+
+    <step id="11092" type="simulate">
+     <name>NET_MODEM_REG_STATUS_IND, Operator NOKIA, NET_REG_STATUS_ROAM</name>
+     <channel id="0x07"/>
+     <input-ref id="1092"/>
+    </step>
+
+    <step id="11093" type="simulate">
+     <name>NET_MODEM_REG_STATUS_IND, Operator SONERA, NET_REG_STATUS_ROAM</name>
+     <channel id="0x07"/>
+     <input-ref id="1093"/>
+    </step>
+
+    <step id="11094" type="simulate">
+     <name>SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available</name>
+     <channel id="0x07"/>
+     <input-ref id="1094"/>
+    </step>
+
+    <step id="11095" type="simulate">
+     <name>NET_MODEM_REG_STATUS_IND, Operator NOKIA</name>
+     <channel id="0x07"/>
+     <input-ref id="1095"/>
+    </step>
+
+    <step id="11096" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA</name>
+     <channel id="0x07"/>
+     <input-ref id="1096"/>
+    </step>
+
+    <step id="11097" type="simulate">
+     <name>NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA, NET_REG_STATUS_ROAM</name>
+     <channel id="0x07"/>
+     <input-ref id="1097"/>
+    </step>
+
+    <step id="11098" type="simulate">
+     <name>SIM_STATUS_RESP, SIM READY</name>
+     <channel id="0x07"/>
+     <input-ref id="1098"/>
+    </step>
+
+    <step id="11099" type="simulate">
+     <name>PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, MAXIMUM-LENGTH-NAME$, ~MAX-NAME~)</name>
+     <channel id="0x07"/>
+     <input-ref id="1099"/>
+    </step>
+
+    <!-- intercepted messages are declared here -->
+
+    <step id="11300" type="intercept">
+     <name>GSS_CS_SERVICE_REQ set UMTS 850</name>
+     <output-ref id="1300"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11301" type="intercept">
+     <name>GSS_CS_SERVICE_REQ set UMTS 2100</name>
+     <output-ref id="1301"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11302" type="intercept">
+     <name>GSS_CS_SERVICE_REQ set DUAL ANY</name>
+     <output-ref id="1302"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11303" type="intercept">
+     <name>GSS_CS_SERVICE_REQ get band</name>
+     <output-ref id="1303"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11304" type="intercept">
+     <name>NET_MODEM_REG_STATUS_GET_REQ</name>
+     <output-ref id="1304"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11305" type="intercept">
+     <name>NET_NEIGHBOUR_CELLS_REQ</name>
+     <output-ref id="1305"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11306" type="intercept">
+     <name>NET_NETWORK_SELECT_MODE_SET_REQ Manual</name>
+     <output-ref id="1306"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11307" type="intercept">
+     <name>NET_NETWORK_SELECT_MODE_SET_REQ Automatic</name>
+     <output-ref id="1307"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11308" type="intercept">
+     <name>SIM_CS_READ_REQ Automatic</name>
+     <output-ref id="1308"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11311" type="intercept">
+     <name>NET_MODEM_AVAILABLE_GET_REQ</name>
+     <output-ref id="1311"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11312" type="intercept">
+     <name>SIM_READ_CI_REQ</name>
+     <output-ref id="1312"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11313" type="intercept">
+     <name>SIM_READ_CI_REQ</name>
+     <output-ref id="1313"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11314" type="intercept">
+     <name>NET_CS_WAKEUP_REQ</name>
+     <output-ref id="1314"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11315" type="intercept">
+     <name>NET_SET_REQ</name>
+     <output-ref id="1315"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11316" type="intercept">
+     <name>NET_RAT_REQ, Supported RAT</name>
+     <output-ref id="1316"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11317" type="intercept">
+     <name>GSS_CS_SERVICE_REQ, GSM</name>
+     <output-ref id="1317"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11318" type="intercept">
+     <name>GSS_CS_SERVICE_REQ, UMTS</name>
+     <output-ref id="1318"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11319" type="intercept">
+     <name>GSS_CS_SERVICE_REQ, DUAL</name>
+     <output-ref id="1319"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11320" type="intercept">
+     <name>MTC_RAT_QUERY_REQ</name>
+     <output-ref id="1320"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11321" type="intercept">
+     <name>SIM_READ_CI_REQ</name>
+     <output-ref id="1321"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11322" type="intercept">
+     <name>NET_AVAILABLE_CANCEL_REQ</name>
+     <output-ref id="1322"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11323" type="intercept">
+     <name>NET_SET_CANCEL_REQ</name>
+     <output-ref id="1323"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11324" type="intercept">
+     <name>NET_MODEM_REG_STATUS_GET_REQ</name>
+     <output-ref id="1324"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11325" type="intercept">
+     <name>NET_MODEM_REG_STATUS_GET_REQ</name>
+     <output-ref id="1325"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11326" type="intercept">
+     <name>NET_SET_REQ, 244 91</name>
+     <output-ref id="1326"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11327" type="intercept">
+     <name>SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1</name>
+     <output-ref id="1327"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11328" type="intercept">
+     <name>INFO_PP_READ_REQ, INFO_PP_EONS_FEAT</name>
+     <output-ref id="1328"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11329" type="intercept">
+     <name>PERM_PM_RECORD_READ_REQ, NITZ data</name>
+     <output-ref id="1329"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11330" type="intercept">
+     <name>PERM_PM_RECORD_WRITE_REQ, NITZ data (244, 7, NOKIA, NOKIA)</name>
+     <output-ref id="1330"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11331" type="intercept">
+     <name>PERM_PM_RECORD_WRITE_REQ, NITZ data (244, 7, TEST NETWORK OULU, NTN OULU)</name>
+     <output-ref id="1331"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11332" type="intercept">
+     <name>SIM_OPERATOR_REQ, READ_NAME</name>
+     <output-ref id="1332"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11333" type="intercept">
+     <name>SIM_OPERATOR_REQ, SIM_ST_READ_OPL</name>
+     <output-ref id="1333"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11334" type="intercept">
+     <name>SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 2</name>
+     <output-ref id="1334"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11338" type="intercept">
+     <name>NET_SET_REQ(O2: 262 07)</name>
+     <output-ref id="1338"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11339" type="intercept">
+     <name>NET_RAT_REQ</name>
+     <output-ref id="1339"/>
+     <channel id="0x07"/>
+    </step>
+
+    <step id="11340" type="intercept">
+     <name>PERM_PM_RECORD_WRITE_REQ, NITZ data (244, 7, Test NOKIA, T NOKIA)</name>
+     <output-ref id="1340"/>
+     <channel id="0x07"/>
+    </step>
+
+
+
+    <!-- Open channel steps are used to attach the ISC test controller to an existing ISC channel -->
+
+    <step id="2001" type="open-channel">
+     <name>Open TSY channel</name>
+     <channel id="0x07"/>
+    </step>
+
+
+    <!-- Close channel steps are used to detach the ISC test controller from an existing ISC channel -->
+
+    <step id="2002" type="close-channel">
+     <name>Close TSY channel</name>
+     <channel id="0x07"/>
+    </step>
+
+
+    <!-- Synchronization step is used to synchronize with -->
+    <!-- the test cases of the adaptation test environment -->
+
+    <step id="2003" type="sync">
+     <name>Sync ( ignore messages )</name>
+     <flags>1</flags>
+    </step>
+
+  </steps>
+
+
+  <!-- Test step groups are declared here. Step groups must not have same ID's as steps -->
+
+  <!-- Intercept steps can be grouped to receive messages in undetermined order. -->
+  <groups>
+
+  </groups>
+
+
+  <!-- Test cases are declared here -->
+
+  <!-- step-ref elements are used to reference the test steps of the test case -->
+  <cases>
+
+    <case id="101">
+     <name>NotifyNetworkConnectionFailure 1</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11001"/> <!-- NET_MODEM_REG_STATUS_IND, NET_REG_STATUS_NOSERV_NOSIM -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="102">
+     <name>NotifyNetworkConnectionFailure 2</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11002"/> <!-- NET_MODEM_REG_STATUS_IND, NET_REG_STATUS_NOSERV_SIM_REJECTED_BY_NW -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="103">
+     <name>GetHomeNetwork LATIN 1</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11006"/> <!-- SIM_CS_READ_RESP, 244 070 -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="104">
+     <name>CustomGetOperatorName EOperatorNameHardcodedLatin</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11325"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11010"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="105">
+     <name>GetHomeNetwork APAC 1</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11009"/> <!-- SIM_CS_READ_RESP, 454 18 -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="106">
+     <name>GetHomeNetwork APAC 2</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11008"/> <!-- SIM_CS_READ_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="108">
+     <name>GetNetworkRegistrationStatus LATIN</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11324"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11015"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="109">
+     <name>GetNetworkRegistrationStatus APAC</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11324"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11016"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator CSL, APAC_NAME -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="110">
+     <name>CustomGetOperatorName EOperatorNameHardcodedUcs2</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11325"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11017"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator CSL, APAC_NAME -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="111">
+     <name>CustomGetOperatorName EOperatorNameCountryMcn</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11325"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11011"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator "FIN 70" -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="112">
+     <name>CustomGetOperatorName EOperatorNameMccMnc</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11325"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11012"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator "100 10" -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="113">
+     <name>ManualNetworkSearch, SONERA elisa dna NOKIA</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11311"/> <!-- NET_MODEM_AVAILABLE_GET_REQ -->
+      <step-ref id="11020"/> <!-- NET_MODEM_AVAILABLE_GET_RESP, SONERA elisa dna NOKIA -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="115">
+     <name>ManualNetworkSelection_ManualSelection LATIN</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11326"/> <!-- NET_SET_REQ, 244 91 -->
+      <step-ref id="11023"/> <!-- NET_SET_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="116">
+     <name>ManualNetworkSelection_ManualSelection APAC</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11326"/> <!-- NET_SET_REQ, 244 91 -->
+      <step-ref id="11023"/> <!-- NET_SET_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="117">
+     <name>CustomSetBandSelection_UMTS850</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11300"/> <!-- GSS_CS_SERVICE_REQ set UMTS 850 -->
+      <step-ref id="11025"/> <!-- GSS_CS_SERVICE_RESP set OK -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="118">
+     <name>CustomSetBandSelection_UMTS2100</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11301"/> <!-- GSS_CS_SERVICE_REQ set UMTS 2100 -->
+      <step-ref id="11025"/> <!-- GSS_CS_SERVICE_RESP set OK -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="119">
+     <name>CustomGetBandSelection_UMTS2100</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11303"/> <!-- GSS_CS_SERVICE_REQ get band -->
+      <step-ref id="11026"/> <!-- GSS_CS_SERVICE_RESP get UMTS 2100 -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="120">
+     <name>CustomSetBandSelection_ANY</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11302"/> <!-- GSS_CS_SERVICE_REQ set DUAL ANY -->
+      <step-ref id="11025"/> <!-- GSS_CS_SERVICE_RESP set OK -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="121">
+     <name>CustomGetBandSelection_ANY</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11303"/> <!-- GSS_CS_SERVICE_REQ get band -->
+      <step-ref id="11027"/> <!-- GSS_CS_SERVICE_RESP get DUAL ANY -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="122">
+     <name>CustomSetBandSelection_Failed</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11300"/> <!-- GSS_CS_SERVICE_REQ set UMTS 850 -->
+      <step-ref id="11028"/> <!-- GSS_CS_SERVICE_FAIL_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="123">
+     <name>CustomGetBandSelection_UMTS850</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11303"/> <!-- GSS_CS_SERVICE_REQ get band -->
+      <step-ref id="11030"/> <!-- GSS_CS_SERVICE_RESP UMTS 850 -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="124">
+     <name>CustomGetBandSelection_Forced_UMTS</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11303"/> <!-- GSS_CS_SERVICE_REQ get band -->
+      <step-ref id="11031"/> <!-- GSS_CS_SERVICE_RESP Forced UMTS -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="125">
+     <name>CustomGetBandSelection_Forced_GSM</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11303"/> <!-- GSS_CS_SERVICE_REQ get band -->
+      <step-ref id="11029"/> <!-- GSS_CS_SERVICE_RESP Forced GSM -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="126">
+     <name>GetNetworkRegistrationStatus 126</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11304"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11032"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="127">
+     <name>GetNetworkRegistrationStatus 127 HSUPA</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11304"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11033"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA, HSUPA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="128">
+     <name>GetNetworkRegistrationStatus 128 HSDPA</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11304"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11034"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA, HSDPA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="129">
+     <name>GetNetworkRegistrationStatus 129 HSDPA and HSUPA</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11304"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11035"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator SONERA, HSDPA and HSUPA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="130">
+     <name>GetCellInfo 1</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11305"/> <!-- NET_NEIGHBOUR_CELLS_REQ -->
+      <step-ref id="11036"/> <!-- NET_NEIGHBOUR_CELLS_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="131">
+     <name>GetCellInfo 2</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11305"/> <!-- NET_NEIGHBOUR_CELLS_REQ -->
+      <step-ref id="11037"/> <!-- NET_NEIGHBOUR_CELLS_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="132">
+     <name>SetNetworkSelectionSetting Manual</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11306"/> <!-- NET_NETWORK_SELECT_MODE_SET_REQ Manual -->
+      <step-ref id="11038"/> <!-- NET_NETWORK_SELECT_MODE_SET_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="133">
+     <name>SetNetworkSelectionSetting Automatic</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11307"/> <!-- NET_NETWORK_SELECT_MODE_SET_REQ Automatic -->
+      <step-ref id="11038"/> <!-- NET_NETWORK_SELECT_MODE_SET_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="134">
+     <name>GetCipheringIndicatorStatus</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11312"/> <!-- SIM_READ_CI_REQ -->
+      <step-ref id="11039"/> <!-- SIM_READ_CI_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="135">
+     <name>CustomGetCipheringInfo</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11313"/> <!-- SIM_READ_CI_REQ -->
+      <step-ref id="11040"/> <!-- SIM_READ_CI_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="136">
+     <name>CustomNetWakeup</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11314"/> <!-- NET_CS_WAKEUP_REQ -->
+      <step-ref id="11041"/> <!-- NET_CS_WAKEUP_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="137">
+     <name>CustomResetNetworkRegistrationStatus</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11315"/> <!-- NET_SET_REQ -->
+      <step-ref id="11042"/> <!-- NET_SET_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="138">
+     <name>CustomGetSystemNetworkModes</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11316"/> <!-- NET_RAT_REQ, Supported RAT -->
+      <step-ref id="11043"/> <!-- NET_RAT_RESP, GSM RAT -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="139">
+     <name>CustomSetSystemNetworkMode GSM</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11317"/> <!-- GSS_CS_SERVICE_REQ, GSM -->
+      <step-ref id="11044"/> <!-- GSS_CS_SERVICE_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="140">
+     <name>CustomSetSystemNetworkMode UMTS</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11318"/> <!-- GSS_CS_SERVICE_REQ, UMTS -->
+      <step-ref id="11044"/> <!-- GSS_CS_SERVICE_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="141">
+     <name>CustomSetSystemNetworkMode Dual</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11319"/> <!-- GSS_CS_SERVICE_REQ, DUAL -->
+      <step-ref id="11044"/> <!-- GSS_CS_SERVICE_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="142">
+     <name>CustomGetCurrentSystemNetworkModes MTC_GSM_RAT</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11320"/> <!-- MTC_RAT_QUERY_REQ -->
+      <step-ref id="11047"/> <!-- MTC_RAT_QUERY_RESP, MTC_GSM_RAT -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="143">
+     <name>NotifyNITZInfoChange</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11048"/> <!-- NET_TIME_IND -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="144">
+     <name>NotifyNetworkSecurityLevelChange</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11049"/> <!-- NET_CIPHERING_IND -->
+      <step-ref id="11321"/> <!-- SIM_READ_CI_REQ -->
+      <step-ref id="11050"/> <!-- SIM_READ_CI_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="145">
+     <name>ManualNetworkSearchCancel</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11311"/> <!-- NET_MODEM_AVAILABLE_GET_REQ -->
+      <step-ref id="11322"/> <!-- NET_AVAILABLE_CANCEL_REQ -->
+      <step-ref id="11070"/> <!-- NET_MODEM_AVAILABLE_GET_RESP, NET_CAUSE_REQUEST_INTERRUPTED -->
+      <step-ref id="11051"/> <!-- NET_AVAILABLE_CANCEL_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="146">
+     <name>ManualNetworkSelectionCancel</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11326"/> <!-- NET_SET_REQ, 244 91 -->
+      <step-ref id="11323"/> <!-- NET_SET_CANCEL_REQ -->
+      <step-ref id="11052"/> <!-- NET_SET_CANCEL_RESP -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="147">
+     <name>NotifyNetworkConnection with NITZ and operator names</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11088"/> <!-- NET_NITZ_NAME_IND (244, 7, TEST NETWORK OULU, NTN OULU), GSM 7-Bit Default alphabet coding -->
+      <step-ref id="11053"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="151">
+     <name>O2 HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_IND(NET_MODEM_GSM_REG_INFO) with O2 network Id</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11059"/> <!-- SIM_CS_READ_RESP (with O2 HPLMN) -->
+      <step-ref id="11060"/> <!-- NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_GSM_REG_INFO subblock) -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="152">
+     <name>O2 HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_IND(NET_MODEM_CURRENT_CELL_INFO) with O2 network Id</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11059"/> <!-- SIM_CS_READ_RESP (with O2 HPLMN) -->
+      <step-ref id="11061"/> <!-- NET_MODEM_REG_STATUS_IND (with O2 current network in NET_CURRENT_CELL_INFO subblock) -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="153">
+     <name>O2 HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_GET_RESP(NET_GSM_REG_INFO) with O2 network Id</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11059"/> <!-- SIM_CS_READ_RESP (with O2 HPLMN) -->
+      <step-ref id="11339"/> <!-- NET_RAT_REQ -->
+      <step-ref id="11304"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11064"/> <!-- NET_RAT_RESP(NET_CAUSE_OK) -->
+      <step-ref id="11062"/> <!-- NET_MODEM_REG_STATUS_GET_RESP (with O2 current network in NET_MODEM_GSM_REG_INFO subblock) -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="154">
+     <name>O2 HPLMN is read from SIM-card on boot-up, NET_SET_REQ is sent, NET_SET_RESP (with O2 current network Id) is received</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11059"/> <!-- SIM_CS_READ_RESP (with O2 HPLMN) -->
+      <step-ref id="11338"/> <!-- NET_SET_REQ(O2: 262 07) -->
+      <step-ref id="11065"/> <!-- NET_SET_RESP(O2 network Id in NET_MODEM_GSM_REG_INFO subblock) -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="155">
+     <name>O2 HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_IND(NET_GSM_REG_INFO) with non-O2 network Id</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11059"/> <!-- SIM_CS_READ_RESP (with O2 HPLMN) -->
+      <step-ref id="11063"/> <!-- NET_MODEM_REG_STATUS_IND (with non-O2 current network in NET_MODEM_GSM_REG_INFO subblock) -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="156">
+     <name>LATIN HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_IND(NET_MODEM_GSM_REG_INFO) with O2 network Id</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11006"/> <!-- SIM_CS_READ_RESP (LATIN) -->
+      <step-ref id="11060"/> <!-- NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_GSM_REG_INFO subblock) -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="160">
+     <name>GetHomeNetwork LATIN 2</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11007"/> <!-- SIM_CS_READ_RESP, 100 010 -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="161">
+     <name>GetHomeNetwork LATIN 3</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11308"/> <!-- SIM_CS_READ_REQ -->
+      <step-ref id="11008"/> <!-- SIM_CS_READ_RESP, 244 91 -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="162">
+     <name>CustomGetOperatorName EOperatorNameNitzFull</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11325"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11018"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="163">
+     <name>CustomGetOperatorName EOperatorNameNitzShort</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11325"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11018"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="164">
+     <name>CustomGetOperatorName EOperatorNameFlexiblePlmn</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11325"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11018"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11085"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 LAC RIGHT, GSM 7-bit Default alphabet coding -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="165">
+     <name>Network test 1</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11085"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 LAC RIGHT, GSM 7-bit Default alphabet coding -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="166">
+     <name>Network test, continue 1</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11325"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11096"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="167">
+     <name>Network test 2</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA -->
+      <step-ref id="11334"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 2 -->
+      <step-ref id="11086"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 2 COMMON, UCS2 coding -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="168">
+     <name>Network test 3</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA -->
+      <step-ref id="11334"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 2 -->
+      <step-ref id="11087"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 2 COMMON COMM, UCS2 coding -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="169">
+     <name>Network test 4</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="170">
+     <name>Network test 5</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11093"/> <!-- NET_MODEM_REG_STATUS_IND, Operator SONERA, NET_REG_STATUS_ROAM -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="171">
+     <name>Network test 6</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11092"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA, NET_REG_STATUS_ROAM -->
+      <step-ref id="11334"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 2 -->
+      <step-ref id="11087"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 2 COMMON COMM, UCS2 coding -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="172">
+     <name>Network test, continue 2</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11325"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+      <step-ref id="11097"/> <!-- NET_MODEM_REG_STATUS_GET_RESP, Operator NOKIA, NET_REG_STATUS_ROAM -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="173">
+     <name>Network test 7</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11088"/> <!-- NET_NITZ_NAME_IND (244, 7, TEST NETWORK OULU, NTN OULU), GSM 7-Bit Default alphabet coding -->
+      <step-ref id="11331"/> <!-- PERM_PM_RECORD_WRITE_REQ, NITZ data (244, 7, TEST NETWORK OULU, NTN OULU) -->
+      <step-ref id="11079"/> <!-- PERM_PM_RECORD_WRITE_RESP, Error case PMM_RECORD_NOT_FOUND -->
+      <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="174">
+     <name>Network test 8</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11089"/> <!-- NET_NITZ_NAME_IND (244, 7, NOKIA, NOKIA), GSM 7-Bit Default alphabet coding -->
+      <step-ref id="11330"/> <!-- PERM_PM_RECORD_WRITE_REQ, NITZ data (244, 7, NOKIA, NOKIA) -->
+      <step-ref id="11078"/> <!-- PERM_PM_RECORD_WRITE_RESP, Successful case -->
+      <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="175">
+     <name>Network test 9</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11089"/> <!-- NET_NITZ_NAME_IND (244, 7, NOKIA, NOKIA), GSM 7-Bit Default alphabet coding -->
+      <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA -->
+      <step-ref id="11327"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_PNN Record 1 -->
+      <step-ref id="11084"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_PNN Record 1 SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="176">
+     <name>Network test, continue 3</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11090"/> <!-- NET_NITZ_NAME_IND (244, 7, Test NOKIA, T NOKIA), UCS2 coding -->
+      <step-ref id="11340"/> <!-- PERM_PM_RECORD_WRITE_REQ, NITZ data (244, 7, Test NOKIA, T NOKIA) -->
+      <step-ref id="11078"/> <!-- PERM_PM_RECORD_WRITE_RESP, Successful case -->
+      <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND, Operator NOKIA -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="200">
+     <name>Initialize Network 200, INFO_PP_EONS_FEAT PP-Bit "0", No ONS name, No OPL list</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11071"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0" -->
+      <step-ref id="11075"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, NOKIA, NOKIA) -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11080"/> <!-- SIM_OPERATOR_RESP, READ_NAME SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="11082"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="201">
+     <name>Initialize Network 201, INFO_PP_EONS_FEAT PP-Bit "0", No ONS name, No OPL list</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11071"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0" -->
+      <step-ref id="11076"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, TEST NETWORK OULU, NTN OULU) -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11080"/> <!-- SIM_OPERATOR_RESP, READ_NAME SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="11082"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="202">
+     <name>Initialize Network 202, INFO_PP_EONS_FEAT PP-Bit "0", No ONS name, No OPL list</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11071"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0" -->
+      <step-ref id="11091"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, , NTN OULU) -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11080"/> <!-- SIM_OPERATOR_RESP, READ_NAME SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="11082"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="203">
+     <name>Initialize Network 203, INFO_PP_EONS_FEAT PP-Bit "0", ONS name available, OPL rules available</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11071"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0" -->
+      <step-ref id="11075"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, NOKIA, NOKIA) -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11081"/> <!-- SIM_OPERATOR_RESP, READ_NAME NOKIA ONS NIMI -->
+      <step-ref id="11083"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="204">
+     <name>Initialize Network 204, INFO_PP_EONS_FEAT PP-Bit "1", ONS name available, OPL rules available, Country Initials</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11072"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "1" -->
+      <step-ref id="11076"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, TEST NETWORK OULU, NTN OULU) -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11081"/> <!-- SIM_OPERATOR_RESP, READ_NAME NOKIA ONS NIMI -->
+      <step-ref id="11083"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="205">
+     <name>Initialize Network 205, INFO_PP_EONS_FEAT PP-Bit "2", ONS name available, OPL rules available, Country Initials</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11073"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "2" -->
+      <step-ref id="11076"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, TEST NETWORK OULU, NTN OULU) -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11081"/> <!-- SIM_OPERATOR_RESP, READ_NAME NOKIA ONS NIMI -->
+      <step-ref id="11083"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="206">
+     <name>Initialize Network 206, INFO_PP_EONS_FEAT PP-Bit "3", ONS name available, OPL rules available</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11074"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "3" -->
+      <step-ref id="11076"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, TEST NETWORK OULU, NTN OULU) -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11081"/> <!-- SIM_OPERATOR_RESP, READ_NAME NOKIA ONS NIMI -->
+      <step-ref id="11083"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="207">
+     <name>Initialize Network 207, INFO_PP_EONS_FEAT PP-Bit "0", No ONS name, OPL rules available</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11071"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0" -->
+      <step-ref id="11075"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, NOKIA, NOKIA) -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11080"/> <!-- SIM_OPERATOR_RESP, READ_NAME SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="11094"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="208">
+     <name>Initialize Network 208, INFO_PP_EONS_FEAT PP-Bit "0", No ONS name, OPL rules available</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11071"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0" -->
+      <step-ref id="11075"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, NOKIA, NOKIA) -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11080"/> <!-- SIM_OPERATOR_RESP, READ_NAME SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="11083"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL OPL rules available -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="209">
+     <name>Initialize Network 209, PMM read error case, INFO_PP_EONS_FEAT PP-Bit "0", No ONS name, No OPL list</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11071"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0" -->
+      <step-ref id="11077"/> <!-- PERM_PM_RECORD_READ_RESP, Error case PMM_RECORD_NOT_FOUND -->
+      <step-ref id="11098"/> <!-- SIM_STATUS_RESP, SIM READY -->
+      <step-ref id="11332"/> <!-- SIM_OPERATOR_REQ, READ_NAME -->
+      <step-ref id="11333"/> <!-- SIM_OPERATOR_REQ, SIM_ST_READ_OPL -->
+      <step-ref id="11080"/> <!-- SIM_OPERATOR_RESP, READ_NAME SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="11082"/> <!-- SIM_OPERATOR_RESP, SIM_ST_READ_OPL SIM_SERV_DATA_NOT_AVAIL -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+    <case id="210">
+     <name>Boot: NITZ long name of maximum possible length</name>
+     <timeout>100</timeout>
+     <test-steps>
+      <step-ref id="2001"/>  <!-- attach -->
+      <step-ref id="2003"/>  <!-- sync -->
+      <step-ref id="11328"/> <!-- INFO_PP_READ_REQ, INFO_PP_EONS_FEAT -->
+      <step-ref id="11329"/> <!-- PERM_PM_RECORD_READ_REQ, NITZ data -->
+      <step-ref id="11071"/> <!-- INFO_PP_READ_RESP, INFO_PP_EONS_FEAT PP-Bit "0" -->
+      <step-ref id="11099"/> <!-- PERM_PM_RECORD_READ_RESP, NITZ data from PMM (244, 7, MAXIMUM-LENGTH-NAME$, ~MAX-NAME~) -->
+      <step-ref id="2002"/>  <!-- detach -->
+     </test-steps>
+    </case>
+
+  </cases>
+
+</isc-test-control>

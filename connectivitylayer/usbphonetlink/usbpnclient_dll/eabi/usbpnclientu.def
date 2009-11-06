@@ -1,0 +1,6 @@
+EXPORTS
+	_ZN12RUsbPnClient8ConnectLEv @ 1 NONAME
+	_ZN12RUsbPnClientC1Ev @ 2 NONAME
+	_ZN12RUsbPnClientC2Ev @ 3 NONAME
+	_ZN12RUsbPnClient6DetachEv @ 4 NONAME
+

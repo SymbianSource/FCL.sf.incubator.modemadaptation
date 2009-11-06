@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- MOD_1010.001_SIM_ATK_TSY_[POLLING OFF - with status SIM_SERV_NOT_READY] -->
+
+
+<isc-test-control id="1010">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <input id="10001">
+        <name>PROACTIVE COMMAND: POLL INTERVAL</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,19,08,00,00,10,00,55,00,11,D0,0D,81,03,01,03,00,82,02,81,82,84,02,00,01,90,00</message>
+    </input>
+
+    <input id="10002">
+        <name>PROACTIVE COMMAND: POLLING OFF</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,15,08,00,00,10,00,55,00,0D,D0,09,81,03,01,04,00,82,02,81,82,90,00</message>
+    </input>
+
+<!-- SIM SERVER RESPONSES -->
+<!-- ******************** -->
+
+    <input id="30001">
+        <name>SIM_ATK_RESP(SIM_ST_POLL_INTERVAL, 60 seconds)</name>
+        <direction>sos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E3,10,01,3C,00,00,00</message>
+    </input>
+
+    <input id="30002">
+        <name>SIM_ATK_RESP(SIM_ST_POLL_INTERVAL, with status SIM_SERV_NOT_READY)</name>
+        <direction>sos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E3,10,FB</message>
+    </input>
+
+<!-- SIM SESSION END -->
+<!-- *************** -->
+
+    <input id="90004">
+        <name>ATK_SW_DATA_NTF: PROACTIVE SIM SESSION ENDED</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+    </input>
+
+</inputs>
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+
+<!-- SIM SERVER REQUESTS -->
+<!-- ******************* -->
+
+    <output id="20001">
+        <name>SIM_ATK_REQ(SIM_ST_POLL_INTERVAL, 60 seconds)</name>
+        <direction>dos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E2,10,00,3C,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,00,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="20002">
+        <name>SIM_ATK_REQ(SIM_ST_POLL_INTERVAL, default)</name>
+        <direction>dos</direction>
+        <message>00,00,00,09,00,00,00,00,00,E2,10,00,00,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,00,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <output id="40001">
+        <name>TERMINAL RESPONSE: POLL INTERVAL</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,03,00,82,02,82,81,83,01,00,84,02,01,3C,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40002">
+        <name>TERMINAL RESPONSE: POLLING OFF</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0D,81,03,01,04,00,82,02,82,81,83,02,20,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <step id="10001" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10001"/>
+    </step>
+
+    <step id="10002" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10002"/>
+    </step>
+
+<!-- SIM SERVER REQUESTS -->
+<!-- ******************* -->
+
+    <step id="20001" type="intercept">
+        <name>Intercept SIM_ATK_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20001"/>
+    </step>
+
+    <step id="20002" type="intercept">
+        <name>Intercept SIM_ATK_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20002"/>
+    </step>
+
+<!-- SIM SERVER RESPONSES -->
+<!-- ******************** -->
+
+    <step id="30001" type="simulate">
+        <name>Send SIM_ATK_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="30001"/>
+    </step>
+
+    <step id="30002" type="simulate">
+        <name>Send SIM_ATK_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="30002"/>
+    </step>
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <step id="40001" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40001"/>
+        <flags>0x40</flags>  <!-- Store transaction ID in simulated message -->
+    </step>
+
+    <step id="40002" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40002"/>
+        <flags>0x40</flags>  <!-- Store transaction ID in simulated message -->
+    </step>
+
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+    </step>
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->
+    </step>
+
+</steps>
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+<!-- POLLING OFF - with status SIM_SERV_NOT_READY -->
+    <case id="101">
+        <name>POLLING OFF - with status SIM_SERV_NOT_READY</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+
+            <!-- Polling 1 min -->
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="20001"/> <!-- Receive SIM_ATK_REQ -->
+            <step-ref id="30001"/> <!-- Send SIM_ATK_RESP -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+
+            <step-ref id="10002"/> <!-- Send PCMD -->
+            <step-ref id="20002"/> <!-- Receive SIM_ATK_REQ -->
+            <step-ref id="30002"/> <!-- Send SIM_ATK_RESP -->
+            <step-ref id="40002"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+</cases>
+
+</isc-test-control>
+

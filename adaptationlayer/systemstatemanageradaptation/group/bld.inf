@@ -1,0 +1,41 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* This file provides the information required for building.
+*
+*/
+
+
+#include <non_foundation_paths.hrh>
+
+PRJ_PLATFORMS
+DEFAULT
+
+PRJ_EXPORTS
+../rom/sspluginsadaptation.iby    NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(sspluginsadaptation.iby)
+
+PRJ_MMPFILES
+    ../ssm_misc_adaptation_dll/group/miscadaptationref.mmp
+
+    /* 
+    Only misc adaptation supported in the first phase. Others are commented out.
+    
+    ../ssm_state_adaptation_dll/group/stateadaptationref.mmp
+    ../ssm_sim_adaptation_dll/group/simadaptationref.mmp
+    ../ssm_rtc_adaptation_dll/group/rtcadaptationref.mmp
+    ../ssm_emergencycallrf_adaptation_dll/group/emergencycallrfadaptationref.mmp
+    */
+
+//  End of File
+

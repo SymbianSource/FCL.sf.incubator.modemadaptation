@@ -1,0 +1,4 @@
+EXPORTS
+	_ZN6MemApi10AllocBlockEt @ 1 NONAME
+	_ZN6MemApi12DeallocBlockER5TDes8 @ 2 NONAME
+

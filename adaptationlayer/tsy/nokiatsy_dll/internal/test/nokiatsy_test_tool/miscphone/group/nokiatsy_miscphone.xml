@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<isc-test-control id="1">
+
+
+
+  <!-- Channels that are opened during startup and closed when test environment exits -->
+  <channels>
+  </channels>
+
+  <!-- Test inputs are declared here -->
+  <inputs>
+  
+    <input id="1101">
+      <name>SIM_CSP_RESP ( READ_LINE_DATA, SIM_SERV_OK )</name>
+      <direction>sos</direction>
+      <message>1E,10,00,09,00,46,07,29,06,32,3B,01,01,00,00,00,00,01,01,01,01,00,00,00,01,01,01,01,01,00,00,00,00,00,01,00,00,01,01,00,01,01,01,01,00,01,01,00,01,00,00,00,01,01,01,00,01,00,00,00,00,01,00,00,00,00,01,00,00,00,01,01,00,00,00,00</message>
+    </input>
+    
+    <input id="1102">
+      <name>INFO_SERIAL_NUMBER_READ_RESP ( INFO_OK, INFO_SB_SN_IMEI_PLAIN )</name>
+      <direction>sos</direction>
+      <message>1E,10,00,1B,00,1A,07,1E,06,01,00,01,41,14,00,10,30,30,34,34,30,30,39,33,31,36,39,36,37,31,38,00</message>
+    </input>
+    
+    <input id="1103">
+      <name>CALL_PROPERTY_SET_RESP ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_OFF )</name>
+      <direction>sos</direction>
+      <message>1E,10,00,01,00,0A,07,30,06,22,00,01,13,04,A3,00</message>
+    </input>
+    
+    <input id="1104">
+      <name>CALL_PROPERTY_SET_RESP ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_ON )</name>
+      <direction>sos</direction>
+      <message>1E,10,00,01,00,0A,07,30,06,22,00,01,13,04,A3,01</message>
+    </input>
+  
+  </inputs>
+
+
+  <!-- Test outputs are declared here -->
+  <outputs>
+  
+   <output id="3000">
+     <name>SIM_CSP_REQ ( READ_LINE_DATA, SIM_PRIMARY_LINE )</name>
+     <direction>dos</direction>
+     <message>00,00,00,09,00,07,00,00,06,31,3B,00,00</message>
+        <mask>00,00,00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+   </output>
+   
+   <output id="3001">
+     <name>INFO_SERIAL_NUMBER_READ_REQ ( INFO_SN_IMEI_PLAIN )</name>
+     <direction>dos</direction>
+     <message>00,00,00,1B,00,05,00,00,06,00,41</message>
+        <mask>00,00,00,00,00,00,00,00,00,00,ff</mask>
+   </output>
+   
+   <output id="3002">
+     <name>CALL_PROPERTY_SET_REQ ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_OFF )</name>
+     <direction>dos</direction>
+     <message>00,00,00,01,00,0A,00,00,06,21,00,01,13,04,A3,00</message>
+        <mask>00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+   
+   <output id="3003">
+     <name>CALL_PROPERTY_SET_REQ ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_ON )</name>
+     <direction>dos</direction>
+     <message>00,00,00,01,00,0A,00,00,06,21,00,01,13,04,A3,01</message>
+        <mask>00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+  
+  </outputs>
+  
+
+  <!-- Test filters are declared here -->
+  <filters>
+  </filters>
+
+
+  <!-- Test steps are declared here -->
+  <steps>
+    
+
+    <!-- Open channel steps are used to attach the ISC test controller to an existing ISC channel -->
+    <step id="2001" type="open-channel">
+      <name>Open TSY channel</name>
+      <channel id="0x07"/>
+    </step>
+    
+    <!-- Close channel steps are used to detach the ISC test controller from an existing ISC channel -->
+    <step id="2002" type="close-channel">
+      <name>Close TSY channel</name>
+      <channel id="0x07"/>
+    </step>
+
+    <!-- Synchronization step is used to synchronize with -->
+    <!-- the test cases of the adaptation test environment -->
+    <step id="2003" type="sync">
+      <name>Sync ( ignore messages )</name>
+      <flags>1</flags>
+    </step>
+    
+    <step id="10101" type="simulate">
+      <name>SIM_CSP_RESP ( READ_LINE_DATA, SIM_SERV_OK )</name>
+      <channel id="0x07"/>
+      <input-ref id="1101"/>
+    </step>
+    
+    <step id="10102" type="simulate">
+      <name>INFO_SERIAL_NUMBER_READ_RESP ( INFO_OK, INFO_SB_SN_IMEI_PLAIN )</name>
+      <channel id="0x07"/>
+      <input-ref id="1102"/>
+    </step>
+    
+    <step id="10103" type="simulate">
+      <name>CALL_PROPERTY_SET_RESP ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_OFF )</name>
+      <channel id="0x07"/>
+      <input-ref id="1103"/>
+    </step>
+    
+     <step id="10104" type="simulate">
+      <name>CALL_PROPERTY_SET_RESP ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_ON )</name>
+      <channel id="0x07"/>
+      <input-ref id="1104"/>
+    </step>
+
+    <step id="13000" type="intercept">
+      <name>SIM_CSP_REQ ( READ_LINE_DATA, SIM_PRIMARY_LINE )</name>
+      <channel id="0x07"/>
+      <output-ref id="3000"/>
+    </step>
+    
+     <step id="13001" type="intercept">
+      <name>INFO_SERIAL_NUMBER_READ_REQ ( INFO_SN_IMEI_PLAIN )</name>
+      <channel id="0x07"/>
+      <output-ref id="3001"/>
+    </step>
+    
+     <step id="13002" type="intercept">
+      <name>CALL_PROPERTY_SET_REQ ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_OFF )</name>
+      <channel id="0x07"/>
+      <output-ref id="3002"/>
+    </step>
+    
+     <step id="13003" type="intercept">
+      <name>CALL_PROPERTY_SET_REQ ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_ON )</name>
+      <channel id="0x07"/>
+      <output-ref id="3003"/>
+    </step>
+    
+  </steps>
+
+
+  <!-- Test step groups are declared here. Step groups must not have same ID's as steps -->
+  
+  <!-- Intercept steps can be grouped to receive messages in undetermined order. -->
+  <groups>
+  </groups>
+  
+  <!-- Test cases are declared here -->
+  
+  <!-- step-ref elements are used to reference the test steps of the test case -->
+  <cases>
+  
+    <case id="101">
+      <name>GetCustomerServiceProfile 101</name>
+      <timeout>100</timeout>
+      <test-steps>
+        <step-ref id="2001"/>  <!-- attach to TSY channel -->
+        <step-ref id="2003"/>  <!-- sync -->
+        <step-ref id="13000"/> <!-- SIM_CSP_REQ ( READ_LINE_DATA, SIM_PRIMARY_LINE ) intercept -->
+        <step-ref id="10101"/> <!-- SIM_CSP_RESP ( READ_LINE_DATA, SIM_SERV_OK ) -->
+        <step-ref id="2002"/>  <!-- Detach from TSY channel -->
+      </test-steps>
+    </case>
+    
+    <case id="102">
+      <name>GetPhoneId 102</name>
+      <timeout>100</timeout>
+      <test-steps>
+        <step-ref id="2001"/>  <!-- attach to TSY channel -->
+        <step-ref id="2003"/>  <!-- sync -->
+        <step-ref id="13001"/> <!-- INFO_SERIAL_NUMBER_READ_REQ ( INFO_SN_IMEI_PLAIN ) intercept -->
+        <step-ref id="10102"/> <!-- INFO_SERIAL_NUMBER_READ_RESP ( INFO_OK, INFO_SB_SN_IMEI_PLAIN ) -->
+        <step-ref id="2002"/>  <!-- Detach from TSY channel -->
+      </test-steps>
+    </case>
+    
+    <case id="103">
+      <name>SetDriveMode Deactive 103</name>
+      <timeout>100</timeout>
+      <test-steps>
+        <step-ref id="2001"/>  <!-- attach to TSY channel -->
+        <step-ref id="2003"/>  <!-- sync -->
+        <step-ref id="13002"/> <!-- CALL_PROPERTY_SET_REQ ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_OFF ) intercept -->
+        <step-ref id="10103"/> <!-- CALL_PROPERTY_SET_RESP ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_OFF ) -->
+        <step-ref id="2002"/>  <!-- Detach from TSY channel -->
+      </test-steps>
+    </case>
+    
+     <case id="104">
+      <name>SetDriveMode Deactive 104</name>
+      <timeout>100</timeout>
+      <test-steps>
+        <step-ref id="2001"/>  <!-- attach to TSY channel -->
+        <step-ref id="2003"/>  <!-- sync -->
+        <step-ref id="13003"/> <!-- CALL_PROPERTY_SET_REQ ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_ON ) intercept -->
+        <step-ref id="10104"/> <!-- CALL_PROPERTY_SET_RESP ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_ON ) -->
+        <step-ref id="2002"/>  <!-- Detach from TSY channel -->
+      </test-steps>
+    </case>
+  
+  <!-- Cases for testing using HW (intercept)  -->
+  
+    <case id="1001">
+      <name>GetCustomerServiceProfile 1001</name>
+      <timeout>100</timeout>
+      <test-steps>
+        <step-ref id="2001"/>  <!-- attach to TSY channel -->
+        <step-ref id="2003"/>  <!-- sync -->
+        <step-ref id="13000"/> <!-- SIM_CSP_REQ ( READ_LINE_DATA, SIM_PRIMARY_LINE ) intercept -->
+        <step-ref id="2002"/>  <!-- Detach from TSY channel -->
+      </test-steps>
+    </case>
+  
+    <case id="1002">
+      <name>GetPhoneId 1002</name>
+      <timeout>100</timeout>
+      <test-steps>
+        <step-ref id="2001"/>  <!-- attach to TSY channel -->
+        <step-ref id="2003"/>  <!-- sync -->
+        <step-ref id="13001"/> <!-- INFO_SERIAL_NUMBER_READ_REQ ( INFO_SN_IMEI_PLAIN ) intercept -->
+        <step-ref id="2002"/>  <!-- Detach from TSY channel -->
+      </test-steps>
+    </case>
+    
+    <case id="1003">
+      <name>SetDriveMode Deactive 1003</name>
+      <timeout>100</timeout>
+      <test-steps>
+        <step-ref id="2001"/>  <!-- attach to TSY channel -->
+        <step-ref id="2003"/>  <!-- sync -->
+        <step-ref id="13002"/> <!-- CALL_PROPERTY_SET_REQ ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_OFF ) intercept -->
+        <step-ref id="2002"/>  <!-- Detach from TSY channel -->
+      </test-steps>
+    </case>
+    
+    <case id="1004">
+      <name>SetDriveMode Active 1004</name>
+      <timeout>100</timeout>
+      <test-steps>
+        <step-ref id="2001"/>  <!-- attach to TSY channel -->
+        <step-ref id="2003"/>  <!-- sync -->
+        <step-ref id="13003"/> <!-- CALL_PROPERTY_SET_REQ ( CALL_PROPERTY_INFO, CALL_GSM_PROP_DCM_DRIVE_MODE, CALL_GSM_DCM_DRIVE_MODE_ON ) intercept -->
+        <step-ref id="2002"/>  <!-- Detach from TSY channel -->
+      </test-steps>
+    </case>
+  
+  </cases>
+  
+</isc-test-control>

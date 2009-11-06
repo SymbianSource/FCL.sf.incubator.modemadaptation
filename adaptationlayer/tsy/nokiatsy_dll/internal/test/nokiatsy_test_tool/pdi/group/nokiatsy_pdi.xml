@@ -1,0 +1,2552 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<isc-test-control id="1">
+
+
+  <!-- Channels that are opened during startup and closed when test environment exits -->
+  <channels>
+  </channels>
+
+  <!-- Test inputs are declared here -->
+  <inputs>
+
+   <input id="1001">
+    <name>NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO)</name>
+    <direction>sos</direction>
+    <message>00,00,10,C8,00,0E,20,01,00,3F,00,01,3C,08,00,01,00,00,00,00</message>
+   </input>
+
+   <input id="1003">
+    <name>GPDS_ATTACH_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,07,08,37,13,14,01,00,01</message>
+   </input>
+
+   <input id="1005">
+    <name>PNS_PIPE_CREATE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,D9,00,08,08,00,0D,01,01,00,00,00</message>
+   </input>
+
+   <input id="1007">
+    <name>GPDS_CONTEXT_ID_CREATE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,0D,03,00,01</message>
+   </input>
+
+   <input id="1008">
+    <name>GPDS_CONTEXT_ID_CREATE_IND</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,05,08,37,00,04,00</message>
+   </input>
+
+   <input id="1010">
+    <name>GPDS_LL_CONFIGURE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,0D,01,00,01</message>
+   </input>
+
+   <input id="1013">
+    <name>GPDS_CONTEXT_CONFIGURE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,0D,07,00,01</message>
+   </input>
+
+   <input id="1015">
+    <name>PNS_PIPE_REMOVE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,D9,00,08,08,00,0D,03,01,00,00,00</message>
+   </input>
+
+   <input id="1017">
+    <name>GPDS_DETACH_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,16,17,01,01</message>
+   </input>
+
+   <input id="1020">
+    <name>GPDS_CONTEXT_DEACTIVATE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,00,00,0D,0C,00,00</message>
+   </input>
+
+   <input id="1021">
+    <name>GPDS_CONTEXT_CONFIGURE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,06,07,00,01</message>
+   </input>
+
+   <input id="1022">
+    <name>GPDS_CONTEXT_DEACTIVATE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,00,00,0D,0C,00,01</message>
+   </input>
+
+   <input id="1024">
+    <name>PNS_PIPE_ENABLE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,D9,00,08,00,00,0D,07,01,00,00,00</message>
+   </input>
+
+   <input id="1026">
+    <name>GPDS_CONTEXT_ACTIVATE_RESP</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,46,00,00,41,0D,09,00,01,00,55,55,05,04,08,55,04,0A,65,B6,28,03,08,00,04,03,06,1F,55,08,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,E4,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,F8,04,00,00</message>
+   </input>
+
+   <input id="1027">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,5E,00,00,41,00,0A,00,08,04,08,55,04,0A,65,B6,28,03,08,00,04,03,06,1F,55,05,0C,08,69,6E,74,65,72,6E,65,74,55,08,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,E4,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,0D,08,55,04,C0,59,7B,E6,0E,08,55,04,C0,59,7B,E7,F8,04,00,00</message>
+   </input>
+
+   <input id="1028">
+    <name>GPDS_CONTEXT_ACTIVATING_IND</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,1E,00,00,41,00,25,00,01,21,00,55,01,05,14,0E,77,61,70,2E,73,6F,6E,65,72,61,2E,6E,65,74,55,55,55</message>
+   </input>
+
+   <input id="1030">
+    <name>PNS_PIPE_RESET_RESP</name>
+    <direction>sos</direction>
+    <message>00,00,00,D9,00,08,00,00,0D,05,01,00,00,00</message>
+   </input>
+
+   <input id="1031">
+    <name>GPDS_CONTEXT_ACTIVATING_IND</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,1E,00,00,41,00,25,00,01,57,00,55,01,05,14,0E,77,61,70,2E,73,6F,6E,65,72,61,2E,6E,65,74,55,55,55</message>
+   </input>
+
+   <input id="1033">
+    <name>PNS_PIPE_CREATE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,D9,00,08,08,00,0E,01,02,00,00,00</message>
+   </input>
+
+   <input id="1035">
+    <name>GPDS_CONTEXT_ID_CREATE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,0E,03,01,01</message>
+   </input>
+
+   <input id="1036">
+    <name>GPDS_CONTEXT_ID_CREATE_IND</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,05,08,37,00,04,01</message>
+   </input>
+
+   <input id="1038">
+    <name>GPDS_LL_CONFIGURE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,0E,01,01,01</message>
+   </input>
+
+   <input id="1040">
+    <name>PNS_PIPE_ENABLE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,D9,00,08,00,00,0E,07,02,00,00,00</message>
+   </input>
+
+   <input id="1042">
+    <name>GPDS_CONTEXT_ACTIVATE_RESP</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,46,00,00,41,0E,09,01,01,00,55,55,05,04,08,55,04,0A,65,B6,28,03,08,00,04,03,06,1F,55,08,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,E4,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,F8,04,00,00</message>
+   </input>
+
+   <input id="1043">
+    <name>GPDS_CONTEXT_ACTIVATING_IND</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,1E,00,00,41,00,25,01,01,57,02,55,01,05,14,0E,77,61,70,2E,73,6F,6E,65,72,61,2E,6E,65,74,55,55,55</message>
+   </input>
+
+   <input id="1044">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,5E,00,00,41,00,0A,01,08,04,08,55,04,0A,65,B6,28,03,08,00,04,03,06,1F,55,05,0C,08,69,6E,74,65,72,6E,65,74,55,08,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,E4,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,0D,08,55,04,C0,59,7B,E6,0E,08,55,04,C0,59,7B,E7,F8,04,00,00</message>
+   </input>
+
+   <input id="1045">
+    <name>GPDS_CONTEXT_DEACTIVATING_IND</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,05,00,94,44,00,2F,00</message>
+   </input>
+
+   <input id="1046">
+    <name>GPDS_CONTEXT_DEACTIVATE_IND</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,16,00,94,44,00,0D,00,24,55,55,55,01,05,0C,08,69,6E,74,65,72,6E,65,74,55</message>
+   </input>
+
+   <input id="1047">
+    <name>GPDS_CONTEXT_ID_DELETE_IND</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,05,00,94,44,00,05,00</message>
+   </input>
+
+   <input id="1050">
+    <name>GPDS_CONTEXT_DEACTIVATING_IND</name>
+    <direction>sos</direction>
+    <message>00,00,10,31,00,05,07,00,00,2F,01</message>
+   </input>
+
+   <input id="1051">
+    <name>GPDS_CONTEXT_DEACTIVATE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,00,10,31,00,06,07,00,0E,0C,01,01</message>
+   </input>
+
+   <input id="1053">
+    <name>GPDS_CONTEXT_DEACTIVATE_IND</name>
+    <direction>sos</direction>
+    <message>00,00,10,31,16,00,07,44,00,0D,01,24,55,55,55,01,05,0C,08,69,6E,74,65,72,6E,65,74,55</message>
+   </input>
+
+   <input id="1054">
+    <name>PNS_PIPE_RESET_RESP</name>
+    <direction>sos</direction>
+    <message>00,00,10,D9,00,08,07,00,0E,05,02,00,00,00</message>
+   </input>
+
+   <input id="1056">
+    <name>GPDS_CONTEXT_ID_DELETE_IND</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,05,00,94,44,00,05,01</message>
+   </input>
+
+   <input id="1057">
+    <name>PNS_PIPE_REMOVE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,D9,00,08,08,00,0E,03,02,00,00,00</message>
+   </input>
+
+   <input id="1058">
+    <name>GPDS_CONTEXT_CONFIGURE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,0E,07,01,01</message>
+   </input>
+
+   <input id="1059">
+    <name>GPDS_CONTEXT_CONFIGURE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,06,07,01,01</message>
+   </input>
+
+   <input id="1060">
+    <name>GPDS_CONTEXT_MODIFY_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,3A,08,37,0E,2B,01,01,00,55,55,03,03,08,00,00,00,00,00,55,08,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,E4,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00</message>
+   </input>
+
+   <input id="1061">
+    <name>CALL_SERVICE_ACTIVATE_IND</name>
+    <direction>sos</direction>
+    <message>1E,00,10,01,00,0E,07,00,00,38,01,03,00,00,00,01,07,04,01,01</message>
+   </input>
+
+   <input id="1062">
+    <name>CALL_SERVICE_ACTIVATE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,00,10,01,06,00,07,00,01,3A,01,00</message>
+   </input>
+
+   <input id="1064">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name> <!-- With IPv4 P-CSCF address -->
+    <direction>sos</direction>
+    <message>00,00,00,31,66,00,00,41,00,0A,00,09,04,08,55,04,0A,65,B6,28,03,08,00,04,03,06,1F,55,05,0C,08,69,6E,74,65,72,6E,65,74,55,08,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,E4,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,0D,08,55,04,C0,59,7B,E6,0E,08,55,04,C0,59,7B,E7,F8,04,00,00,F4,08,00,04,01,02,03,04</message>
+   </input>
+
+   <input id="1065">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name> <!-- With IPv6 P-CSCF address -->
+    <direction>sos</direction>
+    <message>00,00,00,31,72,00,00,41,00,0A,00,09,04,08,55,04,0A,65,B6,28,03,08,00,04,03,06,1F,55,05,0C,08,69,6E,74,65,72,6E,65,74,55,08,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,E4,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,0D,08,55,04,C0,59,7B,E6,0E,08,55,04,C0,59,7B,E7,F8,04,00,00,F4,14,00,10,20,01,04,90,0F,F0,C1,95,00,00,00,00,00,00,00,10</message>
+   </input>
+
+   <input id="1066">
+    <name>NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO)</name>
+    <direction>sos</direction>
+    <message>00,00,10,C8,00,0E,20,01,00,3F,00,01,3C,08,00,00,01,00,00,00</message>
+   </input>
+
+   <input id="1067">
+    <name>NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO)</name>
+    <direction>sos</direction>
+    <message>00,00,10,C8,00,0E,20,01,00,3F,00,01,3C,08,00,01,01,00,00,00</message>
+   </input>
+
+   <input id="1068">
+    <name>GPDS_TRANSFER_STATUS_IND</name>
+    <direction>sos</direction>
+    <message>00,00,10,31,00,0E,20,01,00,1e,01,0b</message>
+   </input>
+
+   <input id="1069">
+    <name>GPDS_CONTEXT_NWI_ACT_REJECT_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,0F,10,00,00</message>
+   </input>
+
+   <input id="1070">
+    <name>GPDS_CONFIGURATION_INFO_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,0A,08,37,30,31,01,01,00,00,00,00</message>
+   </input>
+
+   <input id="1071">
+    <name>GPDS_CONFIGURE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,11,12,01,00</message>
+   </input>
+
+   <input id="1072">
+    <name>GPDS_CONFIGURE_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,31,00,06,08,37,DC,12,01,00</message>
+   </input>
+
+   <input id="1073">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name>
+    <direction>sos</direction>
+    <message>15,10,00,31,00,46,07,36,00,0A,00,06,04,08,00,04,0A,15,81,A6,03,08,02,04,03,01,1F,04,05,04,00,00,08,14,04,02,03,15,14,01,03,E8,05,DC,00,08,00,08,00,00,00,00,E4,14,04,02,03,15,14,01,03,E8,05,DC,00,08,00,08,00,00,00,00,F8,04,00,00</message>
+   </input>
+
+   <input id="1074">
+    <name>GPDS_CONTEXT_STATUS_RESP</name>
+    <direction>sos</direction>
+    <message>15,10,00,31,00,1A,07,36,0D,23,00,01,00,00,00,05,00,00,00,0A,55,55,55,01,04,08,55,04,0A,15,81,A6</message>
+   </input>
+
+   <input id="1077">
+    <name>GPDS_CONTEXT_ACTIVATE_FAIL_IND</name>
+    <direction>sos</direction>
+    <message>15,6C,00,31,1A,00,07,35,00,1F,00,19,55,55,55,01,05,10,0C,77,61,70,2E,63,69,6E,67,75,6C,61,72,55</message>
+   </input>
+
+   <input id="1078">
+    <name>GPDS_CONTEXT_ACTIVATE_FAIL_IND</name>
+    <direction>sos</direction>
+    <message>15,6C,00,31,1A,00,07,35,00,1F,00,6F,55,55,55,01,05,10,0C,77,61,70,2E,63,69,6E,67,75,6C,61,72,55</message>
+   </input>
+
+   <input id="1079">
+    <name>NET_MODEM_REG_STATUS_GET_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,C8,00,22,07,32,04,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+   </input>
+
+   <input id="1080">
+    <name>GPDS_CONTEXT_ACTIVATING_IND (empty APN)</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,1E,00,00,41,00,25,00,01,21,00,55,00</message>
+   </input>
+
+   <input id="1081">
+    <name>GPDS_ATTACH_IND</name>
+    <direction>sos</direction>
+    <message>00,00,10,31,00,05,20,01,00,15,01</message>
+   </input>
+
+   <input id="1082">
+    <name>SIM_CS_READ_RESP (with O2 HPLMN: 62,F2,80)</name>
+    <direction>sos</direction>
+    <message>1E,10,00,09,00,16,08,36,04,D5,01,01,01,00,00,00,00,70,00,0C,01,00,00,00,03,62,F2,80</message>
+   </input>
+
+   <input id="1084">
+    <name>NET_MODEM_REG_STATUS_IND (O2 current network Id in NET_MODEM_GSM_REG_INFO subblock)</name>
+    <direction>sos</direction>
+    <message>00,00,10,C8,00,22,20,01,00,02,00,02,00,04,01,02,09,18,00,00,00,00,00,00,62,F2,70,00,00,00,00,00,00,00,00,00,00,00,01,00</message>
+   </input>
+
+   <input id="1085">
+    <name>NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_CURRENT_CELL_INFO subblock)</name>
+    <direction>sos</direction>
+    <message>00,00,10,C8,00,22,20,01,00,02,00,02,00,04,01,02,39,18,00,00,00,00,00,00,62,F2,70,00,00,00,00,00,00,00,00,00,00,00,01,00</message>
+   </input>
+
+   <input id="1086">
+    <name>NET_MODEM_REG_STATUS_GET_RESP (with O2 current network in NET_MODEM_GSM_REG_INFO subblock)</name>
+    <direction>sos</direction>
+    <message>1E,10,00,C8,00,22,07,32,00,01,00,02,00,04,01,02,09,18,00,01,00,00,00,01,62,F2,70,02,03,00,00,00,00,00,00,00,00,00,01,00</message>
+   </input>
+
+   <input id="1087">
+    <name>SIM_CS_READ_RESP</name>
+    <direction>sos</direction>
+    <message>1E,10,00,09,00,16,08,36,04,D5,01,01,01,00,00,00,00,70,00,0C,01,00,00,00,03,42,04,70</message>
+   </input>
+
+   <input id="1089">
+    <name>NET_MODEM_REG_STATUS_IND (with non-O2 current network in NET_MODEM_GSM_REG_INFO subblock)</name>
+    <direction>sos</direction>
+    <message>00,00,10,C8,00,22,20,01,00,02,00,02,00,04,01,02,09,18,00,00,00,00,00,00,62,F3,70,00,00,00,00,00,00,00,00,00,00,00,01,00</message>
+   </input>
+
+   <input id="1090">
+    <name>GPDS_CONTEXT_ACTIVATE_IND IPv6</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,5E,00,00,41,00,0A,00,08,04,14,55,10,20,01,06,18,04,00,00,6A,00,00,00,00,00,00,0A,BC,03,08,00,04,03,06,1F,55,05,0C,08,69,6E,74,65,72,6E,65,74,55,08,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,E4,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,0D,14,55,10,20,01,06,18,04,00,00,6A,00,00,00,00,00,00,0A,BD,0E,14,55,10,20,01,06,18,04,00,00,6A,00,00,00,00,00,00,0A,BE,F8,04,00,00</message>
+   </input>
+
+   <input id="1091">
+    <name>GPDS_CONTEXT_ACTIVATING_IND IPv6</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,1E,00,00,41,00,25,00,01,57,00,55,01,05,14,0E,77,61,70,2E,73,6F,6E,65,72,61,2E,6E,65,74,55,55,55</message>
+   </input>
+
+   <input id="1092">
+    <name>GPDS_CONTEXT_ACTIVATE_RESP IPv6</name>
+    <direction>sos</direction>
+    <message>00,00,00,31,46,00,00,41,0D,09,00,01,00,55,55,05,04,14,55,10,20,01,06,18,04,00,00,6A,00,00,00,00,00,00,0A,BC,03,08,00,04,03,06,1F,55,08,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,E4,14,04,02,03,15,14,00,03,E8,05,DC,01,80,01,80,00,00,00,00,F8,04,00,00</message>
+   </input>
+   
+   <input id="1093">
+    <name>NET_MODEM_REG_STATUS_GET_RESP EGPRS Supported</name>
+    <direction>sos</direction>
+    <message>1E,10,00,C8,00,22,07,32,04,01,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,01,00,06,00,00,01,00</message>
+   </input>
+   
+   <input id="1094">
+    <name>NET_MODEM_REG_STATUS_IND</name>
+    <direction>sos</direction>
+    <message>1E,10,00,C8,00,22,07,32,04,02,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,00,00,06,00,00,01,00</message>
+   </input>
+   
+   <input id="1095">
+    <name>NET_MODEM_REG_STATUS_IND, EGPRS supported</name>
+    <direction>sos</direction>
+    <message>1E,10,00,C8,00,22,07,32,04,02,00,02,00,04,00,02,09,18,13,8E,00,06,E0,BE,42,F4,19,02,00,01,02,01,00,01,00,06,00,00,01,00</message>
+   </input>
+
+  </inputs>
+
+
+  <!-- Test outputs are declared here -->
+  <outputs>
+
+   <output id="1100">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,22,00,00,06,06,00,21,01,FF,00,04,90,04,00,00,01,08,01,04,03,01,01,00,02,08,02,04,03,01,1F,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1101">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,3A,00,00,06,06,00,21,01,FF,00,04,F8,04,00,01,06,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,07,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,FF,00,00,00,00,00,FF,FF,00,00,00,FF,FF,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,FF,FF,00,00</mask>
+   </output>
+
+   <output id="1102">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,22,00,00,06,06,00,21,00,FF,00,04,90,04,00,00,01,08,01,01,01,01,01,00,02,08,00,00,00,00,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,FF,00,00,00,00,00,FF,FF,00,00,00,FF,FF,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,FF,FF,00,00</mask>
+   </output>
+
+   <output id="1103">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,22,00,00,06,06,00,57,01,FF,00,04,90,04,00,00,01,08,01,01,01,01,01,00,02,08,00,00,00,00,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,FF,00,00,00,00,00,FF,FF,00,00,00,FF,FF,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,FF,FF,00,00</mask>
+   </output>
+
+   <output id="1104">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,4A,00,00,0E,06,01,57,02,00,00,04,09,34,01,01,0A,30,00,FF,00,00,00,06,80,08,00,00,00,03,FB,D0,70,04,00,0B,60,08,00,00,00,00,04,57,51,08,00,01,FF,FF,00,00,41,08,00,01,FF,FF,00,00,30,04,14,00,00,04,01,00,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,FF,00,00,00,00,00,FF,FF,00,00,00,FF,FF,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,FF,FF,00,00</mask>
+   </output>
+
+   <output id="1105">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,3A,00,00,06,06,01,57,02,00,00,04,F8,04,00,01,06,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,07,14,02,01,01,52,11,01,00,00,00,00,00,00,00,00,00,00,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,FF,00,00,00,00,00,FF,FF,00,00,00,FF,FF,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,FF,FF,00,00</mask>
+   </output>
+
+   <output id="1106">
+    <name>intercept GPDS_CONTEXT_MODIFY_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,06,00,00,0E,2A,01,00</message>
+    <mask   >00,00,00,00,00,FF,00,00,00,00,00,00</mask>
+   </output>
+
+   <output id="1107">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name> <!-- Set Config With P-CSCF address request -->
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,0D,06,00,21,00,FF,00,05,90,04,00,00,F3,04,00,00,00,04,00,00,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,FF,00,00,00,00,00,FF,FF,00,00,00,FF,FF,00,00,FF,FF,00,00,00,00,00,00,00,00,00,00,FF,FF,00,00</mask>
+   </output>
+
+   <output id="1108">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name> <!-- Set Profile Params With P-CSCF address request -->
+    <direction>dos</direction>
+    <message>00,00,00,31,00,26,00,00,06,06,00,21,00,FF,00,04,90,04,00,00,F3,04,00,00,01,08,01,01,01,01,01,00,02,08,00,00,00,00,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,FF,00,00,00,00,00,FF,FF,00,00,00,FF,FF,00,00,FF,FF,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,FF,FF,00,00</mask>
+   </output>
+
+   <output id="1109">
+    <name>intercept NET_MODEM_REG_STATUS_GET_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,C8,00,04,00,00,04,00</message>
+    <mask   >00,00,00,00,00,00,00,00,00,ff</mask>
+   </output>
+
+   <output id="1110">
+    <name>intercept GPDS_CONTEXT_NWI_ACT_REJECT_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,05,00,00,0F,0F,1F</message>
+    <mask   >00,00,00,00,00,00,00,00,00,ff,ff</mask>
+   </output>
+
+   <output id="1111">
+    <name>intercept GPDS_CONFIGURATION_INFO_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,04,00,00,30,30</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff</mask>
+   </output>
+
+   <output id="1112">
+    <name>intercept GPDS_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,08,00,00,11,11,00,FF,FF,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1113">
+    <name>intercept GPDS_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,08,00,00,11,11,01,FF,FF,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1114">
+    <name>intercept GPDS_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,08,00,00,DC,11,FF,01,01,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1115">
+    <name>intercept GPDS_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,08,00,00,DC,11,FF,01,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1116">
+    <name>GPDS_ATTACH_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,05,00,00,13,13,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+   </output>
+
+   <output id="1117">
+    <name>PNS_PIPE_CREATE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,D9,00,0E,00,00,0D,00,00,00,10,0D,00,00,00,33,04,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1118">
+    <name>GPDS_CONTEXT_ID_CREATE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,04,00,00,0D,02</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff</mask>
+   </output>
+
+   <output id="1119">
+    <name>GPDS_LL_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,07,00,00,0D,00,00,01,02</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1120">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1A,00,00,0D,06,00,21,01,FF,00,04,90,04,00,00,00,04,00,00,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1121">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,42,00,00,0D,06,00,21,00,FF,00,04,09,2C,01,01,0A,28,00,FF,00,00,00,05,70,04,00,0B,60,08,00,00,00,00,04,57,51,08,00,01,FF,FF,00,00,41,08,00,01,FF,FF,00,00,30,04,14,00,00,04,01,00,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1122">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,4A,00,00,0D,06,00,21,00,FF,00,04,09,34,01,05,F1,0C,05,00,74,6F,6B,65,6E,00,00,00,F2,08,00,00,00,01,00,01,F1,0C,05,00,74,6F,6B,65,6E,00,00,00,F2,08,00,00,00,01,00,01,F2,08,00,00,00,01,00,01,00,04,FF,FF,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1123">
+    <name>PNS_PIPE_ENABLE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,D9,00,06,00,00,0D,06,01,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1124">
+    <name>GPDS_CONTEXT_ACTIVATE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,06,00,00,0D,08,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1125">
+    <name>GPDS_CONTEXT_STATUS_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,05,00,00,0D,22,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+   </output>
+
+   <output id="1126">
+    <name>GPDS_CONTEXT_DEACTIVATE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,05,00,00,0D,0B,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+   </output>
+
+   <output id="1127">
+    <name>PNS_PIPE_RESET_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,D9,00,06,00,00,0D,04,01,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1128">
+    <name>PNS_PIPE_REMOVE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,D9,00,06,00,00,0D,02,01,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1129">
+    <name>GPDS_DETACH_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,0A,00,00,16,16,00,01,A0,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1130">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,16,00,00,0D,06,00,57,01,FF,00,03,00,04,FF,FF,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1131">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,21,01,FF,00,03,01,08,01,01,01,01,01,00,02,08,00,00,00,00,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1132">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,FF,01,FF,00,03,01,08,03,03,03,03,03,00,02,08,02,02,02,02,02,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1133">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,FF,01,FF,00,03,01,08,01,03,05,05,05,00,02,08,01,04,04,04,04,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1134">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,FF,01,FF,00,03,01,08,03,03,02,07,07,00,02,08,02,03,01,06,06,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1135">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,57,01,FF,00,03,01,08,02,01,04,09,09,00,02,08,01,03,03,08,08,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1136">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,57,01,FF,00,03,01,08,01,03,01,02,0B,00,02,08,03,02,05,01,0A,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1137">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,57,01,FF,00,03,01,08,03,03,03,04,0D,00,02,08,02,04,02,03,0C,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1138">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,57,01,FF,00,03,01,08,02,04,05,06,0F,00,02,08,01,04,04,05,0E,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1139">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,57,01,FF,00,03,01,08,01,02,02,08,11,00,02,08,03,01,01,07,10,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1140">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1E,00,00,06,06,00,57,01,FF,00,03,01,08,03,04,04,01,1F,00,02,08,02,03,03,09,12,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1141">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,3A,00,00,06,06,00,57,00,FF,00,04,F8,04,00,01,06,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,07,14,01,01,01,52,11,01,00,00,00,00,00,00,00,00,00,00,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1142">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,16,00,00,0D,06,00,57,00,FF,00,03,00,04,FF,FF,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1143">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,16,00,00,0D,06,00,21,01,FF,00,03,00,04,FF,FF,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1144">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1A,00,00,0D,06,00,21,00,FF,00,04,90,04,00,00,00,04,00,00,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1145">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1A,00,00,0D,06,00,57,01,FF,00,04,90,04,00,00,00,04,00,00,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1146">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,16,00,00,0D,06,00,57,00,FF,00,03,00,04,FF,FF,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1147">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,3A,00,00,06,06,00,57,00,FF,00,04,F8,04,00,01,06,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,07,14,04,02,03,15,14,00,00,00,00,00,00,00,00,00,00,00,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1148">
+    <name>PNS_PIPE_CREATE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,D9,00,0E,00,00,0E,00,00,00,10,0E,00,00,00,33,04,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1149">
+    <name>GPDS_CONTEXT_ID_CREATE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,04,00,00,0E,02</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff</mask>
+   </output>
+
+   <output id="1150">
+    <name>GPDS_LL_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,07,00,00,0E,00,01,02,02</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1151">
+    <name>PNS_PIPE_ENABLE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,D9,00,06,00,00,0E,06,02,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1152">
+    <name>GPDS_CONTEXT_ACTIVATE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,06,00,00,0E,08,01,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1153">
+    <name>GPDS_CONTEXT_DEACTIVATE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,05,00,00,0E,0B,01</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff</mask>
+   </output>
+
+   <output id="1154">
+    <name>PNS_PIPE_RESET_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,D9,00,06,00,00,0E,04,02,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1155">
+    <name>PNS_PIPE_REMOVE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,D9,00,06,00,00,0E,02,02,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1156">
+    <name>CALL_SERVICE_ACTIVATE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,01,00,0A,00,00,01,39,01,01,00,00,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1157">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1A,00,00,0D,06,00,21,00,FF,00,04,90,04,00,00,00,04,FF,FF,05,04,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,00,FF,FF,FF,FF,FF,00,FF,FF,FF,00,00,FF,FF,FF,FF,FF,FF,FF,00,FF,FF,00,00</mask>
+   </output>
+
+   <output id="1158">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,3A,00,00,06,06,00,21,00,FF,00,04,90,04,00,00,06,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,07,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,F9,04,00,00</message>
+    <mask   >00,00,00,00,00,00,00,00,00,FF,FF,FF,FF,FF,00,FF,FF,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,00,00</mask>
+   </output>
+
+   <output id="1159">
+    <name>SIM_CS_READ_REQ</name>
+    <direction>dos</direction>
+    <message>00,00,00,09,00,0A,00,00,04,D4,01,02,00,8A,00,70</message>
+    <mask   >00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1160">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ IPv6</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,1A,00,00,0D,06,00,57,00,FF,00,04,90,04,00,00,00,04,00,00,05,04,00,00,F9,04,00,00</message>
+    <mask>   00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff</mask>
+   </output>
+
+   <output id="1161">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ IPv6</name>
+    <direction>dos</direction>
+    <message>00,00,00,31,00,22,00,00,06,06,00,57,00,FF,00,04,90,04,00,00,01,08,01,01,01,01,01,00,02,08,00,00,00,00,00,00,F9,04,00,00</message>
+       <mask>00,00,00,00,00,FF,00,00,00,00,00,FF,FF,00,00,00,FF,FF,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,FF,FF,00,00</mask>
+   </output>
+
+  </outputs>
+
+
+  <!-- Test filters are declared here -->
+  <filters>
+  </filters>
+
+
+  <!-- Test steps are declared here -->
+  <steps>
+
+   <step id="11001" type="simulate">
+    <name>NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO)</name>
+    <channel id="0x07"/>
+    <input-ref id="1001"/>
+   </step>
+
+   <step id="11003" type="simulate">
+    <name>GPDS_ATTACH_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1003"/>
+   </step>
+
+   <step id="11005" type="simulate">
+    <name>PNS_PIPE_CREATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1005"/>
+   </step>
+
+   <step id="11007" type="simulate">
+    <name>GPDS_CONTEXT_ID_CREATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1007"/>
+   </step>
+
+   <step id="11008" type="simulate">
+    <name>GPDS_CONTEXT_ID_CREATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1008"/>
+   </step>
+
+   <step id="11010" type="simulate">
+    <name>GPDS_LL_CONFIGURE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1010"/>
+   </step>
+
+   <step id="11013" type="simulate">
+    <name>GPDS_CONTEXT_CONFIGURE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1013"/>
+   </step>
+
+   <step id="11015" type="simulate">
+    <name>PNS_PIPE_REMOVE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1015"/>
+   </step>
+
+   <step id="11017" type="simulate">
+    <name>GDPS_DETACH_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1017"/>
+   </step>
+
+   <step id="11020" type="simulate">
+    <name>GPDS_CONTEXT_DEACTIVATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1020"/>
+   </step>
+
+   <step id="11021" type="simulate">
+    <name>GPDS_CONTEXT_CONFIGURE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1021"/>
+   </step>
+
+   <step id="11022" type="simulate">
+    <name>GPDS_CONTEXT_DEACTIVATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1022"/>
+   </step>
+
+   <step id="11024" type="simulate">
+    <name>PNS_PIPE_ENABLE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1024"/>
+   </step>
+
+   <step id="11026" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1026"/>
+   </step>
+
+   <step id="11027" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1027"/>
+   </step>
+
+   <step id="11028" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATING_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1028"/>
+   </step>
+
+   <step id="11030" type="simulate">
+    <name>PNS_PIPE_RESET_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1030"/>
+   </step>
+
+   <step id="11031" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATING_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1031"/>
+   </step>
+
+   <step id="11033" type="simulate">
+    <name>PNS_PIPE_CREATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1033"/>
+   </step>
+
+   <step id="11035" type="simulate">
+    <name>GPDS_CONTEXT_ID_CREATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1035"/>
+   </step>
+
+   <step id="11036" type="simulate">
+    <name>GPDS_CONTEXT_ID_CREATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1036"/>
+   </step>
+
+   <step id="11038" type="simulate">
+    <name>GPDS_LL_CONFIGURE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1038"/>
+   </step>
+
+   <step id="11040" type="simulate">
+    <name>PNS_PIPE_ENABLE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1040"/>
+   </step>
+
+   <step id="11042" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1042"/>
+   </step>
+
+   <step id="11043" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATING_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1043"/>
+   </step>
+
+   <step id="11044" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1044"/>
+   </step>
+
+   <step id="11045" type="simulate">
+    <name>GPDS_CONTEXT_DEACTIVATING_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1045"/>
+   </step>
+
+   <step id="11046" type="simulate">
+    <name>GPDS_CONTEXT_DEACTIVATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1046"/>
+   </step>
+
+   <step id="11047" type="simulate">
+    <name>GPDS_CONTEXT_ID_DELETE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1047"/>
+   </step>
+
+   <step id="11050" type="simulate">
+    <name>GPDS_CONTEXT_DEACTIVATING_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1050"/>
+   </step>
+
+   <step id="11051" type="simulate">
+    <name>GPDS_CONTEXT_DEACTIVATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1051"/>
+   </step>
+
+   <step id="11053" type="simulate">
+    <name>GPDS_CONTEXT_DEACTIVATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1053"/>
+   </step>
+
+   <step id="11054" type="simulate">
+    <name>PNS_PIPE_RESET_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1054"/>
+   </step>
+
+   <step id="11056" type="simulate">
+    <name>GPDS_CONTEXT_ID_DELETE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1056"/>
+   </step>
+
+   <step id="11057" type="simulate">
+    <name>PNS_PIPE_REMOVE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1057"/>
+   </step>
+
+   <step id="11058" type="simulate">
+    <name>GPDS_CONTEXT_CONFIGURE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1058"/>
+   </step>
+
+   <step id="11059" type="simulate">
+    <name>GPDS_CONTEXT_CONFIGURE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1059"/>
+   </step>
+
+   <step id="11060" type="simulate">
+    <name>GPDS_CONTEXT_MODIFY_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1060"/>
+   </step>
+
+   <step id="11061" type="simulate">
+    <name>CALL_SERVICE_ACTIVATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1061"/>
+   </step>
+
+   <step id="11062" type="simulate">
+    <name>CALL_SERVICE_ACTIVATE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1062"/>
+   </step>
+
+   <step id="11064" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1064"/>
+   </step>
+
+   <step id="11065" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1065"/>
+   </step>
+
+   <step id="11066" type="simulate">
+    <name>NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO)</name>
+    <channel id="0x07"/>
+    <input-ref id="1066"/>
+   </step>
+
+   <step id="11067" type="simulate">
+    <name>NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO)</name>
+    <channel id="0x07"/>
+    <input-ref id="1067"/>
+   </step>
+
+   <step id="11068" type="simulate">
+    <name>GPDS_TRANSFER_STATUS_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1068"/>
+   </step>
+
+   <step id="11069" type="simulate">
+    <name>GPDS_CONTEXT_NWI_ACT_REJECT_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1069"/>
+   </step>
+
+   <step id="11070" type="simulate">
+    <name>GPDS_CONFIGURATION_INFO_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1070"/>
+   </step>
+
+   <step id="11071" type="simulate">
+    <name>GPDS_CONFIGURE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1071"/>
+   </step>
+
+   <step id="11072" type="simulate">
+    <name>GPDS_CONFIGURE_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1072"/>
+   </step>
+
+   <step id="11073" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1073"/>
+   </step>
+
+   <step id="11074" type="simulate">
+    <name>GPDS_CONTEXT_STATUS_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1074"/>
+   </step>
+
+   <step id="11077" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_FAIL_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1077"/>
+   </step>
+
+   <step id="11078" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_FAIL_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1078"/>
+   </step>
+
+   <step id="11079" type="simulate">
+    <name>NET_MODEM_REG_STATUS_GET_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1079"/>
+   </step>
+
+   <step id="11080" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATING_IND (empty APN)</name>
+    <channel id="0x07"/>
+    <input-ref id="1080"/>
+   </step>
+
+   <step id="11081" type="simulate">
+    <name>GPDS_ATTACH_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1081"/>
+   </step>
+
+   <step id="11082" type="simulate">
+    <name>SIM_CS_READ_RESP(O2 HPLMN)</name>
+    <channel id="0x07"/>
+    <input-ref id="1082"/>
+   </step>
+
+   <step id="11084" type="simulate">
+    <name>NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_GSM_REG_INFO subblock)</name>
+    <channel id="0x07"/>
+    <input-ref id="1084"/>
+   </step>
+
+   <step id="11085" type="simulate">
+    <name>NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_CURRENT_CELL_INFO subblock)</name>
+    <channel id="0x07"/>
+    <input-ref id="1085"/>
+   </step>
+
+   <step id="11086" type="simulate">
+    <name>NET_MODEM_REG_STATUS_GET_RESP (with O2 current network in NET_MODEM_GSM_REG_INFO subblock)</name>
+    <channel id="0x07"/>
+    <input-ref id="1086"/>
+   </step>
+
+   <step id="11087" type="simulate">
+    <name>SIM_CS_READ_RESP</name>
+    <channel id="0x07"/>
+    <input-ref id="1087"/>
+   </step>
+
+   <step id="11089" type="simulate">
+    <name>NET_MODEM_REG_STATUS_IND (with non-O2 current network in NET_MODEM_GSM_REG_INFO subblock)</name>
+    <channel id="0x07"/>
+    <input-ref id="1089"/>
+   </step>
+
+   <step id="11090" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1090"/>
+   </step>
+
+   <step id="11091" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATING_IND IPv6</name>
+    <channel id="0x07"/>
+    <input-ref id="1091"/>
+   </step>
+
+   <step id="11092" type="simulate">
+    <name>GPDS_CONTEXT_ACTIVATE_RESP IPv6</name>
+    <channel id="0x07"/>
+    <input-ref id="1092"/>
+   </step>
+   
+   <step id="11093" type="simulate">
+    <name>NET_MODEM_REG_STATUS_GET_RESP EGPRS Supported</name>
+    <channel id="0x07"/>
+    <input-ref id="1093"/>
+   </step>
+   
+   <step id="11094" type="simulate">
+    <name>NET_MODEM_REG_STATUS_IND</name>
+    <channel id="0x07"/>
+    <input-ref id="1094"/>
+   </step>
+   
+   <step id="11095" type="simulate">
+    <name>NET_MODEM_REG_STATUS_IND EGPRS supported</name>
+    <channel id="0x07"/>
+    <input-ref id="1095"/>
+   </step>
+
+   <!--intercepted messsages are declared here-->
+
+   <step id="11100" type="intercept">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <output-ref id="1100"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11101" type="intercept">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <output-ref id="1101"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11102" type="intercept">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <output-ref id="1102"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11103" type="intercept">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <output-ref id="1103"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11104" type="intercept">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <output-ref id="1104"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11105" type="intercept">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <output-ref id="1105"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11106" type="intercept">
+    <name>intercept GPDS_CONTEXT_MODIFY_REQ</name>
+    <output-ref id="1106"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11107" type="intercept">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <output-ref id="1107"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11108" type="intercept">
+    <name>intercept GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <output-ref id="1108"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11109" type="intercept">
+    <name>intercept NET_MODEM_REG_STATUS_GET_REQ</name>
+    <output-ref id="1109"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11110" type="intercept">
+    <name>intercept GPDS_CONTEXT_NWI_ACT_REJECT_REQ</name>
+    <output-ref id="1110"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11111" type="intercept">
+    <name>intercept GPDS_CONFIGURATION_INFO_REQ</name>
+    <output-ref id="1111"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11112" type="intercept">
+    <name>intercept GPDS_CONFIGURE_REQ</name>
+    <output-ref id="1112"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11113" type="intercept">
+    <name>intercept GPDS_CONFIGURE_REQ</name>
+    <output-ref id="1113"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11114" type="intercept">
+    <name>intercept GPDS_CONFIGURE_REQ</name>
+    <output-ref id="1114"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11115" type="intercept">
+    <name>intercept GPDS_CONFIGURE_REQ</name>
+    <output-ref id="1115"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11116" type="intercept">
+    <name>GPDS_ATTACH_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1116"/>
+   </step>
+
+   <step id="11117" type="intercept">
+    <name>PNS_PIPE_CREATE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1117"/>
+   </step>
+
+   <step id="11118" type="intercept">
+    <name>GPDS_CONTEXT_ID_CREATE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1118"/>
+   </step>
+
+   <step id="11119" type="intercept">
+    <name>GPDS_LL_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1119"/>
+   </step>
+
+   <step id="11120" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1120"/>
+   </step>
+
+   <step id="11121" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1121"/>
+   </step>
+
+   <step id="11122" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1122"/>
+   </step>
+
+   <step id="11123" type="intercept">
+    <name>PNS_PIPE_ENABLE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1123"/>
+   </step>
+
+   <step id="11124" type="intercept">
+    <name>GPDS_CONTEXT_ACTIVATE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1124"/>
+   </step>
+
+   <step id="11125" type="intercept">
+    <name>GPDS_CONTEXT_STATUS_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1125"/>
+   </step>
+
+   <step id="11126" type="intercept">
+    <name>GPDS_CONTEXT_DEACTIVATE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1126"/>
+   </step>
+
+   <step id="11127" type="intercept">
+    <name>PNS_PIPE_RESET_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1127"/>
+   </step>
+
+   <step id="11128" type="intercept">
+    <name>PNS_PIPE_REMOVE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1128"/>
+   </step>
+
+   <step id="11129" type="intercept">
+    <name>GDPS_DETACH_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1129"/>
+   </step>
+
+   <step id="11130" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1130"/>
+   </step>
+
+   <step id="11131" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1131"/>
+   </step>
+
+   <step id="11132" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1132"/>
+   </step>
+
+   <step id="11133" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1133"/>
+   </step>
+
+   <step id="11134" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1134"/>
+   </step>
+
+   <step id="11135" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1135"/>
+   </step>
+
+   <step id="11136" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1136"/>
+   </step>
+
+   <step id="11137" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1137"/>
+   </step>
+
+   <step id="11138" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1138"/>
+   </step>
+
+   <step id="11139" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1139"/>
+   </step>
+
+   <step id="11140" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1140"/>
+   </step>
+
+   <step id="11141" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1141"/>
+   </step>
+
+   <step id="11142" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1142"/>
+   </step>
+
+   <step id="11143" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1143"/>
+   </step>
+
+   <step id="11144" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1144"/>
+   </step>
+
+   <step id="11145" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1145"/>
+   </step>
+
+   <step id="11146" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1146"/>
+   </step>
+
+   <step id="11147" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1147"/>
+   </step>
+
+   <step id="11148" type="intercept">
+    <name>PNS_PIPE_CREATE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1148"/>
+   </step>
+
+   <step id="11149" type="intercept">
+    <name>GPDS_CONTEXT_ID_CREATE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1149"/>
+   </step>
+
+   <step id="11150" type="intercept">
+    <name>GPDS_LL_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1150"/>
+   </step>
+
+   <step id="11151" type="intercept">
+    <name>PNS_PIPE_ENABLE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1151"/>
+   </step>
+
+   <step id="11152" type="intercept">
+    <name>GPDS_CONTEXT_ACTIVATE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1152"/>
+   </step>
+
+   <step id="11153" type="intercept">
+    <name>GPDS_CONTEXT_DEACTIVATE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1153"/>
+   </step>
+
+   <step id="11154" type="intercept">
+    <name>PNS_PIPE_RESET_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1154"/>
+   </step>
+
+   <step id="11155" type="intercept">
+    <name>PNS_PIPE_REMOVE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1155"/>
+   </step>
+
+   <step id="11156" type="intercept">
+    <name>CALL_SERVICE_ACTIVATE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1156"/>
+   </step>
+
+   <step id="11157" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1157"/>
+   </step>
+
+   <step id="11158" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ</name>
+    <channel id="0x07"/>
+    <output-ref id="1158"/>
+   </step>
+
+   <step id="11159" type="intercept">
+    <name>SIM_CS_READ_REQ Automatic</name>
+    <output-ref id="1159"/>
+    <channel id="0x07"/>
+   </step>
+
+   <step id="11160" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ IPv6</name>
+    <channel id="0x07"/>
+    <output-ref id="1160"/>
+   </step>
+
+   <step id="11161" type="intercept">
+    <name>GPDS_CONTEXT_CONFIGURE_REQ IPv6</name>
+    <channel id="0x07"/>
+    <output-ref id="1161"/>
+   </step>
+
+   <!-- Open channel steps are used to attach the ISC test controller to an existing ISC channel -->
+   <step id="2001" type="open-channel">
+    <name>Open TSY channel</name>
+    <channel id="0x07"/>
+   </step>
+
+   <!-- Close channel steps are used to detach the ISC test controller from an existing ISC channel -->
+   <step id="2002" type="close-channel">
+    <name>Close TSY channel</name>
+    <channel id="0x07"/>
+   </step>
+
+   <!-- Synchronization step is used to synchronize with -->
+   <!-- the test cases of the adaptation test environment -->
+   <step id="2003" type="sync">
+    <name>Sync ( ignore messages )</name>
+    <flags>1</flags>
+   </step>
+
+  </steps>
+
+
+  <!-- Test step groups are declared here. Step groups must not have same ID's as steps -->
+  <!-- Intercept steps can be grouped to receive messages in undetermined order. -->
+  <groups>
+  </groups>
+
+
+  <!-- Test cases are declared here -->
+  <!-- step-ref elements are used to reference the test steps of the test case -->
+  <cases>
+
+   <case id="101">
+    <name>HSDPA Resource Allocation</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11094"/> <!-- NET_MODEM_REG_STATUS_IND -->
+     <step-ref id="11001"/> <!-- NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="102">
+    <name>PacketServiceAttach</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11116"/> <!-- GPDS_ATTACH_REQ -->
+     <step-ref id="11003"/> <!-- GPDS_ATTACH_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="103">
+    <name>InitializePacketContext</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11117"/> <!-- PNS_PIPE_CREATE_REQ -->
+     <step-ref id="11005"/> <!-- PNS_PIPE_CREATE_RESP -->
+     <step-ref id="11118"/> <!-- GPDS_CONTEXT_ID_CREATE_REQ -->
+     <step-ref id="11007"/> <!-- GPDS_CONTEXT_ID_CREATE_RESP -->
+     <step-ref id="11008"/> <!-- GPDS_CONTEXT_ID_CREATE_IND -->
+     <step-ref id="11119"/> <!-- GPDS_LL_CONFIGURE_REQ -->
+     <step-ref id="11010"/> <!-- GPDS_LL_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="104">
+    <name>SetPacketContextConfiguration / R5 / IPv6 / MO</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11120"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11100"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="106">
+    <name>PacketServiceDetach</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11129"/> <!-- GPDS_DETACH_REQ -->
+     <step-ref id="11017"/> <!-- GPDS_DETACH_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="107">
+    <name>SetPacketContextConfiguration / R5 / IPv4 / NWI</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11143"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11101"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="108">
+    <name>SetPacketContextConfiguration / GPRS / IPv4 / MO</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11144"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11102"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="109">
+    <name>SetPacketContextConfiguration / GPRS / IPv6 / NWI</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11145"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11103"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="110">
+    <name>DeactivatePacketContext</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11128"/> <!-- PNS_PIPE_REMOVE_REQ -->
+     <step-ref id="11126"/> <!-- GPDS_CONTEXT_DEACTIVATE_REQ -->
+     <step-ref id="11020"/> <!-- GPDS_CONTEXT_DEACTIVATE_RESP -->
+     <step-ref id="11015"/> <!-- PNS_PIPE_REMOVE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="111">
+    <name>DeactivatePacketContext 2</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11126"/> <!-- GPDS_CONTEXT_DEACTIVATE_REQ -->
+     <step-ref id="11045"/> <!-- GPDS_CONTEXT_DEACTIVATING_IND -->
+     <step-ref id="11022"/> <!-- GPDS_CONTEXT_DEACTIVATE_RESP -->
+     <step-ref id="11127"/> <!-- PNS_PIPE_RESET_REQ -->
+     <step-ref id="11046"/> <!-- GPDS_CONTEXT_DEACTIVATE_IND -->
+     <step-ref id="11030"/> <!-- PNS_PIPE_RESET_RESP -->
+     <step-ref id="11128"/> <!-- PNS_PIPE_REMOVE_REQ -->
+     <step-ref id="11047"/> <!-- GPDS_CONTEXT_ID_DELETE_IND -->
+     <step-ref id="11015"/> <!-- PNS_PIPE_REMOVE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="112">
+    <name>ActivatePacketContext / GPRS / IPv4</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11123"/> <!-- PNS_PIPE_ENABLE_REQ -->
+     <step-ref id="11024"/> <!-- PNS_PIPE_ENABLE_RESP -->
+     <step-ref id="11124"/> <!-- GPDS_CONTEXT_ACTIVATE_REQ -->
+     <step-ref id="11028"/> <!-- GPDS_CONTEXT_ACTIVATING_IND -->
+     <step-ref id="11026"/> <!-- GPDS_CONTEXT_ACTIVATE_RESP -->
+     <step-ref id="11027"/> <!-- GPDS_CONTEXT_ACTIVATE_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="114">
+    <name>SetPacketContextConfiguration / R5 / IPv6 / MO / QoS only</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11141"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="115">
+    <name>ActivatePacketContext / R5 / IPv6</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11123"/> <!-- PNS_PIPE_ENABLE_REQ -->
+     <step-ref id="11024"/> <!-- PNS_PIPE_ENABLE_RESP -->
+     <step-ref id="11124"/> <!-- GPDS_CONTEXT_ACTIVATE_REQ -->
+     <step-ref id="11031"/> <!-- GPDS_CONTEXT_ACTIVATING_IND -->
+     <step-ref id="11026"/> <!-- GPDS_CONTEXT_ACTIVATE_RESP -->
+     <step-ref id="11027"/> <!-- GPDS_CONTEXT_ACTIVATE_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="116">
+    <name>InitializeSecondaryPacketContext</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11148"/> <!-- PNS_PIPE_CREATE_REQ -->
+     <step-ref id="11033"/> <!-- PNS_PIPE_CREATE_RESP -->
+     <step-ref id="11149"/> <!-- GPDS_CONTEXT_ID_CREATE_REQ -->
+     <step-ref id="11035"/> <!-- GPDS_CONTEXT_ID_CREATE_RESP -->
+     <step-ref id="11036"/> <!-- GPDS_CONTEXT_ID_CREATE_IND -->
+     <step-ref id="11150"/> <!-- GPDS_LL_CONFIGURE_REQ -->
+     <step-ref id="11038"/> <!-- GPDS_LL_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="117">
+    <name>SetSecondaryPacketContextConfiguration / R5 / IPv6 / MO</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11104"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11058"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11105"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11059"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="118">
+    <name>ActivateSecondaryPacketContext / R5 / IPv6</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11151"/> <!-- PNS_PIPE_ENABLE_REQ -->
+     <step-ref id="11040"/> <!-- PNS_PIPE_ENABLE_RESP -->
+     <step-ref id="11152"/> <!-- GPDS_CONTEXT_ACTIVATE_REQ -->
+     <step-ref id="11042"/> <!-- GPDS_CONTEXT_ACTIVATING_IND -->
+     <step-ref id="11043"/> <!-- GPDS_CONTEXT_ACTIVATE_RESP -->
+     <step-ref id="11044"/> <!-- GPDS_CONTEXT_ACTIVATE_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="119">
+    <name>DeactivateSecondaryPacketContext</name> <!-- To be used with delete case 120-->
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11153"/> <!-- GPDS_CONTEXT_DEACTIVATE_REQ -->
+     <step-ref id="11050"/> <!-- GPDS_CONTEXT_DEACTIVATING_IND -->
+     <step-ref id="11051"/> <!-- GPDS_CONTEXT_DEACTIVATE_RESP -->
+     <step-ref id="11154"/> <!-- PNS_PIPE_RESET_REQ -->
+     <step-ref id="11053"/> <!-- GPDS_CONTEXT_DEACTIVATE_IND -->
+     <step-ref id="11054"/> <!-- PNS_PIPE_RESET_RESP -->
+     <step-ref id="11155"/> <!-- PNS_PIPE_REMOVE_REQ -->
+     <step-ref id="11056"/> <!-- GPDS_CONTEXT_ID_DELETE_IND -->
+     <step-ref id="11057"/> <!-- PNS_PIPE_REMOVE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="121">
+    <name>ModifySecondaryPacketContext</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11106"/> <!-- GPDS_CONTEXT_MODIFY_REQ -->
+     <step-ref id="11060"/> <!-- GPDS_CONTEXT_MODIFY_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="122">
+    <name>AllowIncomingCSCall</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11061"/> <!-- CALL_SERVICE_ACTIVATE_IND -->
+     <step-ref id="11153"/> <!-- GPDS_CONTEXT_DEACTIVATE_REQ -->
+     <step-ref id="11050"/> <!-- GPDS_CONTEXT_DEACTIVATING_IND -->
+     <step-ref id="11051"/> <!-- GPDS_CONTEXT_DEACTIVATE_RESP -->
+     <step-ref id="11154"/> <!-- PNS_PIPE_RESET_REQ -->
+     <step-ref id="11156"/> <!-- CALL_SERVICE_ACTIVATE_REQ -->
+     <step-ref id="11053"/> <!-- GPDS_CONTEXT_DEACTIVATE_IND -->
+     <step-ref id="11054"/> <!-- PNS_PIPE_RESET_RESP -->
+     <step-ref id="11062"/> <!-- CALL_SERVICE_ACTIVATE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="123">
+    <name>DeleteSecondaryPacketContext2</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11155"/> <!-- PNS_PIPE_REMOVE_REQ -->
+     <step-ref id="11056"/> <!-- GPDS_CONTEXT_ID_DELETE_IND -->
+     <step-ref id="11057"/> <!-- PNS_PIPE_REMOVE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="124">
+    <name>SetPacketContextConfiguration / GPRS / IPv4 / MO / P-CSCF req</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11107"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11108"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="125">
+    <name>ActivatePacketContext / GPRS / IPv4 / IPv4 P-CSCF</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11123"/> <!-- PNS_PIPE_ENABLE_REQ -->
+     <step-ref id="11024"/> <!-- PNS_PIPE_ENABLE_RESP -->
+     <step-ref id="11124"/> <!-- GPDS_CONTEXT_ACTIVATE_REQ -->
+     <step-ref id="11028"/> <!-- GPDS_CONTEXT_ACTIVATING_IND -->
+     <step-ref id="11026"/> <!-- GPDS_CONTEXT_ACTIVATE_RESP -->
+     <step-ref id="11064"/> <!-- GPDS_CONTEXT_ACTIVATE_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="126">
+    <name>ActivatePacketContext / GPRS / IPv4 / IPv6 P-CSCF</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11123"/> <!-- PNS_PIPE_ENABLE_REQ -->
+     <step-ref id="11024"/> <!-- PNS_PIPE_ENABLE_RESP -->
+     <step-ref id="11124"/> <!-- GPDS_CONTEXT_ACTIVATE_REQ -->
+     <step-ref id="11028"/> <!-- GPDS_CONTEXT_ACTIVATING_IND -->
+     <step-ref id="11026"/> <!-- GPDS_CONTEXT_ACTIVATE_RESP -->
+     <step-ref id="11065"/> <!-- GPDS_CONTEXT_ACTIVATE_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="127">
+    <name>HSUPA Resource Allocation 127</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND EGPRS supported-->
+     <step-ref id="11066"/> <!-- NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="128">
+    <name>HSDPA and HSUPA Resource Allocation 128</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11094"/> <!-- NET_MODEM_REG_STATUS_IND -->
+     <step-ref id="11067"/> <!-- NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="129">
+    <name>GPDS transfer status indication, barred network</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11068"/> <!-- GPDS_TRANSFER_STATUS_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="130">
+    <name>PacketServiceRejectActivationRequest 130</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11110"/> <!-- GPDS_CONTEXT_NWI_ACT_REJECT_REQ -->
+     <step-ref id="11069"/> <!-- GPDS_CONTEXT_NWI_ACT_REJECT_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="131">
+    <name>GetPacketAttachMode 131</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11111"/> <!-- GPDS_CONFIGURATION_INFO_REQ -->
+     <step-ref id="11070"/> <!-- GPDS_CONFIGURATION_INFO_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="132">
+    <name>SetPacketServiceAttachMode 132</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11112"/> <!-- GPDS_CONFIGURE_REQ -->
+     <step-ref id="11071"/> <!-- GPDS_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="133">
+    <name>SetPacketServiceAttachMode 133</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11113"/> <!-- GPDS_CONFIGURE_REQ -->
+     <step-ref id="11071"/> <!-- GPDS_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="134">
+    <name>SetPreferredBearer 134</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11114"/> <!-- GPDS_CONFIGURE_REQ -->
+     <step-ref id="11072"/> <!-- GPDS_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="135">
+    <name>SetPreferredBearer 135</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11115"/> <!-- GPDS_CONFIGURE_REQ -->
+     <step-ref id="11072"/> <!-- GPDS_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="136">
+    <name>SetPacketContextConfiguration 136</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11121"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11122"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11123"/> <!-- PNS_PIPE_ENABLE_REQ -->
+     <step-ref id="11024"/> <!-- PNS_PIPE_ENABLE_RESP -->
+     <step-ref id="11124"/> <!-- GPDS_CONTEXT_ACTIVATE_REQ -->
+     <step-ref id="11028"/> <!-- GPDS_CONTEXT_ACTIVATING_IND -->
+     <step-ref id="11026"/> <!-- GPDS_CONTEXT_ACTIVATE_RESP -->
+     <step-ref id="11073"/> <!-- GPDS_CONTEXT_ACTIVATE_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="137">
+    <name>ContextStatusRequest 137</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11125"/> <!-- GPDS_CONTEXT_STATUS_REQ -->
+     <step-ref id="11074"/> <!-- GPDS_CONTEXT_STATUS_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="138">
+    <name>SetPacketContextConfiguration 138</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11131"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="139">
+    <name>DeactivatePacketContext 139</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11128"/> <!-- PNS_PIPE_REMOVE_REQ -->
+     <step-ref id="11047"/> <!-- GPDS_CONTEXT_ID_DELETE_IND -->
+     <step-ref id="11015"/> <!-- PNS_PIPE_REMOVE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="140">
+    <name>SetPacketContextConfiguration 140</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11132"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="141">
+    <name>SetPacketContextConfiguration 141</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11133"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="142">
+    <name>SetPacketContextConfiguration 142</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11134"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="143">
+    <name>SetPacketContextConfiguration 143</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11135"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="144">
+    <name>SetPacketContextConfiguration 144</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11136"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="145">
+    <name>SetPacketContextConfiguration 145</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11137"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="146">
+    <name>SetPacketContextConfiguration 146</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11138"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="147">
+    <name>SetPacketContextConfiguration 147</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11139"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="148">
+    <name>SetPacketContextConfiguration 148</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11130"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11140"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="150">
+    <name>ContextActivationFailIndication 150</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11077"/> <!-- GPDS_CONTEXT_ACTIVATE_FAIL_IND -->
+     <step-ref id="11078"/> <!-- GPDS_CONTEXT_ACTIVATE_FAIL_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="151">
+    <name>GetNetworkRegistrationStatus 151</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11109"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+     <step-ref id="11079"/> <!-- NET_MODEM_REG_STATUS_GET_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="152">
+    <name>SetPacketContextConfiguration 152</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11142"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11141"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="153">
+    <name>DeactivatePacketContext 153</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11126"/> <!-- GPDS_CONTEXT_DEACTIVATE_REQ -->
+     <step-ref id="11045"/> <!-- GPDS_CONTEXT_DEACTIVATING_IND -->
+     <step-ref id="11022"/> <!-- GPDS_CONTEXT_DEACTIVATE_RESP -->
+     <step-ref id="11128"/> <!-- PNS_PIPE_REMOVE_REQ -->
+     <step-ref id="11047"/> <!-- GPDS_CONTEXT_ID_DELETE_IND -->
+     <step-ref id="11015"/> <!-- PNS_PIPE_REMOVE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="154">
+    <name>SetPacketContextConfiguration 154</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11146"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11147"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="155">
+    <name>ActivatePacketContext / GPRS / IPv4 / IPv4 P-CSCF empty APN</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11123"/> <!-- PNS_PIPE_ENABLE_REQ -->
+     <step-ref id="11024"/> <!-- PNS_PIPE_ENABLE_RESP -->
+     <step-ref id="11124"/> <!-- GPDS_CONTEXT_ACTIVATE_REQ -->
+     <step-ref id="11080"/> <!-- GPDS_CONTEXT_ACTIVATING_IND (empty APN) -->
+     <step-ref id="11026"/> <!-- GPDS_CONTEXT_ACTIVATE_RESP -->
+     <step-ref id="11064"/> <!-- GPDS_CONTEXT_ACTIVATE_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="156">
+    <name>SetPacketContextConfiguration / R99R4 / IPv4 / MO / P-CSCF req</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11157"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11158"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="157">
+    <name>AT modem creates and activates dialup context</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11081"/> <!-- GPDS_ATTACH_IND -->
+     <step-ref id="11008"/> <!-- GPDS_CONTEXT_ID_CREATE_IND -->
+     <step-ref id="11080"/> <!-- GPDS_CONTEXT_ACTIVATING_IND (empty APN) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="158">
+    <name>O2 HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_IND(NET_MODEM_GSM_REG_INFO) with O2 network Id</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11159"/> <!-- SIM_CS_READ_REQ -->
+     <step-ref id="11082"/> <!-- SIM_CS_READ_RESP (with O2 HPLMN) -->
+     <step-ref id="11084"/> <!-- NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_GSM_REG_INFO subblock) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="159">
+    <name>O2 HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_IND(NET_MODEM_CURRENT_CELL_INFO) with O2 network Id</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11159"/> <!-- SIM_CS_READ_REQ -->
+     <step-ref id="11082"/> <!-- SIM_CS_READ_RESP (with O2 HPLMN) -->
+     <step-ref id="11085"/> <!-- NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_CURRENT_CELL_INFO subblock) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="160">
+    <name>O2 HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_GET_RESP(NET_MODEM_GSM_REG_INFO) with O2 network Id</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11159"/> <!-- SIM_CS_READ_REQ -->
+     <step-ref id="11082"/> <!-- SIM_CS_READ_RESP (with O2 HPLMN) -->
+     <step-ref id="11109"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+     <step-ref id="11086"/> <!-- NET_MODEM_REG_STATUS_GET_RESP (with O2 current network in NET_MODEM_GSM_REG_INFO subblock) -->
+    </test-steps>
+   </case>
+
+   <case id="161">
+    <name>O2 HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_IND(NET_MODEM_GSM_REG_INFO) with non-O2 network Id</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11159"/> <!-- SIM_CS_READ_REQ -->
+     <step-ref id="11082"/> <!-- SIM_CS_READ_RESP (with O2 HPLMN) -->
+     <step-ref id="11089"/> <!-- NET_MODEM_REG_STATUS_IND (with non-O2 current network in NET_MODEM_GSM_REG_INFO subblock) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="162">
+    <name>LATIN HPLMN is read from SIM-card on boot-up, NET_MODEM_REG_STATUS_IND(NET_MODEM_GSM_REG_INFO) with O2 network Id</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11159"/> <!-- SIM_CS_READ_REQ -->
+     <step-ref id="11087"/> <!-- SIM_CS_READ_RESP (LATIN) -->
+     <step-ref id="11084"/> <!-- NET_MODEM_REG_STATUS_IND (with O2 current network in NET_MODEM_GSM_REG_INFO subblock) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="163">
+    <name>SetPacketContextConfiguration / GPRS / IPv6 / MO</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11160"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11013"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="11161"/> <!-- GPDS_CONTEXT_CONFIGURE_REQ -->
+     <step-ref id="11021"/> <!-- GPDS_CONTEXT_CONFIGURE_RESP -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="164">
+    <name>ActivatePacketContext / GPRS / IPv6</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11123"/> <!-- PNS_PIPE_ENABLE_REQ -->
+     <step-ref id="11024"/> <!-- PNS_PIPE_ENABLE_RESP -->
+     <step-ref id="11124"/> <!-- GPDS_CONTEXT_ACTIVATE_REQ -->
+     <step-ref id="11091"/> <!-- GPDS_CONTEXT_ACTIVATING_IND -->
+     <step-ref id="11092"/> <!-- GPDS_CONTEXT_ACTIVATE_RESP -->
+     <step-ref id="11090"/> <!-- GPDS_CONTEXT_ACTIVATE_IND -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+   <case id="169">
+    <name>GetNetworkRegistrationStatus 169</name>
+    <timeout>100</timeout>
+    <test-steps>
+    <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11001"/> <!-- NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO) -->
+     <step-ref id="11109"/> <!-- NET_MODEM_REG_STATUS_GET_REQ -->
+     <step-ref id="11093"/> <!-- NET_MODEM_REG_STATUS_GET_RESP EGPRS Supported-->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+   
+   <case id="170">
+    <name>HSDPA Resource Allocation 170</name>
+    <timeout>100</timeout>
+    <test-steps>
+     <step-ref id="2001"/>  <!-- attach -->
+     <step-ref id="2003"/>  <!-- sync -->
+     <step-ref id="11095"/> <!-- NET_MODEM_REG_STATUS_IND EGPRS supported-->
+     <step-ref id="11001"/> <!-- NET_RADIO_INFO_IND (NET_UTRAN_RADIO_INFO) -->
+     <step-ref id="2002"/>  <!-- detach -->
+    </test-steps>
+   </case>
+
+  </cases>
+
+</isc-test-control>

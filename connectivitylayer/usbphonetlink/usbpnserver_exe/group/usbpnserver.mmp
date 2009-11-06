@@ -1,0 +1,59 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+#include <non_foundation_paths.hrh>
+#include <platform_paths.hrh>
+
+TARGET          usbpnserver.exe
+TARGETTYPE      exe
+UID             0x10003d38 0x2000B5CE
+CAPABILITY      CommDD
+VENDORID        VID_DEFAULT
+
+FEATUREVARIANT
+
+SOURCEPATH      ../src
+SOURCE          cusbpnusbreceiver.cpp
+SOURCE          cusbpnusbsender.cpp
+SOURCE          cusbpninterface.cpp
+SOURCE          cusbpnalt.cpp
+SOURCE          usbpnexe.cpp
+SOURCE          cusbpnisareceiver.cpp
+SOURCE          cusbpnisasender.cpp
+SOURCE          cusbpnpacket.cpp
+SOURCE          cusbpnscheduler.cpp
+SOURCE          cusbpnserver.cpp
+SOURCE          cusbpnserversession.cpp
+SOURCE          usbpntrace.cpp
+
+
+USERINCLUDE     ../traces
+USERINCLUDE     ../inc
+
+OS_LAYER_SYSTEMINCLUDE
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
+
+LIBRARY         euser.lib
+LIBRARY         iscapi.lib
+LIBRARY         isimessage.lib
+
+SMPSAFE
+
+MACRO API_TRACE_FLAG
+MACRO COMPONENT_TRACE_FLAG
+//MACRO EXTENDED_TRACE_FLAG

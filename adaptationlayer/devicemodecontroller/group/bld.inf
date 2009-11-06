@@ -1,0 +1,37 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: 
+*     This file provides the information required for building
+*     DMC (Device Mode Controller).
+*
+*/
+
+
+#include <non_foundation_paths.hrh>
+
+PRJ_PLATFORMS
+DEFAULT
+
+// Remove comments if the default "boot reason API" is needed.
+//#include "../internal/boot_reason_api_dummy/group/bld.inf"
+#include "../boot_reason_plat/group/bld.inf"
+
+PRJ_EXPORTS
+
+../rom/devicemodecontroller.iby NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(devicemodecontroller.iby) 
+
+PRJ_MMPFILES
+../dmc_ext/group/dmc.mmp
+
+//  End of File

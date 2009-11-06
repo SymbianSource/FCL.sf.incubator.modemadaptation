@@ -1,0 +1,5 @@
+EXPORTS
+	_ZN16CMmMessageRouter4NewLEP17CMmMessageManager @ 1 NONAME
+	_ZN16CMmMessageRouter15GetPhoNetSenderEv @ 2 NONAME
+	_ZN16CMmMessageRouter17GetPhoNetReceiverEv @ 3 NONAME
+

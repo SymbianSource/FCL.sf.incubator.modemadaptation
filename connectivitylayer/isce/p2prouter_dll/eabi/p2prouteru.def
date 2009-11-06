@@ -1,0 +1,4 @@
+EXPORTS
+	_Z19CreateLogicalDevicev @ 1 NONAME
+	_ZN11TP2PFactory9NewP2PIfFEv @ 2 NONAME
+

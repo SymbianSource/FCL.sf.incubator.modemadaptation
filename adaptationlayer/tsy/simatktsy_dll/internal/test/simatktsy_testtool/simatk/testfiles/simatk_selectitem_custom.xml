@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!--
+MOD_1012.001_SIM_ATK_TSY_[SELECT ITEM - Empty Item TLV] 
+MOD_1012.002_SIM_ATK_TSY_[SELECT ITEM - invalid char amount in Item data]
+-->
+
+
+<isc-test-control id="1012">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <input id="10101">
+        <name>SELECT ITEM with Empty Item TLV (length == 0)</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,1B,D0,17,81,03,01,24,00,82,02,81,82,05,0A,53,65,6C,65,63,74,49,74,65,6D,0F,00,90,00</message>
+    </input>
+
+    <input id="10102">
+        <name>SELECT ITEM with invalid char amount in Item data</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,64,00,af,d0,81,aa,81,03,01,24,00,82,02,81,82,0f,0c,33,43,72,69,6f,6c,6c,6f,20,2e,2e,2e,0f,0c,34,43,72,69,73,74,69,6e,61,2e,2e,2e,0f,0a,35,43,72,75,7a,20,52,6f,6a,61,0f,0b,36,43,72,75,7a,20,56,65,72,64,65,0f,0c,37,44,61,6e,69,65,6c,20,55,2e,2e,2e,0f,0c,38,81,0d,01,44,61,76,69,64,2e,2e,2e,0f,0c,39,81,0c,01,44,61,76,69,64,2e,2e,2e,0f,0c,3a,81,0d,01,44,61,76,69,64,2e,2e,2e,0f,0c,3b,44,65,6e,74,69,73,74,61,2e,2e,2e,0f,0c,3c,44,65,6e,74,69,73,74,61,2e,2e,2e,0f,0d,3d,82,0d,00,01,44,61,76,69,64,2e,2e,2e,0f,07,ff,4d,61,73,2e,2e,2e,90,00</message>
+    </input>
+
+<!-- SIM SESSION END -->
+<!-- *************** -->
+    <input id="90004">
+        <name>SIM Session End</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+        <!-- Transaction Id's (9:th byte) must match with Terminal responses transaction id -->
+    </input>
+
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+    
+    
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <output id="40101">
+        <name>TERMINAL RESPONSE: SELECT ITEM 1.1.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0F,81,03,01,24,00,82,02,82,81,83,01,00,90,01,00,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <step id="10101" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10101"/>
+    </step>
+
+    <step id="10102" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10102"/>
+    </step>
+
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <step id="40101" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40101"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+    </step>
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+</steps>
+
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+    <case id="101">
+        <name>SELECT ITEM with Empty Item TLV</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10101"/> <!-- Send PCMD -->
+            <step-ref id="40101"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="102">
+        <name>SELECT ITEM with invalid char amount in Item data</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10102"/> <!-- Send PCMD -->
+            <step-ref id="40101"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+</cases>
+
+</isc-test-control>

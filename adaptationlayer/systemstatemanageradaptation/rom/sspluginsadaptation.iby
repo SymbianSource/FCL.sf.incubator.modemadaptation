@@ -1,0 +1,37 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: 
+* Ssm adaptation iby-file.
+*
+*/
+
+
+#ifndef __SSPLUGINSADAPTATION_IBY__
+#define __SSPLUGINSADAPTATION_IBY__
+
+
+/* 
+Only misc adaptation supported in the first phase. Others are commented out.
+
+file=ABI_DIR\BUILD_DIR\ssm_state_adaptation.dll             sys\bin\ssm_state_adaptation.dll
+file=ABI_DIR\BUILD_DIR\ssm_sim_adaptation.dll               sys\bin\ssm_sim_adaptation.dll
+file=ABI_DIR\BUILD_DIR\ssm_rtc_adaptation.dll               sys\bin\ssm_rtc_adaptation.dll
+file=ABI_DIR\BUILD_DIR\ssm_emergencycallrf_adaptation.dll   sys\bin\ssm_emergencycallrf_adaptation.dll
+*/
+
+file=ABI_DIR\BUILD_DIR\miscadaptationref.dll                sys\bin\miscadaptationref.dll
+
+#endif //__SSPLUGINSADAPTATION_IBY__
+
+// End of file

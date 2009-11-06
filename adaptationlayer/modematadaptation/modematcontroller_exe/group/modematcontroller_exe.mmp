@@ -1,0 +1,56 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: 
+*
+*/
+
+
+
+#include <non_foundation_paths.hrh>
+#include <platform_paths.hrh>
+
+
+TARGET                  modematcontroller.exe
+TARGETTYPE              exe
+UID                     0x1000008d 0x2001FCB1
+EPOCSTACKSIZE           0x8000
+EPOCHEAPSIZE            0x5000 0x400000
+FEATUREVARIANT
+
+CAPABILITY              CAP_SERVER  CommDD MultimediaDD PowerMgmt ReadDeviceData WriteDeviceData
+VENDORID                VID_DEFAULT
+
+SOURCEPATH              ../src
+SOURCE                  main.cpp
+SOURCE                  cmodematsrv.cpp
+SOURCE                  cmodematsession.cpp
+SOURCE                  cmodemathandler.cpp
+SOURCE                  cmodematpipecontroller.cpp
+SOURCE                  catmessage.cpp
+
+
+
+OS_LAYER_SYSTEMINCLUDE
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
+USERINCLUDE             ../inc ../../modematcontroller_dll/inc
+
+
+LIBRARY                 euser.lib
+LIBRARY                 iscapi.lib
+LIBRARY                 isimessage.lib
+
+#ifdef PRJ_FILE_TRACE
+LIBRARY flogger.lib
+#endif
+

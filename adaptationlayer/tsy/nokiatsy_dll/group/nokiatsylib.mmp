@@ -1,0 +1,56 @@
+/*
+* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+
+#include <non_foundation_paths.hrh>
+#include <platform_paths.hrh>
+
+
+OS_LAYER_SYSTEMINCLUDE
+
+TARGET NOKIATSY.DLL
+TARGETTYPE IMPLIB
+UID           0x1000008D 0x1000A84A
+FEATUREVARIANT
+
+VENDORID VID_DEFAULT
+
+
+
+// ######### Include files #########
+CAPABILITY CAP_GENERAL_DLL
+
+#if defined(WINSCW)
+#if (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
+DEFFILE       ../bwinscw/nokiatsy_not_export_to_root.def
+#else
+DEFFILE       ../bwinscw/nokiatsy.def
+#endif //NCP_COMMON_S60_VERSION_SUPPORT
+#elif defined(WINS)
+#if (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
+DEFFILE       ../bwins/nokiatsy_not_export_to_root.def
+#else
+DEFFILE       ../bwins/nokiatsy.def
+#endif //NCP_COMMON_S60_VERSION_SUPPORT
+#else
+#if (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
+DEFFILE       nokiatsy_not_export_to_root.def
+#else
+DEFFILE       nokiatsy.def
+#endif //NCP_COMMON_S60_VERSION_SUPPORT
+#endif

@@ -1,0 +1,36 @@
+EXPORTS
+	_ZN7RIscApi10OpenCancelEv @ 1 NONAME
+	_ZN7RIscApi10SendCancelEv @ 2 NONAME
+	_ZN7RIscApi11DataReceiveER14TRequestStatusR5TDes8Rt @ 3 NONAME
+	_ZN7RIscApi12ResetBuffersEv @ 4 NONAME
+	_ZN7RIscApi13ReceiveCancelEv @ 5 NONAME
+	_ZN7RIscApi14CustomFunctionER14TRequestStatustPv @ 6 NONAME
+	_ZN7RIscApi14CustomFunctionEtPv @ 7 NONAME
+	_ZN7RIscApi14DataSendCancelEv @ 8 NONAME
+	_ZN7RIscApi14GetChannelInfoEtR5TDes8 @ 9 NONAME
+	_ZN7RIscApi15MaximumDataSizeEv @ 10 NONAME
+	_ZN7RIscApi16ConnectionStatusEv @ 11 NONAME
+	_ZN7RIscApi16InitializeCancelEv @ 12 NONAME
+	_ZN7RIscApi17DataReceiveCancelEv @ 13 NONAME
+	_ZN7RIscApi17FlowControlStatusEv @ 14 NONAME
+	_ZN7RIscApi17NotifyFlowControlER14TRequestStatusRi @ 15 NONAME
+	_ZN7RIscApi20CustomFunctionCancelEt @ 16 NONAME
+	_ZN7RIscApi22NotifyConnectionStatusER14TRequestStatusRi @ 17 NONAME
+	_ZN7RIscApi23NotifyFlowControlCancelEv @ 18 NONAME
+	_ZN7RIscApi24InitializeModemInterfaceER14TRequestStatus @ 19 NONAME
+	_ZN7RIscApi28NotifyConnectionStatusCancelEv @ 20 NONAME
+	_ZN7RIscApi4OpenEtR14TRequestStatus10TOwnerTypePK6TDesC8 @ 21 NONAME
+	_ZN7RIscApi4SendER14TRequestStatusRK6TDesC8 @ 22 NONAME
+	_ZN7RIscApi4SendERK6TDesC8 @ 23 NONAME
+	_ZN7RIscApi5CloseER14TRequestStatus @ 24 NONAME
+	_ZN7RIscApi5CloseEv @ 25 NONAME
+	_ZN7RIscApi7ReceiveER14TRequestStatusR5TDes8Rt @ 26 NONAME
+	_ZN7RIscApi8DataSendER14TRequestStatusRK6TDesC8 @ 27 NONAME
+	_ZN7RIscApi8DataSendERK6TDesC8 @ 28 NONAME
+	_ZN7RIscApiC1Ev @ 29 NONAME
+	_ZN7RIscApiC2Ev @ 30 NONAME
+	_ZN7RIscApiD1Ev @ 31 NONAME
+	_ZN7RIscApiD2Ev @ 32 NONAME
+	_ZN7RIscApi10ReturnLoanEt @ 33 NONAME
+	_ZN7RIscApi4LoanEt10TOwnerType @ 34 NONAME
+

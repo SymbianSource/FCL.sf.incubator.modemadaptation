@@ -1,0 +1,8 @@
+EXPORTS
+	??0RMmCustomApiExt@@QAE@XZ @ 1 NONAME ; RMmCustomApiExt::RMmCustomApiExt(void)
+	?Close@RMmCustomApiExt@@QAEXXZ @ 2 NONAME ; void RMmCustomApiExt::Close(void)
+	?ConstructL@RMmCustomApiExt@@IAEXXZ @ 3 NONAME ; void RMmCustomApiExt::ConstructL(void)
+	?Destruct@RMmCustomApiExt@@IAEXXZ @ 4 NONAME ; void RMmCustomApiExt::Destruct(void)
+	?Open@RMmCustomApiExt@@QAEHAAVRMobilePhone@@@Z @ 5 NONAME ; int RMmCustomApiExt::Open(class RMobilePhone &)
+	
+

@@ -1,0 +1,36 @@
+EXPORTS
+	_ZN10TIsiKernelaSERKS_ @ 1 NONAME
+	_ZN14TIsiKernelSend15SetSenderDeviceEh @ 2 NONAME
+	_ZN14TIsiKernelSend15SetSenderObjectEt @ 3 NONAME
+	_ZN14TIsiKernelSend17SetReceiverDeviceEh @ 4 NONAME
+	_ZN14TIsiKernelSend17SetReceiverObjectEt @ 5 NONAME
+	_ZN14TIsiKernelSend21SetExtendedResourceIdEm @ 6 NONAME
+	_ZN14TIsiKernelSend7Set8bitEjh @ 7 NONAME
+	_ZN14TIsiKernelSend8CompleteEv @ 8 NONAME
+	_ZN14TIsiKernelSend8CopyDataEjRK6TDesC8 @ 9 NONAME
+	_ZN14TIsiKernelSend8Set16bitEjt @ 10 NONAME
+	_ZN14TIsiKernelSend8Set32bitEjm @ 11 NONAME
+	_ZN14TIsiKernelSendC1ER5TDes8 @ 12 NONAME
+	_ZN14TIsiKernelSendC1ER5TDes8j @ 13 NONAME
+	_ZN14TIsiKernelSendC2ER5TDes8 @ 14 NONAME
+	_ZN14TIsiKernelSendC2ER5TDes8j @ 15 NONAME
+	_ZN18TIsiKernelReceiveCC1ERK6TDesC8 @ 16 NONAME
+	_ZN18TIsiKernelReceiveCC2ERK6TDesC8 @ 17 NONAME
+	_ZN18TIsiKernelSubBlock16CompleteSubBlockEv @ 18 NONAME
+	_ZN18TIsiKernelSubBlockC1ER5TDes8t13TSubBlockType @ 19 NONAME
+	_ZN18TIsiKernelSubBlockC2ER5TDes8t13TSubBlockType @ 20 NONAME
+	_ZNK18TIsiKernelReceiveC15GetSenderDeviceEv @ 21 NONAME
+	_ZNK18TIsiKernelReceiveC15GetSenderObjectEv @ 22 NONAME
+	_ZNK18TIsiKernelReceiveC17GetReceiverDeviceEv @ 23 NONAME
+	_ZNK18TIsiKernelReceiveC17GetReceiverObjectEv @ 24 NONAME
+	_ZNK18TIsiKernelReceiveC21GetExtendedResourceIdEv @ 25 NONAME
+	_ZNK18TIsiKernelReceiveC22FindSubBlockOffsetByIdEjj13TSubBlockTypeRj @ 26 NONAME
+	_ZNK18TIsiKernelReceiveC25FindSubBlockOffsetByIndexEjj13TSubBlockTypeRj @ 27 NONAME
+	_ZNK18TIsiKernelReceiveC7Get8bitEj @ 28 NONAME
+	_ZNK18TIsiKernelReceiveC7GetDataEji @ 29 NONAME
+	_ZNK18TIsiKernelReceiveC8Get16bitEj @ 30 NONAME
+	_ZNK18TIsiKernelReceiveC8Get32bitEj @ 31 NONAME
+	_ZNK18TIsiKernelReceiveC9GetBufferEv @ 32 NONAME
+	_ZN10TIsiKernelC1Ev @ 33 NONAME
+	_ZN10TIsiKernelC2Ev @ 34 NONAME
+

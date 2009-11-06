@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!-- MOD_1009.001_SIM_ATK_TSY_[DISPLAY TEXT - With NULL text] -->
+<!-- MOD_1009.002_SIM_ATK_TSY_[DISPLAY TEXT - With NULL text and not-self or self explanatory icon] -->
+
+
+<isc-test-control id="1009">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <input id="10001">
+        <name>PROACTIVE COMMAND: DISPLAY TEXT - With NULL text</name>
+        <direction>sos</direction>
+        <!--              res|LEN |rcv| |trans|ca|   |LEN |ber|B |  -->
+        <!--    ISI       sou|GTH |obj| |id___|rd|   |GTH |tlv|E |  -->
+        <!--  message     rce| 2  | |snd| |msg|  |fil| 2  |tag|R |  -->
+        <!--              id |BYT | |obj| | id|id|ler|BYT |  |LEN|  -->
+        <message>15,28,00,5A,00,00,00,00,00,10,00,55,00,0F,D0,0B,81,03,01,21,80,82,02,81,02,8D,00,90,00</message>
+        <!-- "ISC Test Control sets the correct length to the message" (5 & 6 tavu) -->
+    </input>
+    
+    <input id="10201">
+        <name>PROACTIVE COMMAND: DISPLAY TEXT - With NULL text and not-self explanatory icon</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,00,00,00,10,00,55,00,13,D0,0F,81,03,01,21,80,82,02,81,02,8D,00,9E,02,01,01,90,00</message>
+    </input>
+    
+    <input id="10202">
+        <name>PROACTIVE COMMAND: DISPLAY TEXT - With NULL text and -self explanatory icon</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,00,00,00,10,00,55,00,13,D0,0F,81,03,01,21,80,82,02,81,02,8D,00,9E,02,00,01,90,00</message>
+    </input>
+    
+<!-- SIM SESSION END -->
+<!-- *************** -->
+
+    <input id="90004">
+        <name>PROACTIVE SIM SESSION ENDED</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+        <!-- Transaction Id's (9:th byte) must match with Terminal responses transaction id -->
+    </input>
+   
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+    
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <output id="40001">
+        <name>TERMINAL RESPONSE: DISPLAY TEXT - With NULL text</name>
+        <direction>dos</direction>
+    <!--                     WHOLE         |  |  |  |  |  | cmd details  | dev ident | result data -->
+    <!--                     LENGTH        |c |i |  |  |  |      qualifer|   dest(81)|             -->
+    <!--               resource |          |l |n |  |  |LE|      type  | | source  | |  + fillers  -->
+    <!--                   |    |          |A |s |p1|p2|N |         |  | |      |  | |             -->
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,21,80,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40201">
+        <name>TERMINAL RESPONSE: DISPLAY TEXT - With NULL text and not-self or self explanatory icon</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,21,80,82,02,82,81,83,01,32,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+        
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <step id="10001" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10001"/>
+    </step>
+    
+    <step id="10201" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10201"/>
+    </step>
+    
+    <step id="10202" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10202"/>
+    </step>
+    
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <step id="40001" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40001"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+    
+    <step id="40201" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40201"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+    
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+    </step>
+    
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+    
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+    
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+    
+</steps>
+
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+<!-- DISPLAY TEXT - With NULL text -->
+    <case id="101">
+        <name>DISPLAY TEXT - With NULL text</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+<!-- DISPLAY TEXT - With NULL text and not-self or self explanatory icon" -->
+    <case id="201">
+        <name>DISPLAY TEXT - With NULL text and not-self explanatory icon</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10201"/> <!-- Send PCMD -->
+            <step-ref id="40201"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="202">
+        <name>DISPLAY TEXT - With NULL text and -self explanatory icon</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10202"/> <!-- Send PCMD -->
+            <step-ref id="40201"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+</cases>
+
+</isc-test-control>
+

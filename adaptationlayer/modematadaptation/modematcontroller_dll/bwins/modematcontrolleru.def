@@ -1,0 +1,16 @@
+EXPORTS
+	?ReceiveSignalIndCancel@RModemAtController@@QAEHXZ @ 1 NONAME ; int RModemAtController::ReceiveSignalIndCancel(void)
+	?RemovePipe@RModemAtController@@QAEHXZ @ 2 NONAME ; int RModemAtController::RemovePipe(void)
+	?GetNvramStatus@RModemAtController@@QAEHAAVTDesC8@@AAVTDes8@@@Z @ 3 NONAME ; int RModemAtController::GetNvramStatus(class TDesC8 &, class TDes8 &)
+	?Connect@RModemAtController@@QAEHW4TATPluginInterface@@AAVTDesC8@@PAVMAtControllerObserver@@@Z @ 4 NONAME ; int RModemAtController::Connect(enum TATPluginInterface, class TDesC8 &, class MAtControllerObserver *)
+	?Disconnect@RModemAtController@@QAEHXZ @ 5 NONAME ; int RModemAtController::Disconnect(void)
+	?HandleATCommandCancel@RModemAtController@@QAEHXZ @ 6 NONAME ; int RModemAtController::HandleATCommandCancel(void)
+	??0RModemAtController@@QAE@XZ @ 7 NONAME ; RModemAtController::RModemAtController(void)
+	?GetCommandMode@RModemAtController@@QAEHXZ @ 8 NONAME ; int RModemAtController::GetCommandMode(void)
+	?HandleATCommand@RModemAtController@@QAEHABVTDesC8@@AAVTDes8@@@Z @ 9 NONAME ; int RModemAtController::HandleATCommand(class TDesC8 const &, class TDes8 &)
+	?ReceiveUnsolicitedResultCancel@RModemAtController@@QAEHXZ @ 10 NONAME ; int RModemAtController::ReceiveUnsolicitedResultCancel(void)
+	?ReceiveUnsolicitedResult@RModemAtController@@QAEHAAVTDes8@@@Z @ 11 NONAME ; int RModemAtController::ReceiveUnsolicitedResult(class TDes8 &)
+	?GetCommandModeCancel@RModemAtController@@QAEHXZ @ 12 NONAME ; int RModemAtController::GetCommandModeCancel(void)
+	?ReceiveSignalInd@RModemAtController@@QAEHXZ @ 13 NONAME ; int RModemAtController::ReceiveSignalInd(void)
+	??1RModemAtController@@QAE@XZ @ 14 NONAME ; RModemAtController::~RModemAtController(void)
+

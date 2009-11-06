@@ -1,0 +1,52 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: 
+*
+*/
+
+
+
+#include <non_foundation_paths.hrh>
+#include <platform_paths.hrh>
+
+TARGET          isiapi.dll
+TARGETTYPE      dll
+linkas          isiapi.dll
+UID             0x10000079 0x20026FE6
+VENDORID        VID_DEFAULT
+CAPABILITY      ALL
+FEATUREVARIANT
+
+SOURCEPATH      ../src
+SOURCE          isiif.cpp
+
+USERINCLUDE     ../inc
+USERINCLUDE     ../../isirouter_dll/inc
+
+OS_LAYER_SYSTEMINCLUDE                   // For e32std.h
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE    // For misiif.h
+
+LIBRARY         euser.lib
+
+DEFFILE         isiapi.def
+
+
+START WINS
+win32_library kernel32.lib
+END
+
+// flag to enable normal trace inside component
+MACRO   COMPONENT_TRACE_FLAG
+
+

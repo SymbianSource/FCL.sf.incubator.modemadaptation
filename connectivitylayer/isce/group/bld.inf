@@ -1,0 +1,65 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: 
+*
+*/
+
+
+
+#include <non_foundation_paths.hrh>
+
+#define NCP_COMMON_RD_ISCE_IN_USE
+#ifdef NCP_COMMON_RD_ISCE_IN_USE // Internal R&D flag
+PRJ_PLATFORMS
+DEFAULT
+
+PRJ_EXPORTS
+// IBY FILES
+../rom/isce.iby                                 NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(isce.iby)
+
+// HEADER FILES
+// MULTIPLEXER
+../ismpmultiplexer_dll/inc/mtrxmuxif.h          NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(mtrxmuxif.h)
+../ismpmultiplexer_dll/inc/mmuxtrxif.h          NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(mmuxtrxif.h)
+../ismpmultiplexer_dll/inc/trxdefs.h            NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(trxdefs.h)
+
+// P2P API
+../p2papi_dll/inc/p2pif.h                       NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(p2pif.h)
+../p2prouter_dll/inc/mp2pif.h                   NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(mp2pif.h)
+../p2prouter_dll/inc/p2pdefs.h                  NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(p2pdefs.h)
+
+// ISC & ISI
+../isaaccessextension_dll/inc/isakernelapi.h        NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(isakernelapi.h)
+../isaaccessextension_dll/inc/iscnokiadefinitions.h NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(iscnokiadefinitions.h)
+../iscapi_dll/inc/iscdefinitions.h                  NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(iscdefinitions.h)
+#if (NCP_COMMON_SOS_VERSION_SUPPORT >= SOS_VERSION_95)
+../iscapi_dll/inc/iscapi.h                          NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(iscapi.h)
+#endif
+
+PRJ_MMPFILES
+../ismpmultiplexer_dll/group/ismpmultiplexer.mmp
+../memmanager_dll/group/memmanager.mmp
+// P2P
+../p2prouter_dll/group/p2prouter.mmp
+../p2papi_dll/group/p2papi.mmp
+// ISC & ISI
+../isaaccessextension_dll/group/isaaccessextension.mmp
+../isaaccessldd_ldd/group/isaaccessesldd.mmp
+../iscapi_dll/group/isauserapi.mmp
+
+#else
+// No actions
+#endif // NCP_COMMON_RD_ISCE_IN_USE
+
+//  End of File

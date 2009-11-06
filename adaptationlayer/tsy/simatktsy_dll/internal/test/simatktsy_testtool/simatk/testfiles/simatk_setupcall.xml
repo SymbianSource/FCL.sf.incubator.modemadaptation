@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!-- MOD_0014.001_SIM_ATK_TSY_[SET UP CALL - normal] -->
+<!-- MOD_0014.002_SIM_ATK_TSY_[SET UP CALL - second alpha identifier] -->
+<!-- MOD_0014.003_SIM_ATK_TSY_[SET UP CALL - display of icons (Sequence B)] -->
+
+
+<isc-test-control id="14">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <input id="10001">
+        <name>PROACTIVE COMMAND: SET UP CALL 1.1.1, 1.2.1, 1.6.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,22,D0,1E,81,03,01,10,00,82,02,81,83,85,08,4E,6F,74,20,62,75,73,79,86,09,91,10,32,04,21,43,65,1C,2C,90,00</message>
+    </input>
+
+    <input id="10002">
+        <name>PROACTIVE COMMAND: SET UP CALL 1.3.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,2E,D0,2A,81,03,01,10,01,82,02,81,83,85,14,4E,6F,74,20,62,75,73,79,20,77,69,74,68,20,72,65,64,69,61,6C,86,09,91,10,32,04,21,43,65,1C,2C,90,00</message>
+    </input>
+
+    <input id="10003">
+        <name>PROACTIVE COMMAND: SET UP CALL 1.4.1, 1.7.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,21,D0,1D,81,03,01,10,02,82,02,81,83,85,07,4F,6E,20,68,6F,6C,64,86,09,91,10,32,04,21,43,65,1C,2C,90,00</message>
+    </input>
+
+    <input id="10004">
+        <name>PROACTIVE COMMAND: SET UP CALL 1.5.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,24,D0,20,81,03,01,10,04,82,02,81,83,85,0A,44,69,73,63,6F,6E,6E,65,63,74,86,09,91,10,32,04,21,43,65,1C,2C,90,00</message>
+    </input>
+
+    <input id="10005">
+        <name>PROACTIVE COMMAND: SET UP CALL 1.8.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,2F,D0,2B,81,03,01,10,00,82,02,81,83,85,11,43,61,70,61,62,69,6C,69,74,79,20,63,6F,6E,66,69,67,86,09,91,10,32,04,21,43,65,1C,2C,87,02,01,A0,90,00</message>
+    </input>
+
+    <input id="10006">
+        <name>PROACTIVE COMMAND: SET UP CALL 1.9.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,38,D0,34,81,03,01,10,01,82,02,81,83,86,29,91,10,32,54,76,98,10,32,54,76,98,10,32,54,76,98,BA,BA,BA,BA,BA,10,32,54,76,98,10,32,54,76,98,10,32,54,76,98,BA,BA,BA,BA,BA,90,00</message>
+    </input>
+
+    <input id="10007">
+        <name>PROACTIVE COMMAND: SET UP CALL 1.10.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,01,02,D0,81,FD,81,03,01,10,01,82,02,81,83,85,81,ED,54,68,72,65,65,20,74,79,70,65,73,20,61,72,65,20,64,65,66,69,6E,65,64,3A,20,2D,20,73,65,74,20,75,70,20,61,20,63,61,6C,6C,2C,20,62,75,74,20,6F,6E,6C,79,20,69,66,20,6E,6F,74,20,63,75,72,72,65,6E,74,6C,79,20,62,75,73,79,20,6F,6E,20,61,6E,6F,74,68,65,72,20,63,61,6C,6C,3B,20,2D,20,73,65,74,20,75,70,20,61,20,63,61,6C,6C,2C,20,70,75,74,74,69,6E,67,20,61,6C,6C,20,6F,74,68,65,72,20,63,61,6C,6C,73,20,28,69,66,20,61,6E,79,29,20,6F,6E,20,68,6F,6C,64,3B,20,2D,20,73,65,74,20,75,70,20,61,20,63,61,6C,6C,2C,20,64,69,73,63,6F,6E,6E,65,63,74,69,6E,67,20,61,6C,6C,20,6F,74,68,65,72,20,63,61,6C,6C,73,20,28,69,66,20,61,6E,79,29,20,66,69,72,73,74,2E,20,46,6F,72,20,65,61,63,68,20,6F,66,20,74,68,65,73,65,20,74,79,70,65,73,2C,20,86,02,91,10,90,00</message>
+    </input>
+
+    <input id="10008">
+        <name>PROACTIVE COMMAND: SET UP CALL 1.11.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,2F,D0,2B,81,03,01,10,00,82,02,81,83,85,0C,43,61,6C,6C,65,64,20,70,61,72,74,79,86,09,91,10,32,04,21,43,65,1C,2C,88,07,80,50,95,95,95,95,95,90,00</message>
+    </input>
+
+    <input id="10009">
+        <name>PROACTIVE COMMAND: SET UP CALL 1.12.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,26,D0,22,81,03,01,10,01,82,02,81,83,85,08,44,75,72,61,74,69,6F,6E,86,09,91,10,32,04,21,43,65,1C,2C,84,02,01,0A,90,00</message>
+    </input>
+    
+    <input id="10201">
+        <name>PROACTIVE COMMAND: SET UP CALL 2.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,2C,D0,28,81,03,01,10,00,82,02,81,83,85,0C,43,4F,4E,46,49,52,4D,41,54,49,4F,4E,86,09,91,10,32,04,21,43,65,1C,2C,85,04,43,41,4C,4C,90,00</message>
+    </input>
+    
+    <input id="10301">
+        <name>PROACTIVE COMMAND: SET UP CALL 3.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,34,D0,30,81,03,01,10,00,82,02,81,83,85,16,53,65,74,20,75,70,20,63,61,6C,6C,20,49,63,6F,6E,20,33,2E,31,2E,31,86,09,91,10,32,04,21,43,65,1C,2C,9E,02,01,01,90,00</message>
+    </input>
+    
+    <input id="10302">
+        <name>PROACTIVE COMMAND: SET UP CALL 3.2.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,34,D0,30,81,03,01,10,00,82,02,81,83,85,16,53,65,74,20,75,70,20,63,61,6C,6C,20,49,63,6F,6E,20,33,2E,32,2E,31,86,09,91,10,32,04,21,43,65,1C,2C,9E,02,00,01,90,00</message>
+    </input>
+    
+    <input id="10303">
+        <name>PROACTIVE COMMAND: SET UP CALL 3.3.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,34,D0,30,81,03,01,10,00,82,02,81,83,85,16,53,65,74,20,75,70,20,63,61,6C,6C,20,49,63,6F,6E,20,33,2E,33,2E,31,86,09,91,10,32,04,21,43,65,1C,2C,9E,02,01,02,90,00</message>
+    </input>
+    
+    <input id="10304">
+        <name>PROACTIVE COMMAND: SET UP CALL 3.4.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,50,D0,4C,81,03,01,10,00,82,02,81,83,85,16,53,65,74,20,75,70,20,63,61,6C,6C,20,49,63,6F,6E,20,33,2E,34,2E,31,86,09,91,10,32,04,21,43,65,1C,2C,9E,02,00,01,85,16,53,65,74,20,75,70,20,63,61,6C,6C,20,49,63,6F,6E,20,33,2E,34,2E,32,9E,02,00,01,90,00</message>
+    </input>
+
+<!-- SIM SESSION END -->
+<!-- *************** -->
+    <input id="90004">
+        <name>SIM Session End</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+        <!-- Transaction Id's (9:th byte) must match with Terminal responses transaction id -->
+    </input>
+
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <output id="40001">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.1.1, used also in 2.1.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,00,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40002">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.2.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,00,82,02,82,81,83,01,22,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40003">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.3.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0D,81,03,01,10,01,82,02,82,81,83,02,21,91,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40004">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.4.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,02,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40005">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.5.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,04,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40006">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.6.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0D,81,03,01,10,00,82,02,82,81,83,02,20,02,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40007">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.7.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0D,81,03,01,10,02,82,02,82,81,83,02,21,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40008">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.8.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,00,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40009">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.9.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,01,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40010">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.10.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,01,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40011">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.11.1B</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,00,82,02,82,81,83,01,30,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40012">
+        <name>TERMINAL RESPONSE: SET UP CALL 1.12.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0D,81,03,01,10,01,82,02,82,81,83,02,21,91,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40301">
+        <name>TERMINAL RESPONSE: SET UP CALL 3.1.1B, 3.2.1B, 3.3.1B, 3.4.1B</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,10,00,82,02,82,81,83,01,04,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <step id="10001" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10001"/>
+    </step>
+
+    <step id="10002" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10002"/>
+    </step>
+
+    <step id="10003" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10003"/>
+    </step>
+
+    <step id="10004" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10004"/>
+    </step>
+
+    <step id="10005" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10005"/>
+    </step>
+
+    <step id="10006" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10006"/>
+    </step>
+
+    <step id="10007" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10007"/>
+    </step>
+
+    <step id="10008" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10008"/>
+    </step>
+
+    <step id="10009" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10009"/>
+    </step>
+    
+    <step id="10201" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10201"/>
+    </step>
+    
+    <step id="10301" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10301"/>
+    </step>
+    
+    <step id="10302" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10302"/>
+    </step>
+    
+    <step id="10303" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10303"/>
+    </step>
+    
+    <step id="10304" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10304"/>
+    </step>
+
+    
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <step id="40001" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40001"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40002" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40002"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40003" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40003"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40004" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40004"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40005" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40005"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40006" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40006"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40007" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40007"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40008" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40008"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40009" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40009"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40010" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40010"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40011" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40011"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40012" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40012"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+	<step id="40301" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40301"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+    </step>
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+</steps>
+
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+<!-- 27.22.4.13.1 SET UP CALL - normal -->
+    <case id="101">
+        <name>Sequence 1.1 (SET UP CALL, call confirmed by the user and connected)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="102">
+        <name>Sequence 1.2 (SET UP CALL, call rejected by the user)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="40002"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="103">
+        <name>Sequence 1.3 (SET UP CALL, redial)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10002"/> <!-- Send PCMD -->
+            <step-ref id="40003"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="104">
+        <name>Sequence 1.4 (SET UP CALL, putting all other calls on hold, ME busy)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10003"/> <!-- Send PCMD -->
+            <step-ref id="40004"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="105">
+        <name>Sequence 1.5 (SET UP CALL, disconnecting all other calls, ME busy)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10004"/> <!-- Send PCMD -->
+            <step-ref id="40005"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="106">
+        <name>Sequence 1.6 (SET UP CALL, only if not currently busy on another call, ME busy)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="40006"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="107">
+        <name>Sequence 1.7 (SET UP CALL, putting all other calls on hold, ME busy)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10003"/> <!-- Send PCMD -->
+            <step-ref id="40007"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="108">
+        <name>Sequence 1.8 (SET UP CALL, Capability configuration)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10005"/> <!-- Send PCMD -->
+            <step-ref id="40008"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="109">
+        <name>Sequence 1.9 (SET UP CALL, Capability configuration)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10006"/> <!-- Send PCMD -->
+            <step-ref id="40009"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="110">
+        <name>Sequence 1.10 (SET UP CALL,256 octets length, long first alpha identifier)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10007"/> <!-- Send PCMD -->
+            <step-ref id="40010"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="111">
+        <name>Sequence 1.11B (SET UP CALL, Called party subaddress, ME not supporting the called party subaddress)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10008"/> <!-- Send PCMD -->
+            <step-ref id="40011"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="112">
+        <name>Sequence 1.12 (SET UP CALL, maximum duration for the redial mechanism)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10009"/> <!-- Send PCMD -->
+            <step-ref id="40012"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+<!-- 27.22.4.13.2 SET UP CALL - second alpha identifier -->    
+    <case id="201">
+        <name>Sequence 2.1 (SET UP CALL, two alpha identifiers)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10201"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+<!-- 27.22.4.13.3 SET UP CALL - display of icons -->    
+    <case id="301">
+        <name>Sequence 3.1B (SET UP CALL, display of basic icon during confirmation phase, not self-explanatory, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10301"/> <!-- Send PCMD -->
+            <step-ref id="40301"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="302">
+        <name>Sequence 3.2B (SET UP CALL, display of basic icon during confirmation phase, self-explanatory, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10302"/> <!-- Send PCMD -->
+            <step-ref id="40301"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="303">
+        <name>Sequence 3.3B (SET UP CALL, display of colour icon during confirmation phase, not self explanatory, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10303"/> <!-- Send PCMD -->
+            <step-ref id="40301"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="304">
+        <name>Sequence 3.4B (SET UP CALL, display of self explanatory basic icon during set up call, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10304"/> <!-- Send PCMD -->
+            <step-ref id="40301"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Sim session end -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+</cases>
+
+</isc-test-control>

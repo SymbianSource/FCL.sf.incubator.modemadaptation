@@ -1,0 +1,767 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!-- MOD_0003.001_SIM_ATK_TSY_[GET INKEY - normal] -->
+<!-- MOD_0003.002_SIM_ATK_TSY_[GET INKEY - No response from User] -->
+<!-- MOD_0003.003_SIM_ATK_TSY_[GET INKEY - UCS2 format display] -->
+<!-- MOD_0003.004_SIM_ATK_TSY_[GET INKEY - UCS2 format of entry] -->
+<!-- MOD_0003.005_SIM_ATK_TSY_[GET INKEY - "Yes/No" Response] -->
+<!-- MOD_0003.006_SIM_ATK_TSY_[GET INKEY - display of Icon (Sequence B)] -->
+<!-- MOD_0003.007_SIM_ATK_TSY_[GET INKEY - Help Information] -->
+
+
+<isc-test-control id="3">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <input id="10001">
+        <name>PROACTIVE COMMAND: GET INKEY 1.1.1</name>
+        <direction>sos</direction>
+    <!--                  res|LEN |rcv| |trans|ca|   |LEN |ber|B |  -->
+    <!--    ISI           sou|GTH |obj| |id___|rd|   |GTH |tlv|E |  -->
+    <!--  message         rce| 2  | |snd| |msg|  |fil| 2  |tag|R |  -->
+    <!--                  id |BYT | |obj| | id|id|ler|BYT |  |LEN|  -->
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,19,D0,15,81,03,01,22,00,82,02,81,82,8D,0A,04,45,6E,74,65,72,20,22,2B,22,90,00</message>
+     <!-- "ISC Test Control sets the correct length to the message" (5 & 6 tavu) -->  
+    </input>
+
+    <input id="10002">
+        <name>PROACTIVE COMMAND: GET INKEY 1.2.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,18,D0,14,81,03,01,22,00,82,02,81,82,8D,09,00,45,37,BD,2C,07,89,60,22,90,00</message>
+    </input>
+    
+    <input id="10003">
+        <name>PROACTIVE COMMAND: GET INKEY 1.3.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,1E,D0,1A,81,03,01,22,00,82,02,81,82,8D,0F,04,3C,47,4F,2D,42,41,43,4B,57,41,52,44,53,3E,90,00</message>
+    </input>
+
+    <input id="10004">
+        <name>PROACTIVE COMMAND: GET INKEY 1.4.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,17,D0,13,81,03,01,22,00,82,02,81,82,8D,08,04,3C,41,42,4F,52,54,3E,90,00</message>
+    </input>
+
+    <input id="10005">
+        <name>PROACTIVE COMMAND: GET INKEY 1.5.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,19,D0,15,81,03,01,22,01,82,02,81,82,8D,0A,04,45,6E,74,65,72,20,22,71,22,90,00</message>
+    </input>
+
+    <input id="10006">
+        <name>PROACTIVE COMMAND: GET INKEY 1.6.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,B2,D0,81,AD,81,03,01,22,01,82,02,81,82,8D,81,A1,04,45,6E,74,65,72,20,22,78,22,2E,20,54,68,69,73,20,63,6F,6D,6D,61,6E,64,20,69,6E,73,74,72,75,63,74,73,20,74,68,65,20,4D,45,20,74,6F,20,64,69,73,70,6C,61,79,20,74,65,78,74,2C,20,61,6E,64,20,74,6F,20,65,78,70,65,63,74,20,74,68,65,20,75,73,65,72,20,74,6F,20,65,6E,74,65,72,20,61,20,73,69,6E,67,6C,65,20,63,68,61,72,61,63,74,65,72,2E,20,41,6E,79,20,72,65,73,70,6F,6E,73,65,20,65,6E,74,65,72,65,64,20,62,79,20,74,68,65,20,75,73,65,72,20,73,68,61,6C,6C,20,62,65,20,70,61,73,73,65,64,20,74,90,00</message>
+    </input>
+    
+    <input id="10201">
+        <name>PROACTIVE COMMAND: GET INKEY 2.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,1A,D0,16,81,03,01,22,00,82,02,81,82,8D,0B,04,3C,54,49,4D,45,2D,4F,55,54,3E,90,00</message>
+    </input>
+    
+    <input id="10301">
+        <name>PROACTIVE COMMAND: GET INKEY 3.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,28,D0,24,81,03,01,22,00,82,02,81,82,8D,19,08,04,17,04,14,04,20,04,10,04,12,04,21,04,22,04,12,04,23,04,19,04,22,04,15,90,00</message>
+    </input>
+    
+    <input id="10302">
+        <name>PROACTIVE COMMAND: GET INKEY 3.2.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,9E,D0,81,99,81,03,01,22,00,82,02,81,82,8D,81,8D,08,04,17,04,14,04,20,04,10,04,12,04,21,04,22,04,12,04,23,04,19,04,22,04,15,04,17,04,14,04,20,04,10,04,12,04,21,04,22,04,12,04,23,04,19,04,22,04,15,04,17,04,14,04,20,04,10,04,12,04,21,04,22,04,12,04,23,04,19,04,22,04,15,04,17,04,14,04,20,04,10,04,12,04,21,04,22,04,12,04,23,04,19,04,22,04,15,04,17,04,14,04,20,04,10,04,12,04,21,04,22,04,12,04,23,04,19,04,22,04,15,04,17,04,14,04,20,04,10,04,12,04,21,04,22,04,12,04,23,04,19,90,00</message>
+    </input>
+    
+    <input id="10401">
+        <name>PROACTIVE COMMAND: GET INKEY 4.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,15,D0,11,81,03,01,22,03,82,02,81,82,8D,06,04,45,6E,74,65,72,90,00</message>
+    </input>
+    
+    <input id="10501">
+        <name>PROACTIVE COMMAND: GET INKEY 5.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,19,D0,15,81,03,01,22,04,82,02,81,82,8D,0A,04,45,6E,74,65,72,20,59,45,53,90,00</message>
+    </input>
+    
+    <input id="10502">
+        <name>PROACTIVE COMMAND: GET INKEY 5.1.2</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,18,D0,14,81,03,01,22,04,82,02,81,82,8D,09,04,45,6E,74,65,72,20,4E,4F,90,00</message>
+    </input>
+    
+    <input id="10601">
+        <name>PROACTIVE COMMAND: GET INKEY 6.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,1D,D0,19,81,03,01,22,00,82,02,81,82,8D,0A,04,3C,4E,4F,2D,49,43,4F,4E,3E,1E,02,00,01,90,00</message>
+    </input>
+    
+    <input id="10602">
+        <name>PROACTIVE COMMAND: GET INKEY 6.2.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,20,D0,1C,81,03,01,22,00,82,02,81,82,8D,0D,04,3C,42,41,53,49,43,2D,49,43,4F,4E,3E,1E,02,01,01,90,00</message>
+    </input>
+    
+    <input id="10603">
+        <name>PROACTIVE COMMAND: GET INKEY 6.3.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,1D,D0,19,81,03,01,22,00,82,02,81,82,8D,0A,04,3C,4E,4F,2D,49,43,4F,4E,3E,1E,02,00,02,90,00</message>
+    </input>
+    
+    <input id="10604">
+        <name>PROACTIVE COMMAND: GET INKEY 6.4.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,21,D0,1D,81,03,01,22,00,82,02,81,82,8D,0E,04,3C,43,4F,4C,4F,55,52,2D,49,43,4F,4E,3E,1E,02,01,02,90,00</message>
+    </input>
+    
+    <input id="10701">
+        <name>PROACTIVE COMMAND: GET INKEY 7.1.1, usad also as 7.1.2</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,19,D0,15,81,03,01,22,80,82,02,81,82,8D,0A,04,45,6E,74,65,72,20,22,2B,22,90,00</message>
+    </input>
+    
+    <input id="10702">
+        <name>PROACTIVE COMMAND : DISPLAY TEXT 7.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,20,D0,1C,81,03,01,21,80,82,02,81,02,8D,11,04,48,65,6C,70,20,69,6E,66,6F,72,6D,61,74,69,6F,6E,90,00</message>
+    </input>
+        
+<!-- SIM SESSION END -->
+<!-- *************** -->
+    <input id="90004">
+        <name>ATK_SW_DATA_NTF: PROACTIVE SIM SESSION ENDED</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+    </input>
+
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <!-- USED BY: 27.22.4.2.1 -->
+    <output id="40001">
+        <name>TERMINAL RESPONSE: GET INKEY 1.1.1</name>
+        <direction>dos</direction>
+    <!--                     WHOLE         |  |  |  |  |  | cmd details  | dev ident | result data -->
+    <!--                     LENGTH        |c |i |  |  |  |      qualifer|   dest(81)|             -->
+    <!--            resource    |          |l |n |  |  |LE|      type  | | source  | |  + fillers  -->
+    <!--                   |    |          |A |s |p1|p2|N |         |  | |      |  | |             -->
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,22,00,82,02,82,81,83,01,00,8D,02,04,2B,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40002">
+        <name>TERMINAL RESPONSE: GET INKEY 1.2.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,22,00,82,02,82,81,83,01,00,8D,02,04,30,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40003">
+        <name>TERMINAL RESPONSE: GET INKEY 1.3.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,22,00,82,02,82,81,83,01,11,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40004">
+        <name>PROACTIVE COMMAND: GET INKEY 1.4.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0c,81,03,01,22,00,82,02,82,81,83,01,10,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40005">
+        <name>TERMINAL RESPONSE: GET INKEY 1.5.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,22,01,82,02,82,81,83,01,00,8D,02,04,71,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40006">
+        <name>TERMINAL RESPONSE: GET INKEY 1.6.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,22,01,82,02,82,81,83,01,00,8D,02,04,78,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40201">
+        <name>TERMINAL RESPONSE: GET INKEY 2.1.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0C,81,03,01,22,00,82,02,82,81,83,01,12,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40301">
+        <name>TERMINAL RESPONSE: GET INKEY 3.1.1, used also in 3.2.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,22,00,82,02,82,81,83,01,00,8D,02,04,2B,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40401">
+        <name>TERMINAL RESPONSE: GET INKEY 4.1.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,11,81,03,01,22,03,82,02,82,81,83,01,00,8D,03,08,04,14,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40501">
+        <name>TERMINAL RESPONSE: GET INKEY 5.1.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,22,04,82,02,82,81,83,01,00,8D,02,04,01,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40502">
+        <name>TERMINAL RESPONSE: GET INKEY 5.1.2</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,22,04,82,02,82,81,83,01,00,8D,02,04,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40601">
+        <name>TERMINAL RESPONSE: GET INKEY 6.1.1B, used also in 6.2.1B, 6.3.1B and 6.4.1B</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,22,00,82,02,82,81,83,01,04,8D,02,04,2B,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40701">
+        <name>TERMINAL RESPONSE: GET INKEY 7.1.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0C,81,03,01,22,80,82,02,82,81,83,01,13,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+    
+	<output id="40702">
+        <name>TERMINAL RESPONSE : DISPLAY TEXT 7.1.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,0C,81,03,01,21,80,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="40703">
+        <name>TERMINAL RESPONSE: GET INKEY 7.1.2</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,1A,00,08,00,11,00,00,00,10,81,03,01,22,80,82,02,82,81,83,01,00,8D,02,04,2B,00,00</message>
+           <mask>00,00,00,FF,00,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,7F,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+<!-- USED BY: 27.22.4.2.1 -->
+    <step id="10001" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10001"/>
+    </step>
+
+    <step id="10002" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10002"/>
+    </step>
+
+    <step id="10003" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10003"/>
+    </step>
+
+    <step id="10004" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10004"/>
+    </step>
+    
+    <step id="10005" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10005"/>
+    </step>
+    
+    <step id="10006" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10006"/>
+    </step>
+    
+    <step id="10201" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10201"/>
+    </step>
+    
+    <step id="10301" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10301"/>
+    </step>
+    
+    <step id="10302" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10302"/>
+    </step>
+    
+    <step id="10401" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10401"/>
+    </step>
+    
+    <step id="10501" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10501"/>
+    </step>
+    
+    <step id="10502" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10502"/>
+    </step>
+    
+    <step id="10601" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10601"/>
+    </step>
+    
+    <step id="10602" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10602"/>
+    </step>
+    
+    <step id="10603" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10603"/>
+    </step>
+    
+    <step id="10604" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10604"/>
+    </step>
+    
+    <step id="10701" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10701"/>
+    </step>
+    
+    <step id="10702" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10702"/>
+    </step>
+    
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+<!-- USED BY: 27.22.4.2.1 -->
+    <step id="40001" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40001"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+
+    <step id="40002" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40002"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+
+    <step id="40003" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40003"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+
+    <step id="40004" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40004"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+
+    <step id="40005" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40005"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+
+    <step id="40006" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40006"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+    
+    <step id="40201" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40201"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+    
+    <step id="40301" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40301"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+    
+    <step id="40401" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40401"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+
+	<step id="40501" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40501"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+    
+    <step id="40502" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40502"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+    
+    <step id="40601" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40601"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+    
+    <step id="40701" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40701"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+    
+    <step id="40702" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40702"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+    
+    <step id="40703" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40703"/>
+        <flags>0x40</flags>  <!-- store transaction ID in simulated message -->
+    </step>
+    
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+    </step>
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+    
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->
+    </step>
+    
+    
+</steps>
+
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+<!-- 27.22.4.2.1 GET INKEY - normal -->
+
+    <case id="101">
+        <name>Sequence 1.1 (GET INKEY, digits only for character, Unpacked 8 bit data for Text String, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10001"/> <!-- Send PCMD -->
+            <step-ref id="40001"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="102">
+        <name>Sequence 1.2 (GET INKEY, digits only for character set, SMS default Alphabet for Text String, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10002"/> <!-- Send PCMD -->
+            <step-ref id="40002"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+    <case id="103">
+        <name>Sequence 1.3 (GET INKEY, backward move)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10003"/> <!-- Send PCMD -->
+            <step-ref id="40003"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="104">
+        <name>Sequence 1.4 (GET INKEY, backward move)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10004"/> <!-- Send PCMD -->
+            <step-ref id="40004"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="105">
+        <name>Sequence 1.5 (GET INKEY, SMS default alphabet for character set, Unpacked 8 bit data for Text String, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10005"/> <!-- Send PCMD -->
+            <step-ref id="40005"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="106">
+        <name>Sequence 1.6 (GET INKEY, Max length for the Text String, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10006"/> <!-- Send PCMD -->
+            <step-ref id="40006"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+<!-- 27.22.4.2.2 GET INKEY - No response from User -->
+    
+    <case id="201">
+        <name>Sequence 2.1 (GET INKEY, no response from the user)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10201"/> <!-- Send PCMD -->
+            <step-ref id="40201"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+<!-- 27.22.4.2.3 GET INKEY - UCS2 format display -->
+    
+    <case id="301">
+        <name>Sequence 3.1 (GET INKEY, Text String coding in UCS2 Alphabet, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10301"/> <!-- Send PCMD -->
+            <step-ref id="40301"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="302">
+        <name>Sequence 3.2 (GET INKEY, max length for the Text String coding in UCS2 Alphabet, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10302"/> <!-- Send PCMD -->
+            <step-ref id="40301"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+<!-- 27.22.4.2.4 GET INKEY - UCS2 format of entry -->
+    
+    <case id="401">
+        <name>Sequence 4.1 (GET INKEY, characters from UCS2 alphabet, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10401"/> <!-- Send PCMD -->
+            <step-ref id="40401"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+<!-- 27.22.4.2.5 GET INKEY - "Yes/No" Response -->
+    
+    <case id="501">
+        <name>Sequence 5.1(GET INKEY, "Yes/No" Response for the input, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10501"/> <!-- Send PCMD -->
+            <step-ref id="40501"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            
+            <step-ref id="90001"/> <!-- Synch -->
+            
+            <step-ref id="10502"/> <!-- Send PCMD -->
+            <step-ref id="40502"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+<!-- 27.22.4.2.6 GET INKEY - display of Icon (Sequence B) -->
+    
+    <case id="601">
+        <name>Sequence 6.1B (GET INKEY, Basic icon, self-explanatory, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10601"/> <!-- Send PCMD -->
+            <step-ref id="40601"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="602">
+        <name>Sequence 6.2B (GET INKEY, Basic icon, non self-explanatory, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10602"/> <!-- Send PCMD -->
+            <step-ref id="40601"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="603">
+        <name>Sequence 6.3B (GET INKEY, Colour icon, self-explanatory, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10603"/> <!-- Send PCMD -->
+            <step-ref id="40601"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    <case id="604">
+        <name>Sequence 6.4B (GET INKEY, Colour icon, non self-explanatory, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            <step-ref id="10604"/> <!-- Send PCMD -->
+            <step-ref id="40601"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+<!-- 27.22.4.2.7 GET INKEY - Help Information -->
+    
+    <case id="701">
+        <name>Sequence 7.1 (GET INKEY, help information available)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10701"/> <!-- Send PCMD -->
+            <step-ref id="40701"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            
+            <step-ref id="90001"/> <!-- Synch -->
+            
+            <step-ref id="10702"/> <!-- Send PCMD -->
+            <step-ref id="40702"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            
+            <step-ref id="90001"/> <!-- Synch -->
+            
+            <step-ref id="10701"/> <!-- Send PCMD -->
+            <step-ref id="40703"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+</cases>
+
+</isc-test-control>

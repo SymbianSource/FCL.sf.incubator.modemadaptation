@@ -1,0 +1,30 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: 
+*     This file provides the information required for building
+*     Boot Reason API library.
+*
+*/
+
+
+#include "boot_reason_api.mmh"
+#include <platform_paths.hrh>
+#include <non_foundation_paths.hrh>
+
+OS_LAYER_SYSTEMINCLUDE
+
+TARGET          boot_reason_api.lib
+TARGETTYPE      IMPLIB
+
+//  End of File

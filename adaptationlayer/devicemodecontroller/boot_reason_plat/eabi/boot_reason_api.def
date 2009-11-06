@@ -1,0 +1,7 @@
+EXPORTS
+	_ZN11TBootReason12SetSleepTestEt @ 1 NONAME
+	_ZN11TBootReason13IsHiddenResetEv @ 2 NONAME
+	_ZN11TBootReason14GetStartupModeERNS_12TStartupModeE @ 3 NONAME
+	_ZN11TBootReason20GetTargetStartupModeERNS_12TStartupModeE @ 4 NONAME
+	_ZN11TBootReason20SetTargetStartupModeENS_12TStartupModeE @ 5 NONAME
+

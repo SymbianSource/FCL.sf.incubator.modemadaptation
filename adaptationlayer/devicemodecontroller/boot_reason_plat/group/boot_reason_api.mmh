@@ -1,0 +1,36 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description: 
+*     This file provides the information required for building
+*     Boot Reason API library.
+*
+*/
+
+
+#include        <platform_paths.hrh>
+#include        <non_foundation_paths.hrh>
+
+UID             0x1000008d 0x20022EF2
+VENDORID        VID_DEFAULT
+
+CAPABILITY      ALL
+
+OS_LAYER_KERNEL_SYSTEMINCLUDE
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
+
+// Remove suffix -u from def-file
+NOSTRICTDEF
+DEFFILE         NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(boot_reason_api/boot_reason_api.def)
+
+//  End of File

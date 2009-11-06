@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!-- MOD_0030.001_SIM_ATK_TSY_[SMS-CB Data Download] -->
+
+
+
+<isc-test-control id="30">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+<!-- INITIALIZATION_MESSAGES -->
+<!-- *********************** -->
+
+    <input id="00001">
+        <name>SIM_READ_FIELD_RESP servicetype:READ_FIELD status:SIM_SERV_OK</name>
+        <direction>sos</direction>
+        <message>00,00,10,09,00,0c,00,01,C4,bb,64,01,00,00,00,02,10,01</message>
+    </input>
+
+
+    <input id="00003">
+        <name>SMS_CB_ROUTING_RESP</name>
+        <direction>sos</direction>
+        <message>00,00,10,02,00,06,00,01,00,35,01,00,01,00,00,00</message>
+    </input>    
+
+<!-- SMS_PP_ROUTING_NTF -->
+<!-- ****************** -->
+
+
+    
+    <input id="10001">
+        <name>SMS_CB_SIM_ROUTING_IND: SEQ 1, 2</name>
+        <direction>sos</direction>
+        <message>00,00,00,02,00,00,80,3e,00,37,00,02,00,2d,00,08,01,01,00,00,00,0e,00,60,c0,11,10,01,f0,11,ff,C3,32,9B,0D,12,CA,DF,61,F2,38,3C,A7,83,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,00,00,00,00,00</message>
+    </input>
+
+    <input id="10003">
+        <name>SMS_CB_SIM_ROUTING_IND: SEQ 3</name>
+        <direction>sos</direction>
+        <message>00,00,00,02,00,00,80,3e,00,37,00,02,00,2d,00,08,01,01,00,00,00,0e,00,60,C0,11,03,E7,F0,11,00,C3,32,9B,0D,12,CA,DF,61,F2,38,3C,A7,83,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,00,00,00,00,00</message>
+    </input>
+    
+
+<!-- ATK_SW_DATA_NTF -->
+<!-- *************** -->
+
+    <input id="30002">
+        <name>ATK_SW_DATA_NTF, Command pending</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,91,0B,00,00</message>
+    </input>
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+    <input id="50002">
+        <name>PROACTIVE COMMAND: MORE TIME 1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,0D,D0,09,81,03,01,02,00,82,02,81,82,90,00</message>
+    </input>  
+    
+<!-- SIM SESSION END -->
+<!-- *************** -->
+    <input id="90004">
+        <name>SIM Session End</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+    </input>
+
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+
+<!-- INITIALIZATION_MESSAGES -->
+<!-- *********************** -->
+
+    
+    <output id="00002">
+        <name>SMS_CB_ROUTING_REQ</name>
+        <direction>dos</direction>
+        <message>00,00,10,02,00,0a,00,01,00,34,01,00,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+
+
+<!-- ATK_ENVELOPE_NTF -->
+<!-- **************** -->
+
+    <output id="20001">
+        <name>ENVELOPE: SMS-CB DOWNLOAD 1.1</name>
+        <direction>dos</direction>
+        <message>00,00,00,5A,00,66,00,00,CA,12,00,60,D2,5E,82,02,83,81,8C,58,C0,11,10,01,F0,11,C3,32,9B,0D,12,CA,DF,61,F2,38,3C,A7,83,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02,81,40,20,10,08,04,02</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+    <output id="60002">
+        <name>TERMINAL RESPONSE: MORE TIME 1.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,02,00,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>    
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+<!-- INITIALIZATION_MESSAGES -->
+<!-- *********************** -->
+    <step id="00001" type="simulate">
+        <name>Send SIM_READ_FIELD_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="00001"/>
+    </step>
+
+
+    <step id="00002" type="intercept">
+        <name>Intercept SMS_CB_ROUTING_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="00002"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+    
+    
+    
+    <step id="00003" type="simulate">
+        <name>Send SMS_CB_ROUTING_RESP</name>
+        <channel id="0x07"/>
+        <input-ref id="00003"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID -->
+    </step>    
+    
+    
+<!-- SMS_GSM_TEMP_CB_ROUTING_NTF -->
+<!-- *************************** -->
+
+    
+    <step id="10001" type="simulate">
+        <name>Send NTF</name>
+        <channel id="0x07"/>
+        <input-ref id="10001"/>
+    </step>
+
+    <step id="10003" type="simulate">
+        <name>Send NTF</name>
+        <channel id="0x07"/>
+        <input-ref id="10003"/>
+    </step>
+    
+
+<!-- ATK_ENVELOPE_NTF -->
+<!-- **************** -->
+    <step id="20001" type="intercept">
+        <name>Intercept Envelope</name>
+        <channel id="0x07"/>
+        <output-ref id="20001"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+    
+<!-- ATK_SW_DATA_NTF -->
+<!-- *************** -->
+    <step id="30002" type="simulate">
+        <name>Send ntf</name>
+        <channel id="0x07"/>
+        <input-ref id="30002"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID -->
+    </step>
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+    <step id="50002" type="simulate">
+        <name>Send pcmd</name>
+        <channel id="0x07"/>
+        <input-ref id="50002"/>
+    </step>
+    
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+    <step id="60002" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="60002"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+    
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+    </step>
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+    
+    <step id="90005" type="sleep">
+        <name>Sleep for one second</name>
+        <timeout>1000</timeout>
+        <block>false</block>
+    </step>
+    
+</steps>
+
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+<!-- 27.22.5.2	SMS-CB Data Download -->
+
+
+    <case id="101">
+        <name>Sequence 1.1 (SMS-CB (Data Download), ENVELOPE(SMS-CB DOWNLOAD), ME does not display message)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="00001"/> <!-- Send SIM_READ_FIELD_RESP -->
+            <step-ref id="00002"/> <!-- Receive SMS_CB_ROUTING_REQ -->
+            <step-ref id="00003"/> <!-- Send SMS_CB_ROUTING_RESP -->
+            
+            <step-ref id="10001"/> <!-- Send SMS_CB_SIM_ROUTING_IND -->
+            <step-ref id="20001"/> <!-- Receive ATK_ENVELOPE_NTF -->
+            <step-ref id="90004"/> <!-- Send ATK_SW_DATA_NTF Resp -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+
+
+    <case id="102">
+        <name>Sequence 1.2 (SMS-CB(DATA DOWNLOAD), ENVELOPE(SMS-CB DATA DOWNLOAD), FETCH, MORE TIME, ME does not display message)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="90002"/> <!-- Attach to channel 7 -->
+            
+            <step-ref id="10001"/> <!-- Send SMS_CB_SIM_ROUTING_IND -->
+            <step-ref id="20001"/> <!-- Receive ATK_ENVELOPE_NTF -->
+            <step-ref id="30002"/> <!-- Send ATK_SW_DATA_NTF Resp -->
+            <step-ref id="50002"/> <!-- Send PCMD -->
+            <step-ref id="60002"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- Send ATK_SW_DATA_NTF -->
+            
+            <step-ref id="90003"/> <!-- Detach from channel 7 -->
+        </test-steps>
+    </case>
+    
+    
+
+
+</cases>
+
+</isc-test-control>

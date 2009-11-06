@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!--
+MOD_0011.001_SIM_ATK_TSY_[SEND SHORT MESSAGE - normal]
+MOD_0011.002_SIM_ATK_TSY_[SEND SHORT MESSAGE - UCS2 support]
+MOD_0011.003_SIM_ATK_TSY_[SEND SHORT MESSAGE - icon support]
+-->
+
+
+<isc-test-control id="11">
+
+
+<!-- ******** -->
+<!-- CHANNELS -->
+<!-- ******** -->
+<channels>
+	<channel id="0x07"/>
+</channels>
+
+
+<!-- ****** -->
+<!-- INPUTS -->
+<!-- ****** -->
+<inputs>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+<!-- 27.22.4.10.1 SEND SHORT MESSAGE (normal) -->
+    <input id="10101">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 1.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,3B,D0,37,81,03,01,13,00,82,02,81,83,85,07,53,65,6E,64,20,53,4D,86,09,91,11,22,33,44,55,66,77,F8,8B,18,01,00,09,91,10,32,54,76,F8,40,F4,0C,54,65,73,74,20,4D,65,73,73,61,67,65,90,00</message>
+    </input>
+    
+    <input id="10102">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 1.2.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,36,D0,32,81,03,01,13,01,82,02,81,83,85,07,53,65,6E,64,20,53,4D,86,09,91,11,22,33,44,55,66,77,F8,8B,13,01,00,09,91,10,32,54,76,F8,40,F4,07,53,65,6E,64,20,53,4D,90,00</message>
+    </input>
+    
+    <input id="10103">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 1.3.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,41,D0,3D,81,03,01,13,00,82,02,81,83,85,0D,53,68,6F,72,74,20,4D,65,73,73,61,67,65,86,09,91,11,22,33,44,55,66,77,F8,8B,18,01,00,09,91,10,32,54,76,F8,40,F0,0D,53,F4,5B,4E,07,35,CB,F3,79,F8,5C,06,90,00</message>
+    </input>
+    
+    <input id="10104">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 1.4.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,01,02,D0,81,FD,81,03,01,13,01,82,02,81,83,85,38,54,68,65,20,61,64,64,72,65,73,73,20,64,61,74,61,20,6F,62,6A,65,63,74,20,68,6F,6C,64,73,20,74,68,65,20,52,50,11,44,65,73,74,69,6E,61,74,69,6F,6E,11,41,64,64,72,65,73,73,86,09,91,11,22,33,44,55,66,77,F8,8B,81,AC,01,00,09,91,10,32,54,76,F8,40,F4,A0,54,77,6F,20,74,79,70,65,73,20,61,72,65,20,64,65,66,69,6E,65,64,3A,20,2D,20,41,20,73,68,6F,72,74,20,6D,65,73,73,61,67,65,20,74,6F,20,62,65,20,73,65,6E,74,20,74,6F,20,74,68,65,20,6E,65,74,77,6F,72,6B,20,69,6E,20,61,6E,20,53,4D,53,2D,53,55,42,4D,49,54,20,6D,65,73,73,61,67,65,2C,20,6F,72,20,61,6E,20,53,4D,53,2D,43,4F,4D,4D,41,4E,44,20,6D,65,73,73,61,67,65,2C,20,77,68,65,72,65,20,74,68,65,20,75,73,65,72,20,64,61,74,61,20,63,61,6E,20,62,65,20,70,61,73,73,65,64,20,74,72,61,6E,73,70,90,00</message>
+    </input>
+    
+    <input id="10105">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 1.5.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,EE,D0,81,E9,81,03,01,13,00,82,02,81,83,85,38,54,68,65,20,61,64,64,72,65,73,73,20,64,61,74,61,20,6F,62,6A,65,63,74,20,68,6F,6C,64,73,20,74,68,65,20,52,50,20,44,65,73,74,69,6E,61,74,69,6F,6E,20,41,64,64,72,65,73,73,86,09,91,11,22,33,44,55,66,77,F8,8B,81,98,01,00,09,91,10,32,54,76,F8,40,F0,A0,D4,FB,1B,44,CF,C3,CB,73,50,58,5E,06,91,CB,E6,B4,BB,4C,D6,81,5A,A0,20,68,8E,7E,CB,E9,A0,76,79,3E,0F,9F,CB,20,FA,1B,24,2E,83,E6,65,37,1D,44,7F,83,E8,E8,32,C8,5D,A6,DF,DF,F2,35,28,ED,06,85,DD,A0,69,73,DA,9A,56,85,CD,24,15,D4,2E,CF,E7,E1,73,99,05,7A,CB,41,61,37,68,DA,9C,B6,86,CF,66,33,E8,24,82,DA,E5,F9,3C,7C,2E,B3,40,77,74,59,5E,06,D1,D1,65,50,7D,5E,96,83,C8,61,7A,18,34,0E,BB,41,E2,32,08,1E,9E,CF,CB,64,10,5D,1E,76,CF,E1,90,00</message>
+    </input>
+    
+    <input id="10106">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 1.6.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,01,02,D0,81,FD,81,03,01,13,00,82,02,81,83,85,81,E6,54,77,6F,20,74,79,70,65,73,20,61,72,65,20,64,65,66,69,6E,65,64,3A,20,2D,20,41,20,73,68,6F,72,74,20,6D,65,73,73,61,67,65,20,74,6F,20,62,65,20,73,65,6E,74,20,74,6F,20,74,68,65,20,6E,65,74,77,6F,72,6B,20,69,6E,20,61,6E,20,53,4D,53,2D,53,55,42,4D,49,54,20,6D,65,73,73,61,67,65,2C,20,6F,72,20,61,6E,20,53,4D,53,2D,43,4F,4D,4D,41,4E,44,20,6D,65,73,73,61,67,65,2C,20,77,68,65,72,65,20,74,68,65,20,75,73,65,72,20,64,61,74,61,20,63,61,6E,20,62,65,20,70,61,73,73,65,64,20,74,72,61,6E,73,70,61,72,65,6E,74,6C,79,3B,20,2D,20,41,20,73,68,6F,72,74,20,6D,65,73,73,61,67,65,20,74,6F,20,62,65,20,73,65,6E,74,20,74,6F,20,74,68,65,20,6E,65,74,77,6F,72,6B,20,69,6E,20,61,6E,20,53,4D,53,2D,53,55,42,4D,49,54,20,8B,09,01,00,02,91,10,40,F0,01,20,90,00</message>
+    </input>
+ 
+    <input id="10107">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 1.7.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,34,D0,30,81,03,01,13,00,82,02,81,83,85,00,86,09,91,11,22,33,44,55,66,77,F8,8B,18,01,00,09,91,10,32,54,76,F8,40,F4,0C,54,65,73,74,20,4D,65,73,73,61,67,65,90,00</message>
+    </input>
+ 
+    <input id="10108">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 1.8.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,32,D0,2E,81,03,01,13,00,82,02,81,83,86,09,91,11,22,33,44,55,66,77,F8,8B,18,01,00,09,91,10,32,54,76,F8,40,F4,0C,54,65,73,74,20,4D,65,73,73,61,67,65,90,00</message>
+    </input>
+
+<!-- 27.22.4.10.2 SEND SHORT MESSAGE (UCS2 support) -->
+    <input id="10201">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 2.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,47,D0,43,81,03,01,13,00,82,02,81,83,85,07,53,65,6E,64,20,53,4D,86,09,91,11,22,33,44,55,66,77,F8,8B,24,01,00,09,91,10,32,54,76,F8,40,08,18,04,17,04,14,04,20,04,10,04,12,04,21,04,22,04,12,04,23,04,19,04,22,04,15,90,00</message>
+    </input>
+    
+<!-- 27.22.4.10.3 SEND SHORT MESSAGE (icon support) -->
+    <input id="10301">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 3.1.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,3F,D0,3B,81,03,01,13,00,82,02,81,83,85,07,4E,4F,20,49,43,4F,4E,86,09,91,11,22,33,44,55,66,77,F8,8B,18,01,00,09,91,10,32,54,76,F8,40,F4,0C,54,65,73,74,20,4D,65,73,73,61,67,65,9E,02,00,01,90,00</message>
+    </input>
+
+    <input id="10302">
+        <name>PROACTIVE COMMAND: SEND SHORT MESSAGE 3.2.1</name>
+        <direction>sos</direction>
+        <message>15,28,00,5A,00,00,08,00,00,10,00,55,00,3F,D0,3B,81,03,01,13,00,82,02,81,83,85,07,53,65,6E,64,20,53,4D,86,09,91,11,22,33,44,55,66,77,F8,8B,18,01,00,09,91,10,32,54,76,F8,40,F4,0C,54,65,73,74,20,4D,65,73,73,61,67,65,1E,02,01,01,90,00</message>
+    </input>
+
+<!-- SMS_MESSAGE_SEND_RESP -->
+<!-- ********************* -->
+
+<!-- 27.22.4.10.1 SEND SHORT MESSAGE (normal) -->
+<!-- 27.22.4.10.2 SEND SHORT MESSAGE (UCS2 support) -->
+<!-- 27.22.4.10.3 SEND SHORT MESSAGE (icon support) -->
+    <input id="30101">
+        <name>SMS_MESSAGE_SEND_RESP SEQ 1</name>
+        <direction>sos</direction>
+        <message>00,00,00,02,00,00,00,00,04,03,00,01,0C,08,00,00,00,00,00,00</message>
+    </input>
+
+
+<!-- SIM SESSION END -->
+<!-- *************** -->
+    <input id="90004">
+        <name>SIM Session End</name>
+        <direction>sos</direction>
+        <message>00,00,00,5A,00,00,78,34,00,13,00,00,90,00,00,00</message>
+        <!-- Transaction Id's (9:th byte) must match with Terminal responses transaction id -->
+    </input>
+
+</inputs>
+
+
+<!-- ******* -->
+<!-- OUTPUTS -->
+<!-- ******* -->
+<outputs>
+
+<!-- SMS_MESSAGE_SEND_REQ -->
+<!-- ******************** -->
+
+<!--
+NOTE! Verifying the actual content of SMS_MESSAGE_SEND_REQ is actually beyond the scope
+of SimAtkTsy TestTool as the message is created in NokiaTsy. Nevertheless message content
+is verified here at the moment. However, this decision can be changed in the future if it
+causes problems in test execution, due to SMS-server API-changes for example.  
+ -->
+ 
+ <!-- 27.22.4.10.1 SEND SHORT MESSAGE (normal) -->
+    <output id="20101">
+        <name>SMS_MESSAGE_SEND_REQ SEQ 1.1</name>
+        <direction>dos</direction>
+        <message>00,00,00,02,00,3E,00,00,00,02,00,03,00,01,00,01,02,34,01,00,40,F4,00,03,82,0C,01,07,09,91,10,32,54,76,F8,00,82,10,02,0A,09,91,11,22,33,44,55,66,77,F8,00,00,80,10,0C,0C,54,65,73,74,20,4D,65,73,73,61,67,65</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="20102">
+        <name>SMS_MESSAGE_SEND_REQ SEQ 1.2</name>
+        <direction>dos</direction>
+        <message>00,00,00,02,00,3A,00,00,04,02,00,03,00,01,00,01,02,30,01,00,40,F0,00,03,82,0C,01,07,09,91,10,32,54,76,F8,00,82,10,02,0A,09,91,11,22,33,44,55,66,77,F8,00,00,80,0C,07,07,D3,B2,9B,0C,9A,36,01,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="20103">
+        <name>SMS_MESSAGE_SEND_REQ SEQ 1.3</name>
+        <direction>dos</direction>
+        <message>00,00,00,02,00,3E,00,00,04,02,00,03,00,01,00,01,02,34,01,00,40,F0,00,03,82,0C,01,07,09,91,10,32,54,76,F8,00,82,10,02,0A,09,91,11,22,33,44,55,66,77,F8,00,00,80,10,0C,0D,53,F4,5B,4E,07,35,CB,F3,79,F8,5C,06</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="20104">
+        <name>SMS_MESSAGE_SEND_REQ SEQ 1.4, 1.5</name>
+        <direction>dos</direction>
+        <message>00,00,00,02,00,BE,00,00,04,02,00,03,00,01,00,01,02,B4,01,00,40,F0,00,03,82,0C,01,07,09,91,10,32,54,76,F8,00,82,10,02,0A,09,91,11,22,33,44,55,66,77,F8,00,00,80,90,8C,A0,D4,FB,1B,44,CF,C3,CB,73,50,58,5E,06,91,CB,E6,B4,BB,4C,D6,81,5A,A0,20,68,8E,7E,CB,E9,A0,76,79,3E,0F,9F,CB,20,FA,1B,24,2E,83,E6,65,37,1D,44,7F,83,E8,E8,32,C8,5D,A6,DF,DF,F2,35,28,ED,06,85,DD,A0,69,73,DA,9A,56,85,CD,24,15,D4,2E,CF,E7,E1,73,99,05,7A,CB,41,61,37,68,DA,9C,B6,86,CF,66,33,E8,24,82,DA,E5,F9,3C,7C,2E,B3,40,77,74,59,5E,06,D1,D1,65,50,7D,5E,96,83,C8,61,7A,18,34,0E,BB,41,E2,32,08,1E,9E,CF,CB,64,10,5D,1E,76,CF,E1</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="20105">
+        <name>SMS_MESSAGE_SEND_REQ SEQ 1.6</name>
+        <direction>dos</direction>
+        <message>00,00,00,02,00,2A,00,00,04,02,00,03,00,01,00,01,02,20,01,00,40,F0,00,03,82,08,01,03,02,91,10,00,82,08,02,04,03,80,21,43,80,08,01,01,20,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    <output id="20106">
+        <name>SMS_MESSAGE_SEND_REQ SEQ 1.7, 1.8</name>
+        <direction>dos</direction>
+        <message>00,00,00,02,00,3E,00,00,04,02,00,03,00,01,00,01,02,34,01,00,40,F4,00,03,82,0C,01,07,09,91,10,32,54,76,F8,00,82,10,02,0A,09,91,11,22,33,44,55,66,77,F8,00,00,80,10,0C,0C,54,65,73,74,20,4D,65,73,73,61,67,65</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 27.22.4.10.2 SEND SHORT MESSAGE (UCS2 support) -->
+    <output id="20201">
+        <name>SMS_MESSAGE_SEND_REQ SEQ 2.1</name>
+        <direction>dos</direction>
+        <message>00,00,00,02,00,4A,00,00,04,02,00,03,00,01,00,01,02,40,01,00,40,08,00,03,82,0C,01,07,09,91,10,32,54,76,F8,00,82,10,02,0A,09,91,11,22,33,44,55,66,77,F8,00,00,80,1C,18,18,04,17,04,14,04,20,04,10,04,12,04,21,04,22,04,12,04,23,04,19,04,22,04,15</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+<!-- 27.22.4.10.3 SEND SHORT MESSAGE (icon support) -->
+   
+    <output id="20301">
+        <name>SMS_MESSAGE_SEND_REQ SEQ 3.1</name>
+        <direction>dos</direction>
+        <message>00,00,00,02,00,3E,00,00,04,02,00,03,00,01,00,01,02,34,01,00,40,F4,00,03,82,0C,01,07,09,91,10,32,54,76,F8,00,82,10,02,0A,09,91,11,22,33,44,55,66,77,F8,00,00,80,10,0C,0C,54,65,73,74,20,4D,65,73,73,61,67,65</message>
+           <mask>00,00,00,FF,00,FF,00,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF</mask>
+    </output>
+    
+    
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+<!-- 27.22.4.10.1 SEND SHORT MESSAGE (normal) -->
+    <output id="40101">
+        <name>TERMINAL RESPONSE: SEND SHORT MESSAGE 1.1.1, 1.3.1, 1.5.1, 1.6.1, 1.7.1, 1.8.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,13,00,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40102">
+        <name>TERMINAL RESPONSE: SEND SHORT MESSAGE 1.2.1, 1.4.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,13,01,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 27.22.4.10.2 SEND SHORT MESSAGE (UCS2 support) -->
+    <output id="40201">
+        <name>TERMINAL RESPONSE: SEND SHORT MESSAGE 2.1.1</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,13,00,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+<!-- 27.22.4.10.3 SEND SHORT MESSAGE (icon support) -->
+    <output id="40301">
+        <name>TERMINAL RESPONSE: SEND SHORT MESSAGE 3.1.1A</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,13,00,82,02,82,81,83,01,00,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+    <output id="40302">
+        <name>TERMINAL RESPONSE: SEND SHORT MESSAGE 3.1.1B</name>
+        <direction>dos</direction>
+        <message>1D,00,10,5A,00,16,00,08,00,11,00,00,00,0C,81,03,01,13,00,82,02,82,81,83,01,04,00,00</message>
+           <mask>00,00,00,FF,00,FF,00,00,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,7F,FF,FF,FF,7F,FF,FF,FF,FF</mask>
+    </output>
+
+</outputs>
+
+
+<!-- ********** -->
+<!-- TEST STEPS -->
+<!-- ********** -->
+<steps>
+
+
+<!-- PROACTIVE COMMANDS -->
+<!-- ****************** -->
+
+<!-- 27.22.4.10.1 SEND SHORT MESSAGE (normal) -->
+    <step id="10101" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10101"/>
+    </step>
+
+    <step id="10102" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10102"/>
+    </step>
+
+    <step id="10103" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10103"/>
+    </step>
+
+    <step id="10104" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10104"/>
+    </step>
+
+    <step id="10105" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10105"/>
+    </step>
+
+    <step id="10106" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10106"/>
+    </step>
+
+    <step id="10107" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10107"/>
+    </step>
+
+    <step id="10108" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10108"/>
+    </step>
+
+<!-- 27.22.4.10.2 SEND SHORT MESSAGE (UCS2 support) -->
+    <step id="10201" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10201"/>
+    </step>
+
+<!-- 27.22.4.10.3 SEND SHORT MESSAGE (icon support) -->
+    <step id="10301" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10301"/>
+    </step>
+
+    <step id="10302" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="10302"/>
+    </step>
+
+<!-- SMS_MESSAGE_SEND_REQ -->
+<!-- ******************** -->
+
+<!-- 27.22.4.10.1 SEND SHORT MESSAGE (normal) -->
+    <step id="20101" type="intercept">
+        <name>Intercept SMS_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20101"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="20102" type="intercept">
+        <name>Intercept SMS_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20102"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="20103" type="intercept">
+        <name>Intercept SMS_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20103"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="20104" type="intercept">
+        <name>Intercept SMS_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20104"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="20105" type="intercept">
+        <name>Intercept SMS_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20105"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="20106" type="intercept">
+        <name>Intercept SMS_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20106"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 27.22.4.10.2 SEND SHORT MESSAGE (UCS2 support) -->
+    <step id="20201" type="intercept">
+        <name>Intercept SMS_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20201"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 27.22.4.10.3 SEND SHORT MESSAGE (icon support) -->
+    <step id="20301" type="intercept">
+        <name>Intercept SMS_REQ</name>
+        <channel id="0x07"/>
+        <output-ref id="20301"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+
+<!-- SMS_MESSAGE_SEND_RESP -->
+<!-- ********************* -->
+
+<!-- 27.22.4.10.1 SEND SHORT MESSAGE (normal) -->
+<!-- 27.22.4.10.2 SEND SHORT MESSAGE (UCS2 support) -->
+<!-- 27.22.4.10.3 SEND SHORT MESSAGE (icon support) -->
+    <step id="30101" type="simulate">
+        <name>Send PCMD</name>
+        <channel id="0x07"/>
+        <input-ref id="30101"/>
+    </step>
+
+
+<!-- TERMINAL RESPONSES -->
+<!-- ****************** -->
+
+<!-- 27.22.4.10.1 SEND SHORT MESSAGE (normal) -->
+    <step id="40101" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40101"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40102" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40102"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 27.22.4.10.2 SEND SHORT MESSAGE (UCS2 support) -->
+    <step id="40201" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40201"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+<!-- 27.22.4.10.3 SEND SHORT MESSAGE (icon support) -->
+    <step id="40301" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40301"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+    <step id="40302" type="intercept">
+        <name>Intercept TR</name>
+        <channel id="0x07"/>
+        <output-ref id="40302"/>
+        <flags>0x40</flags>  <!-- Store transaction ID from intercepted message -->
+    </step>
+
+
+<!-- GENERAL STEPS -->
+<!-- ************* -->
+
+    <step id="90001" type="sync">
+        <name>Sync with test env</name>
+    </step>
+
+    <step id="90002" type="open-channel">
+        <name>Attach to channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90003" type="close-channel">
+        <name>Detach from channel 7</name>
+        <channel id="0x07"/>
+    </step>
+
+    <step id="90004" type="simulate">
+        <name>SIM session end</name>
+        <channel id="0x07"/>
+        <input-ref id="90004"/>
+        <flags>0x40</flags>  <!-- Use stored transaction ID in simulated message -->        
+    </step>
+
+</steps>
+
+
+<!-- ********** -->
+<!-- TEST CASES -->
+<!-- ********** -->
+<cases>
+
+<!-- 27.22.4.10.1	SEND SHORT MESSAGE (normal) -->
+    <case id="101">
+        <name>Sequence 1.1(SEND SHORT MESSAGE, packing not required, 8-bit data, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10101"/> <!-- Send PCMD #1 -->
+            <step-ref id="20101"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40101"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+    
+    <case id="102">
+        <name>Sequence 1.2 (SEND SHORT MESSAGE, packing required, 8-bit data, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10102"/> <!-- Send PCMD #2 -->
+            <step-ref id="20102"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40102"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+    
+    <case id="103">
+        <name>Sequence 1.3 (SEND SHORT MESSAGE, packing not required, SMS default alphabet, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10103"/> <!-- Send PCMD #3 -->
+            <step-ref id="20103"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40101"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+    
+    <case id="104">
+        <name>Sequence 1.4 (SEND SHORT MESSAGE, packing required, 8 bit data, message of 160 characters user data, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10104"/> <!-- Send PCMD #4 -->
+            <step-ref id="20104"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40102"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+    
+    <case id="105">
+        <name>Sequence 1.5 (SEND SHORT MESSAGE, packing not required, SMS default alphabet, message of 160 characters user data, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10105"/> <!-- Send PCMD #5 -->
+            <step-ref id="20104"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40101"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+    
+    <case id="106">
+        <name>Sequence 1.6 (SEND SHORT MESSAGE, alpha identifier 160 bytes long, SMS default alphabet, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10106"/> <!-- Send PCMD #6 -->
+            <step-ref id="20105"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40101"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+    
+    <case id="107">
+        <name>Sequence 1.7 (SEND SHORT MESSAGE, alpha identifier length '00', packing not required, 8-bit data, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10107"/> <!-- Send PCMD #7 -->
+            <step-ref id="20106"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40101"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+    
+    <case id="108">
+        <name>Sequence 1.8 (SEND SHORT MESSAGE, packing not required, 8-bit data, no alpha identifier, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10108"/> <!-- Send PCMD #8 -->
+            <step-ref id="20106"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40101"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+
+<!-- 27.22.4.10.2	SEND SHORT MESSAGE (UCS2 support) -->
+    <case id="201">
+        <name>Sequence 2.1 (SEND SHORT MESSAGE, packing not required, UCS2 (16-bit data))</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10201"/> <!-- Send PCMD #1 -->
+            <step-ref id="20201"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40201"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+    
+<!-- 27.22.4.10.3	SEND SHORT MESSAGE (icon support) -->  
+    <case id="3011">
+        <name>Sequence 3.1A (SEND SHORT MESSAGE, basic icon self-explanatory, packing not required, 8-bit data, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10301"/> <!-- Send PCMD #1 -->
+            <step-ref id="20301"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40301"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+
+    <case id="3012">
+        <name>Sequence 3.1B (SEND SHORT MESSAGE, basic icon self-explanatory, packing not required, 8-bit data, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10301"/> <!-- Send PCMD #1 -->
+            <step-ref id="20301"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40302"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+
+    <case id="3021">
+        <name>Sequence 3.2A (SEND SHORT MESSAGE, basic icon non-self-explanatory, packing not required, 8-bit data, successful)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10302"/> <!-- Send PCMD #1 -->
+            <step-ref id="20301"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40301"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+
+    <case id="3022">
+        <name>Sequence 3.2B (SEND SHORT MESSAGE, basic icon non-self-explanatory, packing not required, 8-bit data, requested icon could not be displayed)</name>
+        <timeout>10</timeout>
+        <test-steps>
+            <step-ref id="10302"/> <!-- Send PCMD #1 -->
+            <step-ref id="20301"/> <!-- Receive SMS Req -->
+            <step-ref id="30101"/> <!-- Send SMS Resp -->
+            <step-ref id="40302"/> <!-- Receive TR -->
+            <step-ref id="90004"/> <!-- SimSessionEnd -->
+        </test-steps>
+    </case>
+
+</cases>
+
+</isc-test-control>

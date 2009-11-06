@@ -1,0 +1,56 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* This file provides the information required for building.
+*
+*/
+
+
+#include        <platform_paths.hrh>
+#include        <non_foundation_paths.hrh>
+
+TARGET          miscadaptationref.dll
+TARGETTYPE      dll
+
+// UID2 value from ssmadaptation.h ( KMiscAdaptationDllTypeUidValue 0x2000E658 )
+UID             0x2000E658 0x20022D92 // UID3 ssm_misc_adaptation.dll
+VENDORID        VID_DEFAULT
+
+CAPABILITY      PowerMgmt ReadDeviceData WriteDeviceData ProtServ SwEvent ReadUserData WriteUserData
+
+// Has a fixed interface miscadaptationref.def
+NOEXPORTLIBRARY 
+
+USERINCLUDE     ../inc
+USERINCLUDE     ../../localinc
+USERINCLUDE     ../traces
+
+OS_LAYER_SYSTEMINCLUDE
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE 
+
+SOURCEPATH      ../src
+
+SOURCE          miscadaptationref.cpp
+
+// -u suffix behaviour can be removed by using nostrictdef
+NOSTRICTDEF
+DEFFILE         miscadaptationref.def
+
+LIBRARY         euser.lib
+LIBRARY         estor.lib 
+LIBRARY         efsrv.lib 
+
+SMPSAFE
+
+// End of file

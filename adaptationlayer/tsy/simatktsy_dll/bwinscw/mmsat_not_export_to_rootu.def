@@ -1,0 +1,3 @@
+EXPORTS
+	?NewL@CTsySatMessaging@@SAPAV1@PAVCMmPhoneTsy@@PAVCMmMessageRouterBase@@V?$TBuf@$0IA@@@@Z @ 1 NONAME ; class CTsySatMessaging * CTsySatMessaging::NewL(class CMmPhoneTsy *, class CMmMessageRouterBase *, class TBuf<128>)
+

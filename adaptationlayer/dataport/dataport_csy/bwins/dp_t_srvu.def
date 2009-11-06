@@ -1,0 +1,10 @@
+EXPORTS
+	??0RDpTest@@QAE@XZ @ 1 NONAME ; public: __thiscall RDpTest::RDpTest(void)
+	??1RDpTest@@QAE@XZ @ 2 NONAME ; public: __thiscall RDpTest::~RDpTest(void)
+	?Close@RDpTest@@QAEHXZ @ 3 NONAME ; public: int __thiscall RDpTest::Close(void)
+	?DescriptionOfTests@RDpTest@@QAEHHAAVTDesC16@@@Z @ 4 NONAME ; public: int __thiscall RDpTest::DescriptionOfTests(int,class TDesC16 &)
+	?ExecuteTest@RDpTest@@QAEHAAH0AAVTRequestStatus@@@Z @ 5 NONAME ; public: int __thiscall RDpTest::ExecuteTest(int &,int &,class TRequestStatus &)
+	?NumberOfTests@RDpTest@@QAEHAAH@Z @ 6 NONAME ; public: int __thiscall RDpTest::NumberOfTests(int &)
+	?Open@RDpTest@@QAEHXZ @ 7 NONAME ; public: int __thiscall RDpTest::Open(void)
+	?StartThread@@YAHXZ @ 8 NONAME ; int __cdecl StartThread(void)
+

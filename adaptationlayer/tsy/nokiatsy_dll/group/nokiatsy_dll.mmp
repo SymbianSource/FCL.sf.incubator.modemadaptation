@@ -1,0 +1,142 @@
+/*
+* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+
+#include <non_foundation_paths.hrh>
+#include <platform_paths.hrh>
+
+TARGET        nokiatsy.dll
+TARGETTYPE    dll
+UID           0x1000008D 0x1000A84A
+FEATUREVARIANT
+
+// inhibit generation of nokiatsy.lib
+NOEXPORTLIBRARY
+
+VENDORID VID_DEFAULT
+
+// ######### Source files #########
+SOURCEPATH    ../src
+
+// LTSY Plug-in API
+SOURCE        cmmmessagerouter.cpp
+
+// ISA communication
+SOURCE        cmmphonetsender.cpp
+SOURCE        cmmphonetreceiver.cpp
+
+// Phone
+SOURCE        cmmphonemesshandler.cpp
+SOURCE        cmmsecuritymesshandler.cpp
+SOURCE        cmmdtmfmesshandler.cpp
+SOURCE        cmmsupplservmesshandler.cpp
+SOURCE        tssparser.cpp
+SOURCE        cmmnetmesshandler.cpp
+SOURCE        cmmnetoperatornamehandler.cpp
+SOURCE        toperatornames.cpp
+
+// Call
+SOURCE        cmmcallmesshandler.cpp
+SOURCE        cmmconferencecallmesshandler.cpp
+SOURCE        cmmdataporthandler.cpp
+
+// Storage
+SOURCE        cmmphonebookstoremesshandler.cpp
+SOURCE        cmmphonebookstoreoperationbase.cpp
+SOURCE        cmmphonebookstoreoperationlist.cpp
+SOURCE        cmmphonebookoperationinit.cpp
+SOURCE		  cmmphonebookoperationinit3g_adn.cpp
+SOURCE        cmmphonebookoperationread.cpp
+SOURCE        cmmphonebookoperationread3g_adn.cpp
+// SMS & other messaging
+SOURCE        cmmsmsmesshandler.cpp
+SOURCE        cmmsmscache.cpp
+SOURCE        cmmsmsgsmaddress.cpp
+SOURCE        cmmbroadmesshandler.cpp
+SOURCE        cmmussdmesshandler.cpp
+
+// Custom Tsy
+SOURCE        cmmcustommesshandler.cpp
+
+// Packet data
+SOURCE        cmmpacketservicemesshandler.cpp
+SOURCE        cmmpacketcontextmesshandler.cpp
+SOURCE        cmmpacketqosmesshandler.cpp
+SOURCE        cmmpipecontrol.cpp
+SOURCE        cmmpacketmesshandlercontextlist.cpp
+
+// UICC messaging
+SOURCE        cmmuiccmesshandler.cpp
+
+// Error mapping
+SOURCE        cmmstaticutility.cpp
+
+// customapiext implementation (CMmCustomNokiaExt.cpp ) is removed, SUB 402-2149.
+
+// ######### Include files #########
+CAPABILITY CAP_GENERAL_DLL
+USERINCLUDE     ../inc
+USERINCLUDE     ../traces
+
+// Dependencies from other components
+OS_LAYER_SYSTEMINCLUDE
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
+
+// ######### Library files #########
+
+// Symbian
+LIBRARY       euser.lib    // EPOC basics
+LIBRARY       efsrv.lib    // File handling
+LIBRARY       bafl.lib     // Arrays
+LIBRARY       insock.lib   // IP address handling
+LIBRARY       flogger.lib  // Logging
+LIBRARY       c32.lib      // Comms server
+LIBRARY       commdb.lib   // For data call
+
+// ETel
+LIBRARY       etel.lib     // ETel Server
+LIBRARY       etelmm.lib   // ETel Multimode API
+LIBRARY       etelpckt.lib // ETel Multimode Packet API
+
+// TSY
+LIBRARY       customapi.lib     // for using customapi
+LIBRARY       commontsy.lib     // for using Common Tsy
+
+// ISA communication
+LIBRARY       iscapi.lib      // ISA API PDA Phonet
+LIBRARY       isimessage.lib  // IsiMessage component
+
+#if defined(WINSCW)
+#if (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
+DEFFILE       ../bwinscw/nokiatsy_not_export_to_root.def
+#else
+DEFFILE       ../bwinscw/nokiatsy.def
+#endif //NCP_COMMON_S60_VERSION_SUPPORT
+#elif defined(WINS)
+#if (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
+DEFFILE       ../bwins/nokiatsy_not_export_to_root.def
+#else
+DEFFILE       ../bwins/nokiatsy.def
+#endif //NCP_COMMON_S60_VERSION_SUPPORT
+#else
+#if (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
+DEFFILE       nokiatsy_not_export_to_root.def
+#else
+DEFFILE       nokiatsy.def
+#endif //NCP_COMMON_S60_VERSION_SUPPORT
+#endif
