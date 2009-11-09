@@ -1,4 +1,0 @@
-EXPORTS
-	?LibEntryL@@YAPAVCScriptBase@@AAVCTestModuleIf@@@Z @ 1 NONAME ; class CScriptBase * LibEntryL(class CTestModuleIf &)
-	?RouteCompletion@CNWE@@UAEXHPAVCMmDataPackage@@H@Z @ 2 NONAME ; void CNWE::RouteCompletion(int, class CMmDataPackage *, int)
-

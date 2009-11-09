@@ -1,4 +1,0 @@
-EXPORTS
-	?LibEntryL@@YAPAVCScriptBase@@AAVCTestModuleIf@@@Z @ 1 NONAME ; class CScriptBase * LibEntryL(class CTestModuleIf &)
-	?RouteCompletion@CSecurity@@UAEXHPAVCMmDataPackage@@H@Z @ 2 NONAME ; void CSecurity::RouteCompletion(int, class CMmDataPackage *, int)
-
