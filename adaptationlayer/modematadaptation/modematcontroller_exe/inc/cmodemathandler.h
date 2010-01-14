@@ -87,14 +87,57 @@ public:
      *  @return Disconnect status
      */
     TInt Disconnect( const  TUint8 aDteId );
+    
+    /**
+     *  Check if disconnect is called directly
+     *  @return ETrue if disconnect called directly
+     */
     TBool IsDisconnected();
+    
+    /**
+     *  HandleCommandModeChange
+     *  @param TUint8 aDteId
+     *  @param TCommandMode aMode
+     */
     void HandleCommandModeChange( TInt aDteid, TCommandMode aMode );
     
+    /**
+     *  SendAtModemDataRedirectResultReq
+     *  @param TUint8 aDteId
+     *  @param TUint aResult
+     */
     void SendAtModemDataRedirectResultReq( const TUint8 aDteId, const TUint aResult);
+
+    /**
+     *  SendEscapeSignalDetection
+     *  @param TUint8 aDteId
+     *  @return Symbian error code if error
+     */
     TInt SendEscapeSignalDetection( const TUint8 aDteId );
+
+    /**
+     *  HandleSignalDetectedResp
+     *  @param TIsiReceiveC aMessage
+     */
     void HandleSignalDetectedResp( const TIsiReceiveC& aMessage );
+
+    /**
+     *  RemovePipe
+     *  @param TUint8 aDteId
+     */
     void RemovePipe( const TUint8 aDteId );
+
+    /**
+     *  IsPluginConnected
+     *  @return ETrue if plugin is connected
+     */
     TBool IsPluginConnected();
+
+    /**
+     *  SetModemAtExistsInCmt
+     *  @param TBool aModemAtExistsInCmt
+     */
+    void SetModemAtExistsInCmt( TBool aModemAtExistsInCmt );
 
 protected:
     // from CActive
@@ -111,24 +154,25 @@ private:
      *  2nd phase constructor
      */
     void ConstructL();
- 
+    /**
+     *  Open ISI channel
+     */
     void OpenChannelL();
-    void HandleATResponse(const TIsiReceiveC& aMessage);
 
+    /**
+     *  ISI message handlers
+     */
+    void HandleATResponse(const TIsiReceiveC& aMessage);
 #ifdef __WINSCW__
     void HandleATResponse( );
 #endif
     void HandleModemConnectResp( const TIsiReceiveC& aMessage);
     void HandleSignalInd(const TIsiReceiveC& aMessage);
     void HandleUnsolicitedData(const TIsiReceiveC& aMessage);
-
-    TInt GetMinSizeDividendByFour( TInt aSize);
-   
     void HandleIntermediateDataInd(const TIsiReceiveC& aMessage);
     void HandleRedirectInd(const TIsiReceiveC& aMessage);
     void HandleRedirectResultResp(const TIsiReceiveC& aMessage);
     void SetDisconnected( TBool aIsDisconnected );
-
 
 private:
     //data
@@ -153,7 +197,7 @@ private:
 #endif
     TUint8 iLastTransactionId[KMaxNumOfTransactionIds];
     TBool iDisconnected;
-    
+    TBool iModemAtExistInCmt;
     };
 
 #endif  // CMODEMATHANDLER_H

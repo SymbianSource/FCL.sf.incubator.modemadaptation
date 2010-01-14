@@ -33,8 +33,7 @@
     //none
 
 //  MACROS
-    //none
-
+    // none
 //  DATA TYPES
     //none
 
@@ -72,16 +71,17 @@ class CMmPhoneBookStoreOperationList
         */
         ~CMmPhoneBookStoreOperationList();
 
+
         /**
-        * Creates entry point to correct operation.
+        * Addoperation to operation list
         *
-        * @param aDataPackage Packaged data
-        * @param aIpc Identify number of request.
-        * @return Pointer to operation.
+        * @param aTransId Transaction for index to be filled with operation
+        * @param aOperation operation to be updated in operation list
+        * @return None
         */
-        CMmPhoneBookStoreOperationBase* BuildL(
-            const CMmDataPackage* aDataPackage,
-            TInt aIpc );
+        void AddOperation(
+            TUint8 aTransId,
+            CMmPhoneBookStoreOperationBase* aOperation );
 
         /**
         * Get pointer to correct operation uing identify number.
@@ -91,8 +91,7 @@ class CMmPhoneBookStoreOperationList
         * @return Pointer to operation.
         */
         CMmPhoneBookStoreOperationBase* Find(
-            TUint8 aTrans,
-            const CMmPhoneBookStoreOperationBase* aSearchFrom=NULL );
+            TUint8 aTrans );
 
         /**
         * Remove correct operation from operation list.
@@ -103,24 +102,34 @@ class CMmPhoneBookStoreOperationList
         void RemoveOperationFromList( TUint8 aTrans );
 
         /**
-        * Removes last operation from operation list.
-        * @return TInt KErrNone or KErrNotFound in case list is empty
+        * Remove correct operation from operation list.
+        *
+        * @param aTrans Transaction Id
+        * @return None
+        */
+        void RemoveCacheOperationFromList( TUint8 aTrans );
+
+        /**
+        * Remove correct operation from operation list.
+        *
+        * @param aTrans Transaction Id
+        * @return None
         */
         TInt RemoveLastOperationFromList();
 
         /**
-        * Calculates transaction Id from IPC number and
-        * data package
-        * @param aIpc IPC number
-        * @param aDataPackage data package
-        * @param aTransactionId resulting transaction id
-        * @return TInt KErrNone or KErrNotSupported
+        * Check for empty Index
+        * @param aInd empty index
+        * @return TInt KErrNone or KErrNotFound
         */
-        static TInt CalculateTransactionId(
-            TInt aIpc,
-            const CMmDataPackage* aDataPackage,
-            TUint8& aTransactionId
-            );
+        TInt FindEmptyIndexTransId();
+        
+        /**
+        * Cancel all operation with same phonebook name
+        * @param aPhoneBook phoenbook name for operation
+        */
+        void CancelOperation( TName &aPhoneBook);
+
   private:
 
         /**
@@ -146,9 +155,8 @@ class CMmPhoneBookStoreOperationList
         // Pointer to CMmUiccMessHandler
         CMmUiccMessHandler* iUiccMessHandler;
         
-        //CMmUiccMessHandler* iMmUiccMessHandler;
-        // Array for saving operation(s)
-        RPointerArray<CMmPhoneBookStoreOperationBase> iPtrOperationArray;
+        // new Array for Storing Operation
+        TFixedArray<CMmPhoneBookStoreOperationBase*, KMaxPbTrIdCount> iPtrOperationArrayNew;
 };
 
 #endif // CMMPHONEBOOKOPERATIONLIST_H

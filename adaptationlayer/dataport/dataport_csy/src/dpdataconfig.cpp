@@ -30,9 +30,9 @@
 #include "dplog.h"          // dataport logging
 
 #include <pipe_sharedisi.h>
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpdataconfigtraces.h"
+#include "dpdataconfigTraces.h"
 #endif
 
 

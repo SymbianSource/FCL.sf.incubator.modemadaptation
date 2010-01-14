@@ -29,4 +29,6 @@ file=ABI_DIR\DEBUG_DIR\p2papi.dll                            SHARED_LIB_DIR\p2pa
 file=ABI_DIR\DEBUG_DIR\iscapi.dll                             SHARED_LIB_DIR\iscapi.dll
 device[VARID]=KERNEL_DIR\DEBUG_DIR\isaaccessldd.ldd           SHARED_LIB_DIR\isaaccessldd.ldd
 extension[VARID]=KERNEL_DIR\DEBUG_DIR\isaaccessextension.dll  \Sys\Bin\isaaccessextension.dll
+extension[VARID]=KERNEL_DIR\DEBUG_DIR\isinameservice.dll      \Sys\Bin\isinameservice.dll
+extension[VARID]=KERNEL_DIR\DEBUG_DIR\isicommunicationmanager.dll      \Sys\Bin\isicommunicationmanager.dll
 #endif // __ISCE_IBY__

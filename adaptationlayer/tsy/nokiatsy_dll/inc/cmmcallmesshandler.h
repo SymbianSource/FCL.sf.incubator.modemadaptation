@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -60,6 +60,10 @@ const TUint8 KMaskBits5to7 = 0x70;
 const TUint8 KMaskBits6to7 = 0x60;
 const TUint8 KMaskBits1to7 = 0x7F;
 const TUint8 KMaskBit8 = 0x80;
+
+// These OBJ ID is used in pipe direction.
+// Pipe-End-Point, Circuit Switched Data server
+#define PN_OBJ_CSD_SRV       0x31
 
 // MACROS
 //  None
@@ -561,7 +565,7 @@ class CMmCallMessHandler : public CBase,
         void CsdMultimediaDataRateInd( const TIsiReceiveC &aIsiMessage );
 
         /**
-        * Creates subblocks for CSD_CALL_CONTROL_REQ 
+        * Creates subblocks for CSD_CALL_CONTROL_REQ
         * @param aTelNumber Phone number to be called
         * @param aIdRestrict Caller id restriction
         * @param aCsdIsiMsg CSD IsiMsg
@@ -631,64 +635,24 @@ class CMmCallMessHandler : public CBase,
         TInt PnsPipeCreateReq( const TUint8 aPipeStateAfter ) const;
 
         /**
-        * Creates PnsPipeEnableReq ISI message and sends it to Phonet.
-		* @return error value: Symbian error code
-        */
-        TInt PnsPipeEnableReq() const;
-
-        /**
-        * Creates PnsPipeResetReq ISI message and sends it to Phonet.
-        * @param aStateAfterReset: pipe state after reset
-		* @return error value: Symbian error code
-        */
-        TInt PnsPipeResetReq( const TUint8 aStateAfterReset );
-
-        /**
         * Creates PnsPipeRemoveReq ISI message and sends it to Phonet.
 		* @return error value: Symbian error code
         */
         TInt PnsPipeRemoveReq();
 
         /**
-        * Creates PnsPipeRedirectReq ISI message and sends it to Phonet.
-		* @return error value: Symbian error code
-        */
-        TInt PnsPipeRedirectReq();
-
-        /**
-        * PnsPipeCreate response. 
+        * PnsPipeCreate response.
         * @param aIsiMessage, reference to the received message.
         * @return void
         */
         void PnsPipeCreateResp( const TIsiReceiveC &aIsiMessage );
 
         /**
-        * PnsPipeEnable response.
-        * @param aIsiMessage, reference to the received message.
-        * @return void
-        */
-        void PnsPipeEnableResp( const TIsiReceiveC& aIsiMessage );
-
-        /**
-        * PnsPipeReset response. 
-        * @param aIsiMessage, reference to the received message.
-        * @return void
-        */
-        void PnsPipeResetResp( const TIsiReceiveC& aIsiMessage );
-
-        /**
-        * PnsPipeRemove response. 
+        * PnsPipeRemove response.
         * @param aIsiMessage, reference to the received message.
         * @return void
         */
         void PnsPipeRemoveResp( const TIsiReceiveC& aIsiMessage );
-
-        /**
-        * PnsPipeRedirect response. 
-        * @param aIsiMessage, reference to the received message.
-        * @return void
-        */
-        void PnsPipeRedirectResp( const TIsiReceiveC& aIsiMessage );
 
     public:     // Data
         // None
@@ -798,16 +762,16 @@ class CMmCallMessHandler : public CBase,
 
 		// Video call connected or disconnected
         TUint8 iVideoCallStatus;
-        
+
 		// bearer rate for multimedia call
         TUint8 iDataRateCode;
-        
+
         // Call direction
         RMobileCall:: TMobileCallDirection iCallDirection;
 
         // Mobile call info
         RMobileCall::TMobileCallInfoV1 iMobileCallInfo;
-        
+
         // Is call multimedia/video call
         TBool iIsMultimedia;
 
@@ -817,14 +781,17 @@ class CMmCallMessHandler : public CBase,
         // Pipe handle for video/multimediacall
         TUint8 iPipeHandle;
 
-        TUint8 iSecondPepDeviceId; 
-        TUint8 iSecondPepObjectId;
-        
         // Call Operation ID
         TUint8 iCallOperationID;
 
-        // Video call mt released
-        TBool iVideoCallMtReleased;
+        // Video call mo/mt released
+        TBool iVideoCallReleased;
+
+        // CALL_ID of the call controlled request
+        TUint8 iCallControlCallId;
+
+        // call control result
+        TUint8 iCcResult;
 
     public:     // Friend classes
         // None

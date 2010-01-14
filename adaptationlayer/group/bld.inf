@@ -21,19 +21,11 @@
 PRJ_PLATFORMS
 DEFAULT
 
-
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-#include "../dataport/group/bld.inf"
-#endif
-
-#include "../modematadaptation/group/bld.inf"
 #include "../bcaiscadapter/group/bld.inf"
-
-#ifdef NCP_COMMON_BRIDGE_FAMILY
 #include "../devicemodecontroller/group/bld.inf"
+#include "../modematadaptation/group/bld.inf"
 #include "../systemstatemanageradaptation/group/bld.inf"
 #include "../tsy/group/bld.inf"
-#endif
 
 PRJ_EXPORTS
 ../rom/adaptationlayer.iby					NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(adaptationlayer.iby)

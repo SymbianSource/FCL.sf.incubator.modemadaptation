@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -29,9 +29,9 @@
 #include <uiccisi.h>            // UICC server
 #include <smsisi.h>             // sms server
 #include <atk_sharedisi.h>
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "satmosmsctrltraces.h"
+#include "satmosmsctrlTraces.h"
 #endif
 
 
@@ -378,8 +378,7 @@ void CSatMoSmsCtrl::SmsResourceIndReceived
     OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_SMSRESOURCEINDRECEIVED, "CSatMoSmsCtrl::SmsResourceIndReceived" );
     TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceived");
 
-    TBuf8<256> addressData1;
-    TBuf8<256> addressData2;
+    TUint sbOffset;
 
     // Save the transaction id, which is going to
     // be re-used in the resp.
@@ -390,33 +389,64 @@ void CSatMoSmsCtrl::SmsResourceIndReceived
     iSenderObject = aIsiMessage.Get8bit( ISI_HEADER_OFFSET_SENDEROBJECT );
 
     // Save Sequence id to send it in request message
-    iSequenceId = aIsiMessage.Get8bit( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+
-            SIZE_SMS_SB_RESOURCE+SMS_SB_RESOURCE_SEQ_ID_OFFSET_SEQUENCEID );
+    if ( KErrNotFound != aIsiMessage.FindSubBlockOffsetById(
+        ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND,
+        SMS_SB_RESOURCE_SEQ_ID,
+        EIsiSubBlockTypeId16Len16,
+        sbOffset ) )
+        {
+        iSequenceId = aIsiMessage.Get8bit(
+            sbOffset + SMS_SB_RESOURCE_SEQ_ID_OFFSET_SEQUENCEID );
+        }
 
     // save resource id to send it in request mesage
-    iResourceId = aIsiMessage.Get16bit( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+
-                                         SMS_SB_RESOURCE_OFFSET_RESOURCES );
+    if ( KErrNotFound != aIsiMessage.FindSubBlockOffsetById(
+        ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND,
+        SMS_SB_RESOURCE,
+        EIsiSubBlockTypeId16Len16,
+        sbOffset ) )
+        {
+        iResourceId = aIsiMessage.Get16bit(
+            sbOffset + SMS_SB_RESOURCE_OFFSET_RESOURCES );
+        }
 
+    // Save Service Centre Address Subblock to send it in request message if server has
+    //denied to access
+    if ( KErrNotFound != aIsiMessage.FindSubBlockOffsetById(
+        ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND,
+        SMS_SB_ADDRESS,
+        EIsiSubBlockTypeId16Len16,
+        sbOffset ) )
+        {
+        TUint8 addressLength = aIsiMessage.Get8bit(
+            sbOffset + SMS_SB_ADDRESS_OFFSET_ADDRESSDATALENGTH );
+        iAddressSubblock = aIsiMessage.GetData(
+            sbOffset + SMS_SB_ADDRESS_OFFSET_ADDRESSDATA,
+            addressLength );
+        }
+    else
+        {
+        iAddressSubblock.Zero();
+        }
 
-     // Save Service Centre Address Subblock to send it in request message if server has
-     //denied to access
-     iAddressSubblock = aIsiMessage.GetData( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+SIZE_SMS_SB_RESOURCE+
-                    SIZE_SMS_SB_RESOURCE_SEQ_ID+SMS_SB_ADDRESS_OFFSET_ADDRESSDATA ,
-                    aIsiMessage.Get8bit(ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+SIZE_SMS_SB_RESOURCE+SIZE_SMS_SB_RESOURCE_SEQ_ID+
-                    SMS_SB_ADDRESS_OFFSET_ADDRESSDATALENGTH) );
-
-     // Calculate Address Subblock length
-     TUint8 addrSbLen = aIsiMessage.Get16bit( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+SIZE_SMS_SB_RESOURCE+SIZE_SMS_SB_RESOURCE_SEQ_ID+
-                                             SMS_SB_ADDRESS_OFFSET_SUBBLOCKLENGTH );
-
-     // Save Destination address TPDU to send it in request message if server has
-     // Denied the access for that address
-     iUserDataSubblock = ( aIsiMessage.GetData( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+SIZE_SMS_SB_RESOURCE+
-                    SIZE_SMS_SB_RESOURCE_SEQ_ID+addrSbLen+
-                    SMS_SB_TPDU_OFFSET_DATABYTES,
-                    aIsiMessage.Get8bit( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+SIZE_SMS_SB_RESOURCE+
-                                 SIZE_SMS_SB_RESOURCE_SEQ_ID+addrSbLen+SMS_SB_TPDU_OFFSET_DATALENGTH )));
-
+    // Save TPDU to send it in request message if server has
+    // Denied the access for that address
+     if ( KErrNotFound != aIsiMessage.FindSubBlockOffsetById(
+         ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND,
+         SMS_SB_TPDU,
+         EIsiSubBlockTypeId16Len16,
+         sbOffset ) )
+        {
+        TUint8 tpduLength =
+            aIsiMessage.Get8bit( sbOffset + SMS_SB_TPDU_OFFSET_DATALENGTH );
+        iUserDataSubblock = aIsiMessage.GetData(
+            sbOffset + SMS_SB_TPDU_OFFSET_DATABYTES,
+            tpduLength );
+         }
+     else
+         {
+         iUserDataSubblock.Zero();
+         }
 
      //Check if location data is present. Otherwise response to SmsResourceInd
      //is always ALLOWED.
@@ -473,7 +503,7 @@ void CSatMoSmsCtrl::SmsResourceIndReceived
          dataResp.AppendFill( KPadding,fillbytes );
          addressSb.CompleteSubBlock();
 
-        // Add 5th Subblock SMS_SB_TPDU (Destination address)
+   // Add 5th Subblock SMS_SB_TPDU (Destination address)
 
          TIsiSubBlock userDataSb( dataResp, SMS_SB_TPDU ,
              EIsiSubBlockTypeId16Len16 );
@@ -504,58 +534,43 @@ void CSatMoSmsCtrl::SmsResourceIndReceived
          {
         if( iIsMoSmsCtrlActivated )    // Check is MO SMS is activated or not
             {
-            TDes8* addressData = NULL;
-            if(SMS_SB_ADDRESS == aIsiMessage.Get16bit( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+SIZE_SMS_SB_RESOURCE+
-                    SIZE_SMS_SB_RESOURCE_SEQ_ID+SMS_SB_ADDRESS_OFFSET_SUBBLOCKID ))
+            TPtrC8 addressData2;
+
+            if ( iUserDataSubblock.Length() )
                 {
-                addressData = &addressData1;
-
-                TPtrC8 phoneNumber = aIsiMessage.GetData( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+SIZE_SMS_SB_RESOURCE+
-                        SIZE_SMS_SB_RESOURCE_SEQ_ID+SMS_SB_ADDRESS_OFFSET_ADDRESSDATA,
-                        aIsiMessage.Get8bit( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+SIZE_SMS_SB_RESOURCE+
-                        SIZE_SMS_SB_RESOURCE_SEQ_ID+SMS_SB_ADDRESS_OFFSET_ADDRESSDATALENGTH ) );
-
-                addressData->Append( phoneNumber.Mid( 0, phoneNumber.Length()) );
-
-                }
-            if(SMS_SB_TPDU == aIsiMessage.Get16bit( ISI_HEADER_SIZE+SIZE_SMS_RESOURCE_IND+SIZE_SMS_SB_RESOURCE
-                    +SIZE_SMS_SB_RESOURCE_SEQ_ID+addrSbLen+SMS_SB_TPDU_OFFSET_SUBBLOCKID ))
-                {
-                addressData =&addressData2;
-
                 // check for message type
                 // Whether its a command type message or Submit type
-
                 if(KSmsCommandType == ( iUserDataSubblock[0]& 0x03 ))
                     {
                     iMessageType = KSmsCommandType;
                     TPtrC8 phoneNumber = &iUserDataSubblock[5];
-
                     // Addition of two for Type of number semi octet
-                    addressData->Append( phoneNumber.Mid( 1, (iUserDataSubblock[5]/2)+1 ));
+                    addressData2.Set(
+                        phoneNumber.Mid( 1, (iUserDataSubblock[5]/2)+1 ) );
                     }
-                else if( KSmsSubmitType == ( iUserDataSubblock[0] & 0x03 ))
+                else if( KSmsSubmitType == ( iUserDataSubblock[0] & 0x03 ) )
                     {
                     iMessageType = KSmsSubmitType;
                     TPtrC8 phoneNumber = &iUserDataSubblock[2];
                     // Addition of two for Type of number semi octet
-                    addressData->Append( phoneNumber.Mid( 1, (iUserDataSubblock[2]/2)+1 ));
+                    addressData2.Set(
+                        phoneNumber.Mid( 1, (iUserDataSubblock[2]/2)+1 ) );
                     }
                 }
             // Dialled Number String, the length has to be removed (first byte)
 
-        iMoSmsCtrlEnvelopeTransactionId = iSatMessaging->GetTransactionId();
+            iMoSmsCtrlEnvelopeTransactionId = iSatMessaging->GetTransactionId();
 
-            TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceived, Send envelope");
-            OstTrace0( TRACE_NORMAL, DUP3_CSATMOSMSCTRL_SMSRESOURCEINDRECEIVED, "CSatMoSmsCtrl::SmsResourceIndReceived, Send envelope" );
+TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceived, Send envelope");
+OstTrace0( TRACE_NORMAL, DUP3_CSATMOSMSCTRL_SMSRESOURCEINDRECEIVED, "CSatMoSmsCtrl::SmsResourceIndReceived, Send envelope" );
 
             // The envelope is sent if MO SMS is activated
             SendMoSmsCtrlEnvelope(
                 iMoSmsCtrlEnvelopeTransactionId,
-                addressData1,
+                iAddressSubblock,
                 addressData2
                 );
-       }
+            }
         else        // If MO SMS is not activated
             {
             TBuf8<KMaxLengthOfResourceReq> dataResp;
@@ -623,8 +638,8 @@ void CSatMoSmsCtrl::SmsResourceIndReceived
 void CSatMoSmsCtrl::SendMoSmsCtrlEnvelope
         (
         TUint8 aTraId,
-        TDes8& aAddressData1,
-        TDes8& aAddressData2
+        const TDesC8& aAddressData1,
+        const TDesC8& aAddressData2
         )
     {
     OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_SENDMOSMSCTRLENVELOPE, "CSatMoSmsCtrl::SendMoSmsCtrlEnvelope" );
@@ -897,7 +912,6 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
 
     if(iIsMoSmsCtrlActivated)
         {
-
             //Resource is disallowed   ||    Resource is allowed without modification
         if((SMS_RESOURCE_ALLOWED != status)||(0 == address1.Length()))
               {
@@ -1129,6 +1143,7 @@ TInt CSatMoSmsCtrl::MessageReceived
                 break;
                 }
             }
+
         }
     else if ( PN_UICC == resource )
         {

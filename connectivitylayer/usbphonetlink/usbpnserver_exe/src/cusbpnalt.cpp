@@ -21,7 +21,7 @@
 #include "usbpntrace.h"
 #include "musbpnaltobserver.h"
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
 #include "cusbpnaltTraces.h"
 #endif

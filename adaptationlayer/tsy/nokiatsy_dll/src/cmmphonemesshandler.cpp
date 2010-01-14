@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -27,7 +27,7 @@
 #include "cmmnetmesshandler.h"
 #include "cmmnetoperatornamehandler.h"
 #include "tsylogger.h"
-#include "cmmuiccmesshandler.h"
+#include "cmmphonebookoperationinit.h"
 
 #include <call_modemisi.h>
 #include <ctsy/pluginapi/cmmdatapackage.h>
@@ -49,9 +49,9 @@
 #include <tisi.h>
 #include <uiccisi.h>
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmphonemesshandlertraces.h"
+#include "cmmphonemesshandlerTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES
@@ -69,6 +69,11 @@ const TUint8 KPhoneTransId = 6; //hard coded transaction ID
 const TUint8 KImsiSize = 8;
 const TUint8 KServiceProviderSize = 36;
 const TUint8 KSpnFileSize = 16;
+
+const TUint8 KServiceAcl( 35 );
+const TUint8 KAclStateMask( 4 );
+const TUint8 KNumOfApnsIndex( 0 );
+const TUint8 KApnDataIndex( 1 );
 
 // ------------------------------------------------------
 // --- Alternate Line Service (ALS)-related constants ---
@@ -153,6 +158,16 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_NEWL, "CMmPhoneMessHandler::NewL" )
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
         INFO_SERIAL_NUMBER_READ_RESP );
 
+    aPhoNetReceiver->RegisterL(
+        phoneMessHandler,
+        PN_UICC,
+        UICC_REFRESH_RESP );
+
+    aPhoNetReceiver->RegisterL(
+        phoneMessHandler,
+        PN_UICC,
+        UICC_REFRESH_IND );
+
     CleanupStack::Pop( phoneMessHandler );
 
     return phoneMessHandler;
@@ -180,7 +195,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_CONSTRUCTL, "CMmPhoneMessHandler::C
 
     iCommonTSYRefreshPending = EFalse;
     iRefreshError = EFalse;
-
+    iCompleteRefresfDone = EFalse;
     iInternalRefreshFiles = 0;
 
     SubscribeEventsFromPhoNet();
@@ -284,6 +299,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_SUBSCRIBEEVENTSFROMPHONET, "CMmPhon
         // UICC SERVER INDICATIONS
             PN_UICC, UICC_CARD_IND,
             PN_UICC, UICC_IND,
+            PN_UICC, UICC_REFRESH_IND,
 
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
         // MTC SERVER INDICATIONS
@@ -389,6 +405,148 @@ OstTrace1( TRACE_NORMAL, CMMPHONEMESSHANDLER_EXTFUNCL, "CMmPhoneMessHandler::Ext
             ret = UiccReadServiceProviderName();
             break;
             }
+        case EMmTsySimRefreshDoneIPC:
+            {
+            iCommonTSYRefreshPending = EFalse;
+            TBool readError;
+            aDataPackage->UnPackData( readError );
+
+            if ( ! readError )
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::ExtFuncL: commontsy refresh successfully completed ==> REFRESH_DONE");
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_EXTFUNCL, "CMmPhoneMessHandler::ExtFuncL: commontsy refresh successfully completed ==> REFRESH_DONE" );
+                ret = UiccRefreshReq( UICC_REFRESH_DONE );
+                }
+            else
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::ExtFuncL: commontsy refresh completed with an error ==> REFRESH_DONE");
+OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEMESSHANDLER_EXTFUNCL, "CMmPhoneMessHandler::ExtFuncL: commontsy refresh completed with an error ==> REFRESH_DONE" );
+                ret = UiccRefreshReq( UICC_REFRESH_NOT_OK );
+                }
+            break;
+            }
+
+        case EMobilePhoneGetAPNControlListServiceStatus:
+            {
+            if( !iACLIsProgress )
+                {
+                iOngoingAclIpc = EMobilePhoneGetAPNControlListServiceStatus;
+                iACLIsProgress = ETrue;
+                ret = UiccReadEfEstReq();
+                }
+            else
+                {
+                ret = KErrInUse;
+                }
+            break;
+            }
+        case EMobilePhoneSetAPNControlListServiceStatus:
+            {
+            if( !iACLIsProgress )
+                {
+                iOngoingAclIpc = EMobilePhoneSetAPNControlListServiceStatus;
+                iACLIsProgress = ETrue;
+                aDataPackage->UnPackData( iAclStatus );
+                ret = UiccReadEfEstReq();
+                }
+            else
+                {
+                ret = KErrInUse;
+                }
+            break;
+            }
+        case EMobilePhoneDeleteAPNName:
+            {
+            if( !iACLIsProgress )
+                {
+                iACLIsProgress = ETrue;
+                iOngoingAclIpc = EMobilePhoneDeleteAPNName;
+                aDataPackage->UnPackData( iAPNReadOrDeleteIndex );
+                if( !iAPNList )
+                    {
+                    ret = UiccReadAclReq();
+                    }
+                else
+                    {
+                    ret = UiccDeleteApnEntry( iAPNReadOrDeleteIndex );
+                    }
+                }
+            else
+                {
+                ret = KErrInUse;
+                }
+            break;
+            }
+        case EMobilePhoneAppendAPNName:
+            {
+            if( !iACLIsProgress )
+                {
+                iACLIsProgress = ETrue;
+                iOngoingAclIpc = EMobilePhoneAppendAPNName;
+                RMobilePhone::TAPNEntryV3* apnEntryName( NULL );
+                aDataPackage->UnPackData( &apnEntryName );
+                iAPNDataBuffer =  *apnEntryName;
+
+                if( !iAPNList )
+                    {
+                    ret = UiccReadAclReq();
+                    }
+                else
+                    {
+                    iAPNList->AppendL( iAPNDataBuffer.iApn );
+                    ret = UiccWriteEfAclReq();
+                    }
+                }
+            else
+                {
+                ret = KErrInUse;
+                }
+            break;
+            }
+        case EMobilePhoneEnumerateAPNEntries:
+            {
+            if( !iAPNList )
+                {
+                if( !iACLIsProgress )
+                    {
+                    iACLIsProgress = ETrue;
+                    iOngoingAclIpc = EMobilePhoneEnumerateAPNEntries;
+                    ret = UiccReadAclReq();
+                    }
+                else
+                    {
+                    ret = KErrInUse;
+                    }
+                }
+            else
+                {
+                CompleteEnumerateAPNEntries();
+                }
+            break;
+            }
+        case EMobilePhoneGetAPNname:
+            {
+            aDataPackage->UnPackData( iAPNReadOrDeleteIndex );
+            if( !iAPNList )
+                {
+                if( !iACLIsProgress )
+                    {
+                    iACLIsProgress = ETrue;
+                    iOngoingAclIpc = EMobilePhoneGetAPNname;
+                    ret = UiccReadAclReq();
+                    }
+                else
+                    {
+                    ret = KErrInUse;
+                    }
+                }
+            else
+                {
+                CompleteGetAPNName( iAPNReadOrDeleteIndex );
+                }
+            break;
+            }
+
         default:
             {
 TFLOGSTRING2("TSY: CMmPhoneMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
@@ -441,6 +599,27 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEMESSHANDLER_RECEIVEMESSAGEL, "CMmPhoneMess
                     }
                 }
             break; // end case PN_MODEM_INFO
+            }
+        case PN_UICC:
+            {
+            switch( messageId )
+                {
+                case UICC_REFRESH_IND:
+                    {
+                    UiccRefreshInd( aIsiMessage );
+                    break;
+                    }
+                case UICC_REFRESH_RESP:
+                    {
+                    UiccRefreshResp( aIsiMessage );
+                    break;
+                    }
+                default:
+                    {
+                    break;
+                    }
+                }
+            break;
             }
         default:
             {
@@ -966,6 +1145,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADSERVICEPROVIDERNAMERESP, "C
 TInt CMmPhoneMessHandler::ProcessUiccMsg(
     TInt aTraId,
     TInt aStatus,
+    TUint8 /*aDetails*/,
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY: CMmPhoneMessHandler::ProcessUiccMsg, transaction ID: %d, status %d", aTraId, aStatus );
@@ -1000,6 +1180,33 @@ switch( aTraId )
         case ETrIdWriteDynamicFlags:
             {
             UiccWriteDynamicFlagsResp( aStatus );
+            break;
+            }
+        case ETrIdAclStatusReadEfEst:
+            {
+            if( EMobilePhoneGetAPNControlListServiceStatus == iOngoingAclIpc )
+                {
+                UiccGetAclStatusReadEfEstResp( aStatus, aFileData );
+                }
+            else if( EMobilePhoneSetAPNControlListServiceStatus == iOngoingAclIpc )
+                {
+                UiccSetAclStatusReadEfEstResp( aStatus, aFileData );
+                }
+            break;
+            }
+        case ETrIdAclStatusWriteEfEst:
+            {
+            UiccSetAclStatusWriteEfEstResp( aStatus );
+            break;
+            }
+        case ETrIdAclReadEfAcl:
+            {
+            UiccReadAclResp( aStatus, aFileData );
+            break;
+            }
+        case ETrIdAclWriteEfAcl:
+            {
+            UiccWriteEfAclResp( aStatus );
             break;
             }
         default:
@@ -1212,6 +1419,1089 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCPROCESSSPNNAMEINFO, "CMmPhoneMe
     // Reset iServiceProviderName for next time.
     iServiceProviderName.iSPName.Zero();
     iServiceProviderName.iPLMNField.Zero();
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccRefreshInd
+//
+// --------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::UiccRefreshInd( const TIsiReceiveC &aIsiMessage )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccRefreshInd");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREFRESHIND, "CMmPhoneMessHandler::UiccRefreshInd" );
+    TUint8 serviceType( aIsiMessage.Get8bit(
+        ISI_HEADER_SIZE + UICC_REFRESH_IND_OFFSET_SERVICETYPE ) );
+    if ( UICC_REFRESH_PERMISSION == serviceType )
+        {
+        UiccRefreshReq( UICC_REFRESH_OK );
+        }
+    else if ( UICC_REFRESH_NOW == serviceType )
+        {
+        HandleUiccRefresh( aIsiMessage );
+        }
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccRefreshResp
+//
+// --------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::UiccRefreshResp( const TIsiReceiveC &aIsiMessage )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccRefreshResp");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREFRESHRESP, "CMmPhoneMessHandler::UiccRefreshResp" );
+    if ( iCompleteRefresfDone )
+        {
+        TUint8 status( aIsiMessage.Get8bit(
+            ISI_HEADER_SIZE + UICC_REFRESH_RESP_OFFSET_STATUS ) );
+        TInt err( KErrNone );
+        if ( UICC_STATUS_OK != status )
+            {
+            err = KErrGeneral;
+            }
+        iMessageRouter->Complete( EMmTsySimRefreshDoneIPC, err );
+        iCompleteRefresfDone = EFalse;
+        }
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccRefreshReq
+//
+// --------------------------------------------------------------------------
+//
+TInt CMmPhoneMessHandler::UiccRefreshReq( TUint8 aStatus )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccRefreshReq");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREFRESHREQ, "CMmPhoneMessHandler::UiccRefreshReq" );
+    TInt ret( KErrNone );
+
+    // If there was error in cacheing some file, set internal flag
+    if ( UICC_REFRESH_NOT_OK == aStatus )
+        {
+        iRefreshError = ETrue;
+        }
+
+    // If NTSY or CTSY cacheing is ongoing, message is not sent
+    if ( ! iCommonTSYRefreshPending && ! iInternalRefreshFiles )
+        {
+        if ( iRefreshError ) // Some cacheing was failed, set error status
+            {
+            aStatus = UICC_REFRESH_NOT_OK;
+            }
+
+        TIsiSend isiMsg( iPhoNetSender->SendBufferDes() );
+        isiMsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_UICC );
+        isiMsg.Set8bit( ISI_HEADER_OFFSET_TRANSID, KPhoneTransId );
+        isiMsg.Set8bit( ISI_HEADER_OFFSET_MESSAGEID, UICC_REFRESH_REQ );
+        isiMsg.Set8bit( ISI_HEADER_SIZE + UICC_REFRESH_REQ_OFFSET_SERVICETYPE,
+            UICC_REFRESH_STATUS );
+        isiMsg.Set8bit( ISI_HEADER_SIZE + UICC_REFRESH_REQ_OFFSET_STATUS,
+            aStatus );
+        isiMsg.Set8bit( ISI_HEADER_SIZE + UICC_REFRESH_REQ_OFFSET_CLIENTID,
+            iMmUiccMessHandler->GetUiccClientId() );
+        isiMsg.Set16bit( ISI_HEADER_SIZE + UICC_REFRESH_REQ_OFFSET_FILLERBYTE1,
+            KPadding );
+        isiMsg.Set8bit( ISI_HEADER_SIZE + UICC_REFRESH_REQ_OFFSET_NSB,
+            0 ); // No subblocks
+
+        ret = iPhoNetSender->Send( isiMsg.Complete() );
+        iRefreshError = EFalse;
+
+        // When NTSY/CTSY refresh was performed, set iCompleteRefresfDone flag
+        // that IPC EMmTsySimRefreshDoneIPC will be completed to CTSY
+        if ( UICC_REFRESH_DONE == aStatus || UICC_REFRESH_NOT_OK == aStatus )
+            {
+            iCompleteRefresfDone = ETrue;
+            }
+        }
+    return ret;
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::HandleUiccRefresh
+//
+// --------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::HandleUiccRefresh( const TIsiReceiveC &aIsiMessage )
+    {
+TFLOGSTRING("TSY:CMmPhoneMessHandler::HandleUiccRefresh" );
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh" );
+
+    TUint16 refreshFiles( 0 );
+    TBool enabledServicesChanged( EFalse );
+    TUint startIndex( ISI_HEADER_SIZE + SIZE_UICC_REFRESH_IND );
+
+    // There is one subblock UICC_SB_APPL_PATH per refreshed file
+    TUint uiccSbApplPathOffset( 0 );
+    while ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+        startIndex,
+        UICC_SB_APPL_PATH,
+        EIsiSubBlockTypeId16Len16,
+        uiccSbApplPathOffset ) )
+        {
+        TUint16 sbLen( aIsiMessage.Get16bit(
+            uiccSbApplPathOffset + UICC_SB_APPL_PATH_OFFSET_SBLEN ) );
+
+        // Get file id
+        TUint16 fileId( aIsiMessage.Get16bit(
+            uiccSbApplPathOffset + UICC_SB_APPL_PATH_OFFSET_EF ) );
+
+        switch( fileId )
+            {
+            case KElemFileSmsParams: // 6F42, SMS parameters
+                {
+TFLOGSTRING("TSY:CMmPhoneMessHandler::HandleUiccRefresh: SMSP refresh.");
+OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: SMSP refresh" );
+                refreshFiles |= KCacheSmsParams;
+                break;
+                }
+            case KElemFileFixedDiallingNumbers: // 6F3B, Storage FDN
+                {
+TFLOGSTRING("TSY:CMmPhoneMessHandler::HandleUiccRefresh: FDN refresh");
+OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: FDN refresh" );
+                refreshFiles |= KCacheFdn;
+                break;
+                }
+            case KElemSimServiceTable: // 6F38, Service table
+                {
+TFLOGSTRING("TSY:CMmPhoneMessHandler::HandleUiccRefresh: ServiceTable refresh");
+OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: ServiceTable refresh" );
+                refreshFiles |= KCacheServiceTable;
+                // Also internal service table cacheing is needed. EFalse means
+                // no complete to CTSY.
+                iInternalRefreshFiles |= KRefreshServiceTable;
+                iMmUiccMessHandler->InitializeSimServiceTableCache( EFalse );
+                break;
+                }
+            case KElemFileDynFlagsOrange: // 6F9F, ALS
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::HandleUiccRefresh: ALS line refresh");
+OstTrace0( TRACE_NORMAL, DUP5_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: ALS line." );
+                refreshFiles |= KCacheALSline;
+                break;
+                }
+            case KElemFileShortMessages: // 6F3C, SMS
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::HandleUiccRefresh: SMS refresh");
+OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: SMS refresh" );
+                iInternalRefreshFiles |= KRefreshSms;
+                iMessageRouter->GetSmsMessHandler()->InitializeSmsCache();
+                break;
+                }
+            case KElemFileAcl: // 6F57, ACL
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::HandleUiccRefresh: APN refresh");
+OstTrace0( TRACE_NORMAL, DUP7_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: APN refresh" );
+                iMessageRouter->Complete(
+                    EMobilePhoneNotifyAPNListChanged,
+                    KErrNone );
+
+                // Clear and delete cache
+                if ( iAPNList )
+                    {
+                    iAPNList->Reset();
+                    delete iAPNList;
+                    iAPNList = NULL;
+                    }
+                break;
+                }
+            case KElemEst: // 6F56, Enabled service table
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::HandleUiccRefresh: ServiceTable enabled");
+OstTrace0( TRACE_NORMAL, DUP8_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: ServiceTable enabled" );
+                enabledServicesChanged = ETrue;
+                break;
+                }
+            case KElemFileCallFwdFlagsCphs:
+            case KElemFileCallFwdIndicationStatus:
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::HandleUiccRefresh: Call forwarding flags refresh ");
+OstTrace0( TRACE_NORMAL, DUP9_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: Call forwarding flags refresh" );
+                // Re-read call forwarding flags
+                iInternalRefreshFiles |= KRefreshCallForwardingFlags;
+
+                iMessageRouter->GetSupplServHandler()->ExtFuncL(
+                    ECustomNotifyIccCallForwardingStatusChangeIPC,
+                    NULL );
+                break;
+                }
+            case KElemFileOpl: // 6FC6, Operator PLMN List
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::HandleUiccRefresh: OPL list refresh");
+OstTrace0( TRACE_NORMAL, DUP10_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: OPL list refresh" );
+
+                iInternalRefreshFiles |= KRefreshOplRules;
+
+                iMessageRouter->
+                    GetNetMessHandler()->
+                    GetNetOperatorNameHandler()->
+                    UiccReadOplRecordCount();
+                break;
+                }
+            case KElemFilePlmnNetworkName: // 6FC5, PLMN Network Name
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::HandleUiccRefresh: PNN refresh");
+OstTrace0( TRACE_NORMAL, DUP11_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: PNN refresh" );
+
+                iInternalRefreshFiles |= KRefreshPnnRecord;
+
+                // Get PNN record to be cached.
+                TUint8 pnnIdentifier(
+                    iMessageRouter->
+                    GetNetMessHandler()->
+                    GetNetOperatorNameHandler()->
+                    GetPnnRecordIdentifierValue() );
+
+                iMessageRouter->
+                    GetNetMessHandler()->
+                    GetNetOperatorNameHandler()->
+                    UiccOperatorReqReadPnn( pnnIdentifier );
+                break;
+                }
+            case KElemFileOperatorName: // 6F14, Operator name
+                {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::HandleUiccRefresh: ONS name refresh");
+OstTrace0( TRACE_NORMAL, DUP12_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: ONS name refresh" );
+
+                iInternalRefreshFiles |= KRefreshOnsName;
+
+                iMessageRouter->
+                    GetNetMessHandler()->
+                    GetNetOperatorNameHandler()->
+                    UiccOperatorReq();
+                break;
+                }
+            default:
+                {
+TFLOGSTRING2("TSY:CMmPhoneMessHandler::HandleUiccRefresh:Unknown type: 0x%x", fileId);
+OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh;fileId=%hu", fileId );
+                break;
+                }
+            }
+
+        // Abbreviated dialling numbers, EFadn 4FXX
+        if ( 0x4F == ( fileId >> 8 ) )
+            {
+TFLOGSTRING("TSY:CMmPhoneMessHandler::HandleUiccRefresh: ADN refresh.");
+OstTrace0( TRACE_NORMAL, DUP13_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh: ADN refresh" );
+
+            refreshFiles |= KCacheAdn;
+            }
+
+        startIndex = uiccSbApplPathOffset + sbLen;
+        }
+
+    // If Enabled Services table has been changed during the refresh,
+    // we need to make phonebook init phase 1 to enable UICC to send
+    // indication about FDN.
+    if ( enabledServicesChanged )
+        {
+        // In case of ADN or FDN phonebook refresh, CommonTSY is
+        // responsible of making phonebook initialization. => No need for
+        // internal initialization.
+        if ( !( refreshFiles & KCacheAdn )
+            && !( refreshFiles & KCacheFdn ) )
+            {
+            // Creating buffer for phonebook's name
+            TName phonebookName;
+            phonebookName.Copy( KInternalPhoneBookType );
+
+            CPhoneBookDataPackage package;
+            package.SetPhoneBookName( phonebookName );
+
+            iMessageRouter->PhoneBookStoreMessHandler()->ExtFuncL(
+                EMmTsyPhoneBookStoreInitIPC,
+                &package );
+            }
+        }
+
+    // Check if we have any files to refresh in CommonTSY.
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::HandleUiccRefresh: refreshFiles = %d", refreshFiles );
+OstTraceExt1( TRACE_NORMAL, DUP14_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh;refreshFiles=%hu", refreshFiles );
+    if ( 0 < refreshFiles )
+        {
+        iCommonTSYRefreshPending = ETrue;
+
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::HandleUiccRefresh: CommonTSY Refresh Pending = %d", iCommonTSYRefreshPending );
+OstTrace1( TRACE_NORMAL, DUP15_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh;iCommonTSYRefreshPending=%d", iCommonTSYRefreshPending );
+
+        // Packed parameter: List of files needed to be refreshed.
+        CMmDataPackage dataPackage;
+        dataPackage.PackData( &refreshFiles );
+
+        // Complete. This will start the cache update process.
+        iMessageRouter->Complete(
+            EMmTsySimRefreshNowIPC,
+            &dataPackage,
+            KErrNone );
+        }
+
+    // Send refresh done to UICC only if there's no CTSY/NTSY
+    // caching ongoing.
+    if ( ! iCommonTSYRefreshPending && ! iInternalRefreshFiles )
+        {
+        UiccRefreshReq( UICC_REFRESH_DONE );
+        }
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::SmsCachingCompleted
+// Checks if "Refresh Done" will be sent to UICC now or later.
+// Counterpart is CMmPhoneMessHandler::ExtFuncL, case
+// EMmTsySimRefreshDoneIPC.
+// --------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::SmsCachingCompleted( TInt aError )
+    {
+    iInternalRefreshFiles ^= KRefreshSms;
+
+    if ( KErrNone == aError )
+        {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::SmsCachingCompleted: nokiatsy sms caching completed");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_SMSCACHINGCOMPLETED, "CMmPhoneMessHandler::SmsCachingCompleted: nokiatsy sms caching completed" );
+        UiccRefreshReq( UICC_REFRESH_DONE );
+        }
+    else
+        {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::SmsCachingCompleted: nokiatsy sms caching completed with error %d", aError);
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_SMSCACHINGCOMPLETED, "CMmPhoneMessHandler::SmsCachingCompleted: nokiatsy sms caching completed with error" );
+        UiccRefreshReq( UICC_REFRESH_NOT_OK );
+        }
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::ServiceTableCachingCompleted
+// Checks if "Refresh Done" will be sent to UICC now or later.
+// --------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::ServiceTableCachingCompleted( TInt aError )
+    {
+    iInternalRefreshFiles ^= KRefreshServiceTable;
+
+    if ( UICC_STATUS_OK == aError )
+        {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::ServiceTableCachingCompleted: nokiatsy service table caching completed");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_SERVICETABLECACHINGCOMPLETED, "CMmPhoneMessHandler::ServiceTableCachingCompleted: nokiatsy service table caching completed" );
+        UiccRefreshReq( UICC_REFRESH_DONE );
+        }
+    else
+        {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::ServiceTableCachingCompleted: nokiatsy service table caching completed with error %d", aError);
+OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_SERVICETABLECACHINGCOMPLETED, "CMmPhoneMessHandler::ServiceTableCachingCompleted: nokiatsy service table caching completed with error;aError=%d", aError );
+        UiccRefreshReq( UICC_REFRESH_NOT_OK );
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::CallForwFlagsCachingCompleted
+// Checks if "Refresh Done" will be sent to UICC.
+// Counterpart is CMmPhoneMessHandler::ExtFuncL, case
+// EMmTsySimRefreshDoneIPC.
+// ----------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::CallForwFlagsCachingCompleted( TUint aError )
+    {
+    iInternalRefreshFiles ^= KRefreshCallForwardingFlags;
+
+    if ( UICC_STATUS_OK == aError )
+        {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::CallForwFlagsCachingCompleted: nokiatsy refresh successfully completed ==> REFRESH_DONE");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_CALLFORWFLAGSCACHINGCOMPLETED, "CMmPhoneMessHandler::CallForwFlagsCachingCompleted: nokiatsy refresh successfully completed" );
+        UiccRefreshReq( UICC_REFRESH_DONE );
+        }
+    else
+        {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::CallForwFlagsCachingCompleted: nokiatsy refresh completed with error %d ==> REFRESH_DONE", aError);
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_CALLFORWFLAGSCACHINGCOMPLETED, "CMmPhoneMessHandler::CallForwFlagsCachingCompleted: nokiatsy refresh completed with error" );
+        UiccRefreshReq( UICC_REFRESH_NOT_OK );
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::OplRulesCachingCompleted
+// Checks if "Refresh Done" will be sent to UICC.
+// ----------------------------------------------------------------------------
+//
+TBool CMmPhoneMessHandler::OplRulesCachingCompleted( TInt aError )
+    {
+    // Initialize OPL refresh ongoing value.
+    TBool oplRefreshOngoing( EFalse );
+
+    // Check if refresh is ongoing.
+    if ( iInternalRefreshFiles & KRefreshOplRules )
+        {
+        iInternalRefreshFiles ^= KRefreshOplRules;
+
+        oplRefreshOngoing = ETrue;
+
+        if ( KErrNone == aError )
+            {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::OplRulesCachingCompleted: nokiatsy refresh successfully completed ==> REFRESH_DONE");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_OPLRULESCACHINGCOMPLETED, "CMmPhoneMessHandler::OplRulesCachingCompleted: nokiatsy refresh successfully completed ==> REFRESH_DONE" );
+            UiccRefreshReq( UICC_REFRESH_DONE );
+            }
+        else
+            {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::OplRulesCachingCompleted: nokiatsy refresh completed with error %d ==> REFRESH_DONE", aError);
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_OPLRULESCACHINGCOMPLETED, "CMmPhoneMessHandler::OplRulesCachingCompleted: nokiatsy refresh completed with error" );
+            UiccRefreshReq( UICC_REFRESH_NOT_OK );
+            }
+        }
+
+    return oplRefreshOngoing;
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::PnnRecordCachingCompleted
+// Checks if "Refresh Done" will be sent to UICC.
+// ----------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::PnnRecordCachingCompleted( TUint8 aError )
+    {
+    // Check if refresh is ongoing.
+    if ( iInternalRefreshFiles & KRefreshPnnRecord )
+        {
+        iInternalRefreshFiles ^= KRefreshPnnRecord;
+
+        if ( UICC_STATUS_OK == aError )
+            {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::PnnRecordCachingCompleted: nokiatsy refresh successfully completed ==> REFRESH_DONE");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_PNNRECORDCACHINGCOMPLETED, "CMmPhoneMessHandler::PnnRecordCachingCompleted: nokiatsy refresh successfully completed ==> REFRESH_DONE" );
+            UiccRefreshReq( UICC_REFRESH_DONE );
+            }
+        else
+            {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::PnnRecordCachingCompleted: nokiatsy refresh completed with error %d ==> REFRESH_DONE", aError);
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_PNNRECORDCACHINGCOMPLETED, "CMmPhoneMessHandler::PnnRecordCachingCompleted: nokiatsy refresh completed with error" );
+            UiccRefreshReq( UICC_REFRESH_NOT_OK );
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::OnsNameCachingCompleted
+// Checks if "Refresh Done" will be sent to SIMSON.
+// ----------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::OnsNameCachingCompleted( TUint8 aError )
+    {
+    // Check if refresh is ongoing.
+    if ( iInternalRefreshFiles & KRefreshOnsName )
+        {
+        iInternalRefreshFiles ^= KRefreshOnsName;
+
+        if ( UICC_STATUS_OK == aError )
+            {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::OnsNameCachingCompleted: nokiatsy refresh successfully completed ==> REFRESH_DONE");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_ONSNAMECACHINGCOMPLETED, "CMmPhoneMessHandler::OnsNameCachingCompleted: nokiatsy refresh successfully completed ==> REFRESH_DONE" );
+            UiccRefreshReq( UICC_REFRESH_DONE );
+            }
+        else
+            {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::OnsNameCachingCompleted: nokiatsy refresh completed with error %d ==> REFRESH_DONE", aError);
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_ONSNAMECACHINGCOMPLETED, "CMmPhoneMessHandler::OnsNameCachingCompleted: nokiatsy refresh completed with error" );
+            UiccRefreshReq( UICC_REFRESH_NOT_OK );
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccReadEfEstReq
+// reads EFest
+// ----------------------------------------------------------------------------
+//
+TInt CMmPhoneMessHandler::UiccReadEfEstReq()
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccReadEfEstReq");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADEFESTREQ, "CMmPhoneMessHandler::UiccReadEfEstReq" );
+
+    TInt ret( KErrNone );
+
+    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() &&
+        iMmUiccMessHandler->GetServiceStatus( KServiceAcl ) )
+        {
+        // Set parameters for UICC_APPL_CMD_REQ message
+        TUiccReadTransparent params;
+        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+        params.trId = ETrIdAclStatusReadEfEst;
+        params.dataAmount = 0;
+        params.dataOffset = 0;
+        params.fileId = KElemEst;
+        params.fileIdSfi = 0x05;
+        params.serviceType = UICC_APPL_READ_TRANSPARENT;
+
+        // File id path
+        params.filePath.Append( KMasterFileId >> 8 );
+        params.filePath.Append( KMasterFileId );
+        params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccReadEfEstReq: card type is NOT UICC or ACL not supported in EFust");
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCREADEFESTREQ, "CMmPhoneMessHandler::UiccReadEfEstReq: card type is NOT UICC or ACL not supported in EFust" );
+        iACLIsProgress = EFalse;
+        ret = KErrNotFound;
+        }
+    return ret;
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccGetAclStatusReadEfEstResp
+// Handles EFest read response in case of getting ACL status
+// ----------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::UiccGetAclStatusReadEfEstResp(
+    TInt aStatus,
+    const TDesC8& aFileData )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccGetAclStatusReadEfEstResp");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCGETACLSTATUSREADEFESTRESP, "CMmPhoneMessHandler::UiccGetAclStatusReadEfEstResp" );
+
+    TInt ret( KErrNone );
+    RMobilePhone::TAPNControlListServiceStatus aclStatus;
+
+    if( UICC_STATUS_OK == aStatus )
+        {
+        TUint8 aclState( aFileData[0] & KAclStateMask );
+        if( aclState )
+            {
+            aclStatus = RMobilePhone::EAPNControlListServiceEnabled;
+            }
+        else
+            {
+            aclStatus = RMobilePhone::EAPNControlListServiceDisabled;
+            }
+        }
+    else
+        {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::UiccGetAclStatusReadEfEstResp: EFest reading failed: 0x%x", aStatus);
+OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCGETACLSTATUSREADEFESTRESP, "CMmPhoneMessHandler::UiccGetAclStatusReadEfEstResp: EFest reading failed: 0x%x", aStatus );
+        ret = KErrAccessDenied;
+        }
+
+    // complete with packed parameter
+    CMmDataPackage dataPackage;
+
+    if( KErrNone == ret )
+        {
+        dataPackage.PackData( &aclStatus );
+        }
+
+    iACLIsProgress = EFalse; //set ACL flag
+    iMessageRouter->Complete(
+        EMobilePhoneGetAPNControlListServiceStatus,
+        &dataPackage,
+        ret );
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp
+// Handles EFest read response in case of setting ACL status
+// ----------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp(
+    TInt aStatus,
+    const TDesC8& aFileData )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP, "CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp" );
+
+    TInt ret( KErrNone );
+    TBool completeNeeded( ETrue );
+
+    if( UICC_STATUS_OK == aStatus )
+        {
+        TUint8 aclState( aFileData[0] );
+        if( aclState & KAclStateMask )
+            {
+            if( RMobilePhone::EAPNControlListServiceDisabled == iAclStatus )
+                {
+                // ACL state is enabled and we need to set it to disabled .
+                // So EFest needs to be updated
+                completeNeeded = EFalse;
+                UiccSetAclStatusWriteEfEstReq( aclState );
+                }
+            else
+                {
+                // ACL status already correct, let's complete
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete");
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP, "CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete" );
+                }
+            }
+        else
+            {
+            if( RMobilePhone::EAPNControlListServiceEnabled == iAclStatus )
+                {
+                // EFest needs to be updated
+                completeNeeded = EFalse;
+                UiccSetAclStatusWriteEfEstReq( aclState );
+                }
+            else
+                {
+                // ACL status already correct, let's complete
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete");
+OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP, "CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete" );
+                }
+            }
+        }
+    else
+        {
+        // EFest reading failed
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: EFest reading failed: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL, DUP3_CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP, "CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: EFest reading failed: 0x%x", aStatus );
+        ret = KErrAccessDenied;
+        }
+
+    if( completeNeeded )
+        {
+        // set flag and complete
+        iACLIsProgress = EFalse; //set ACL flag
+        iMessageRouter->Complete(
+            EMobilePhoneSetAPNControlListServiceStatus,
+            ret );
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq
+// Writes ACL status to EFest
+// ----------------------------------------------------------------------------
+//
+TInt CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq(  TUint8 aOldAclState )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCSETACLSTATUSWRITEEFESTREQ, "CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq" );
+
+    TInt ret( KErrNone );
+    TUint8 newState;
+    if( RMobilePhone::EAPNControlListServiceDisabled == iAclStatus )
+        {
+        // ACL status is going to be disabled and status is in 3rd
+        // bit of 1st byte, so let's set 3rd bit in 1st byte to 0
+        newState = aOldAclState & 0xFB;
+        }
+    else
+        {
+        // ACL status is going to be enabled and status is in 3rd
+        // bit of 1st byte, so let's set 3rd bit in 1st byte to 1
+        newState = aOldAclState + 0x04;
+        }
+
+    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() &&
+        iMmUiccMessHandler->GetServiceStatus( KServiceAcl ) )
+        {
+        TUiccWriteTransparent params;
+        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+        params.trId = ETrIdAclStatusWriteEfEst;
+        params.dataOffset = 0;
+        params.dataAmount = 1; // only one byte is update
+        params.fileId = KElemEst;
+        params.fileIdSfi = 0x05;
+        params.serviceType = UICC_APPL_UPDATE_TRANSPARENT;
+        // File id path
+        params.filePath.Append( KMasterFileId >> 8 );
+        params.filePath.Append( KMasterFileId );
+        params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+        params.fileData.Append( newState );
+
+        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq: card type is NOT UICC or ACL not supported in EFust");
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCSETACLSTATUSWRITEEFESTREQ, "CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq: card type is NOT UICC or ACL not supported in EFust" );
+        iACLIsProgress = EFalse;
+        ret = KErrGeneral;
+        }
+    return ret;
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstResp
+// Handles EFest write response in case of setting ACL status
+// ----------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstResp(
+    TInt aStatus )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstResp");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCSETACLSTATUSWRITEEFESTRESP, "CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstResp" );
+    TInt ret( KErrAccessDenied );
+
+    if( UICC_STATUS_OK == aStatus )
+        {
+        ret = KErrNone;
+        }
+    else
+        {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstResp: writing failed: 0x%x", aStatus);
+OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCSETACLSTATUSWRITEEFESTRESP, "CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstResp: writing failed: 0x%x", aStatus );
+        }
+
+    iACLIsProgress = EFalse; //set ACL flag
+    iMessageRouter->Complete(
+        EMobilePhoneSetAPNControlListServiceStatus,
+        ret );
+
+    if ( KErrNone == ret )
+        {
+        iMessageRouter->Complete(
+            EMobilePhoneNotifyAPNControlListServiceStatusChange,
+            KErrNone );
+        }
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccReadAclReq
+// reads ACL list from EFacl
+// ----------------------------------------------------------------------------
+//
+TInt CMmPhoneMessHandler::UiccReadAclReq()
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccReadAclReq");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADACLREQ, "CMmPhoneMessHandler::UiccReadAclReq" );
+
+    TInt ret( KErrNone );
+
+    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() &&
+        iMmUiccMessHandler->GetServiceStatus( KServiceAcl ) )
+        {
+        // Set parameters for UICC_APPL_CMD_REQ message
+        TUiccReadTransparent params;
+        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+        params.trId = ETrIdAclReadEfAcl;
+        params.dataAmount = 0;
+        params.dataOffset = 0;
+        params.fileId = KElemFileAcl;
+        params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+        params.serviceType = UICC_APPL_READ_TRANSPARENT;
+
+        // File id path
+        params.filePath.Append( KMasterFileId >> 8 );
+        params.filePath.Append( KMasterFileId );
+        params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccReadAclReq: card type is NOT UICC or ACL not supported in EFust");
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCREADACLREQ, "CMmPhoneMessHandler::UiccReadAclReq: card type is NOT UICC or ACL not supported in EFust" );
+        iACLIsProgress = EFalse;
+        ret = KErrNotFound;
+        }
+
+    return ret;
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccReadAclResp
+// Handles response for ACL list reading from EFacl
+// ----------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::UiccReadAclResp(
+    TInt aStatus,
+    const TDesC8& aFileData )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccReadAclResp");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADACLRESP, "CMmPhoneMessHandler::UiccReadAclResp" );
+    TInt ret( KErrNone );
+    if( UICC_STATUS_OK == aStatus )
+        {
+        if( iAPNList )
+            {
+            delete iAPNList;
+            iAPNList = 0;
+            }
+
+        TPtrC8 dataPoint;
+        dataPoint.Set( &aFileData[KApnDataIndex], aFileData.Length() - 1 );
+        iAPNList = DecodeACL( dataPoint, aFileData[KNumOfApnsIndex] );
+
+        switch( iOngoingAclIpc )
+            {
+            case EMobilePhoneEnumerateAPNEntries:
+                {
+                CompleteEnumerateAPNEntries();
+                break;
+                }
+            case EMobilePhoneGetAPNname:
+                {
+                CompleteGetAPNName( iAPNReadOrDeleteIndex );
+                break;
+                }
+            case EMobilePhoneDeleteAPNName:
+                {
+                ret = UiccDeleteApnEntry( iAPNReadOrDeleteIndex );
+                break;
+                }
+            case EMobilePhoneAppendAPNName:
+                {
+                iAPNList->AppendL( iAPNDataBuffer.iApn );
+                ret = UiccWriteEfAclReq();
+                break;
+                }
+            default:
+                {
+TFLOGSTRING2( "TSY: CMmPhoneMessHandler::UiccReadAclResp: unknown IPC (%d)", iOngoingAclIpc );
+OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCREADACLRESP, "CMmPhoneMessHandler::UiccReadAclResp: unknown IPC (%d)", iOngoingAclIpc );
+                iACLIsProgress = EFalse;
+                break;
+                }
+            }
+        }
+    else
+        {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::UiccReadAclResp: reading failed: 0x%x", aStatus);
+OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEMESSHANDLER_UICCREADACLRESP, "CMmPhoneMessHandler::UiccReadAclResp: reading failed: 0x%x", aStatus );
+        ret = KErrAccessDenied;
+        }
+
+    if( KErrNone != ret )
+        {
+        iACLIsProgress = EFalse;
+        iMessageRouter->Complete( iOngoingAclIpc, ret );
+        }
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::DecodeACL
+// Encrypt from ACL to CDesC8ArrayFlat
+// --------------------------------------------------------------------------
+//
+CDesC8ArrayFlat* CMmPhoneMessHandler::DecodeACL
+        (
+        const TDesC8& aTlv,
+        TInt aTotalEntries
+        ) const
+    {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::DecodeACL. Number of total entries: %d", aTotalEntries);
+OstTrace1( TRACE_NORMAL, CMMPHONEMESSHANDLER_DECODEACL, "CMmPhoneMessHandler::DecodeACL. Number of total entries: %d", aTotalEntries );
+
+    // allocate new array, 1 is granularity
+    CDesC8ArrayFlat* apnList = new( ELeave ) CDesC8ArrayFlat( 1 );
+    CleanupStack::PushL( apnList );
+
+    TInt offset( 0 );
+
+    //check length before using
+    if ( 0 < aTlv.Length() )
+        {
+        // decode TLV entries to CDesC8ArrayFlat
+        for ( TInt i = 0; i < aTotalEntries; i++ )
+            {
+            TInt tag( aTlv[offset++] );
+
+            // spec: The tag value of the APN-TLV shall be 'DD'
+            TF_ASSERT( tag == 0xdd );
+
+            TInt len( aTlv[offset++] );
+            TF_ASSERT( len <= 100 );   // spec: APN max length is 100
+
+            TPtrC8 data = aTlv.Mid( offset, len );
+            apnList->InsertL( i, data );
+
+            offset += len; // advance to next TLV
+            }
+        }
+
+    CleanupStack::Pop( apnList );
+    return apnList;
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::CompleteEnumerateAPNEntries
+// send number of ACL index to the client.
+// --------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::CompleteEnumerateAPNEntries()
+    {
+    TInt indexCount( iAPNList->MdcaCount() );
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::CompleteEnumerateAPNEntries. Number of APN's: %d",indexCount);
+OstTrace1( TRACE_NORMAL, CMMPHONEMESSHANDLER_COMPLETEENUMERATEAPNENTRIES, "CMmPhoneMessHandler::CompleteEnumerateAPNEntries. Number of APN's: %d", indexCount );
+
+    //package index of TLV's to the client
+    CMmDataPackage dataPackage;
+    dataPackage.PackData( &indexCount );
+
+    // set flag and complete
+    iACLIsProgress = EFalse; //set ACL flag
+    iMessageRouter->Complete(
+        EMobilePhoneEnumerateAPNEntries,
+        &dataPackage,
+        KErrNone );
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::CompleteGetAPNName
+// send APN name to the client.
+// --------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::CompleteGetAPNName( TUint8 aIndex )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::CompleteGetAPNName ");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_COMPLETEGETAPNNAME, "CMmPhoneMessHandler::CompleteGetAPNName" );
+
+    CMmDataPackage dataPackage;
+    RMobilePhone::TAPNEntryV3 aclEntry;
+    TInt err( KErrNone );
+
+    //check if index is valid or not.
+    if ( iAPNList->MdcaCount() <= aIndex )
+        {
+        err = KErrOverflow;
+        }
+    else
+        {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::CompleteGetAPNName. Copy entry from index %d",aIndex);
+OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_COMPLETEGETAPNNAME, "CMmPhoneMessHandler::CompleteGetAPNName. Copy entry from index %d", aIndex );
+        aclEntry.iApn.Copy( iAPNList->MdcaPoint( aIndex ) );
+        }
+
+    dataPackage.PackData( &aclEntry );
+
+    // set flag and complete
+    iACLIsProgress = EFalse; //set ACL flag
+    iMessageRouter->Complete( EMobilePhoneGetAPNname, &dataPackage, err );
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccDeleteApnEntry
+// Deletes APN entry from internal cache and writes the change to EFacl
+// --------------------------------------------------------------------------
+//
+TInt CMmPhoneMessHandler::UiccDeleteApnEntry( TInt aIndex )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccDeleteApnEntry ");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCDELETEAPNENTRY, "CMmPhoneMessHandler::UiccDeleteApnEntry" );
+
+    TInt ret;
+    //check if aIndex is valid or not.
+    if ( iAPNList->MdcaCount() <= aIndex )
+        {
+        //error occurs
+        ret = KErrOverflow;
+        }
+    else
+        {
+        //data is valid
+        //delete data from cache
+        iAPNList->Delete( aIndex );
+        iAPNList->Compress();
+
+        //write new list to the SIM
+        ret = UiccWriteEfAclReq();
+        }
+    return ret;
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccWriteEfAclReq
+// Writes APN entries from internal cache to the EFAcl
+// --------------------------------------------------------------------------
+//
+TInt CMmPhoneMessHandler::UiccWriteEfAclReq()
+    {
+TFLOGSTRING( "TSY: CMmPhoneMessHandler::UiccWriteEfAclReq" );
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCWRITEEFACLREQ, "CMmPhoneMessHandler::UiccWriteEfAclReq" );
+
+    TInt ret( KErrNone );
+
+    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() &&
+        iMmUiccMessHandler->GetServiceStatus( KServiceAcl ) )
+        {
+        TInt dataLen( ACLLength( iAPNList ) );
+        TUint8 apnCount( iAPNList->MdcaCount() );
+
+        TUiccWriteTransparent params;
+        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+        params.trId = ETrIdAclWriteEfAcl;
+        params.dataOffset = 0;
+        params.dataAmount = dataLen;
+        params.fileId = KElemFileAcl;
+        params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+        params.serviceType = UICC_APPL_UPDATE_TRANSPARENT;
+        // File id path
+        params.filePath.Append( KMasterFileId >> 8 );
+        params.filePath.Append( KMasterFileId );
+        params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+        params.fileData.Append( apnCount );
+        for ( TInt i = 0; i < apnCount; i++ )
+            {
+            TPtrC8 apn = iAPNList->MdcaPoint( i );
+            // spec: The tag value of the APN-TLV shall be 'DD'
+            params.fileData.Append( 0xdd );
+            params.fileData.Append( apn.Length() );
+            params.fileData.Append( apn );
+            }
+
+        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccWriteEfAclReq: card type is NOT UICC or ACL not supported in EFust");
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCWRITEEFACLREQ, "CMmPhoneMessHandler::UiccWriteEfAclReq: card type is NOT UICC or ACL not supported in EFust" );
+        iACLIsProgress = EFalse;
+        ret = KErrNotFound;
+        }
+    return ret;
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccWriteEfAclResp
+// Handles response for EFAcl writing
+// --------------------------------------------------------------------------
+//
+void CMmPhoneMessHandler::UiccWriteEfAclResp( TInt aStatus )
+    {
+TFLOGSTRING( "TSY: CMmPhoneMessHandler::UiccWriteEfAclResp" );
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCWRITEEFACLRESP, "CMmPhoneMessHandler::UiccWriteEfAclResp" );
+
+    TInt ret( KErrNone );
+    if( UICC_STATUS_OK != aStatus )
+        {
+TFLOGSTRING2( "TSY: CMmPhoneMessHandler::UiccWriteEfAclResp: EFacl writing failed: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCWRITEEFACLRESP, "CMmPhoneMessHandler::UiccWriteEfAclResp: EFacl writing failed: 0x%x", aStatus );
+
+        ret = KErrAccessDenied;
+        }
+
+    iACLIsProgress = EFalse; //set ACL flag
+    iMessageRouter->Complete(
+        iOngoingAclIpc,
+        ret );
+    }
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::ACLLength
+// calculate total length of ACL
+// --------------------------------------------------------------------------
+//
+TUint16 CMmPhoneMessHandler::ACLLength( CDesC8ArrayFlat* aApnList ) const
+    {
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::ACLLength. Count: %d", aApnList->MdcaCount());
+OstTrace1( TRACE_NORMAL, CMMPHONEMESSHANDLER_ACLLENGTH, "CMmPhoneMessHandler::ACLLength. Count: %d", aApnList->MdcaCount() );
+
+    TUint16 length( 0 );
+
+    for ( TInt i = 0; i < aApnList->MdcaCount(); i++ )
+        {
+        TPtrC8 apn = aApnList->MdcaPoint( i );
+        length += apn.Length() + 2;
+        }
+
+    // result is incremented by one because of EFacl contains number of tlv objects
+    // as first byte of the file data
+    length++;
+
+TFLOGSTRING2("TSY: CMmPhoneMessHandler::ACLLength. ACL len: %d", length);
+OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_ACLLENGTH, "CMmPhoneMessHandler::ACLLength. ACL len: %d", length );
+
+    return length;
     }
 
 // End of file

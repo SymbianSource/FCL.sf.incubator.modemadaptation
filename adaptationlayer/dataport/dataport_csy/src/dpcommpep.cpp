@@ -28,9 +28,9 @@
 #include "dplog.h"          // dataport logging
 
 #include "pep_comm_types.h" // structures for isi-message interface
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpcommpeptraces.h"
+#include "dpcommpepTraces.h"
 #endif
 
 // LOCAL FUNCTION PROTOTYPES

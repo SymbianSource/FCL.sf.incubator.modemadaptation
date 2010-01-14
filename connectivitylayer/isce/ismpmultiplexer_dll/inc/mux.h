@@ -24,10 +24,10 @@
 class MMuxTrxIf;
 class MMuxLinkIf;
 
-#include <MTrxMuxIf.h>      // For exported MTrxMuxIf
+#include <mtrxmuxif.h>      // For exported MTrxMuxIf
 
 #include "iscedefs.h"       // For EMuxAmountOfProtocols
-#include "MLinkMuxIf.h"     // For internal MLinkMuxIf
+#include "mlinkmuxif.h"     // For internal MLinkMuxIf
 
 /*
 * Class represents a multiplexer.

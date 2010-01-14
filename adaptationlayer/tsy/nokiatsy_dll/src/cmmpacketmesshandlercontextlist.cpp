@@ -23,9 +23,9 @@
 #include "cmmpacketservicemesshandler.h"
 #include <gpdsisi.h>
 #include "tsylogger.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmpacketmesshandlercontextlisttraces.h"
+#include "cmmpacketmesshandlercontextlistTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

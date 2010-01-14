@@ -164,7 +164,7 @@ TBool CModemAtSession::CheckAndCompleteExistingRequest( const RMessage2& aMessag
 void CModemAtSession::DoServiceL( const RMessage2& aMessage )
     {
     C_TRACE (( _T("CModemAtSession::DoServiceL() function: %d message: 0x%x handle: 0x%x"), aMessage.Function(), &aMessage, aMessage.Handle() ));
-
+    TInt err( KErrNone );
     if( CheckAndCompleteExistingRequest( aMessage ) )
         {
         C_TRACE (( _T("CModemAtSession::DoServiceL() - return") ));
@@ -175,7 +175,7 @@ void CModemAtSession::DoServiceL( const RMessage2& aMessage )
         {
         case EATExtSetExtensionInterface:
             C_TRACE(_L("EATExtSetExtensionInterface"));
-            iPluginType=(TATPluginInterface) aMessage.Int0();
+            iPluginType = (TATPluginInterface)aMessage.Int0();
             if(iClientName) 
                {
                 delete iClientName;
@@ -185,7 +185,8 @@ void CModemAtSession::DoServiceL( const RMessage2& aMessage )
             iClientNamePtr.Set( iClientName->Des() );
             aMessage.Read( KATModemResponseArgumentIndex, iClientNamePtr );
             iConnectReq = aMessage;
-            iServer.ConnectToModem(this);
+            err = iServer.ConnectToModem( this );
+            ModemConnected( err );
             break;
 
         case  EReceiveUnsolicitedResult:
@@ -326,7 +327,7 @@ void CModemAtSession::ModemConnected( const TInt aErr )
         {
         C_TRACE (( _T("Complete iConnectReq( %d )"), aErr ));
         iConnectReq.Complete(aErr);
-        }   
+        }
     }
 
 void CModemAtSession::SignalIndReceived() 

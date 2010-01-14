@@ -97,17 +97,16 @@ CModemAtHandler::CModemAtHandler( CModemAtSrv& aServer )
     iReceivedMessage( NULL ),
     iPepObjId(0),
     iPipeController(NULL),
-    iDisconnected( EFalse )
+    iDisconnected( EFalse ),
+    iModemAtExistInCmt( EFalse )
     {
     C_TRACE (( _T("CModemAtHandler::CModemAtHandler") ));
-    
     }
 
 void CModemAtHandler::DoCancel()
     {
     C_TRACE (( _T("CModemAtHandler::DoCancel()") ));
     iIscApi->ReceiveCancel();
-    
     }
 
 
@@ -229,22 +228,12 @@ void CModemAtHandler::ConstructL()
 #ifndef __WINSCW__
       OpenChannelL();
 #ifndef NCP_COMMON_BRIDGE_FAMILY
-      iPipeController->SendTaskIdQuery();
+      iPipeController->QueryModemAtFromNameService();
 #endif
 #else
       iEmulatedValue = 0;
 #endif
     
-    }
-
-
-TInt CModemAtHandler::GetMinSizeDividendByFour( TInt aSize)
-    {
-     C_TRACE (( _T("CModemAtHandler::GetMinSizeDividendByFour(%d)"),aSize ));
-     aSize += aSize % KAlignToFourBytes;
-      
-     C_TRACE (( _T("CModemAtHandler::GetMinSizeDividendByFour return: %d"),aSize ));
-     return aSize;
     }
 
 TInt CModemAtHandler::SendATCommand(const TUint8 aDteId,
@@ -273,7 +262,11 @@ TInt CModemAtHandler::SendATCommand(const TUint8 aDteId,
 
     TInt size = ISI_HEADER_SIZE + AT_MODEM_CMD_REQ_OFFSET_CMDLINEBUFFER + aCmd.Length();
     
-    TInt sizeWithFillers = GetMinSizeDividendByFour( size );
+    TInt sizeWithFillers = size;
+    while( sizeWithFillers % KAlignToFourBytes )
+        {
+        sizeWithFillers++;
+        }
     C_TRACE((_L("Message length %d"), sizeWithFillers));
 
     HBufC8* message = HBufC8::New( sizeWithFillers );
@@ -424,7 +417,14 @@ void CModemAtHandler::HandleATResponse( )
     
 TInt CModemAtHandler::Connect(const TUint8 aDteId)
     {
-   C_TRACE (( _T("CModemAtHandler::Connect()") ));
+    C_TRACE (( _T("CModemAtHandler::Connect()") ));
+
+    if( !iModemAtExistInCmt )
+        {
+        C_TRACE((_T("Connection failed, PN_AT_MODEM is not in CMT")));
+        TRACE_ASSERT_ALWAYS;
+        return KErrNotFound;
+        }
 
     C_TRACE((_L("Connecting with dteid:%d "), aDteId));
     SetDisconnected( EFalse );
@@ -692,5 +692,11 @@ void CModemAtHandler::HandleSignalDetectedResp( const TIsiReceiveC& aMessage )
     TInt result = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_SIGNAL_DETECTED_RESP_OFFSET_RESULT );
     C_TRACE((_L("CModemAtHandler::HandleSignalDetectedResp() dteId %d"), dteId));
     TRACE_ASSERT( result == AT_MODEM_RESULT_OK );
+    }
+
+void CModemAtHandler::SetModemAtExistsInCmt( TBool aModemAtExistsInCmt )
+    {
+    C_TRACE((_T("CModemAtHandler::SetModemAtExistsInCmt(%d)"), (TInt)aModemAtExistsInCmt));
+    iModemAtExistInCmt = aModemAtExistsInCmt;
     }
 

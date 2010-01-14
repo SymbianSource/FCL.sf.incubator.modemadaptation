@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -45,9 +45,10 @@
 
 #include <atk_sharedisi.h>
 #include <call_sharedisi.h>
-#include "osttracedefinitions.h"
+#include <info_sharedisi.h>
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "satmesshandlertraces.h"
+#include "satmesshandlerTraces.h"
 #endif
 
 
@@ -124,7 +125,8 @@ CSatMessHandler::CSatMessHandler
     iDataDownloadSimReadFieldTraId  = KNoTransactionOngoing;
 
     iCardId                         = KZero;
-    iSerialNumberReadReceived       = EFalse;
+    iImeiAvailable                  = EFalse;
+    iImeiSvAvailable                = EFalse;
     // By default, there's no need to request routing from SMS server
     iSmsCbRoutingComplete           = ETrue;
     iRefreshRequestIsOn             = EFalse;
@@ -1824,6 +1826,12 @@ TInt CSatMessHandler::LocalInfoTerminalResp
                 tlvData.AddData( bcdImei );
                 break;
                 }
+            case RSat::KProvideLocalInfoIMEISV:
+                {
+                tlvData.AddTag( KTlvImeisvTag );
+                tlvData.AddData( iIMEIsv );
+                break;
+                }
             case RSat::KProvideLocalInformationNmr:
                 {
                 // Check if NMR's were for UTRAN
@@ -1997,22 +2005,36 @@ void CSatMessHandler::InfoSerialNumberReadResp
 
     TUint sbStartOffset( 0 );
 
-    TInt retValue( aIsiMessage.FindSubBlockOffsetById(
-                    ISI_HEADER_SIZE + SIZE_INFO_SERIAL_NUMBER_READ_RESP,
-                    INFO_SB_SN_IMEI_PLAIN, EIsiSubBlockTypeId8Len8,
-                    sbStartOffset ) );
     //check if INFO_SB_SN_IMEI_PLAIN sub block is present
-    if ( KErrNone == retValue )
+    if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+        ISI_HEADER_SIZE + SIZE_INFO_SERIAL_NUMBER_READ_RESP,
+        INFO_SB_SN_IMEI_PLAIN, EIsiSubBlockTypeId8Len8,
+        sbStartOffset ) )
         {
         //store imei code
         iIMEI.Copy( aIsiMessage.GetData(
-                    sbStartOffset + INFO_SB_SN_IMEI_PLAIN_OFFSET_IMEIPLAINU8,
-                    aIsiMessage.Get8bit( sbStartOffset +
-                    INFO_SB_SN_IMEI_PLAIN_OFFSET_STRLEN ) - 1 ) );
+            sbStartOffset + INFO_SB_SN_IMEI_PLAIN_OFFSET_IMEIPLAINU8,
+            aIsiMessage.Get8bit( sbStartOffset +
+            INFO_SB_SN_IMEI_PLAIN_OFFSET_STRLEN ) - 1 ) );
         //Set the flag to inform that needed data has been received
-        iSerialNumberReadReceived = ETrue;
-        TFLOGSTRING("TSY: SAT, Imei received.");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_INFOSERIALNUMBERREADRESP, "SAT, Imei received." );
+        iImeiAvailable = ETrue;
+TFLOGSTRING("TSY: SAT, Imei received.");
+OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_INFOSERIALNUMBERREADRESP, "SAT, Imei received." );
+        }
+    //check if INFO_SB_SN_IMEI_SV_TO_NET sub block is present
+    else if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+        ISI_HEADER_SIZE + SIZE_INFO_SERIAL_NUMBER_READ_RESP,
+        INFO_SB_SN_IMEI_SV_TO_NET, EIsiSubBlockTypeId8Len8,
+        sbStartOffset ) )
+        {
+        // store imeisv code
+        iIMEIsv.Copy( aIsiMessage.GetData(
+            sbStartOffset + INFO_SB_SN_IMEI_SV_TO_NET_OFFSET_IMEISVU8,
+            aIsiMessage.Get8bit( sbStartOffset +
+            INFO_SB_SN_IMEI_SV_TO_NET_OFFSET_STRLEN ) ) );
+        iImeiSvAvailable = ETrue;
+TFLOGSTRING("TSY: CSatMessHandler::InfoSerialNumberReadResp IMEISV received");
+OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_INFOSERIALNUMBERREADRESP, "CSatMessHandler::InfoSerialNumberReadResp IMEISV received" );
         }
     }
 
@@ -2039,7 +2061,6 @@ TInt CSatMessHandler::NetNeighbourCellsReq
         NET_NEIGHBOUR_CELLS_REQ,
         data );
     }
-
 
 // -----------------------------------------------------------------------------
 // CSatMessHandler::NetNeighbourCellResp
@@ -2181,9 +2202,9 @@ void CSatMessHandler::NetNeighbourCellResp
 // Sends a CALL_MODEM_RESOURCE_REQ ISI message.
 // -----------------------------------------------------------------------------
 //
-TInt CSatMessHandler::CallModemResourceReq( 
+TInt CSatMessHandler::CallModemResourceReq(
     TUint8 aTransId,
-    const TDesC8& aMsg 
+    const TDesC8& aMsg
     )
     {
     TFLOGSTRING("TSY:CSatMessHandler::CallModemResourceReq");
@@ -2204,26 +2225,26 @@ TInt CSatMessHandler::CallModemResourceConfReq(
     TFLOGSTRING("TSY:CSatMessHandler::CallModemResourceConfReq");
     OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_CALLMODEMRESOURCECONFREQ, "TSY:CSatMessHandler::CallModemResourceConfReq" );
 
-    TBuf8< SIZE_CALL_MODEM_RESOURCE_CONF_REQ + 
+    TBuf8< SIZE_CALL_MODEM_RESOURCE_CONF_REQ +
         SIZE_CALL_MODEM_SB_RESOURCE_CONF> msg;
 
     // CALL_MODEM_RES_CONF_OPERATION
     msg.Append( CALL_MODEM_RES_CONF_SET );
     // Nbr of sb's
     msg.Append( 1 );
-    
+
     TIsiSubBlock sbResourceConf(
         msg,
         CALL_MODEM_SB_RESOURCE_CONF,
         EIsiSubBlockTypeId8Len8 );
-    
+
     TSatUtility::AppendWord( aResourceId, msg );
     TSatUtility::AppendWord( aResourceIdMask, msg);
-    
+
     sbResourceConf.CompleteSubBlock();
-    
-    return iPnSend->Send( 
-        PN_MODEM_CALL, 
+
+    return iPnSend->Send(
+        PN_MODEM_CALL,
         iTsySatMessaging->GetTransactionId(),
         CALL_MODEM_RESOURCE_CONF_REQ,
         msg );
@@ -2238,27 +2259,27 @@ TInt CSatMessHandler::SsResourceConfReq()
     {
     TFLOGSTRING("TSY:CSatMessHandler::SsResourceConfReq");
     OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SSRESOURCECONFREQ, "TSY:CSatMessHandler::SsResourceConfReq" );
-     
-    TBuf8< SIZE_SS_RESOURCE_CONF_REQ  + 
+
+    TBuf8< SIZE_SS_RESOURCE_CONF_REQ  +
         SIZE_SS_SB_RESOURCE_CONF > msg;
 
-    // SS_RESOURCE_CONF_OPERATION 
+    // SS_RESOURCE_CONF_OPERATION
     msg.Append( SS_RESOURCE_CONF_SET );
     // Nbr of sb's
     msg.Append( 1 );
-    
+
     TIsiSubBlock sbResourceConf(
         msg,
         SS_SB_RESOURCE_CONF,
         EIsiSubBlockTypeId8Len8 );
-    
+
     TSatUtility::AppendWord( SS_RES_ID_MO_SS_OPERATION, msg );
     TSatUtility::AppendWord( SS_RES_ID_MO_SS_OPERATION_MASK, msg);
-    
+
     sbResourceConf.CompleteSubBlock();
-    
-    return iPnSend->Send( 
-        PN_SS, 
+
+    return iPnSend->Send(
+        PN_SS,
         iTsySatMessaging->GetTransactionId(),
         SS_RESOURCE_CONF_REQ,
         msg );
@@ -2269,9 +2290,9 @@ TInt CSatMessHandler::SsResourceConfReq()
 // Sends a SS_RESOURCE_CONNTROL_REQ ISI message.
 // -----------------------------------------------------------------------------
 //
-TInt CSatMessHandler::SsResourceControlReq( 
+TInt CSatMessHandler::SsResourceControlReq(
     TUint8 aTransId,
-    const TDesC8& aMsg 
+    const TDesC8& aMsg
     )
     {
     TFLOGSTRING("TSY:CSatMessHandler::SsResourceControlReq");
@@ -2293,11 +2314,11 @@ TInt CSatMessHandler::GpdsResourceConfReq()
     {
     TFLOGSTRING("TSY:CSatMessHandler::GpdsResourceConfReq");
     OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GPDSRESOURCECONFREQ, "TSY:CSatMessHandler::GpdsResourceConfReq" );
-    
-    TBuf8< SIZE_GPDS_RESOURCE_CONF_REQ  + 
+
+    TBuf8< SIZE_GPDS_RESOURCE_CONF_REQ  +
         SIZE_GPDS_RESOURCE_CONF > msg;
 
-    // SS_RESOURCE_CONF_OPERATION 
+    // SS_RESOURCE_CONF_OPERATION
     msg.Append( GPDS_RESOURCE_CONF_SET );
     // Nbr of sb's
     msg.Append( 1 );
@@ -2312,8 +2333,8 @@ TInt CSatMessHandler::GpdsResourceConfReq()
 
     sbResourceConf.CompleteSubBlock();
 
-    return iPnSend->Send( 
-        PN_GPDS, 
+    return iPnSend->Send(
+        PN_GPDS,
         iTsySatMessaging->GetTransactionId(),
         GPDS_RESOURCE_CONF_REQ,
         msg );
@@ -2324,9 +2345,9 @@ TInt CSatMessHandler::GpdsResourceConfReq()
 // Sends a GPDS_RESOURCE_CONNTROL_REQ ISI message.
 // -----------------------------------------------------------------------------
 //
-TInt CSatMessHandler::GpdsResourceControlReq( 
+TInt CSatMessHandler::GpdsResourceControlReq(
     TUint8 aTransId,
-    const TDesC8& aMsg 
+    const TDesC8& aMsg
     )
     {
     TFLOGSTRING("TSY:CSatMessHandler::GpdsResourceControlReq");
@@ -2801,7 +2822,7 @@ TInt CSatMessHandler::CheckProactiveCommand
         if ( KErrCorrupt == ret )
             {
             if ( !berTlv.TlvByTagValue( &commandDetails,
-                KTlvCommandDetailsTag ) && 
+                KTlvCommandDetailsTag ) &&
                 5 == commandDetails.GetSize()  )
                 {
                 commandDetailsTlv.Copy( commandDetails.Data() );
@@ -2893,7 +2914,7 @@ TInt CSatMessHandler::SmsCbRoutingReq
         // TBuf8<SIZE_SMS_CB_ROUTING_REQ> because we are sending [U]SIM EF CBMID Message
         // Subscription;
         TBuf8<SIZE_SMS_CB_ROUTING_REQ> data;
-        
+
         // Append Routing command
         data.Append( aRoutingCommand );
         // Append Subscription number
@@ -2905,7 +2926,7 @@ TInt CSatMessHandler::SmsCbRoutingReq
         // Append no of Subblocks
         data.Append( 0 );
 
-        // Send Subscription request 
+        // Send Subscription request
         ret = iPnSend->Send( PN_SMS, aTransId, SMS_CB_ROUTING_REQ,
                 data );
 
@@ -2957,7 +2978,7 @@ void CSatMessHandler::SmsCbRoutingResp
 
 // -----------------------------------------------------------------------------
 // CSatMessHandler::SmsResourceConfInd
-// Handles Indication from SMS Server for resource configuration Startup 
+// Handles Indication from SMS Server for resource configuration Startup
 // and reconfigure condition .
 // -----------------------------------------------------------------------------
 //
@@ -2975,7 +2996,6 @@ void CSatMessHandler::SmsResourceConfInd
         + SMS_RESOURCE_CONF_IND_OFFSET_CONFSTATUS ) )
         {
         TUint sbStartOffset( 0 );
-        TInt retValue( KErrNotFound );
         // Check if resource control is requested for MO SM.
         if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
             ISI_HEADER_SIZE + SIZE_SMS_RESOURCE_CONF_IND,

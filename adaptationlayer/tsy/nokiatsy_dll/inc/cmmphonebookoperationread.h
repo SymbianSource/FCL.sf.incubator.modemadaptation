@@ -59,6 +59,7 @@ class CMmPhoneBookOperationRead : public CMmPhoneBookStoreOperationBase
         */
         static CMmPhoneBookOperationRead* NewL(
             CMmPhoneBookStoreMessHandler* aMmPhoneBookStoreMessHandler,
+            CMmUiccMessHandler* aUiccMessHandler,
             const CMmDataPackage* aDataPackage );
 
         /**
@@ -80,14 +81,14 @@ class CMmPhoneBookOperationRead : public CMmPhoneBookStoreOperationBase
 
 virtual TInt UICCHandleData3gADNReadReq( TInt /*aFileID*/, TInt /*aFileSFI*/)
 {
-	      TFLOGSTRING("TSY: CMmPhoneBookOperationInit::CreateReq - Return KErrNotSupported");
+        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::CreateReq - Return KErrNotSupported");
         return KErrNotSupported;
 }
 
 
 virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileData*/, const TInt /*aTransId*/)
 {
-	      TFLOGSTRING("TSY: CMmPhoneBookOperationInit::CreateReq - Return KErrNotSupported");
+        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::CreateReq - Return KErrNotSupported");
         return KErrNotSupported;
 }
   private:
@@ -97,8 +98,8 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
         * Class attributes are created in ConstructL.
         */
         void ConstructL();
-        
-        // Transmit 
+
+        // Transmit
 
         /**
         * Separates different IPC requests for each other.
@@ -106,23 +107,23 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
         * @param const CMmDataPackage* aDataPackage: Packaged data.
         * @return TInt: KErrNone or error value.
         */
-        TInt UICCCreateReq( TInt aIpc, const CMmDataPackage* aDataPackage );
+        TInt UICCCreateReq( TInt aIpc, const CMmDataPackage* aDataPackage, TUint8 aTransId );
 
         /**
         * Constructs an ISI-message to read entry from SIM
         * @param
         * @return TInt: KErrNone or error value.
         */
-        TInt USimPbReqRead( TInt aRecordNo );
-        
+        TInt USimPbReqRead( TInt aRecordNo, TUint8 aTransId );
+
         /**
         * Constructs Data to read entry from USIM ADN Phonebook
         * @param
         * @return TInt: KErrNone or error value.
         */
         TInt UICCHandleDataADNReadReq( TUiccReadLinearFixed& aParams, TUint16 aFileID, TUint8 aFileSFI );
-        
-        
+
+
         // Receive
 
         /**
@@ -132,14 +133,14 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
         *        operationlist or not.
         * @return TInt: KErrNone or error value.
         */
-        TInt HandleUICCPbRespL(
-                TBool &aComplete,
+        TBool HandleUICCPbRespL(
                 TInt aStatus,
+                TUint8 aDetails,
                 const TDesC8 &aFileData,
                 TInt aTransId);
 
-        
-        
+
+
         /**
         * Handles SimPbResp ISI -message
         * @param  TInt aTagValue
@@ -147,7 +148,7 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
         * @return TInt: KErrNone or error value.
         */
         TInt UICCHandleDataADNReadResp( const TDesC8& aFileData);
-        
+
 
     public: // Data
         // None
@@ -160,18 +161,21 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
         // array
         TInt iNumOfEntriesFilled;
 
-    private: // Data
-        // None
+        // To Store the information about first valid Entry Search
+        TBool iLocationSearch;
 
-        // Attribute to check if Extension read is going on 
+    private: // Data
+
+        // Attribute to check what kind of read is ongoing
+        TTypeOfFileToBeRead iTypeOfReading ;
+
         TBool iExtensionRead ;
         
-        // Attribute to store the service type requested 
-        TInt iServiceType;
+        // Attribute to Store Entry
+        TPBEntry* iStoreEntry;
         
-        // Attribute to store no of records for all EF
-        
-        TInt iNumOfPhoneBookRecords;
+        // Saved IPC for complete
+        TInt iSavedIPCForComplete;
 
 
 

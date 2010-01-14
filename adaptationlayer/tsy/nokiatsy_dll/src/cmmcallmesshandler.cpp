@@ -26,9 +26,9 @@
 #include "tsylogger.h"
 #include "cmmdataporthandler.h" // dataport includes
 #include "cmmdtmfmesshandler.h" //DTMF includes
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmcallmesshandlertraces.h"
+#include "cmmcallmesshandlerTraces.h"
 #endif
 
 // ISI message coding/decoding functions
@@ -40,6 +40,8 @@
 #include <csdisi.h>
 #include <pipeisi.h>
 #include <pipe_sharedisi.h>
+#include <satcs.h>
+#include <etelsat.h>
 
 // EXTERNAL DATA STRUCTURES
     // None
@@ -83,16 +85,16 @@ const TUint8 KFirstPepType   = PN_PEP_TYPE_COMM; // First PEP type
 
 // Second PEP
 const TUint8 KSecondPepDevice = PN_DEV_MODEM;    // Device Id of second PEP
-const TUint8 KSecondPepObject = 54; // PN_OBJ_CSD_SRV // Object Id of second PEP
+const TUint8 KSecondPepObject = PN_OBJ_CSD_SRV; // Object Id of second PEP
 const TUint8 KSecondPepType   = PN_PEP_TYPE_GPRS; // Second PEP type
-
-// Redirect PEP
-const TUint8 KRedirectPepObject = 59; //PN_OBJ_CSD_WTB; // Object Id of redirected PEP
 
 const TUint8 KPipeTransID  = EIscNokiaDataport1;
 
 const TUint8 KInvalidPipeHandle = 0xFF;
 
+// From 3GPP TS 31.111, 7.3.1.6 Structure of ENVELOPE (CALL CONTROL)
+const TUint8 KCcResultAllowedNoModification     = 0x00;
+const TUint8 KCcResultNotAllowed                = 0x01;
 // MACROS
     // None
 
@@ -239,11 +241,10 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CONSTRUCTL, "CMmCallMessHandler::Con
     // Read "HSDPA Disabled" status from product profile
     InfoPpDataReadReq();
 
-    iSecondPepDeviceId = KSecondPepDevice;
-    iSecondPepObjectId = KSecondPepObject;
-
     iCallOperationID = CSD_CALL_CREATE;
-    iVideoCallMtReleased = EFalse;
+    iVideoCallReleased = EFalse;
+    iCallControlCallId = CALL_MODEM_ID_NONE;
+    iCcResult = KCcResultAllowedNoModification;
     }
 
 // -----------------------------------------------------------------------------
@@ -283,8 +284,6 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_NEWL, "CMmCallMessHandler::NewL" );
     aPhoNetReceiver->RegisterL( callMessHandler, PN_CSD );
 
     aPhoNetReceiver->RegisterL( callMessHandler, PN_PIPE, PNS_PIPE_CREATE_RESP );
-    aPhoNetReceiver->RegisterL( callMessHandler, PN_PIPE, PNS_PIPE_ENABLE_RESP );
-    aPhoNetReceiver->RegisterL( callMessHandler, PN_PIPE, PNS_PIPE_RESET_RESP );
     aPhoNetReceiver->RegisterL( callMessHandler, PN_PIPE, PNS_PIPE_REMOVE_RESP );
 
     callMessHandler->iDtmfMessHandler = aDtmfMessHandler;
@@ -486,24 +485,10 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHa
                     PnsPipeCreateResp( aIsiMessage );
                     break;
                     }
-                case PNS_PIPE_ENABLE_RESP:
-                    {
-                    PnsPipeEnableResp( aIsiMessage );
-                    break;
-                    }
-                case PNS_PIPE_RESET_RESP:
-                    {
-                    PnsPipeResetResp( aIsiMessage );
-                    break;
-                    }
                 case PNS_PIPE_REMOVE_RESP:
                     {
                     PnsPipeRemoveResp( aIsiMessage );
                     break;
-                    }
-                case PNS_PIPE_REDIRECT_RESP:
-                    {
-                    PnsPipeRedirectResp( aIsiMessage );
                     }
                 default:
                     {
@@ -545,341 +530,351 @@ OstTrace1( TRACE_NORMAL, CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFu
     TBool requestDirectedToDataPort( EFalse );
     TBool callCreatedAlready( EFalse );
 
-    const CCallDataPackage* callData(
-        reinterpret_cast<const CCallDataPackage*>( aDataPackage ) );
-
-    // In case of emergency call CMmDataPackage is used and it doesn't contain
-    // call ID or call mode. CCallDataPackage is used in case of normal call.
-    if ( EMobileCallDialEmergencyCall != aIpc )
+    if ( ESatNotifyCallControlRequest == aIpc )
         {
-        callData->GetCallIdAndMode( callId, callMode );
-TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL. CallMode:%d", callMode );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL;callMode=%d", callMode );
-        }
-
-    if ( KSymbianCallIdNone == callId )
-        {
-        dosCallId = CALL_MODEM_ID_NONE;
+        // simatktsy uses this IPC to inform NTSY about call controlled CALL_ID
+        // and call control result
+        aDataPackage->UnPackData ( iCallControlCallId, iCcResult );
         }
     else
         {
-        dosCallId = static_cast<TUint8>( callId );
-        }
+        const CCallDataPackage* callData(
+            reinterpret_cast<const CCallDataPackage*>( aDataPackage ) );
 
-    TIsiSend callReq( iPhoNetSender->SendBufferDes() );
-
-    // Resource ID
-    callReq.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_MODEM_CALL );
-
-    // Transaction ID
-    callReq.Set8bit( ISI_HEADER_OFFSET_TRANSID, KCallTransId );
-
-    switch( aIpc )
-        {
-        case EMobileCallDialEmergencyCall:
+        // In case of emergency call CMmDataPackage is used and it doesn't contain
+        // call ID or call mode. CCallDataPackage is used in case of normal call.
+        if ( EMobileCallDialEmergencyCall != aIpc )
             {
-            aDataPackage->UnPackData( iTelEmergNumber );
+            callData->GetCallIdAndMode( callId, callMode );
+TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL. CallMode:%d", callMode );
+OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL;callMode=%d", callMode );
+            }
+
+        if ( KSymbianCallIdNone == callId )
+            {
+            dosCallId = CALL_MODEM_ID_NONE;
+            }
+        else
+            {
+            dosCallId = static_cast<TUint8>( callId );
+            }
+
+        TIsiSend callReq( iPhoNetSender->SendBufferDes() );
+
+        // Resource ID
+        callReq.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_MODEM_CALL );
+
+        // Transaction ID
+        callReq.Set8bit( ISI_HEADER_OFFSET_TRANSID, KCallTransId );
+
+        switch( aIpc )
+            {
+            case EMobileCallDialEmergencyCall:
+                {
+                aDataPackage->UnPackData( iTelEmergNumber );
 TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL - emergency dial number is %S", &iTelEmergNumber);
 OstTraceExt1( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - emergency dial number is=%S", iTelEmergNumber );
 #ifdef NCP_COMMON_HSDPA_EMERGCALL_WORKAROUND
-            if ( iHSDPADisabledInPp )
-                {
-                // HSPDA is disabled in PP; no need to delay the emergency
-                // call setup.
+                if ( iHSDPADisabledInPp )
+                    {
+                    // HSPDA is disabled in PP; no need to delay the emergency
+                    // call setup.
 #endif //NCP_COMMON_HSDPA_EMERGCALL_WORKAROUND
-                dosCallId = CALL_MODEM_ID_NONE;
-                // In the case when emergency number checking is needed to be ignored
-                // the destination address is delivered
-                EmergencyCallCreateReq( &callReq );
-                // Emergency calls are created immediately, without
-                // setting properties
-                messageId = CALL_MODEM_CREATE_REQ;
-                isiCallId = CALL_MODEM_CREATE_REQ_OFFSET_CALLID;
+                    dosCallId = CALL_MODEM_ID_NONE;
+                    // In the case when emergency number checking is needed to be ignored
+                    // the destination address is delivered
+                    EmergencyCallCreateReq( &callReq );
+                    // Emergency calls are created immediately, without
+                    // setting properties
+                    messageId = CALL_MODEM_CREATE_REQ;
+                    isiCallId = CALL_MODEM_CREATE_REQ_OFFSET_CALLID;
 #ifdef NCP_COMMON_HSDPA_EMERGCALL_WORKAROUND
-                }
-            else
-                {
-                // Destroy all data connections before attempting emergency
-                // call. The call will be set up in GpdsContextsClearResp.
+                    }
+                else
+                    {
+                    // Destroy all data connections before attempting emergency
+                    // call. The call will be set up in GpdsContextsClearResp.
 TFLOGSTRING( "TSY: CMmCallMessHandler::ExtFuncL - HSDPA workaround. Emergency call delayed, data connections have to be closed first." );
 OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - HSDPA workaround. Emergency call delayed, data connections have to be closed first." );
-                iEmergCallDelayed = ETrue;
-                GpdsContextsClearReq();
-                }
-#endif //NCP_COMMON_HSDPA_EMERGCALL_WORKAROUND
-            break;
-            }
-        case EEtelCallDial:
-        case EMobileCallDialISV:
-        case EMobileCallDialNoFdnCheck:
-            {
-            // Set iNoFDNDial flag in correct state
-            if ( EMobileCallDialNoFdnCheck == aIpc )
-                {
-                iNoFdnDial = ETrue;
-                }
-            else
-                {
-                iNoFdnDial = EFalse;
-                }
-            if ( RMobilePhone::ECircuitDataService == callMode )
-                {
-                iFDNErrorAlredyNotified = EFalse;
-                ret = DialDataCall( callData );
-                requestDirectedToDataPort = ETrue;
-                }
-            else if ( RMobilePhone::EVoiceService == callMode )
-                {
-                iCallMode = CALL_MODEM_MODE_SPEECH;
-                }
-            else
-                {
-                iCallMode = CALL_MODEM_MODE_ALS_LINE_2;
-                }
-
-            if ( ! requestDirectedToDataPort )
-                {
-                iIs3rdPartyDial = EFalse;
-
-                // If 3rd party client
-                if ( EMobileCallDialISV == aIpc )
-                    {
-                    iIs3rdPartyDial = ETrue;
+                    iEmergCallDelayed = ETrue;
+                    GpdsContextsClearReq();
                     }
-                // No else
-
-                // Check if CUG info is needed
-                RMobileCall::TMobileCallParamsV1Pckg* callParams( NULL );
-                RMobileCall::TMobileCallInfoV1* callInfo( NULL );
-
-                aDataPackage->UnPackData( &callParams, &callInfo );
-
-                RMobileCall::TMobileCallParamsV1Pckg* paramsPckgV1(
-                    reinterpret_cast<RMobileCall::TMobileCallParamsV1Pckg*>
-                        ( callParams ) );
-
-                RMobileCall::TMobileCallParamsV1 recentCallParams(
-                    ( *paramsPckgV1 )() );
-
-                if ( RMmCustomAPI::KETelCustomExtCustomCallParamsV3 ==
-                        recentCallParams.ExtensionId() )
+#endif //NCP_COMMON_HSDPA_EMERGCALL_WORKAROUND
+                break;
+                }
+            case EEtelCallDial:
+            case EMobileCallDialISV:
+            case EMobileCallDialNoFdnCheck:
+                {
+                // Set iNoFDNDial flag in correct state
+                if ( EMobileCallDialNoFdnCheck == aIpc )
                     {
+                    iNoFdnDial = ETrue;
+                    }
+                else
+                    {
+                    iNoFdnDial = EFalse;
+                    }
+                if ( RMobilePhone::ECircuitDataService == callMode )
+                    {
+                    iFDNErrorAlredyNotified = EFalse;
+                    ret = DialDataCall( callData );
+                    requestDirectedToDataPort = ETrue;
+                    }
+                else if ( RMobilePhone::EVoiceService == callMode )
+                    {
+                    iCallMode = CALL_MODEM_MODE_SPEECH;
+                    }
+                else
+                    {
+                    iCallMode = CALL_MODEM_MODE_ALS_LINE_2;
+                    }
+
+                if ( ! requestDirectedToDataPort )
+                    {
+                    iIs3rdPartyDial = EFalse;
+
+                    // If 3rd party client
+                    if ( EMobileCallDialISV == aIpc )
+                        {
+                        iIs3rdPartyDial = ETrue;
+                        }
+                    // No else
+
+                    // Check if CUG info is needed
+                    RMobileCall::TMobileCallParamsV1Pckg* callParams( NULL );
+                    RMobileCall::TMobileCallInfoV1* callInfo( NULL );
+
+                    aDataPackage->UnPackData( &callParams, &callInfo );
+
+                    RMobileCall::TMobileCallParamsV1Pckg* paramsPckgV1(
+                        reinterpret_cast<RMobileCall::TMobileCallParamsV1Pckg*>
+                            ( callParams ) );
+
+                    RMobileCall::TMobileCallParamsV1 recentCallParams(
+                        ( *paramsPckgV1 )() );
+
+                    if ( RMmCustomAPI::KETelCustomExtCustomCallParamsV3 ==
+                            recentCallParams.ExtensionId() )
+                        {
 TFLOGSTRING("TSY: CMmCallMessHandler::ExtFuncL - Custom API call params in use ");
 OstTrace0( TRACE_NORMAL, DUP7_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - Custom API call params in use" );
 
-                    // Unpack custom call parameters
-                    RMmCustomAPI::TCustomCallParamsPckg* customparamsPckgV1(
-                        reinterpret_cast<RMmCustomAPI::TCustomCallParamsPckg*>
-                            ( paramsPckgV1 ) );
+                        // Unpack custom call parameters
+                        RMmCustomAPI::TCustomCallParamsPckg* customparamsPckgV1(
+                            reinterpret_cast<RMmCustomAPI::TCustomCallParamsPckg*>
+                                ( paramsPckgV1 ) );
 
-                    RMmCustomAPI::TCustomCallParams& aCustomParams(
-                        ( *customparamsPckgV1 )() );
-                    iSubAddress.Copy( aCustomParams.iSubAddress );
-                    iBearer.Copy( aCustomParams.iBearer );
-                    }
-            #if ( NCP_COMMON_S60_VERSION_SUPPORT >= S60_VERSION_50 )
-                else if ( RMobileCall::KETelMobileCallParamsV7 == recentCallParams.ExtensionId() )
-                    {
+                        RMmCustomAPI::TCustomCallParams& aCustomParams(
+                            ( *customparamsPckgV1 )() );
+                        iSubAddress.Copy( aCustomParams.iSubAddress );
+                        iBearer.Copy( aCustomParams.iBearer );
+                        }
+#if ( NCP_COMMON_S60_VERSION_SUPPORT >= S60_VERSION_50 )
+                    else if ( RMobileCall::KETelMobileCallParamsV7 == recentCallParams.ExtensionId() )
+                        {
 TFLOGSTRING("TSY: CMmCallMessHandler::ExtFuncL - V7 call params in use ");
 OstTrace0( TRACE_NORMAL, DUP8_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - V7 call params in use" );
 
-                    RMobileCall::TMobileCallParamsV7Pckg* paramsPckgV7(
-                        reinterpret_cast<RMobileCall::TMobileCallParamsV7Pckg*>
-                            ( callParams ) );
+                        RMobileCall::TMobileCallParamsV7Pckg* paramsPckgV7(
+                            reinterpret_cast<RMobileCall::TMobileCallParamsV7Pckg*>
+                                ( callParams ) );
 
-                    RMobileCall::TMobileCallParamsV7 recentCallParamsV7(
-                        ( *paramsPckgV7 )() );
+                        RMobileCall::TMobileCallParamsV7 recentCallParamsV7(
+                            ( *paramsPckgV7 )() );
 
-                    iSubAddress.Copy( recentCallParamsV7.iSubAddress );
-                    // At the moment only 1 bearer capability is supported in SET UP CALL PCmd
-                    iBearer.Copy( recentCallParamsV7.iBearerCap1 );
+                        iSubAddress.Copy( recentCallParamsV7.iSubAddress );
+                        // At the moment only 1 bearer capability is supported in SET UP CALL PCmd
+                        iBearer.Copy( recentCallParamsV7.iBearerCap1 );
 
-                    // Prevent FDN check if call is SIM originated (SET UP CALL)
-                    if ( RMobileCall::EOriginatorSIM == recentCallParamsV7.iCallParamOrigin )
-                        {
-                        iNoFdnCheck = ETrue;
+                        // Prevent FDN check if call is SIM originated (SET UP CALL)
+                        if ( RMobileCall::EOriginatorSIM == recentCallParamsV7.iCallParamOrigin )
+                            {
+                            iNoFdnCheck = ETrue;
+                            }
+                        else
+                            {
+                            iNoFdnCheck = EFalse;
+                            }
                         }
+#endif
                     else
                         {
-                        iNoFdnCheck = EFalse;
+                        iSubAddress.Zero();
+                        iBearer.Zero();
                         }
-                    }
-            #endif
-                else
-                    {
-                    iSubAddress.Zero();
-                    iBearer.Zero();
-                    }
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL - Cug explicit invoked: %d", recentCallParams.iCug.iExplicitInvoke );
 OstTrace1( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - Cug explicit invoked: %d", recentCallParams.iCug.iExplicitInvoke );
-                // if CUG is explicitly invoked by
-                // the other entries in this structure will be filled in
-                // function CallPropertySetReq.
-                if ( recentCallParams.iCug.iExplicitInvoke )
-                    {
-                    // Non-emergency calls set properties first. CallCreateReq will
-                    // be called after CallPropertySetResp response has come.
-                    messageId = CALL_MODEM_PROPERTY_SET_REQ;
-                    dosCallId = CALL_MODEM_PROP_CUG_INFO;
+                    // if CUG is explicitly invoked by
+                    // the other entries in this structure will be filled in
+                    // function CallPropertySetReq.
+                    if ( recentCallParams.iCug.iExplicitInvoke )
+                        {
+                        // Non-emergency calls set properties first. CallCreateReq will
+                        // be called after CallPropertySetResp response has come.
+                        messageId = CALL_MODEM_PROPERTY_SET_REQ;
+                        dosCallId = CALL_MODEM_PROP_CUG_INFO;
 
-                    CallPropertySetReq( &callReq, callData );
+                        CallPropertySetReq( &callReq, callData );
+                        }
+                    else
+                        {
+    //                    RMobileCall::TMobileCallParamsV1Pckg* callParams( NULL );
+    //                    RMobileCall::TMobileCallInfoV1* callInfo( NULL );
+    //                    aDataPackage->UnPackData( &callParams, &callInfo );
+                        iTelNumber = callInfo->iDialledParty.iTelNumber;
+TFLOGSTRING2("TSY: CMmCallMessHandlerExtFuncL - iTelNumber: %S", &iTelNumber);
+OstTraceExt1( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - iTelNumber=%s", iTelNumber );
+                        iIdRestrict = recentCallParams.iIdRestrict;
+
+                        CallCreateReq();
+                        callCreatedAlready = ETrue;
+                        // Reset information
+                        iSubAddress.Zero();
+                        iBearer.Zero();
+                        }
+                    }
+                // No else
+                break;
+                }
+            case EMobileCallSwap:
+                {
+                // Set special call Id
+                dosCallId = CALL_MODEM_ID_ACTIVE;
+                messageId = CALL_MODEM_CONTROL_REQ;
+                isiCallId = CALL_MODEM_CONTROL_REQ_OFFSET_CALLID;
+                CallControlReq( &callReq, aIpc );
+                break;
+                }
+            case EMobileCallHold:
+            case EMobileCallResume:
+            case EMobileCallGoOneToOne:
+            case EMobileCallTransfer:
+            case EMobileCallActivateCCBS:
+            case EMobilePhoneAcceptCCBSRecall:
+                {
+                messageId = CALL_MODEM_CONTROL_REQ;
+                isiCallId = CALL_MODEM_CONTROL_REQ_OFFSET_CALLID;
+                CallControlReq( &callReq, aIpc );
+                break;
+                }
+            case EMobileCallAnswerISV:
+            case EEtelCallAnswer:
+                {
+                if ( RMobilePhone::ECircuitDataService == callMode )
+                    {
+                    ret = AnswerIncomingDataCall( callData );
+                    requestDirectedToDataPort = ETrue;
                     }
                 else
                     {
-//                    RMobileCall::TMobileCallParamsV1Pckg* callParams( NULL );
-//                    RMobileCall::TMobileCallInfoV1* callInfo( NULL );
-//                    aDataPackage->UnPackData( &callParams, &callInfo );
-                    iTelNumber = callInfo->iDialledParty.iTelNumber;
-TFLOGSTRING2("TSY: CMmCallMessHandlerExtFuncL - iTelNumber: %S", &iTelNumber);
-OstTraceExt1( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - iTelNumber=%s", iTelNumber );
-                    iIdRestrict = recentCallParams.iIdRestrict;
+                    iIs3rdPartyAnswerIncomingCall = EFalse;
 
-                    CallCreateReq();
-                    callCreatedAlready = ETrue;
-                    // Reset information
-                    iSubAddress.Zero();
-                    iBearer.Zero();
+                    // Is it from a 3rd party client or not
+                    if ( EMobileCallAnswerISV == aIpc )
+                        {
+                        iIs3rdPartyAnswerIncomingCall = ETrue;
+                        }
+                    // No else
+                    messageId = CALL_MODEM_ANSWER_REQ;
+                    isiCallId = CALL_MODEM_ANSWER_REQ_OFFSET_CALLID;
+                    callReq.Set8bit(
+                        ISI_HEADER_SIZE + CALL_MODEM_ANSWER_REQ_OFFSET_SUBBLOCKS,
+                        KCallPadding );
                     }
+                break;
                 }
-            // No else
-            break;
-            }
-        case EMobileCallSwap:
-            {
-            // Set special call Id
-            dosCallId = CALL_MODEM_ID_ACTIVE;
-            messageId = CALL_MODEM_CONTROL_REQ;
-            isiCallId = CALL_MODEM_CONTROL_REQ_OFFSET_CALLID;
-            CallControlReq( &callReq, aIpc );
-            break;
-            }
-        case EMobileCallHold:
-        case EMobileCallResume:
-        case EMobileCallGoOneToOne:
-        case EMobileCallTransfer:
-        case EMobileCallActivateCCBS:
-        case EMobilePhoneAcceptCCBSRecall:
-            {
-            messageId = CALL_MODEM_CONTROL_REQ;
-            isiCallId = CALL_MODEM_CONTROL_REQ_OFFSET_CALLID;
-            CallControlReq( &callReq, aIpc );
-            break;
-            }
-        case EMobileCallAnswerISV:
-        case EEtelCallAnswer:
-            {
-            if ( RMobilePhone::ECircuitDataService == callMode )
+            case EEtelCallHangUp:
                 {
-                ret = AnswerIncomingDataCall( callData );
-                requestDirectedToDataPort = ETrue;
-                }
-            else
-                {
-                iIs3rdPartyAnswerIncomingCall = EFalse;
-
-                // Is it from a 3rd party client or not
-                if ( EMobileCallAnswerISV == aIpc )
+                // Call mode for emergency call is voice
+                if ( RMobilePhone::EVoiceService == callMode )
                     {
-                    iIs3rdPartyAnswerIncomingCall = ETrue;
+                    iEmergCallDelayed = EFalse;
+                    }
+
+                if ( RMobilePhone::ECircuitDataService == callMode )
+                    {
+                    ret = HangUp( callId );
+                        requestDirectedToDataPort = ETrue;
+                        }
+                else
+                    {
+                    messageId = CALL_MODEM_RELEASE_REQ;
+                    isiCallId = CALL_MODEM_RELEASE_REQ_OFFSET_CALLID;
+                    CallReleaseReq( &callReq, callData );
                     }
                 // No else
-                messageId = CALL_MODEM_ANSWER_REQ;
-                isiCallId = CALL_MODEM_ANSWER_REQ_OFFSET_CALLID;
-                callReq.Set8bit(
-                    ISI_HEADER_SIZE + CALL_MODEM_ANSWER_REQ_OFFSET_SUBBLOCKS,
-                    KCallPadding );
+                break;
                 }
-            break;
-            }
-        case EEtelCallHangUp:
-            {
-            // Call mode for emergency call is voice
-            if ( RMobilePhone::EVoiceService == callMode )
+            case EMobilePhoneClearBlacklist:
                 {
-                iEmergCallDelayed = EFalse;
+                messageId = CALL_MODEM_BLACKLIST_CLEAR_REQ;
+                break;
                 }
-
-            if ( RMobilePhone::ECircuitDataService == callMode )
+            // CSD fearures
+            case EEtelCallLoanDataPort:
                 {
-                ret = HangUp( callId );
+                if ( iDataPortHandler )
+                    {
+                    ret = iDataPortHandler->LoanDataPort( callData );
+                    }
+                else
+                    {
+                    ret = KErrNotReady;
+                    }
                 requestDirectedToDataPort = ETrue;
+                break;
                 }
-            else
+            case EEtelCallRecoverDataPort:
                 {
-                messageId = CALL_MODEM_RELEASE_REQ;
-                isiCallId = CALL_MODEM_RELEASE_REQ_OFFSET_CALLID;
-                CallReleaseReq( &callReq, callData );
+                if ( iDataPortHandler )
+                    {
+                    ret = iDataPortHandler->RecoverDataPort( callData );
+                    }
+                else
+                    {
+                    ret = KErrNotReady;
+                    }
+                requestDirectedToDataPort = ETrue;
+                break;
                 }
-            // No else
-            break;
-            }
-        case EMobilePhoneClearBlacklist:
-            {
-            messageId = CALL_MODEM_BLACKLIST_CLEAR_REQ;
-            break;
-            }
-        // CSD fearures
-        case EEtelCallLoanDataPort:
-            {
-            if ( iDataPortHandler )
+            case EMobileCallActivateUUS:
                 {
-                ret = iDataPortHandler->LoanDataPort( callData );
+                ret = ActivateUUS( aDataPackage );
+                break;
                 }
-            else
+            default:
                 {
-                ret = KErrNotReady;
-                }
-            requestDirectedToDataPort = ETrue;
-            break;
-            }
-        case EEtelCallRecoverDataPort:
-            {
-            if ( iDataPortHandler )
-                {
-                ret = iDataPortHandler->RecoverDataPort( callData );
-                }
-            else
-                {
-                ret = KErrNotReady;
-                }
-            requestDirectedToDataPort = ETrue;
-            break;
-            }
-        case EMobileCallActivateUUS:
-            {
-            ret = ActivateUUS( aDataPackage );
-            break;
-            }
-        default:
-            {
 TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
 OstTrace1( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL; - Unknown IPC=%d", aIpc );
-            ret = KErrNotSupported;
-            break;
+                ret = KErrNotSupported;
+                break;
+                }
             }
-        }
 
-    if ( ! requestDirectedToDataPort && !callCreatedAlready
+        if ( ! requestDirectedToDataPort && !callCreatedAlready
 #ifdef NCP_COMMON_HSDPA_EMERGCALL_WORKAROUND
-         && !iEmergCallDelayed
+             && !iEmergCallDelayed
 #endif //NCP_COMMON_HSDPA_EMERGCALL_WORKAROUND
-         )
-        {
-        // Create ISI message
-        callReq.Set8bit( ISI_HEADER_OFFSET_MESSAGEID, messageId );
-
-        // Every message definition doesn't contains call ID
-        if ( 0 != isiCallId )
+             )
             {
-            callReq.Set8bit( ISI_HEADER_SIZE + isiCallId, dosCallId );
-            }
-        // No else
+            // Create ISI message
+            callReq.Set8bit( ISI_HEADER_OFFSET_MESSAGEID, messageId );
 
-        if ( KErrNone == ret )
-            {
-            // Send message to PhoNet
-            ret = iPhoNetSender->Send( callReq.Complete() );
+            // Every message definition doesn't contains call ID
+            if ( 0 != isiCallId )
+                {
+                callReq.Set8bit( ISI_HEADER_SIZE + isiCallId, dosCallId );
+                }
+            // No else
+
+            if ( KErrNone == ret )
+                {
+                // Send message to PhoNet
+                ret = iPhoNetSender->Send( callReq.Complete() );
+                }
+            // No else
             }
         // No else
         }
@@ -1184,12 +1179,6 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCREATERESP, "CMmCallMessHandler:
         TUint8 causeValue( aIsiMessage.Get8bit(
             sbStartOffSet + CALL_MODEM_SB_CAUSE_OFFSET_CAUSE ) );
 
-        // Map error value to Symbian OS error value
-        mobileCallInfo.iExitCode = CMmStaticUtility::CSCauseToEpocError(
-            PN_MODEM_CALL,
-            causeType,
-            causeValue );
-
         // To prevent FDN error to be completed again from CallServiceDeniedInd
         if ( CALL_MODEM_CAUSE_FDN_NOT_OK == causeValue )
             {
@@ -1202,6 +1191,39 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCREATERESP, "CMmCallMessHandler:
             ISI_HEADER_SIZE + CALL_MODEM_CREATE_RESP_OFFSET_CALLID )
                 & KMaskBits1to3 );
 
+        // Check if the call request has been call controlled
+        if ( iCallControlCallId == mobileCallInfo.iCallId
+            && iCcResult != KCcResultAllowedNoModification )
+            {
+            // call controlled requests have always different call id than
+            // CALL_MODEM_ID_NONE. If the original request is not changed,
+            // no need for specific error values
+            if ( KCcResultNotAllowed == iCcResult )
+                {
+                // call control rejected the request
+                mobileCallInfo.iExitCode =
+                    CMmStaticUtility::EpocErrorCode( KErrGeneral,
+                        KErrGsmCCCallRejected );
+                }
+            else
+                {
+                // call control modified the request
+                mobileCallInfo.iExitCode =
+                    CMmStaticUtility::EpocErrorCode( KErrAccessDenied,
+                        KErrSatControl );
+                }
+            // reset the values
+            iCallControlCallId = CALL_MODEM_ID_NONE;
+            iCcResult = KCcResultAllowedNoModification;
+            }
+        else
+            {
+            // Map error value to Symbian OS error value
+            mobileCallInfo.iExitCode = CMmStaticUtility::CSCauseToEpocError(
+                PN_MODEM_CALL,
+                causeType,
+                causeValue );
+            }
         // Create call package
         CCallDataPackage callData;
         // Pack the data for sending to the manager
@@ -3257,9 +3279,10 @@ TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_STATUS subbl
     // Check if Video Call is MT Released.
     // Pipe have to remove to make next call possible.
     // Have to wait that Csd videoCall is disconnected.
-    if ( CALL_MODEM_STATUS_MT_RELEASE == callStatusISA )
+    if ( CALL_MODEM_STATUS_MT_RELEASE == callStatusISA ||
+         CALL_MODEM_STATUS_MO_RELEASE == callStatusISA )
         {
-        iVideoCallMtReleased = ETrue;
+        iVideoCallReleased = ETrue;
         }
 
     // Read call mode
@@ -3284,229 +3307,225 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHan
     if( CALL_MODEM_STATUS_IDLE == callStatusISA &&
         mobileCallInfo.iCallId == iIncomingCallInfo.iCallId )
         {
-TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:NOTE! Can't complete to CTSY!, because call is terminated before it is indicated to CTSY");
-OstTrace0( TRACE_NORMAL, DUP19_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL:NOTE! Can't complete to CTSY!, because call is terminated before it is indicated to CTSY" );
         // reset temporary call info
         ResetIncomingCallInfo( iIncomingCallInfo );
         }
-    else
-        {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:Normal completion of call status ind (no termination of calls which haven't been indicated to CTSY yet)");
 OstTrace0( TRACE_NORMAL, DUP20_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL:Normal completion of call status ind (no termination of calls which haven't been indicated to CTSY yet)" );
 
-        // Create call package (used for all completions)
-        CCallDataPackage callData;
-        // Pack the data for sending to the manager
-        callData.SetCallIdAndMode(
-            mobileCallInfo.iCallId,
-            mobileCallInfo.iService );
+    // Create call package (used for all completions)
+    CCallDataPackage callData;
+    // Pack the data for sending to the manager
+    callData.SetCallIdAndMode(
+        mobileCallInfo.iCallId,
+        mobileCallInfo.iService );
 
-        CheckCallIsaStatus( mobileCallInfo, callStatusISA );
+    CheckCallIsaStatus( mobileCallInfo, callStatusISA );
 
-        // Store UUI data when the call is coming
-        if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
-            ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
-            CALL_MODEM_SB_USER_TO_USER,
-            EIsiSubBlockTypeId8Len8,
-            sbStartOffSet ) &&
-            ( CALL_MODEM_STATUS_COMING == callStatusISA ) )
-            {
+    // Store UUI data when the call is coming
+    if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+        ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
+        CALL_MODEM_SB_USER_TO_USER,
+        EIsiSubBlockTypeId8Len8,
+        sbStartOffSet ) &&
+        ( CALL_MODEM_STATUS_COMING == callStatusISA ) )
+        {
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: Receive UUI.");
 OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: Receive UUI" );
 
-            // Get data length
-            TUint8 userToUserDataLen( aIsiMessage.Get8bit(
-            sbStartOffSet + CALL_MODEM_SB_USER_TO_USER_OFFSET_UTOULEN ) );
+        // Get data length
+        TUint8 userToUserDataLen( aIsiMessage.Get8bit(
+        sbStartOffSet + CALL_MODEM_SB_USER_TO_USER_OFFSET_UTOULEN ) );
 
-            // Get UUIE data
-            TPtrC8 data( aIsiMessage.GetData(
-                sbStartOffSet + CALL_MODEM_SB_USER_TO_USER_OFFSET_UTOU,
-                userToUserDataLen ) );
+        // Get UUIE data
+        TPtrC8 data( aIsiMessage.GetData(
+            sbStartOffSet + CALL_MODEM_SB_USER_TO_USER_OFFSET_UTOU,
+            userToUserDataLen ) );
 
-            // Copy UUS data to member variable. Receive UUI will be completed
-            // after EEtelLineNotifyIncomingCall is completed.
-            iReceivedUusData.Zero();
-            iReceivedUusData.Copy( data.Left( RMobileCall::KMaxUUISize ) );
+        // Copy UUS data to member variable. Receive UUI will be completed
+        // after EEtelLineNotifyIncomingCall is completed.
+        iReceivedUusData.Zero();
+        iReceivedUusData.Copy( data.Left( RMobileCall::KMaxUUISize ) );
+        }
+    // No else
+
+    // If status is valid in Symbian OS
+    if ( RMobileCall::EStatusUnknown != statusETel )
+        {
+        TUint8 causeType( 0 );
+        TUint8 causeValue( 0 );
+        // Introduce target
+        TBuf16<RMobilePhone::KMaxMobileTelNumberSize> targetOrig;
+        TBuf16<RMobileCall::KCallingNameSize> targetOrigName;
+
+        // Copy some data previously received to current MobileCallInfo
+        if ( mobileCallInfo.iCallId == iIncomingCallInfo.iCallId )
+            {
+            mobileCallInfo.iForwarded = iIncomingCallInfo.iForwarded;
+            mobileCallInfo.iValid |= RMobileCall::KCallForwarded;
+            mobileCallInfo.iRemoteParty = iIncomingCallInfo.iRemoteParty;
+            mobileCallInfo.iValid |= RMobileCall::KCallRemoteParty;
             }
         // No else
 
-        // If status is valid in Symbian OS
-        if ( RMobileCall::EStatusUnknown != statusETel )
+        // Read gsm redirecting address
+        if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+            ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
+            CALL_MODEM_SB_REDIRECTING_ADDRESS,
+            EIsiSubBlockTypeId8Len8,
+            sbStartOffSet ) )
             {
-            TUint8 causeType( 0 );
-            TUint8 causeValue( 0 );
-            // Introduce target
-            TBuf16<RMobilePhone::KMaxMobileTelNumberSize> targetOrig;
-            TBuf16<RMobileCall::KCallingNameSize> targetOrigName;
-
-            // Copy some data previously received to current MobileCallInfo
-            if ( mobileCallInfo.iCallId == iIncomingCallInfo.iCallId )
-                {
-                mobileCallInfo.iForwarded = iIncomingCallInfo.iForwarded;
-                mobileCallInfo.iValid |= RMobileCall::KCallForwarded;
-                mobileCallInfo.iRemoteParty = iIncomingCallInfo.iRemoteParty;
-                mobileCallInfo.iValid |= RMobileCall::KCallRemoteParty;
-                }
-            // No else
-
-            // Read gsm redirecting address
-            if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
-                ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
-                CALL_MODEM_SB_REDIRECTING_ADDRESS,
-                EIsiSubBlockTypeId8Len8,
-                sbStartOffSet ) )
-                {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_REDIRECTING_ADDRESS subblock");
 OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_REDIRECTING_ADDRESS subblock" );
 
-                // Get address length
-                TUint8 redirectingAddressLength( aIsiMessage.Get8bit(
-                    sbStartOffSet +
-                    CALL_MODEM_SB_REDIRECTING_ADDRESS_OFFSET_ADDRLEN ) );
+            // Get address length
+            TUint8 redirectingAddressLength( aIsiMessage.Get8bit(
+                sbStartOffSet +
+                CALL_MODEM_SB_REDIRECTING_ADDRESS_OFFSET_ADDRLEN ) );
 
-                // If there is a redirection address, the call has been forwarded
-                // (but not vice versa; this information can come with another
-                // indication)
-                if ( 0 != redirectingAddressLength )
-                    {
-                    mobileCallInfo.iForwarded = ETrue;
-                    mobileCallInfo.iValid |= RMobileCall::KCallForwarded;
-                    }
-                    // No else
+            // If there is a redirection address, the call has been forwarded
+            // (but not vice versa; this information can come with another
+            // indication)
+            if ( 0 != redirectingAddressLength )
+                {
+                mobileCallInfo.iForwarded = ETrue;
+                mobileCallInfo.iValid |= RMobileCall::KCallForwarded;
                 }
                 // No else
+            }
+            // No else
 
-            // Read CALL_MODEM_SB_LINE_ID
-            if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
-                ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
-                CALL_MODEM_SB_LINE_ID,
-                EIsiSubBlockTypeId8Len8,
-                sbStartOffSet ))
-                {
+        // Read CALL_MODEM_SB_LINE_ID
+        if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+            ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
+            CALL_MODEM_SB_LINE_ID,
+            EIsiSubBlockTypeId8Len8,
+            sbStartOffSet ))
+            {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_LINE_ID subblock");
 OstTrace0( TRACE_NORMAL, DUP21_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_LINE_ID subblock" );
 
-                origPresentInd = aIsiMessage.Get8bit(
-                    sbStartOffSet + CALL_MODEM_SB_LINE_ID_OFFSET_LINEID );
-                }
-            // Read all destination address
-            if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
-                ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
-                CALL_MODEM_SB_DESTINATION_ADDRESS,
-                EIsiSubBlockTypeId8Len8,
-                sbStartOffSet ) )
-                {
+            origPresentInd = aIsiMessage.Get8bit(
+                sbStartOffSet + CALL_MODEM_SB_LINE_ID_OFFSET_LINEID );
+            }
+        // Read all destination address
+        if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+            ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
+            CALL_MODEM_SB_DESTINATION_ADDRESS,
+            EIsiSubBlockTypeId8Len8,
+            sbStartOffSet ) )
+            {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_DESTINATION_ADDRESS subblock");
 OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_DESTINATION_ADDRESS subblock" );
 
-                ReadAllAddressDestination( mobileCallInfo, targetOrig, aIsiMessage, sbStartOffSet, origPresentInd );
-                }
-                // No else
+            ReadAllAddressDestination( mobileCallInfo, targetOrig, aIsiMessage, sbStartOffSet, origPresentInd );
+            }
+            // No else
 
-            if ( CALL_MODEM_STATUS_CREATE == callStatusISA )
+        if ( CALL_MODEM_STATUS_CREATE == callStatusISA )
+            {
+            // Reset orginator address information. Destination address
+            // contents in CALL_MODEM_STATUS_IND are same as in CALL_MODEM_CREATE_REQ
+            // when call is in create state.
+            mobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber.Zero();
+            mobileCallInfo.iValid &= ~RMobileCall::KCallRemoteParty;
+            }
+            // No else
+
+            // Read call origin info
+            if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+                ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
+                CALL_MODEM_SB_ORIGIN_INFO,
+                EIsiSubBlockTypeId8Len8,
+                sbStartOffSet ) )
                 {
-                // Reset orginator address information. Destination address
-                // contents in CALL_MODEM_STATUS_IND are same as in CALL_MODEM_CREATE_REQ
-                // when call is in create state.
-                mobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber.Zero();
-                mobileCallInfo.iValid &= ~RMobileCall::KCallRemoteParty;
-                }
-                // No else
-
-                // Read call origin info
-                if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
-                    ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
-                    CALL_MODEM_SB_ORIGIN_INFO,
-                    EIsiSubBlockTypeId8Len8,
-                    sbStartOffSet ) )
-                    {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_ORIGIN_INFO subblock");
 OstTrace0( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_ORIGIN_INFO subblock" );
 
-                    ReadCallInfo(
-                        mobileCallInfo,
-                        targetOrigName,
-                        aIsiMessage,
-                        sbStartOffSet );
-                    }
-                    // No else
+                ReadCallInfo(
+                    mobileCallInfo,
+                    targetOrigName,
+                    aIsiMessage,
+                    sbStartOffSet );
+                }
+                // No else
 
-                // Get error value
-                if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
-                    ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
-                    CALL_MODEM_SB_CAUSE,
-                    EIsiSubBlockTypeId8Len8,
-                    sbStartOffSet ) )
-                    {
+            // Get error value
+            if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+                ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
+                CALL_MODEM_SB_CAUSE,
+                EIsiSubBlockTypeId8Len8,
+                sbStartOffSet ) )
+                {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_CAUSE subblock");
 OstTrace0( TRACE_NORMAL, DUP7_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_CAUSE subblock" );
 
-                    // Get cause type and value
-                    causeType = aIsiMessage.Get8bit(
-                        sbStartOffSet + CALL_MODEM_SB_CAUSE_OFFSET_CAUSETYPE );
+                // Get cause type and value
+                causeType = aIsiMessage.Get8bit(
+                    sbStartOffSet + CALL_MODEM_SB_CAUSE_OFFSET_CAUSETYPE );
 
-                    // Get call cause value
-                    causeValue = aIsiMessage.Get8bit(
-                        sbStartOffSet + CALL_MODEM_SB_CAUSE_OFFSET_CAUSE );
-                    }
-                    // No else
+                // Get call cause value
+                causeValue = aIsiMessage.Get8bit(
+                    sbStartOffSet + CALL_MODEM_SB_CAUSE_OFFSET_CAUSE );
+                }
+                // No else
 
-                // If iDestPostAddressIncluded flag is (ETrue) we don't handle
-                // CALL_MODEM_SB_DESTINATION_POST_ADDRESS subblock here
-                if ( !iDestPostAddressIncluded )
+            // If iDestPostAddressIncluded flag is (ETrue) we don't handle
+            // CALL_MODEM_SB_DESTINATION_POST_ADDRESS subblock here
+            if ( !iDestPostAddressIncluded )
+                {
+                // CALL_MODEM_SB_DESTINATION_POST_ADDRESS
+                // If Destination post address is found, save it.
+                // It will be sent later when this call is active
+                if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+                    ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
+                    CALL_MODEM_SB_DESTINATION_POST_ADDRESS,
+                    EIsiSubBlockTypeId8Len8,
+                    sbStartOffSet ) )
                     {
-                    // CALL_MODEM_SB_DESTINATION_POST_ADDRESS
-                    // If Destination post address is found, save it.
-                    // It will be sent later when this call is active
-                    if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
-                        ISI_HEADER_SIZE + SIZE_CALL_MODEM_STATUS_IND,
-                        CALL_MODEM_SB_DESTINATION_POST_ADDRESS,
-                        EIsiSubBlockTypeId8Len8,
-                        sbStartOffSet ) )
-                        {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:CALL_MODEM_SB_DESTINATION_POST_ADDRESS");
 OstTrace0( TRACE_NORMAL, DUP8_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_DESTINATION_POST_ADDRESS" );
 
-                        // Get address length
-                        TUint8 destinationPostAddressLength( aIsiMessage.Get8bit(
-                            sbStartOffSet + CALL_MODEM_SB_DESTINATION_POST_ADDRESS_OFFSET_ADDRLEN ) );
+                    // Get address length
+                    TUint8 destinationPostAddressLength( aIsiMessage.Get8bit(
+                        sbStartOffSet + CALL_MODEM_SB_DESTINATION_POST_ADDRESS_OFFSET_ADDRLEN ) );
 
-                        // Get address
-                        TPtrC8 postAddr( aIsiMessage.GetData(
-                            sbStartOffSet + CALL_MODEM_SB_DESTINATION_POST_ADDRESS_OFFSET_ADDR,
-                            destinationPostAddressLength * 2 ) );
+                    // Get address
+                    TPtrC8 postAddr( aIsiMessage.GetData(
+                        sbStartOffSet + CALL_MODEM_SB_DESTINATION_POST_ADDRESS_OFFSET_ADDR,
+                        destinationPostAddressLength * 2 ) );
 
-                        // Do not handle post address which lenght is over 15 chars
-                        if ( ( KDestPostAddressMaxLength * 2 ) >= postAddr.Length() )
-                            {
+                    // Do not handle post address which lenght is over 15 chars
+                    if ( ( KDestPostAddressMaxLength * 2 ) >= postAddr.Length() )
+                        {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:lenght less than 15 char");
 OstTrace0( TRACE_NORMAL, DUP9_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: Lenght less than 15 char" );
-                            // Copy 8-bit name to the 16-bit target using correct endianess
-                            TIsiUtility::CopyFromBigEndian(
-                                postAddr,
-                                iDestPostAddress );
+                        // Copy 8-bit name to the 16-bit target using correct endianess
+                        TIsiUtility::CopyFromBigEndian(
+                            postAddr,
+                            iDestPostAddress );
 
-                            TInt postAddrLength( iDestPostAddress.Length() );
+                        TInt postAddrLength( iDestPostAddress.Length() );
 
-                            // Store call ID to identify SIM ATK call
-                            iDtmfPostAddressCallId = mobileCallInfo.iCallId;
+                        // Store call ID to identify SIM ATK call
+                        iDtmfPostAddressCallId = mobileCallInfo.iCallId;
 
-                            // Check that there is not "w" char. "w" will mess up internal
-                            // DTMF sending process
-                            for ( TInt i( 0 ); i < postAddrLength; i++ )
+                        // Check that there is not "w" char. "w" will mess up internal
+                        // DTMF sending process
+                        for ( TInt i( 0 ); i < postAddrLength; i++ )
+                            {
+                            if ( 'w' == iDestPostAddress[ i ] )
                                 {
-                                if ( 'w' == iDestPostAddress[ i ] )
-                                    {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:w found");
 OstTrace0( TRACE_NORMAL, DUP10_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: w found" );
-                                    iDestPostAddress.SetLength( 0 );
-                                    iDtmfPostAddressCallId = 0;
-                                    break;
-                                    }
+                                iDestPostAddress.SetLength( 0 );
+                                iDtmfPostAddressCallId = 0;
+                                break;
                                 }
                             }
                         }
+                    }
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallStatusIndL:callStatusISA: %d", callStatusISA);
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallStatusIndL:mobileCallInfo.iCallId: %d", mobileCallInfo.iCallId);
@@ -3515,38 +3534,38 @@ OstTraceExt1( TRACE_NORMAL, DUP11_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMes
 OstTraceExt1( TRACE_NORMAL, DUP13_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL;mobileCallInfo.iCallId=%hhu", mobileCallInfo.iCallId );
 OstTraceExt1( TRACE_NORMAL, DUP12_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL;iDtmfPostAddressCallId=%hhu", iDtmfPostAddressCallId );
 
-                    // When call is active, send post address
-                    // DTMF sending in case this is SIMATK call
-                    if ( CALL_MODEM_STATUS_ACTIVE == callStatusISA &&
-                        iDtmfPostAddressCallId == mobileCallInfo.iCallId &&
-                        0 < iDtmfPostAddressCallId )
-                        {
+                // When call is active, send post address
+                // DTMF sending in case this is SIMATK call
+                if ( CALL_MODEM_STATUS_ACTIVE == callStatusISA &&
+                    iDtmfPostAddressCallId == mobileCallInfo.iCallId &&
+                    0 < iDtmfPostAddressCallId )
+                    {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:Dtmf post address sending (ACTIVE)");
 OstTrace0( TRACE_NORMAL, DUP17_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL, Dtmf post address sending (ACTIVE)" );
-                        iDtmfMessHandler->SendPostAddressL ( &iDestPostAddress );
+                    iDtmfMessHandler->SendPostAddressL ( &iDestPostAddress );
 
-                        // Reset iDestPostAddress and iDtmfPostAddressCallId to prevent multiple
-                        // requests
-                        iDestPostAddress.SetLength( 0 );
-                        iDtmfPostAddressCallId = 0;
-                        }
+                    // Reset iDestPostAddress and iDtmfPostAddressCallId to prevent multiple
+                    // requests
+                    iDestPostAddress.SetLength( 0 );
+                    iDtmfPostAddressCallId = 0;
+                    }
 
-                    // If call fails for some reason, and goes to idle, reset
-                    // iDestPostAddress and iDtmfPostAddressCallId
-                    if ( CALL_MODEM_STATUS_IDLE == callStatusISA &&
-                        iDtmfPostAddressCallId == mobileCallInfo.iCallId &&
-                        0 < iDtmfPostAddressCallId )
-                        {
+                // If call fails for some reason, and goes to idle, reset
+                // iDestPostAddress and iDtmfPostAddressCallId
+                if ( CALL_MODEM_STATUS_IDLE == callStatusISA &&
+                    iDtmfPostAddressCallId == mobileCallInfo.iCallId &&
+                    0 < iDtmfPostAddressCallId )
+                    {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:If call fails for some reason (IDLE)");
 OstTrace0( TRACE_NORMAL, DUP14_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: If call fails for some reason (IDLE)" );
-                        iDestPostAddress.SetLength( 0 );
-                        iDtmfPostAddressCallId = 0;
-                        }
+                    iDestPostAddress.SetLength( 0 );
+                    iDtmfPostAddressCallId = 0;
+                    }
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallStatusIndL:iDtmfPostAddressCallId: %d After value",iDtmfPostAddressCallId);
 OstTraceExt1( TRACE_NORMAL, DUP18_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL;iDtmfPostAddressCallId=%hhu After value", iDtmfPostAddressCallId );
-                    }
-                    // No else
+                }
+                // No else
 
             if ( CALL_MODEM_SSD_NO_CUG == ( iDiagnosticOctet & KMaskBits1to7 ) &&
                 CALL_MODEM_NW_CAUSE_FACILITY_REJECTED == causeValue )
@@ -3579,14 +3598,15 @@ OstTraceExt1( TRACE_NORMAL, DUP18_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMes
             CompleteIncomingCallNotif( mobileCallInfo, statusETel );
             // MT calls which went waiting can alert twice
             // reset stored incoming call information only after they actually rang
-            if ( CALL_MODEM_STATUS_MT_ALERTING == callStatusISA )
+            // or when MT call is answered
+            if ( CALL_MODEM_STATUS_MT_ALERTING == callStatusISA || 
+                 CALL_MODEM_STATUS_ANSWERED == callStatusISA )
                 {
                 ResetIncomingCallInfo( iIncomingCallInfo );
                 }
 
         // Update mobile call info to data port handler also
-            if ( ( CALL_MODEM_MODE_MULTIMEDIA == callModeISA ) &&
-                CALL_MODEM_STATUS_WAITING != callStatusISA )
+            if ( CALL_MODEM_MODE_MULTIMEDIA == callModeISA )
                 {
                 TBool isMultimedia( CALL_MODEM_MODE_MULTIMEDIA == callModeISA );
                 TBool isWaitingCall( iWaitingCall == mobileCallInfo.iCallId );
@@ -3659,10 +3679,8 @@ OstTraceExt1( TRACE_NORMAL, DUP16_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMes
                 iWaitingCall = KSymbianCallIdNone;
                 }
             // No else
-            }
+        }
         // No else
-
-        }//end of if(incoming call && status == idle)
     }
 
 // -----------------------------------------------------------------------------
@@ -4991,9 +5009,6 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMes
         {
         result = CMmStaticUtility::CSCauseToEpocError( PN_CSD, 0x00, causeValue );
 
-        //Remove Pipe for wideo telephony
-        PnsPipeRemoveReq();
-
         // set call id and mode
         if ( iMobileCallInfo.iCallId < 0 )
             {
@@ -5033,6 +5048,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMes
                 break;
                 }
             case CSD_CALL_RELEASE:
+            case CSD_CALL_REJECT:
                 {
                 // Complete failed HangUp request
                 iMessageRouter->Complete(
@@ -5041,21 +5057,12 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMes
                         result );
                 break;
                 }
-            case CSD_CALL_REJECT:
             default:
                 {
 TFLOGSTRING("TSY: CMmCallMessHandler::CsdCallControlResp. Switch oper_Id case default.");
 OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMessHandler::CsdCallControlResp, Switch oper_Id case default" );
                 break;
                 }
-            }
-        }
-    else
-        {
-        if ( CSD_CALL_RELEASE == oper_Id )
-            {
-            //Remove Pipe for wideo telephony
-            PnsPipeRemoveReq();
             }
         }
     }
@@ -5098,14 +5105,14 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCall
         }
     else
         {
-        // MT video call case we have to remove pipe
-        if ( iVideoCallMtReleased )
+        // MO/MT video call released. we have to remove pipe.
+        if ( iVideoCallReleased )
             {
-TFLOGSTRING("TSY: CMmCallMessHandler::CsdVideoCallStatusInd: call MT releated");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessHandler::CsdVideoCallStatusInd: call MT released" );
+TFLOGSTRING("TSY: CMmCallMessHandler::CsdVideoCallStatusInd: call MO/MT releated");
+OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessHandler::CsdVideoCallStatusInd: call MO/MT released" );
             //Remove Pipe for wideo telephony
             PnsPipeRemoveReq();
-            iVideoCallMtReleased = EFalse;
+            iVideoCallReleased = EFalse;
             }
         }
     // CSD_VIDEO_CALL_STATUS_DISCONNECT arrives also when call establishment
@@ -5316,6 +5323,18 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_DIALDATACALL, "CMmCallMessHandler::D
 TFLOGSTRING("TSY: CMmCallMessHandler::DialDataCall. callParams and callInfo ok." );
 OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_DIALDATACALL, "CMmCallMessHandler::DialDataCall;callParams and callInfo ok." );
 
+        // if CTSY does not set call id as valid we need to copy it from
+        // data package
+        if ( 0 == callInfo->iValid & RMobileCall::KCallId )
+            {
+TFLOGSTRING("TSY: CMmCallMessHandler::DialDataCall. Copy call mode into call info");
+OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_DIALDATACALL, "CMmCallMessHandler::DialDataCall. Copy call mode into call info" );
+            aDataPackage->GetCallIdAndMode(
+                callInfo->iCallId, callInfo->iService );
+            // service is always valid
+            callInfo->iValid |= RMobileCall::KCallId;
+            }
+
         SetMobileCallInfo( *callInfo );
 
         iIdRestrict = recentCallParams.iIdRestrict;
@@ -5323,6 +5342,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_DIALDATACALL, "CMmCallMessHandl
 
         // Dial the call
         iCallOperationID = CSD_CALL_CREATE;
+        iCallDirection = RMobileCall::EMobileOriginated;
 
         // Create Pipe for wideo telephony
         // If creation succeed, then CsdCallControlReq( CSD_CALL_CREATE )
@@ -5405,7 +5425,15 @@ OstTrace1( TRACE_NORMAL, CMMCALLMESSHANDLER_HANGUP, "CMmCallMessHandler::HangUp;
     if ( 0 < aCallId )
         {
         // Hangup the call
-        ret = CsdCallControlReq( CSD_CALL_RELEASE );
+        if( iMobileCallInfo.iCallId == aCallId &&
+            RMobileCall::EStatusRinging == iMobileCallInfo.iStatus )
+            {
+            ret = CsdCallControlReq( CSD_CALL_REJECT );
+            }
+        else
+            {
+            ret = CsdCallControlReq( CSD_CALL_RELEASE );
+            }
         }
     else if ( RMobileCall::EStatusIdle == iMobileCallInfo.iStatus )
         {
@@ -5422,7 +5450,6 @@ OstTrace1( TRACE_NORMAL, CMMCALLMESSHANDLER_HANGUP, "CMmCallMessHandler::HangUp;
 //
 TInt CMmCallMessHandler::PnsPipeCreateReq( const TUint8 aPipeStateAfter ) const
     {
-
     TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeCreateReq" );
 OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPECREATEREQ, "CMmCallMessHandler::PnsPipeCreateReq" );
 
@@ -5439,8 +5466,8 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPECREATEREQ, "CMmCallMessHandle
     data.Append( EIscNokiaDataport1 );
     data.Append( KFirstPepType );
     data.Append( KCallPadding );
-    data.Append( iSecondPepDeviceId );
-    data.Append( iSecondPepObjectId );
+    data.Append( KSecondPepDevice );
+    data.Append( KSecondPepObject );
     data.Append( KSecondPepType );
     data.Append( KCallPadding );
 
@@ -5487,161 +5514,34 @@ OstTraceExt3( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPECREATERESP, "CMmCallM
             // Dial or Answer the call
             CsdCallControlReq( iCallOperationID );
             }
-        else if ( PN_PIPE_ERR_GENERAL == errorCode ) // Check PIPE Error Code
+        else
             {
-            TUint8 pep1ErrorCode( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-                ISI_HEADER_SIZE + PNS_PIPE_CREATE_RESP_OFFSET_PEP1ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-                ISI_HEADER_SIZE + CM_PIPE_CREATE_RESP_OFFSET_PEP1ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-            TUint8 pep2ErrorCode( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-                ISI_HEADER_SIZE + PNS_PIPE_CREATE_RESP_OFFSET_PEP2ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-                ISI_HEADER_SIZE + CM_PIPE_CREATE_RESP_OFFSET_PEP2ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-            // Check PEP Error Codes
-            if ( pep1ErrorCode == PN_PIPE_ERR_PEP_IN_USE ||
-                 pep1ErrorCode == PN_PIPE_ERR_ALL_PIPES_IN_USE ||
-                 pep2ErrorCode == PN_PIPE_ERR_PEP_IN_USE ||
-                 pep2ErrorCode == PN_PIPE_ERR_ALL_PIPES_IN_USE )
+            CCallDataPackage callData;
+            // set call id and mode
+            callData.SetCallIdAndMode(
+                iMobileCallInfo.iCallId, iMobileCallInfo.iService );
+            TInt err = CMmStaticUtility::PacketDataCSCauseToEpocError(
+                 errorCode, PN_PIPE );
+            if ( RMobileCall::EMobileTerminated == iCallDirection )
                 {
-                // PEP can't create more pipes (all pipes in use),
-                // error value is updated here
-TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeCreateResp. ErrorCode changed to PN_PIPE_ERR_ALL_PIPES_IN_USE" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_PNSPIPECREATERESP, "CMmCallMessHandler::PnsPipeCreateResp, ErrorCode changed to PN_PIPE_ERR_ALL_PIPES_IN_USE" );
+                // answering video call fails
+                iMessageRouter->Complete(
+                    EEtelCallAnswer,
+                    &callData,
+                    err );
                 }
+            else
+                {
+                // dialling video call fails
+                // for MO calls pipe is created before iCallDirection is set
+                iMessageRouter->Complete(
+                    EEtelCallDial,
+                    &callData,
+                    err );
+                }
+            iCallDirection = RMobileCall::EDirectionUnknown;
             }
-        //no else
         }
-    //no else
-    }
-
-// ----------------------------------------------------------------------------
-// CMmCallMessHandler::PnsPipeEnableReq
-// Construct a PNS_PIPE_ENABLE_REQ ISI-message.
-// ----------------------------------------------------------------------------
-//
-TInt CMmCallMessHandler::PnsPipeEnableReq() const
-    {
-    TFLOGSTRING2("TSY: CMmCallMessHandler::PnsPipeEnableReq. PipeHandle: %d", iPipeHandle );
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_PNSPIPEENABLEREQ, "CMmCallMessHandler::PnsPipeEnableReq;pipehandle=%hhu", iPipeHandle );
-
-    // TODO: this method is not called. See TelAd-110
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-    TBuf8<SIZE_PNS_PIPE_ENABLE_REQ> data;
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PIPE_ENABLE_REQ> data;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-    data.Append( iPipeHandle );
-    data.Append( KCallPadding );
-
-    // Send Isi message via phonet
-    return iPhoNetSender->Send(
-        PN_PIPE, KPipeTransID, PNS_PIPE_ENABLE_REQ, data );
-    }
-
-// ----------------------------------------------------------------------------
-// CMmCallMessHandler::PnsPipeEnableResp
-// Breaks a PNS_PIPE_ENABLE_RESP ISI-message.
-// ----------------------------------------------------------------------------
-//
-void CMmCallMessHandler::PnsPipeEnableResp(
-    const TIsiReceiveC& aIsiMessage )
-    {
-TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeEnableResp");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPEENABLERESP, "CMmCallMessHandler::PnsPipeEnableResp" );
-    // Get Transaction Id from the ISI message
-    TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
-
-    // TODO: this code makes no sense. See TelAd-110
-    if ( KPipeTransID == transId )
-        {
-        // Get Errorcode from the ISI message
-        TUint8 errorCode( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-            ISI_HEADER_SIZE + PNS_PIPE_ENABLE_RESP_OFFSET_ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_ENABLE_RESP_OFFSET_ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-TFLOGSTRING4("TSY: CMmCallMessHandler::PnsPipeEnableResp - traId: %d, PipeHandle: %d, ErrorCode: %d", transId, iPipeHandle, errorCode );
-OstTraceExt3( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPEENABLERESP, "CMmCallMessHandler::PnsPipeEnableResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, iPipeHandle, errorCode );
-        }
-    // no else
-    }
-
-// ----------------------------------------------------------------------------
-// CMmCallMessHandler::PnsPipeResetReq
-// Construct a PNS_PIPE_RESET_REQ ISI-message.
-// ----------------------------------------------------------------------------
-//
-TInt CMmCallMessHandler::PnsPipeResetReq(
-    const TUint8 aStateAfterReset )
-    {
-    TFLOGSTRING2("TSY: CMmCallMessHandler::PnsPipeResetReq. PipeHandle: %d", iPipeHandle );
-OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPERESETREQ, "CMmCallMessHandler::PnsPipeResetReq;aPipeHandle=%hhu", iPipeHandle );
-
-    // TODO: this method is not called. See TelAd-110
-    // Create buffer for isi msg data
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-    TBuf8<SIZE_PNS_PIPE_RESET_REQ> data;
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PIPE_RESET_REQ> data;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-    data.Append( iPipeHandle );
-    data.Append( aStateAfterReset );
-
-    // Send Isi message via phonet
-    return iPhoNetSender->Send(
-        PN_PIPE, KPipeTransID, PNS_PIPE_RESET_REQ, data );
-    }
-
-// ----------------------------------------------------------------------------
-// CMmCallMessHandler::PnsPipeResetResp
-// Breaks a PNS_PIPE_RESET_RESP ISI-message.
-// ----------------------------------------------------------------------------
-//
-void CMmCallMessHandler::PnsPipeResetResp(
-    const TIsiReceiveC& aIsiMessage )
-    {
-TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeResetResp");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_PNSPIPERESETRESP, "CMmCallMessHandler::PnsPipeResetResp" );
-    // Get Transaction Id from the ISI message
-    TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
-
-    // TODO: this code makes no sense. See TelAd-110
-    if ( KPipeTransID == transId )
-        {
-        // Get Pipehandle from the ISI message
-        TUint8 pipeHandle( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-            ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_RESP_OFFSET_PIPEHANDLE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_REDIRECT_RESP_OFFSET_PIPEHANDLE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-        iPipeHandle = pipeHandle;
-
-TFLOGSTRING3("TSY: CMmCallMessHandler::PnsPipeResetResp - traId: %d, pipe handle: %d", transId, pipeHandle);
-OstTraceExt2( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPERESETRESP, "CMmCallMessHandler::PnsPipeResetResp;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
-
-        TUint8 errorCode( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-            ISI_HEADER_SIZE + PNS_PIPE_RESET_RESP_OFFSET_ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_RESET_RESP_OFFSET_ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-TFLOGSTRING3("TSY: CMmCallMessHandler::PnsPipeResetResp. PipeHandle: %d ErrorCode: %d", pipeHandle, errorCode );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPERESETRESP, "CMmCallMessHandler::PnsPipeResetResp;pipeHandle=%hhu;errorCode=%hhu", pipeHandle, errorCode );
-        }
-    // no else
     }
 
 // ----------------------------------------------------------------------------
@@ -5685,7 +5585,6 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPEREMOVERESP, "CMmCallMess
     // Get Transaction Id from the ISI message
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
 
-    // TODO: this code makes no sense. See TelAd-110
     if ( KPipeTransID == transId )
         {
         // Get Errorcode from the ISI message
@@ -5698,80 +5597,8 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPEREMOVERESP, "CMmCallMess
 
 TFLOGSTRING4("TSY: CMmCallMessHandler::PnsPipeRemoveResp - traId: %d, PipeHandle: %d, ErrorCode: %d", transId, iPipeHandle, errorCode );
 OstTraceExt3( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPEREMOVERESP, "CMmCallMessHandler::PnsPipeRemoveResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, iPipeHandle, errorCode );
-        }
-    // no else
-    }
 
-// ----------------------------------------------------------------------------
-// CMmCallMessHandler::PnsPipeRedirectReq
-// Construct a PNS_PIPE_REDIRECT_REQ ISI-message.
-// ----------------------------------------------------------------------------
-//
-TInt CMmCallMessHandler::PnsPipeRedirectReq()
-    {
-    TFLOGSTRING2("TSY: CMmCallMessHandler::PnsPipeRedirectReq. PipeHandle: %d", iPipeHandle );
-OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPEREDIRECTREQ, "CMmCallMessHandler::PnsPipeRedirectReq;aPipeHandle=%hhu", iPipeHandle );
-
-    // TODO: this method is not called. See TelAd-110
-    // Create buffer for isi msg data
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-    TBuf8<SIZE_PNS_PIPE_REDIRECT_REQ> data;
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PIPE_REDIRECT_REQ> data;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    data.Append( iPipeHandle );
-    data.Append( PN_PIPE_ENABLE );
-    data.Append( iSecondPepDeviceId );
-    data.Append( iSecondPepObjectId );
-    data.Append( KSecondPepType );
-    data.Append( KCallPadding );
-    data.Append( KSecondPepDevice );
-    data.Append( KRedirectPepObject );
-    data.Append( KSecondPepType );
-
-    // Send Isi message via phonet
-    return iPhoNetSender->Send(
-        PN_PIPE,
-        KPipeTransID,
-        PNS_PIPE_REDIRECT_REQ,
-        data );
-    }
-
-// ----------------------------------------------------------------------------
-// CMmCallMessHandler::PnsPipeRedirectResp
-// Breaks a PNS_PIPE_REDIRECT_RESP ISI-message.
-// ----------------------------------------------------------------------------
-//
-void CMmCallMessHandler::PnsPipeRedirectResp(
-    const TIsiReceiveC& aIsiMessage )
-    {
-TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeRedirectResp");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPEREDIRECTRESP, "CMmCallMessHandler::PnsPipeRedirectResp" );
-    // Get Transaction Id from the ISI message
-    TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
-
-    if ( KPipeTransID == transId )
-        {
-        // Get Pipehandle from the ISI message
-        TUint8 pipeHandle( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-            ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_RESP_OFFSET_PIPEHANDLE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_REDIRECT_RESP_OFFSET_PIPEHANDLE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-        iPipeHandle = pipeHandle;
-
-        // Get Errorcode from the ISI message
-        TUint8 errorCode( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-            ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_RESP_OFFSET_ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_REDIRECT_RESP_OFFSET_ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-TFLOGSTRING4("TSY: CMmCallMessHandler::PnsPipeRedirectResp - traId: %d, PipeHandle: %d, ErrorCode: %d", transId, pipeHandle, errorCode );
-OstTraceExt3( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPEREDIRECTRESP, "CMmCallMessHandler::PnsPipeRedirectResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, pipeHandle, errorCode );
+        iPipeHandle = KInvalidPipeHandle;
         }
     // no else
     }

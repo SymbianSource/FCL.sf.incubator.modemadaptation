@@ -1,3 +1,4 @@
+
 /*
 * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -37,6 +38,7 @@ enum TP2PUserChannelFaults
     EP2PUserChannelWrongRequest5,
     EP2PUserChannelWrongRequest6,
     EP2PUserChannelWrongRequest7,
+    EP2PUserChannelWrongRequest8,
     EP2PUserChannelWrongParam,
     EP2PUserChannelWrongParam2,
     EP2PUserChannelProtocolIdNotSpecified,
@@ -308,12 +310,28 @@ TInt DP2PUserChannel::Request(
         )
     {
 
-    C_TRACE( ( _T( "DP2PUserChannel::Request 0x%x 0x%x %d 0x%x>" ), this, iShP2PProtocolId, aReqNo, a1 ) );
+    C_TRACE( ( _T( "DP2PUserChannel::Request 0x%x 0x%x 0x%x 0x%x>" ), this, iShP2PProtocolId, aReqNo, a1 ) );
     // Programmer errors.
-    ASSERT_RESET_ALWAYS( aReqNo >= ( TInt ) EMinRequestId, ( EP2PUserChannelWrongRequest3 | EDP2PUserChannelTraceId << KClassIdentifierShift ) );
-    ASSERT_RESET_ALWAYS( ( aReqNo <= EP2PLastAsyncRequest || aReqNo == KMaxTInt ), ( EP2PUserChannelWrongRequest4 | EDP2PUserChannelTraceId << KClassIdentifierShift ) );
-    // Wrong API usage e.g. called function when interface is not open so panic the client thread.
-    ASSERT_PANIC_USER_THREAD_ALWAYS( ( iShP2PProtocolId < EP2PAmountOfProtocols || EP2PAsyncOpen == aReqNo ), iThread, ( EP2PUserChannelWrongParam2 | EDP2PUserChannelTraceId << KClassIdentifierShift ) );
+    ASSERT_RESET_ALWAYS( aReqNo >= ( TInt ) EMinRequestId, ( EP2PUserChannelWrongRequest3 | EDP2PUserChannelTraceId << KClassIdentifierShift | KExtraInfoShift << (TUint8)aReqNo ) );
+    ASSERT_RESET_ALWAYS( ( aReqNo <= EP2PLastAsyncRequest || aReqNo == KMaxTInt ), ( EP2PUserChannelWrongRequest4 | EDP2PUserChannelTraceId << KClassIdentifierShift | KExtraInfoShift << (TUint8)aReqNo ) );
+    
+    if ( iShP2PProtocolId < EP2PAmountOfProtocols )
+        {
+        // normal activity
+        }
+    else if ( iShP2PProtocolId > EP2PAmountOfProtocols ) // Open ongoing, not completed 
+        {
+        ASSERT_PANIC_USER_THREAD_ALWAYS( ( aReqNo == EP2PAsyncOpen                              ||
+                                           ( aReqNo == KMaxTInt && (TInt)a1 == EP2PAsyncOpen )   || // cancel open
+                                           aReqNo == EP2PClose ),
+                                         iThread, ( EP2PUserChannelWrongParam2 | EDP2PUserChannelTraceId << KClassIdentifierShift | KExtraInfoShift << (TUint8)aReqNo ) );
+        }
+	else
+        {
+		// Not possible to come here
+        ASSERT_RESET_ALWAYS( 0, ( EP2PUserChannelWrongRequest8 | EDP2PUserChannelTraceId << KClassIdentifierShift | KExtraInfoShift << (TUint8)aReqNo ) );
+        }
+
     TInt result( KErrNotFound );
     // All request go in kernel context and with ::DoControl call.
     TThreadMessage& m=Kern::Message();
@@ -642,7 +660,9 @@ void DP2PUserChannel::DoCancel(
             C_TRACE( ( _T( "DP2PUserChannel::DoCancel 0x%x 0x%x EP2PAsyncOpen" ), this, iShP2PProtocolId ) );
             TInt err( Kern::MutexWait( *iShP2PProtocolIdMutex ) );
             ASSERT_RESET_ALWAYS( ( KErrNone == err ), ( EP2PUserChannelMutexWaitFailed4 | EDP2PUserChannelTraceId << KClassIdentifierShift ) );
-            Close( ~iShP2PProtocolId );
+            TUint8 protocolId = ( iShP2PProtocolId > EP2PAmountOfProtocols ) ? ~iShP2PProtocolId : iShP2PProtocolId;
+            Close( protocolId );
+                
             Kern::MutexSignal( *iShP2PProtocolIdMutex );
             break;
             }

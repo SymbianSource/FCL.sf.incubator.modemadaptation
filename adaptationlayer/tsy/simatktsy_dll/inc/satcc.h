@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -28,11 +28,11 @@
 
 // CONSTANTS
 const TUint8 KBccMaxSize = 0x10; // Maximum length for BCC
-const TUint8 KStringMaxSize = 249; // Maximum length for SS and 
+const TUint8 KStringMaxSize = 249; // Maximum length for SS and
                                    // Call Destination address string
 const TUint8 KUssdStringMaxSize = 160; // Maximum length for USSD string
 const TUint8 KCallModeSize = 2; // Call Mode + Call Mode Info
-
+const TUint8 KSbCheckInfoSize = 4; // Size needed to store check info subblock
 
 // FORWARD DECLARATIONS
 class TTlv;
@@ -140,6 +140,7 @@ class CSatCC : public CBase
 
             TUint8 iAddressType;
 
+            TBuf8<KSbCheckInfoSize> iCheckInfo;
             // SS and Call specific
             TBuf8<KStringMaxSize> iString;
 

@@ -51,7 +51,12 @@ class CMmPhoneBookOperationRead3g_adn : public CMmPhoneBookOperationRead
         * Two-phased constructor.
         * @return CMmPhoneBookOperationRead3g_adn*: created object
         */
-        static CMmPhoneBookOperationRead3g_adn* NewL();
+        static CMmPhoneBookOperationRead3g_adn* NewL
+               (
+                CMmPhoneBookStoreMessHandler* aMmPhoneBookStoreMessHandler,
+                CMmUiccMessHandler* aUiccMessHandler,
+                const CMmDataPackage* aDataPackage // Data
+               );
 
         /**
         * Destructor.

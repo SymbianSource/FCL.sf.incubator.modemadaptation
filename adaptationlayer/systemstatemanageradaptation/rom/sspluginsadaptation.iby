@@ -22,15 +22,15 @@
 
 
 /* 
-Only misc adaptation supported in the first phase. Others are commented out.
+Only miscadaptation and emergencycallrfadaptation are supported. Others are commented out.
 
 file=ABI_DIR\BUILD_DIR\ssm_state_adaptation.dll             sys\bin\ssm_state_adaptation.dll
 file=ABI_DIR\BUILD_DIR\ssm_sim_adaptation.dll               sys\bin\ssm_sim_adaptation.dll
 file=ABI_DIR\BUILD_DIR\ssm_rtc_adaptation.dll               sys\bin\ssm_rtc_adaptation.dll
-file=ABI_DIR\BUILD_DIR\ssm_emergencycallrf_adaptation.dll   sys\bin\ssm_emergencycallrf_adaptation.dll
 */
 
-file=ABI_DIR\BUILD_DIR\miscadaptationref.dll                sys\bin\miscadaptationref.dll
+file=ABI_DIR\BUILD_DIR\miscadaptation.dll                   sys\bin\miscadaptation.dll
+file=ABI_DIR\BUILD_DIR\emergencycallrfadaptation.dll        sys\bin\emergencycallrfadaptation.dll
 
 #endif //__SSPLUGINSADAPTATION_IBY__
 

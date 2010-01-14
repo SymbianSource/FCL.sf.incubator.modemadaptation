@@ -25,9 +25,9 @@
 #include <ctsy/serviceapi/cmmsmsutility.h>      // ton/npi constants
 #include "tsylogger.h"          // for logging
 #include <tisi.h>               // isi message
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "satutiltraces.h"
+#include "satutilTraces.h"
 #endif
 
 

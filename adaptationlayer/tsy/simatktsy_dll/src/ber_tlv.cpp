@@ -24,9 +24,9 @@
 #include "tsylogger.h"      // for logging
 #include <tisi.h>           // isi message
 #include <uiccisi.h>        // UICC server
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "ber_tlvtraces.h"
+#include "ber_tlvTraces.h"
 #endif
 
 

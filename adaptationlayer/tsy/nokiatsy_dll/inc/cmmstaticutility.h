@@ -232,6 +232,41 @@ class CMmStaticUtility : public CBase
         static TUint16 GetUnicodeGsm( TUint8 aCharacter);
 
         /**
+        * Converts data to GSM format
+        * @param aInputString Input string
+        * @param aGsmDataString Output string
+        * @return None
+        */
+        static void ConvertUcs2ToGsmUcs2Data(
+                TDesC16& aInputString,
+                TDes8& aGsmDataString );
+        
+        /**
+        * Gets the coding scheme GSM default or UCS2
+        * @param aInputString Input string
+        * @return ETrue or EFalse
+        */
+        static TBool GetCodingScheme(
+                TDesC16& aInputString );
+        
+        /**
+        * Get gsm unicode character
+        * @param aCharacter Input character
+        * @return Unicode character
+        */
+        static TUint8 GetGsmForUnicode( TUint16 aCharacter);
+
+        /**
+        * Gets 16 bits from the aSource
+        * @param const TDes8& aSource
+        * @param TInt aIndex: Index of the data in aSource
+        * @return TInt
+        */
+        static TInt Get16Bit(
+            const TDesC8& aSource, //Source
+            TInt aIndex );         //Index
+
+        /**
         * Set value for oper info
         * THIS IS ONLY FOR WINSCW TESTING USE
         */

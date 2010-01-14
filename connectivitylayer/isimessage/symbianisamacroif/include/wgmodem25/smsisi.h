@@ -15,6 +15,8 @@
 * Name      : PN_SMS [ 0x02 ] Resource SMS Server
 * Version   : 008.002
 *
+* Documentation: www.wirelessmodemapi.com
+*
 */
 
 
@@ -22,7 +24,7 @@
 #define _SYMBIAN_ISI_SMSISI_H_
 
 #define SMS_SERVER_ISI_VERSION_Z	 8
-#define SMS_SERVER_ISI_VERSION_Y	 2
+#define SMS_SERVER_ISI_VERSION_Y	 4
 
 
 //CONSTANTS
@@ -43,12 +45,210 @@
 #define SMS_SETTING_REPLY_PATH_MASK                       	0xFE                                              	
 #define SMS_SETTING_CONF_REQUEST                          	0x02                                                 	
 #define SMS_SETTING_CONF_REQUEST_MASK                     	0xFD                                              	
+#define SMS_TP_FCS_TEL_INTERWRK_NOT_SUPPORTED             	0x80                                              	
+#define SMS_TP_FCS_SM_TYPE0_NOT_SUPPORTED                 	0x81                                              	
+#define SMS_TP_FCS_CANNOT_REPLACE_SM                      	0x82                                              	
+#define SMS_TP_FCS_UNSPECIFIED_PID_ERR                    	0x8F                                              	
+#define SMS_TP_FCS_DCS_NOT_SUPPORTED                      	0x90                                              	
+#define SMS_TP_FCS_MESSAGE_CLASS_NOT_SUPPORTED            	0x91                                              	
+#define SMS_TP_FCS_UNSPECIFIED_DCS_ERR                    	0x9F                                              	
+#define SMS_TP_FCS_CMD_CANNOT_BE_ACTIONED                 	0xA0                                              	
+#define SMS_TP_FCS_CMD_UNSUPPORTED                        	0xA1                                              	
+#define SMS_TP_FCS_UNSPECIFIED_CMD_ERR                    	0xAF                                              	
+#define SMS_TP_FCS_TPDU_NOT_SUPPORTED                     	0xB0                                              	
+#define SMS_TP_FCS_SC_BUSY                                	0xC0                                              	
+#define SMS_TP_FCS_NO_SC_SUBSCRIPTION                     	0xC1                                              	
+#define SMS_TP_FCS_SC_SYSTEM_FAILURE                      	0xC2                                              	
+#define SMS_TP_FCS_INVALID_SME_ADDR                       	0xC3                                              	
+#define SMS_TP_FCS_DEST_SME_BARRED                        	0xC4                                              	
+#define SMS_TP_FCS_SM_REJECTED_DUPLICATE_SM               	0xC5                                              	
+#define SMS_TP_FCS_TP_VPF_NOT_SUPPORTED                   	0xC6                                              	
+#define SMS_TP_FCS_TP_VP_NOT_SUPPORTED                    	0xC7                                              	
+#define SMS_TP_FCS_SIM_STORAGE_FULL                       	0xD0                                              	
+#define SMS_TP_FCS_NO_STORAGE_IN_SIM                      	0xD1                                              	
+#define SMS_TP_FCS_ERROR_IN_MS                            	0xD2                                              	
+#define SMS_TP_FCS_MEM_CAP_EXCEEDED                       	0xD3                                              	
+#define SMS_TP_FCS_SIM_ATK_BUSY                           	0xD4                                              	
+#define SMS_TP_FCS_SIM_DATA_DOWNLOAD_ERROR                	0xD5                                              	
+#define SMS_TP_FCS_UNSPECIFIED                            	0xFF                                              	
+#define SMS_TP_MTI_MASK                                   	0x03                                                 	
+#define SMS_TP_MTI_DELIVER                                	0x00                                                 	
+#define SMS_TP_MTI_DELIVER_REPORT                         	0x00                                                 	
+#define SMS_TP_MTI_STATUS_REPORT                          	0x02                                                 	
+#define SMS_TP_MTI_COMMAND                                	0x02                                                 	
+#define SMS_TP_MTI_SUBMIT                                 	0x01                                                 	
+#define SMS_TP_MTI_SUBMIT_REPORT                          	0x01                                                 	
+#define SMS_TP_MTI_UNDEFINED                              	0x03                                                 	
+#define SMS_TP_MMS_MASK                                   	0x04                                                 	
+#define SMS_TP_MMS_MORE_MESSAGES                          	0x00                                                 	
+#define SMS_TP_MMS_NO_MORE_MESSAGES                       	0x04                                                 	
+#define SMS_TP_VPF_MASK                                   	0x18                                              	
+#define SMS_TP_VPF_NOT_PRESENT                            	0x00                                                 	
+#define SMS_TP_VPF_RELATIVE_FORMAT                        	0x10                                              	
+#define SMS_TP_VPF_ENHANCED_FORMAT                        	0x08                                                 	
+#define SMS_TP_VPF_ABSOLUTE_FORMAT                        	0x18                                              	
+#define SMS_TP_VP_RF_WEEK_BASE_VALUE                      	0xC0                                              	
+#define SMS_TP_VP_RF_DAY_BASE_VALUE                       	0xA6                                              	
+#define SMS_TP_VP_RF_HOUR_BASE_VALUE                      	0x8F                                              	
+#define SMS_TP_SRI_MASK                                   	0x20                                              	
+#define SMS_TP_SRI_NOT_RETURNED                           	0x00                                                 	
+#define SMS_TP_SRI_RETURNED                               	0x20                                              	
+#define SMS_TP_SRR_MASK                                   	0x20                                              	
+#define SMS_TP_SRR_NOT_REQUESTED                          	0x00                                                 	
+#define SMS_TP_SRR_REQUESTED                              	0x20                                              	
+#define SMS_TP_RP_MASK                                    	0x80                                              	
+#define SMS_TP_RP_NOT_SET                                 	0x00                                                 	
+#define SMS_TP_RP_SET                                     	0x80                                              	
+#define SMS_TP_RD_MASK                                    	0x04                                                 	
+#define SMS_TP_RD_ACCEPT                                  	0x00                                                 	
+#define SMS_TP_RD_REJECT                                  	0x04                                                 	
+#define SMS_TP_SRQ_MASK                                   	0x20                                              	
+#define SMS_TP_SRQ_SUBMIT                                 	0x00                                                 	
+#define SMS_TP_SRQ_COMMAND                                	0x20                                              	
+#define SMS_TP_UDHI_MASK                                  	0x40                                              	
+#define SMS_TP_UDHI_MESSAGE                               	0x00                                                 	
+#define SMS_TP_UDHI_HEADER_MESSAGE                        	0x40                                              	
+#define SMS_TP_PI_EXTENSION_BIT_MASK                      	0x80                                              	
+#define SMS_TP_PI_EXTENSION_AVAIL                         	0x80                                              	
+#define SMS_TP_PI_EXTENSION_NOT_AVAIL                     	0x00                                                 	
+#define SMS_TP_PI_UDL_AVAIL                               	0x04                                                 	
+#define SMS_TP_PI_UDL_NOT_AVAIL                           	0x00                                                 	
+#define SMS_TP_PI_DCS_AVAIL                               	0x02                                                 	
+#define SMS_TP_PI_DCS_NOT_AVAIL                           	0x00                                                 	
+#define SMS_TP_PI_PID_AVAIL                               	0x01                                                 	
+#define SMS_TP_PI_PID_NOT_AVAIL                           	0x00                                                 	
+#define SMS_TP_DCS_SMS_GDC_UNCOMPRESSED                   	0x00                                                 	
+#define SMS_TP_DCS_SMS_GDC_COMPRESSED                     	0x20                                              	
+#define SMS_TP_DCS_SMS_GDC_NO_CLASS_MEANING               	0x00                                                 	
+#define SMS_TP_DCS_SMS_GDC_CLASS_MEANING                  	0x10                                              	
+#define SMS_TP_DCS_SMS_GDC_CS_GSM_7BIT                    	0x00                                                 	
+#define SMS_TP_DCS_SMS_GDC_CS_8BIT                        	0x04                                                 	
+#define SMS_TP_DCS_SMS_GDC_CS_UCS2                        	0x08                                                 	
+#define SMS_TP_DCS_SMS_GDC_CS_RESERVED                    	0x0C                                                 	
+#define SMS_TP_DCS_SMS_GDC_CLASS0                         	0x00                                                 	
+#define SMS_TP_DCS_SMS_GDC_CLASS1_ME                      	0x01                                                 	
+#define SMS_TP_DCS_SMS_GDC_CLASS2_SIM                     	0x02                                                 	
+#define SMS_TP_DCS_SMS_GDC_CLASS3_TE                      	0x03                                                 	
+#define SMS_TP_DCS_SMS_MWI_IS_INACTIVE                    	0x00                                                 	
+#define SMS_TP_DCS_SMS_MWI_IS_ACTIVE                      	0x08                                                 	
+#define SMS_TP_DCS_SMS_MWI_VOICEMAIL                      	0x00                                                 	
+#define SMS_TP_DCS_SMS_MWI_FAX                            	0x01                                                 	
+#define SMS_TP_DCS_SMS_MWI_EMAIL                          	0x02                                                 	
+#define SMS_TP_DCS_SMS_MWI_OTHER                          	0x03                                                 	
+#define SMS_TP_DCS_SMS_DATA_CODING_MESSAGE_CLASS          	0xF0                                              	
+#define SMS_TP_DCS_SMS_DCMC_MC_GSM_7BIT                   	0x00                                                 	
+#define SMS_TP_DCS_SMS_DCMC_MC_GSM_8BIT                   	0x02                                                 	
+#define SMS_TP_DCS_SMS_DCMC_MC_UCS2                       	0x04                                                 	
+#define SMS_TP_DCS_SMS_DCMC_CLASS0                        	0x00                                                 	
+#define SMS_TP_DCS_SMS_DCMC_CLASS1_ME                     	0x01                                                 	
+#define SMS_TP_DCS_SMS_DCMC_CLASS2_SIM                    	0x02                                                 	
+#define SMS_TP_DCS_SMS_DCMC_CLASS3_TE                     	0x03                                                 	
+#define SMS_TP_DCS_SMS_ADG_MASK_FOR_GDC                   	0x40                                              	
+#define SMS_TP_DCS_MSG_WAITING_MASK                       	0xF0                                              	
+#define SMS_TP_DCS_MSG_WAITING_DISCARD                    	0xC0                                              	
+#define SMS_TP_DCS_MSG_WAITING_STORE                      	0xD0                                              	
+#define SMS_TP_DCS_MSG_WAITING_UCS2                       	0xE0                                              	
+#define SMS_TP_DCS_CBS_LANGUAGE_GSM_7BIT                  	0x00                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_GERMAN                    	0x00                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_ENGLISH                   	0x01                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_ITALIAN                   	0x02                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_FRENCH                    	0x03                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_SPANISH                   	0x04                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_DUTCH                     	0x05                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_SWEDISH                   	0x06                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_DANISH                    	0x07                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_PORTUGESE                 	0x08                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_FINNISH                   	0x09                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_NORWEGIAN                 	0x0A                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_GREEK                     	0x0B                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_TURKISH                   	0x0C                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_HUNGARIAN                 	0x0D                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_POLISH                    	0x0E                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_UNSPECIFIED               	0x0F                                                 	
+#define SMS_TP_DCS_CBS_LANGUAGE_INDICATED_GSM_7BIT        	0x10                                              	
+#define SMS_TP_DCS_CBS_LANGUAGE_INDICATED_UCS2            	0x11                                              	
+#define SMS_TP_DCS_CBS_LANGUAGE_GSM_7BIT_EXTENDED         	0x10                                              	
+#define SMS_TP_DCS_CBS_GSM_7BIT_CZECH                     	0x00                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_HEBREW                    	0x01                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_ARABIC                    	0x02                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_RUSSIAN                   	0x03                                                 	
+#define SMS_TP_DCS_CBS_GSM_7BIT_ICELANDIC                 	0x04                                                 	
+#define SMS_TP_DCS_CBS_GENERAL_DATA_CODING                	0x40                                              	
+#define SMS_TP_DCS_CBS_GDC_UNCOMPRESSED                   	0x00                                                 	
+#define SMS_TP_DCS_CBS_GDC_COMPRESSED                     	0x20                                              	
+#define SMS_TP_DCS_CBS_GDC_NO_CLASS_MEANING               	0x00                                                 	
+#define SMS_TP_DCS_CBS_GDC_CLASS_MEANING                  	0x10                                              	
+#define SMS_TP_DCS_CBS_GDC_CS_GSM_7BIT                    	0x00                                                 	
+#define SMS_TP_DCS_CBS_GDC_CS_8BIT                        	0x04                                                 	
+#define SMS_TP_DCS_CBS_GDC_CS_UCS2                        	0x08                                                 	
+#define SMS_TP_DCS_CBS_GDC_CS_RESERVED                    	0x0C                                                 	
+#define SMS_TP_DCS_CBS_GDC_CLASS0                         	0x00                                                 	
+#define SMS_TP_DCS_CBS_GDC_CLASS1_ME                      	0x01                                                 	
+#define SMS_TP_DCS_CBS_GDC_CLASS2_SIM                     	0x02                                                 	
+#define SMS_TP_DCS_CBS_GDC_CLASS3_TE                      	0x03                                                 	
+#define SMS_TP_DCS_CBS_WAP_MESSAGES                       	0xF0                                              	
+#define SMS_TP_DCS_CBS_DATA_CODING_MSG_HANDLING           	0xF0                                              	
+#define SMS_TP_DCS_CBS_DCMH_MC_GSM_7BIT                   	0x00                                                 	
+#define SMS_TP_DCS_CBS_DCMH_MC_GSM_8BIT                   	0x02                                                 	
+#define SMS_TP_DCS_CBS_DCMH_MC_UCS2                       	0x04                                                 	
+#define SMS_TP_DCS_CBS_DCMH_CLASS0                        	0x00                                                 	
+#define SMS_TP_DCS_CBS_DCMH_CLASS1_ME                     	0x01                                                 	
+#define SMS_TP_DCS_CBS_DCMH_CLASS2_SIM                    	0x02                                                 	
+#define SMS_TP_DCS_CBS_DCMH_CLASS3_TE                     	0x03                                                 	
+#define SMS_TP_ADDR_TON_MASK                              	0x70                                              	
+#define SMS_TP_ADDR_TON_UNKNOWN                           	0x00                                                 	
+#define SMS_TP_ADDR_TON_INTERNATIONAL                     	0x10                                              	
+#define SMS_TP_ADDR_TON_NATIONAL                          	0x20                                              	
+#define SMS_TP_ADDR_TON_NETW_SPECIFIC                     	0x30                                              	
+#define SMS_TP_ADDR_TON_SUBSCRIBER                        	0x40                                              	
+#define SMS_TP_ADDR_TON_ALPHANUMERIC                      	0x50                                              	
+#define SMS_TP_ADDR_TON_ABBREVIATED                       	0x60                                              	
+#define SMS_TP_ADDR_TON_RESERVED                          	0x70                                              	
+#define SMS_RP_ADDR_TON_MASK                              	0x70                                              	
+#define SMS_RP_ADDR_TON_UNKNOWN                           	0x00                                                 	
+#define SMS_RP_ADDR_TON_INTERNATIONAL                     	0x10                                              	
+#define SMS_RP_ADDR_TON_NATIONAL                          	0x20                                              	
+#define SMS_RP_ADDR_TON_NETW_SPECIFIC                     	0x30                                              	
+#define SMS_RP_ADDR_TON_DEDIC_ACCESS                      	0x40                                              	
+#define SMS_RP_ADDR_TON_RESERVED                          	0x70                                              	
+#define SMS_RP_ADDR_NPI_MASK                              	0x0F                                                 	
+#define SMS_RP_ADDR_NPI_UNKNOWN                           	0x00                                                 	
+#define SMS_RP_ADDR_NPI_ISDN                              	0x01                                                 	
+#define SMS_RP_ADDR_NPI_DATA                              	0x03                                                 	
+#define SMS_RP_ADDR_NPI_TELEX                             	0x04                                                 	
+#define SMS_RP_ADDR_NPI_NATIONAL                          	0x08                                                 	
+#define SMS_RP_ADDR_NPI_PRIVATE                           	0x09                                                 	
+#define SMS_RP_ADDR_NPI_RES_CTS                           	0x0B                                                 	
+#define SMS_RP_ADDR_NPI_RESERVED                          	0x0F                                                 	
+#define SMS_TP_ADDR_NPI_MASK                              	0x0F                                                 	
+#define SMS_TP_ADDR_NPI_UNKNOWN                           	0x00                                                 	
+#define SMS_TP_ADDR_NPI_ISDN                              	0x01                                                 	
+#define SMS_TP_ADDR_NPI_DATA                              	0x03                                                 	
+#define SMS_TP_ADDR_NPI_TELEX                             	0x04                                                 	
+#define SMS_TP_ADDR_NPI_SC_SPECIFIC1                      	0x05                                                 	
+#define SMS_TP_ADDR_NPI_SC_SPECIFIC2                      	0x06                                                 	
+#define SMS_TP_ADDR_NPI_NATIONAL                          	0x08                                                 	
+#define SMS_TP_ADDR_NPI_PRIVATE                           	0x09                                                 	
+#define SMS_TP_ADDR_NPI_ERMES                             	0x0A                                                 	
+#define SMS_TP_ADDR_NPI_RESERVED                          	0x0F                                                 	
+#define SMS_SRV_CB_MAX_SUBSCRIPTION_NR                    	0xFF                                              	
+#define SMS_SRV_CB_MAX_CLIENT_AMOUNT                      	0x0B                                                 	
+#define SMS_SRV_CB_MAX_CBMID_COUNT                        	0xC8                                              	
+#define SMS_SRV_CB_MAX_LANGUAGE_COUNT                     	0x11                                              	
+#define SMS_SRV_CB_DCS_ELEMENT_SIZE                       	0x01                                                 	
+#define SMS_SRV_CB_CBMID_ELEMENT_SIZE                     	0x02                                                 	
+#define SMS_CB_SUBSCRIPTION_ID_SIZE                       	0x01                                                 	
 #define SMS_ANY_SIZE                                      	0x01                                                 	
 #define SMS_CONCATENATED_UD_MAX_LEN                       	0x857A                                            	
+//#define SMS_TP_VPF_RELATIVE                               	0x01                                                 	
+//#define SMS_TP_VPF_ABSOLUTE_OR_ENHANCED                   	0x07                                                 	
 #define SMS_PARAM_INDICATOR_MAX_LEN                       	0x0A                                                 	
 #define SMS_SC_TIME_STAMP_SIZE                            	0x07                                                 	
 #define SMS_DEFAULT_PARAMETER_LOCATION                    	0x00                                                 	
 #define SMS_NEW_SUBSCRIPTION                              	0x00                                                 	
+
+#define SMS_VPF_RELATIVE                                  	0x01                                                 	
+#define SMS_VPF_ABSOLUTE_OR_ENHANCED                      	0x07                                                 	
 
 
 //TABLES
@@ -246,8 +446,6 @@
 //ConstantTable for SMS_CONTENT_TYPE
 
 //ConstantTable for SMS_VALIDITY_PERIOD_FORMAT
-#define SMS_VPF_RELATIVE                                  	0x01                                                 	
-#define SMS_VPF_ABSOLUTE_OR_ENHANCED                      	0x07                                                 	
 
 //ConstantTable for SMS_SERVER_STATUS
 #define SMS_SERVER_READY                                  	0x00                                                 	
@@ -406,16 +604,6 @@
 #define SMS_SB_COMMAND_OFFSET_MESSAGENUMBER               	8 //size 1 byte(s)
 #define SMS_SB_COMMAND_OFFSET_FILLERBYTE1                 	9 //size 3 byte(s)
 #define SIZE_SMS_SB_COMMAND                               	12
-
-
-//Definition for SMS_SB_MO_UNDEFINED
-#define SMS_SB_MO_UNDEFINED                               	0x1F                                              	
-#define SMS_SB_MO_UNDEFINED_OFFSET_SUBBLOCKID             	0 //size 2 byte(s)
-#define SMS_SB_MO_UNDEFINED_OFFSET_SUBBLOCKLENGTH         	2 //size 2 byte(s)
-#define SMS_SB_MO_UNDEFINED_OFFSET_MESSAGEPARAMETERS      	4 //size 1 byte(s)
-#define SMS_SB_MO_UNDEFINED_OFFSET_MESSAGEREFERENCE       	5 //size 1 byte(s)
-#define SMS_SB_MO_UNDEFINED_OFFSET_FILLERBYTE1            	6 //size 2 byte(s)
-#define SIZE_SMS_SB_MO_UNDEFINED                          	8
 
 
 //Definition for SMS_SB_DELIVER_REPORT

@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -86,7 +86,6 @@ class CUsbPnInterface : public CBase, public MUsbPnAltObserver
 
         /**
         * Activates data transfer mode when USB host selects alternate setting.
-        * @since Series ?XX ?SeriesXX_version
         * @param TUint aAltSetNumber. 0 for altset zero. 1 for data transfer mode.
         */
         void SetAltSetting( TUint aAltSetNumber );

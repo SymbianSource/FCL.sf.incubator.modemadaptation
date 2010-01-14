@@ -63,4 +63,5 @@ EXPORTS
 	_ZN9DReqQueueD1Ev @ 62 NONAME
 	_ZN9DReqQueueD2Ev @ 63 NONAME
 	_ZNK13DIsaKernelAPI23NotifyStateChangeCancelEv @ 64 NONAME
+	_ZN18MISIObjectRouterIf7ConnectElRhP18MISIRouterObjectIf @ 65 NONAME
 

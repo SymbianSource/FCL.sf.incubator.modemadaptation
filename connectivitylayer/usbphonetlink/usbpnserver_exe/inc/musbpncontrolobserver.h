@@ -34,17 +34,11 @@ class MUsbPnControlObserver
 
         /**
         * Get packet for sending.
-        * @since Series ?XX ?SeriesXX_version
-        * @param ?arg1 ?description
-        * @return ?description
         */
         virtual CUsbPnPacket& PacketL() = 0;
 
         /**
         * Send packet.
-        * @since Series ?XX ?SeriesXX_version
-        * @param ?arg1 ?description
-        * @return ?description
         */
         virtual void Send( CUsbPnPacket& aPacket ) = 0;
 

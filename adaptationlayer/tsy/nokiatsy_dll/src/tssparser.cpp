@@ -20,9 +20,9 @@
 // INCLUDE FILES
 #include "tssparser.h" // class definition file
 #include "tsylogger.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "tssparsertraces.h"
+#include "tssparserTraces.h"
 #endif
  // for TSY logging
 

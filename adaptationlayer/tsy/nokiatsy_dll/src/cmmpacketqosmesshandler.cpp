@@ -33,9 +33,9 @@
 
 #include <gpds_sharedisi.h>
 #include <ctsy/pluginapi/cmmdatapackage.h>
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmpacketqosmesshandlertraces.h"
+#include "cmmpacketqosmesshandlerTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

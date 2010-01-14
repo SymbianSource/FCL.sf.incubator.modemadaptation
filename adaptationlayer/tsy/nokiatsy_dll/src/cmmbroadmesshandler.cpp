@@ -28,9 +28,9 @@
 #include "tsylogger.h"
 #include "cmmphonetsender.h"
 #include "cmmstaticutility.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmbroadmesshandlertraces.h"
+#include "cmmbroadmesshandlerTraces.h"
 #endif
 
 
@@ -84,6 +84,9 @@ TFLOGSTRING("TSY: CMmBroadMessHandler::ConstructL");
 OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_CONSTRUCTL, "CMmBroadMessHandler::ConstructL" );
     // Initialise the array. Maximun of pages in a WCDMA CBS message is 15
     iCbsMsg = new( ELeave ) CArrayPtrFlat< TWcdmaCbsMsg >( 10 );
+
+    // Cb subscription number.
+    iCbSubscriptionNumber = SMS_NEW_SUBSCRIPTION;
     }
 
 // -----------------------------------------------------------------------------
@@ -243,7 +246,18 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST, "CMmBr
     // Create a buffer to hold the request
     TBuf8<SIZE_SMS_CB_ROUTING_REQ> dataBuffer;
     dataBuffer.Append( routingCommand ); // Routing command
-    dataBuffer.Append( SMS_NEW_SUBSCRIPTION  ); // Subscription number
+
+    if ( SMS_ROUTING_RELEASE == routingCommand )
+        {
+        // Subscription number
+        dataBuffer.Append( iCbSubscriptionNumber );
+        }
+    else if ( SMS_ROUTING_SET == routingCommand )
+        {
+        // Subscription number
+        dataBuffer.Append( SMS_NEW_SUBSCRIPTION );
+        }
+
     dataBuffer.Append( SMS_TYPE_DEFAULT ); // Subscription type
     dataBuffer.Append( KBroadPadding ); // Filler
     dataBuffer.Append( KBroadPadding ); // Filler
@@ -271,6 +285,9 @@ void CMmBroadMessHandler::SmsCbRoutingResp
 TFLOGSTRING("TSY: CMmBroadMessHandler::SmsCbRoutingResp");
 OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_SMSGSMCBROUTINGRESP, "CMmBroadMessHandler::SmsCbRoutingResp" );
     TInt ipc( 0 ); // Initialize to zero
+
+    iCbSubscriptionNumber = aSmsCbRoutingResp.Get8bit(
+        ISI_HEADER_SIZE + SMS_CB_ROUTING_RESP_OFFSET_SUBSCRIPTIONNUMBER );
 
     TUint8 isiCause( aSmsCbRoutingResp.Get8bit( ISI_HEADER_SIZE
         + SMS_CB_ROUTING_RESP_OFFSET_SMSCAUSE ) );

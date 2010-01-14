@@ -25,9 +25,9 @@
 #include "tsylogger.h"
 #include "tisi.h"
 #include <smsisi.h>
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmsmscachetraces.h"
+#include "cmmsmscacheTraces.h"
 #endif
 
 //  External Data Structures
@@ -328,4 +328,24 @@ OstTrace0( TRACE_NORMAL, CMMSMSCACHE_DELETEALL, "CMmSmsCache::DeleteAll" );
         }
     }
 
+// -----------------------------------------------------------------------------
+// CMmSmsCache::SetStorageStatus
+// Changes the storage status of a cached entry (TS 31.102, clause 4.2.25)
+// -----------------------------------------------------------------------------
+//
+void CMmSmsCache::SetStorageStatus(
+    TInt aLocation,
+    RMobileSmsStore::TMobileSmsStoreStatus aMsgStatus )
+    {
+TFLOGSTRING2("TSY: CMmSmsCache::SetStorageStatus(loc=%d)", aLocation);
+OstTrace1( TRACE_NORMAL, CMMSMSCACHE_SETSTORAGESTATUS, "CMmSmsCache::SetStorageStatus;aLocation=%d", aLocation );
+
+    if ( aLocation <= iElements.Count()
+        && aLocation >= 1
+        && iElements[aLocation-1] )
+        {
+        // Entry exists, update status.
+        iElements[aLocation-1]->iMsgStatus = aMsgStatus;
+        }
+    }
 //  End of File

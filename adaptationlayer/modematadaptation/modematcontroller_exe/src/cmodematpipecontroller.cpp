@@ -38,8 +38,8 @@ const TUint8 PEP_COMM_IND_ID_ESCAPE(0x07);
 const TInt KInvalidDteId = -1;
 const TUint8 KFiller = 0;
 const TUint8 KDefaultTrId(0);
-const TUint8 KTaskIdQuerySize(20);
 #endif
+const TInt KLastByteIndex = 3;
 
 CModemAtPipeController* CModemAtPipeController::NewL( RIscApi& aIscApi,
     TUint& aObjId,
@@ -79,8 +79,6 @@ CModemAtPipeController::CModemAtPipeController( RIscApi& aIscApi,
     iPipeHandle( KInvalidPipeHandle ),
     iDataportDevId( 0 ),
     iDataportObjId( 0 ),
-    iCellmoDevId( 0 ),
-    iCellmoObjId( 0 ),
     iAtHandler( aHandler ),
     iSchedulerWait( NULL ),
     iDteId( KInitialDteId )
@@ -111,7 +109,7 @@ CModemAtPipeController::CModemAtPipeController( RIscApi& aIscApi,
             break;
 
         default:
-            ASSERT_PANIC_ALWAYS( EFalse ) ;
+            TRACE_ASSERT_ALWAYS;
             break;
         }
      }
@@ -119,6 +117,7 @@ CModemAtPipeController::CModemAtPipeController( RIscApi& aIscApi,
  void CModemAtPipeController::HandlePipeServiceMessage( const TIsiReceiveC& aReceivedMessage)
      {
      C_TRACE (( _T("CModemAtPipeController::HandlePipeServiceMessage()") ));
+     C_TRACE((_L("message id: %d") , aReceivedMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) ));
      switch( aReceivedMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) )
         {
         case PNS_PIPE_CREATE_RESP:
@@ -147,7 +146,7 @@ CModemAtPipeController::CModemAtPipeController( RIscApi& aIscApi,
             break;
 
         default:
-            ASSERT_PANIC_ALWAYS( EFalse );
+            TRACE_ASSERT_ALWAYS;
             break;
         }                            
      }
@@ -192,23 +191,27 @@ TUint CModemAtPipeController::MatchDataportName( TUint aName)
 void CModemAtPipeController::HandleNameAddInd( const TIsiReceiveC& aReceivedMessage )     
      {
      C_TRACE (( _T("CModemAtPipeController::HandleNameAddInd()") ));
-     TInt count = aReceivedMessage.Get16bit( ISI_HEADER_SIZE + PNS_NAME_ADD_IND_OFFSET_MATCHESINMSG );
+     TInt matchesInThisMsg = aReceivedMessage.Get16bit( ISI_HEADER_SIZE +
+       PNS_NAME_ADD_IND_OFFSET_MATCHESINMSG );
      
-     C_TRACE((_L("Count %d") ,count ));
+     C_TRACE((_L("matchesInThisMsg: %d") ,matchesInThisMsg ));
      TUint name = 0;
     
-     for( TInt i = 1; i <= count ; i++ ) 
+     for( TInt i = 1; i <= matchesInThisMsg; i++ ) 
          {
-         name = aReceivedMessage.Get32bit(ISI_HEADER_SIZE+PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL * i);
+         name = aReceivedMessage.Get32bit(ISI_HEADER_SIZE +
+           PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL * i);
          C_TRACE((_L("name [%d] 0x%x"), i ,name));
 
-         if( MatchDataportName(name) )   
+         if( MatchDataportName(name) )
              {
              iDataportDevId = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
-               PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL * i +  PN_NAME_SRV_ITEM_STR_OFFSET_DEV );
+               PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL * i +
+               PN_NAME_SRV_ITEM_STR_OFFSET_DEV );
              iDataportObjId = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
-               PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL * i +  PN_NAME_SRV_ITEM_STR_OFFSET_OBJ);
-             
+               PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL * i +
+               PN_NAME_SRV_ITEM_STR_OFFSET_OBJ);
+
              if( iDataportDevId == THIS_DEVICE )
                 {
                 C_TRACE((_L("CREATE PIPE FROM DATAPORT when ATEXT plugins connect (devid %x  o-bjid %x) "),iDataportDevId,iDataportObjId));
@@ -223,70 +226,70 @@ void CModemAtPipeController::HandleNameAddInd( const TIsiReceiveC& aReceivedMess
      }
 
 void CModemAtPipeController::HandleNameRemoveInd( const TIsiReceiveC& aReceivedMessage )     
-     {
-     C_TRACE (( _T("CModemAtPipeController::HandleNameRemoveInd()") ));
-     TInt count = aReceivedMessage.Get16bit( ISI_HEADER_SIZE + PNS_NAME_REMOVE_IND_OFFSET_MATCHESINMSG );
-     
-     C_TRACE((_L("Count %d") ,count ));
-     TUint name = 0;
-    
-     for( TInt i = 1; i <= count ; i++ ) 
-         {
-         name = aReceivedMessage.Get32bit(ISI_HEADER_SIZE + PNS_NAME_REMOVE_IND_OFFSET_NAMEENTRYTBL * i);
-         C_TRACE((_L("name [%d] 0x%x"), i ,name));
-
-         if( MatchDataportName(name) )   
-             {
-             TUint devId = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
-               PNS_NAME_REMOVE_IND_OFFSET_NAMEENTRYTBL * i +  PN_NAME_SRV_ITEM_STR_OFFSET_DEV );
-             TUint objId = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
-               PNS_NAME_REMOVE_IND_OFFSET_NAMEENTRYTBL * i +  PN_NAME_SRV_ITEM_STR_OFFSET_OBJ);
-
-             if( iDataportDevId == devId && iDataportObjId == objId )
-                {
-                C_TRACE((_L("Dataport removed from name service (devid %x  o-bjid %x) "),iDataportDevId,iDataportObjId));
-                iDataportDevId = 0;
-                iDataportObjId = 0;
-                }
-             else
-                {
-                C_TRACE((_L("Unused dataport removed from name service. DevId: 0x%x or ObjId 0x%x"), iDataportDevId, iDataportObjId ));
-                TRACE_ASSERT_ALWAYS;
-                }
-             }
-         }
-     }
-
-
-void CModemAtPipeController::HandleNameQueryResp( const TIsiReceiveC& aReceivedMessage ) 
     {
-    C_TRACE((_L("CModemAtPipeHandler::HandleNameQueryResp")));
-     
-    TInt count = aReceivedMessage.Get16bit( ISI_HEADER_SIZE + PNS_NAME_QUERY_RESP_OFFSET_MATCHESINMSG );
-    C_TRACE((_L("Count d%d"), count ));
-    TInt name = 0;
-    TBool found = EFalse;
-     
-    for( TInt i = 0; i < count ; i++ ) 
+    C_TRACE (( _T("CModemAtPipeController::HandleNameRemoveInd()") ));
+    TInt matchesInThisMsg = aReceivedMessage.Get16bit( ISI_HEADER_SIZE +
+      PNS_NAME_REMOVE_IND_OFFSET_MATCHESINMSG );
+    
+    C_TRACE((_L("matchesInThisMsg: %d"), matchesInThisMsg ));
+    TUint name = 0;
+
+    for( TInt i = 1; i <= matchesInThisMsg; i++ ) 
         {
-        name = aReceivedMessage.Get32bit( ISI_HEADER_SIZE + PNS_NAME_QUERY_RESP_OFFSET_NAMEENTRYTBL * i );
-        C_TRACE((_L("name [%d]%x"),i ,name ));
-        if(name == PN_AT_MODEM) 
+        name = aReceivedMessage.Get32bit(ISI_HEADER_SIZE +
+          PNS_NAME_REMOVE_IND_OFFSET_NAMEENTRYTBL * i);
+        C_TRACE((_L("name [%d] 0x%x"), i ,name));
+
+        if( MatchDataportName(name) )
             {
-            iCellmoDevId =  aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
-              PNS_NAME_QUERY_RESP_OFFSET_NAMEENTRYTBL * i +  PN_NAME_SRV_ITEM_STR_OFFSET_DEV );
-            iCellmoObjId =  aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
-              PNS_NAME_QUERY_RESP_OFFSET_NAMEENTRYTBL * i +  PN_NAME_SRV_ITEM_STR_OFFSET_OBJ );
-            found = ETrue;
-            C_TRACE((_L("devid %x  objid %x"),iCellmoDevId,iCellmoObjId));
+            TUint devId = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
+              PNS_NAME_REMOVE_IND_OFFSET_NAMEENTRYTBL * i +
+              PN_NAME_SRV_ITEM_STR_OFFSET_DEV );
+            TUint objId = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
+              PNS_NAME_REMOVE_IND_OFFSET_NAMEENTRYTBL * i +
+              PN_NAME_SRV_ITEM_STR_OFFSET_OBJ);
+
+            if( iDataportDevId == devId && iDataportObjId == objId )
+               {
+               C_TRACE((_L("Dataport removed from name service (devid %x  o-bjid %x) "), iDataportDevId, iDataportObjId));
+               iDataportDevId = 0;
+               iDataportObjId = 0;
+               }
+            else
+               {
+               C_TRACE((_L("Unused dataport removed from name service. DevId: 0x%x or ObjId 0x%x"), iDataportDevId, iDataportObjId ));
+               TRACE_ASSERT_ALWAYS;
+               }
             }
         }
-     
-    if( !found )
+    }
+
+void CModemAtPipeController::HandleNameQueryResp( const TIsiReceiveC& aReceivedMessage )
+    {
+    C_TRACE((_L("CModemAtPipeHandler::HandleNameQueryResp")));
+    TUint16 matchesInThisMsg( aReceivedMessage.Get16bit(
+        ISI_HEADER_SIZE + PNS_NAME_QUERY_RESP_OFFSET_MATCHESINMSG ) );
+    C_TRACE((_L("matchesInThisMsg: %d"), matchesInThisMsg ));
+
+    TBool found = EFalse;
+    if( 0 < matchesInThisMsg )
         {
-        TRACE_ASSERT_ALWAYS;
-        User::Panic( _L("NO AT-MODEM"), KErrNotFound );
+        for( TInt i = 0; i < matchesInThisMsg; i++ )
+            {
+            TInt recordIndex( i * SIZE_PN_NAME_SRV_ITEM_STR );
+            TUint8 name( aReceivedMessage.Get8bit(
+                ISI_HEADER_SIZE + PNS_NAME_QUERY_RESP_OFFSET_NAMEENTRYTBL +
+                recordIndex + ( PN_NAME_SRV_ITEM_STR_OFFSET_NAME + KLastByteIndex ) ) );
+            C_TRACE((_L("name [%d] 0x%x"), i, name ));
+            if( PN_AT_MODEM == name )
+                {
+                C_TRACE((_L("PN_AT_MODEM found.")));
+                i = matchesInThisMsg;
+                found = ETrue;
+                }
+            }
         }
+    iAtHandler.SetModemAtExistsInCmt( found );
     }
 
 
@@ -319,7 +322,7 @@ void CModemAtPipeController::SendCreatePipeMessage( const TUint8 aDevId, const T
      C_TRACE(_L("Created ISI-message"));
      DUMP_MESSAGE( messageptr );
      TInt retVal = iIscApi.Send( messageptr );
-     ASSERT_PANIC_ALWAYS( retVal == KErrNone );
+     TRACE_ASSERT( retVal == KErrNone );
      delete message;
      }
 
@@ -362,6 +365,12 @@ void CModemAtPipeController::SendCreatePipeMessage( const TUint8 aDevId, const T
     {
     C_TRACE (( _T("CModemAtPipeController::LinkDteIdToPipe(0x%x)"), aDteId ));
     TRACE_ASSERT( aDteId < KMaxDteIdCount );
+    if( !(aDteId < KMaxDteIdCount) )
+        {
+        C_TRACE(( _T("CModemAtPipeController::LinkDteIdToPipe() illegal dteid %d"), aDteId ));
+        return;
+        }
+
     iDteId = aDteId;
     if( iDataportDevId == THIS_DEVICE )
         {
@@ -391,8 +400,21 @@ void CModemAtPipeController::HandlePipeRemoveResp( const TIsiReceiveC& aReceived
       PNS_PIPE_REMOVE_RESP_OFFSET_PIPEHANDLE );
 
     TInt dteId = FindDteId( pipehandle );
-    ASSERT_PANIC_ALWAYS( dteId < KMaxDteIdCount )
-    ASSERT_PANIC_ALWAYS( error == PN_PIPE_NO_ERROR )
+    
+    TRACE_ASSERT( dteId < KMaxDteIdCount )
+    if( !(dteId < KMaxDteIdCount) )
+        {
+        C_TRACE(( _T("CModemAtPipeController::HandlePipeRemoveResp() illegal dteid %d"), dteId ));
+        return;
+        }
+    
+    TRACE_ASSERT( error == PN_PIPE_NO_ERROR )
+    if( error != PN_PIPE_NO_ERROR )
+        {
+        C_TRACE(( _T("CModemAtPipeController::HandlePipeRemoveResp() error %d"), error ));
+        return;
+        }
+
     ChangePipeState( dteId, TPipeInfo::EPipeNoPipe );
 
     iPipeTable[ dteId ].iHandle = KInvalidPipeHandle; 
@@ -411,7 +433,14 @@ void CModemAtPipeController::HandlePipeRemoveResp( const TIsiReceiveC& aReceived
 void CModemAtPipeController::RemovePipe( const TUint8 aDteId )
     {
     C_TRACE (( _T("CModemAtPipeController::RemovePipe(%d, 0x%x)"), aDteId, this ));
-    ASSERT_PANIC_ALWAYS( aDteId < KMaxDteIdCount );
+
+    TRACE_ASSERT( aDteId < KMaxDteIdCount );
+    if( !(aDteId < KMaxDteIdCount) )
+        {
+        C_TRACE(( _T("CModemAtPipeController::RemovePipe() illegal dteid %d"), aDteId ));
+        return;
+        }
+
     C_TRACE (( _T("iPipeTable[aDteId]:0x%x"), &iPipeTable[aDteId] ));
     C_TRACE (( _T("iHandle: %d"), iPipeTable[aDteId].iHandle ));
     C_TRACE (( _T("i1stDevId: %d"), iPipeTable[aDteId].iFirstDevId ));
@@ -444,7 +473,7 @@ void CModemAtPipeController::SendRemovePipeReq( const TUint8 aPipeHandle )
     C_TRACE((_L("Remove pipe handle %d"), aPipeHandle));
     TInt size = ISI_HEADER_SIZE + SIZE_PNS_PIPE_REMOVE_REQ;
     HBufC8* message = HBufC8::New( size );
-    ASSERT_PANIC_ALWAYS( message );
+    TRACE_ASSERT( message );
 
     TPtr8 messageptr = message->Des();
     TIsiSend isimessage( messageptr, size );
@@ -459,7 +488,7 @@ void CModemAtPipeController::SendRemovePipeReq( const TUint8 aPipeHandle )
     C_TRACE(_L("Created ISI-message"));
 
     TInt retVal = iIscApi.Send( messageptr );
-    ASSERT_PANIC_ALWAYS( retVal == KErrNone );
+    TRACE_ASSERT( retVal == KErrNone );
     delete message;
     if( !iSchedulerWait )
         {
@@ -477,8 +506,18 @@ void CModemAtPipeController::RedirectPipe( const TUint8 aDteId,
     {
     C_TRACE (( _T("CModemAtPipeController::RedirectPipe() dteid %d"), aDteId ));
     C_TRACE((_L("CModemAtPipeController::RedirectPipe() New pep, deviceId: 0x%x objId: 0x%x "), aNewDevId, aNewObjId));
-    ASSERT_PANIC_ALWAYS( aDteId < KMaxDteIdCount ) 
-    ASSERT_PANIC_ALWAYS( iPipeTable[aDteId].iHandle != KInvalidPipeHandle )
+    TRACE_ASSERT( aDteId < KMaxDteIdCount );
+    if( !(aDteId < KMaxDteIdCount) )
+        {
+        C_TRACE(( _T("CModemAtPipeController::RedirectPipe() illegal dteid %d"), aDteId ));
+        return;
+        }
+    TRACE_ASSERT( iPipeTable[aDteId].iHandle != KInvalidPipeHandle );
+    if( iPipeTable[aDteId].iHandle == KInvalidPipeHandle )
+        {
+        C_TRACE(( _T("CModemAtPipeController::RedirectPipe() invalid pipe handle %d"), iPipeTable[aDteId].iHandle ));
+        return;
+        }
 
     if( iPipeTable[aDteId].iPipeState == TPipeInfo::EPipeRemoving || 
         iPipeTable[aDteId].iPipeState == TPipeInfo::EPipeNoPipe ) 
@@ -501,7 +540,7 @@ void CModemAtPipeController::RedirectPipe( const TUint8 aDteId,
     C_TRACE(_L("CModemAtPipeController::RedirectPipe() Redirecting pipe"));
 
     HBufC8* message = HBufC8::New( ISI_HEADER_SIZE + SIZE_PNS_PIPE_REDIRECT_REQ );
-    ASSERT_PANIC_ALWAYS( message ) 
+    ASSERT_PANIC_ALWAYS( message );
     TPtr8 messageptr = message->Des();
     TIsiSend isimessage( messageptr, ISI_HEADER_SIZE + SIZE_PNS_PIPE_REDIRECT_REQ );
     isimessage.Set8bit( ISI_HEADER_OFFSET_RESOURCEID,PN_PIPE);
@@ -534,7 +573,7 @@ void CModemAtPipeController::RedirectPipe( const TUint8 aDteId,
 
     C_TRACE(_L("Created ISI-message"));
     TInt retVal = iIscApi.Send( messageptr );
-    ASSERT_PANIC_ALWAYS( retVal == KErrNone );
+    TRACE_ASSERT( retVal == KErrNone );
     delete message;
     }
  
@@ -574,15 +613,15 @@ void CModemAtPipeController::HandlePipeRedirectResp( const TIsiReceiveC& aReceiv
 
     }
 
-void CModemAtPipeController::SendTaskIdQuery() 
+void CModemAtPipeController::QueryModemAtFromNameService() 
     {
-    C_TRACE (( _T("CModemAtPipeController::SendTaskIdQuery()") ));
-    HBufC8* message = HBufC8::New( KTaskIdQuerySize );
+    C_TRACE (( _T("CModemAtPipeController::QueryModemAtFromNameService()") ));
+    HBufC8* message = HBufC8::New( ISI_HEADER_SIZE + SIZE_PNS_NAME_QUERY_REQ );
     TRACE_ASSERT( message );
     if( message )
         {
         TPtr8 messageptr = message->Des();
-        TIsiSend isimessage( messageptr, KTaskIdQuerySize );
+        TIsiSend isimessage( messageptr, ISI_HEADER_SIZE + SIZE_PNS_NAME_QUERY_REQ );
         isimessage.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_NAMESERVICE );       
         isimessage.Set8bit( ISI_HEADER_SIZE + PNS_NAME_QUERY_REQ_OFFSET_UTID, KDefaultTrId );
         isimessage.Set8bit( ISI_HEADER_SIZE + PNS_NAME_QUERY_REQ_OFFSET_SUBFUNCTION, PNS_NAME_QUERY_REQ );
@@ -594,7 +633,7 @@ void CModemAtPipeController::SendTaskIdQuery()
 
         DUMP_MESSAGE( messageptr );
         TInt retVal = iIscApi.Send( messageptr );
-        ASSERT_PANIC_ALWAYS( retVal == KErrNone );
+        TRACE_ASSERT( retVal == KErrNone );
         delete message;
         }
     }
@@ -615,7 +654,7 @@ void CModemAtPipeController::SendEnablePipeReq( const TUint8 aPipeHandle )
 
     DUMP_MESSAGE( messageptr );
     TInt retVal = iIscApi.Send( messageptr );
-    ASSERT_PANIC_ALWAYS( retVal == KErrNone );
+    TRACE_ASSERT( retVal == KErrNone );
     delete message;
     }
 

@@ -1,0 +1,60 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* This file provides the information required for building.
+*
+*/
+
+
+#include        <platform_paths.hrh>
+#include        <non_foundation_paths.hrh>
+
+TARGET          miscadaptation.dll
+TARGETTYPE      dll
+
+// UID2 value from ssmadaptation.h ( KMiscAdaptationDllTypeUidValue 0x2000E658 )
+UID             0x2000E658 0x20022D92 // UID3 miscadaptation.dll
+VENDORID        VID_DEFAULT
+
+CAPABILITY      CommDD PowerMgmt ReadDeviceData WriteDeviceData ProtServ SwEvent ReadUserData WriteUserData 
+
+// Has a fixed interface ssm_misc_adaptation.def
+NOEXPORTLIBRARY 
+
+USERINCLUDE     ../inc
+USERINCLUDE     ../traces
+
+OS_LAYER_SYSTEMINCLUDE
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE 
+
+USERINCLUDE     ../../iscservice/inc
+SOURCEPATH      ../../iscservice/src
+SOURCE          sa_common_trace.cpp
+
+SOURCEPATH      ../src
+
+SOURCE          ssm_misc_adaptation.cpp
+
+// -u suffix behaviour can be removed by using nostrictdef
+NOSTRICTDEF
+DEFFILE         ssm_misc_adaptation.def
+
+LIBRARY         euser.lib
+LIBRARY         estor.lib 
+
+SMPSAFE
+
+MACRO API_TRACE_FLAG
+MACRO INTERNAL_TRACE_FLAG
+// End of file

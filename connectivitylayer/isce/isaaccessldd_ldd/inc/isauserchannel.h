@@ -137,6 +137,9 @@ class DISAUserChannel : public DLogicalChannel, public MIAD2ChannelApi
         */
         inline TUint16 GetChannelNumber(){ return iChannelNumber; };
 
+        //From objectapi
+        void Receive( const TDesC8& aMessage );
+
         ///// Functions for internal use.
 
     private:

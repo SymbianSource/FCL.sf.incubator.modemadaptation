@@ -27,9 +27,9 @@
 
 // ISA CellMo ATK server
 #include <pn_const.h>
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmphonetreceivertraces.h"
+#include "cmmphonetreceiverTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

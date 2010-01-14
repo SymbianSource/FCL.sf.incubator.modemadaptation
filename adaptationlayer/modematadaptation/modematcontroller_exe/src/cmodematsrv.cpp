@@ -204,7 +204,7 @@ void CModemAtSrv::HandleATResponse( const TInt aDteId, const TDesC8& aResponse, 
     C_TRACE ((_T("<<CModemAtSrv::HandleATResponse()") ));
     }
 
-void CModemAtSrv::ConnectToModem(CModemAtSession* aSession) 
+TInt CModemAtSrv::ConnectToModem(CModemAtSession* aSession) 
     {
     C_TRACE ((_T(">>CModemAtSrv::ConnectToModem 0x%x"), aSession));
     TInt type = aSession->GetPluginType();
@@ -224,22 +224,20 @@ void CModemAtSrv::ConnectToModem(CModemAtSession* aSession)
                 {
                 TRACE_ASSERT_ALWAYS;
                 aSession->SetDteId( dteid );
-                aSession->ModemConnected((TInt)KErrAlreadyExists);
-                C_TRACE ((_T("<<CModemAtSrv::ConnectToModem 0x%x"), aSession));
-                return;
+                C_TRACE ((_T("<<CModemAtSrv::ConnectToModem KErrAlreadyExists 0x%x"), aSession));
+                return KErrAlreadyExists;
                 }
             //add current session to route table
             C_TRACE((_L("AddSessionToRouteTable type: %d, dteid: %d"), type, aSession->GetDteId()));
             iRouteTable[aSession->GetPluginType()][dteid] = aSession;
             C_TRACE((_L("Interface exists=> %d"),dteid));
-          
+
             aSession->SetDteId( dteid );
-            aSession->ModemConnected(KErrNone); //connected
-            C_TRACE ((_T("<<CModemAtSrv::ConnectToModem 0x%x"), aSession));
-            return;
+            C_TRACE ((_T("<<CModemAtSrv::ConnectToModem KErrNone 0x%x"), aSession));
+            return KErrNone;
             }
         }
-             
+
     //no AT-plugin& Common plugin, find first free dteid
     TInt dteId = 0;
     while(iRouteTable[0][dteId] || iRouteTable[1][dteId])
@@ -251,8 +249,8 @@ void CModemAtSrv::ConnectToModem(CModemAtSession* aSession)
     C_TRACE((_L("Added new dteid: %d"),dteId));
 
     aSession->SetDteId(dteId);
-    iHandler->Connect(dteId);
-    C_TRACE ((_T("<<CModemAtSrv::ConnectToModem 0x%x"), aSession));
+    C_TRACE ((_T("<<CModemAtSrv::ConnectToModem session: 0x%x"), aSession));
+    return iHandler->Connect( dteId );
     }
 
 void CModemAtSrv::AddToSendFifo( const TUint8 aDteId,

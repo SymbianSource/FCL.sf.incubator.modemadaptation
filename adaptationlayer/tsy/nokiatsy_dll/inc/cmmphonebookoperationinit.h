@@ -36,7 +36,26 @@
     // None
 
 // EXTERNAL DATA STRUCTURES
-    // None
+    enum TPBIniPhases
+    {
+    EPBInitPhaseADN = 0,
+    EPBInitPhaseFDN,
+    EPBInitPhaseSDN,
+    EPBInitPhaseMBDN,
+    EPBInitPhaseMSISDN,
+    EPBInitPhaseVMBX,
+    EPBInitPhase_File_Info,
+    EPBInitPhase_FIle_Data,
+    EPBInitPhase_Complete,
+    EPBInitPhase_3GADN_PBR,
+    EPBInitPhase_3GADN_Type1,
+    EPBInitPhase_3GADN_Type2,
+    EPBInitPhase_3GADN_Type3,
+    EPBIniPhase_3GADNDone,
+    EPBIniPhase_PBInitialized,
+    EPBIniPhase_Unknown,
+    EPBIniPhase_Internal
+    };
 
 // FUNCTION PROTOTYPES
     // None
@@ -95,7 +114,7 @@ class CMmPhoneBookOperationInit : public CMmPhoneBookStoreOperationBase
         * Creates phonebook initialize request for UICC card Type
         * @return TInt: KErrNone or error value.
         */
-        TInt UICCInitializeReq();
+        TInt UICCInitializeReq(TUint8 aTransId);
         
         /**
         * Get the next phonebook init Phase
@@ -121,7 +140,7 @@ class CMmPhoneBookOperationInit : public CMmPhoneBookStoreOperationBase
         * @return TInt: KErrNone or error value.
         */
         TInt HandlePBRespL(
-            const TDesC8& aFileData, TInt aStatus);
+            const TDesC8& aFileData, TInt aStatus, TUint8 aTransId );
 
 
 
@@ -134,7 +153,7 @@ class CMmPhoneBookOperationInit : public CMmPhoneBookStoreOperationBase
         */
         void ConstructL( );
 
-        TInt UICCCreateReq( TInt aIpc, const CMmDataPackage* aDataPackage );
+        TInt UICCCreateReq( TInt aIpc, const CMmDataPackage* aDataPackage, TUint8 aTransId );
 
         
 
@@ -156,9 +175,9 @@ class CMmPhoneBookOperationInit : public CMmPhoneBookStoreOperationBase
         * @param TDesC8& aFileData
         * @return TInt: KErrNone or error value.
         */
-        TInt HandleUICCPbRespL(
-            TBool &aComplete,
+        TBool HandleUICCPbRespL(
             TInt aStatus,
+            TUint8 aDetails,
             const TDesC8 &aFileData,
             TInt aTransId);
 
@@ -178,8 +197,12 @@ class CMmPhoneBookOperationInit : public CMmPhoneBookStoreOperationBase
         */
         TInt HandleEXTFileResp(const TDesC8 &aFileData, TInt aStatus);        
 
-        
-
+        /**
+        * Handle FileData of MBI File Response
+        * @param const TDes8& aFileData: UICC Message
+        * @return TInt: KErrNone or error value.
+        */
+        TInt HandleMBIFileResp( const TDesC8 &aFileData , TInt aStatus );
 
         
         
@@ -201,8 +224,11 @@ class CMmPhoneBookOperationInit : public CMmPhoneBookStoreOperationBase
         TInt iNumOfPBRRecords;
         // Indicates is internal init ongoing or not.
         TBool iInternalInit;
-        // keep track for whihc file has extension file no 
-        TBool iExtensionPresent;
+        // Attribute to check what kind of read is ongoing
+        TTypeOfFileToBeRead iTypeOfReading ;
+        // Attribute to Store MBI recordlength
+        TUint8 iMbiRecLen;
+
         
         // Check for ADN is Initilized or not 
         

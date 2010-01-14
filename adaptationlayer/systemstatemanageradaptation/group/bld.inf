@@ -26,15 +26,14 @@ PRJ_EXPORTS
 ../rom/sspluginsadaptation.iby    NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(sspluginsadaptation.iby)
 
 PRJ_MMPFILES
-    ../ssm_misc_adaptation_dll/group/miscadaptationref.mmp
-
+    ../ssm_misc_adaptation_dll/group/miscadaptation.mmp
+    ../ssm_emergencycallrf_adaptation_dll/group/emergencycallrfadaptation.mmp
     /* 
-    Only misc adaptation supported in the first phase. Others are commented out.
+    Only miscadaptation and emergencycallrfadaptation are supported. Others are commented out.
     
     ../ssm_state_adaptation_dll/group/stateadaptationref.mmp
     ../ssm_sim_adaptation_dll/group/simadaptationref.mmp
     ../ssm_rtc_adaptation_dll/group/rtcadaptationref.mmp
-    ../ssm_emergencycallrf_adaptation_dll/group/emergencycallrfadaptationref.mmp
     */
 
 //  End of File

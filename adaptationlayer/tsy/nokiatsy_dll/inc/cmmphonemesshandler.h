@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -31,6 +31,7 @@
 #include "cmmphonetreceiver.h"
 #include "nokiatsy_internal_variation.h"
 #include "muiccoperationbase.h"
+#include "cmmuiccmesshandler.h"
 
 // CONSTANTS
     //None
@@ -125,7 +126,45 @@ class CMmPhoneMessHandler:
         TInt ProcessUiccMsg(
             TInt aTraId,
             TInt aStatus,
+            TUint8 aDetails,
             const TDesC8& aFileData );
+
+        /**
+        * Checks if "Refresh Done" will be sent to UICC
+        * @param TInt aError : Error value during re-reading
+        */
+        void SmsCachingCompleted( TInt aError );
+
+        /**
+        * Checks if "Refresh Done" will be sent to UICC
+        * @param TInt aError : Error value during re-reading
+        */
+        void ServiceTableCachingCompleted( TInt aError );
+
+        /**
+        * Checks if "Refresh Done" will be sent to UICC
+        * @param TUint aError : Error value during re-reading
+        */
+        void CallForwFlagsCachingCompleted( TUint aError );
+
+        /**
+        * Checks if "Refresh Done" will be sent to UICC
+        * @param aError : Error value during re-reading
+        * @return refresh ongoing, True or False.
+        */
+        TBool OplRulesCachingCompleted( TInt aError );
+
+        /**
+        * Checks if "Refresh Done" will be sent to UICC
+        * @param aError : Error value during re-reading
+        */
+        void PnnRecordCachingCompleted( TUint8 aError );
+
+        /**
+        * Checks if "Refresh Done" will be sent to UICC
+        * @param aError : Error value during re-reading
+        */
+        void OnsNameCachingCompleted( TUint8 aError );
 
     protected:
 
@@ -194,6 +233,118 @@ class CMmPhoneMessHandler:
         */
         void ConstructL( CMmMessageRouter* aMessageRouter );
 
+        /**
+        * Read request for EFest
+        * @return KErrNone or error code
+        */
+        TInt UiccReadEfEstReq();
+
+        /**
+        * Handles response for EFest reading in case of getting
+        * ACL status       
+        * @param aStatus status of the operation
+        * @param aFileData content of the EFest
+        * @return none
+        */
+        void UiccGetAclStatusReadEfEstResp( 
+            TInt aStatus, 
+            const TDesC8& aFileData );
+
+        /**
+        * Handles response for EFest reading in case of setting
+        * ACL status       
+        * @param aStatus status of the operation
+        * @param aFileData content of the EFest
+        * @return none
+        */
+        void UiccSetAclStatusReadEfEstResp( 
+            TInt aStatus, 
+            const TDesC8& aFileData );
+
+        /**
+        * Write request for EFest
+        * @param aOldAclState old ACL state
+        * @return KErrNone or error code
+        */
+        TInt UiccSetAclStatusWriteEfEstReq( TUint8 aOldAclState );
+
+        /**
+        * Handles response for EFest writing in case of setting
+        * ACL status       
+        * @param aStatus status of the operation
+        * @return none
+        */
+        void UiccSetAclStatusWriteEfEstResp(
+            TInt aStatus );
+
+        /**
+        * Read request for EFacl
+        * @return KErrNone or error code
+        */
+        TInt UiccReadAclReq();
+
+        /**
+        * Handles response for EFacl reading 
+        * @param aStatus status of the operation
+        * @param aFileData content of the EFacl
+        * @return none
+        */
+        void UiccReadAclResp(
+            TInt aStatus, 
+            const TDesC8& aFileData );
+
+        /**
+        * Encrypt from ACL to CDesC8ArrayFlat.
+        * @param const TDesC8& aTlv
+        * @param TInt aTotalEntries
+        * @return CDesC8ArrayFlat*
+        */
+        CDesC8ArrayFlat* DecodeACL(
+            const TDesC8& aTlv,
+            TInt aTotalEntries) const;
+
+        /**
+        * Sends number of ACL index to the client.
+        * @return none
+        */
+        void CompleteEnumerateAPNEntries();
+
+        /**
+        * Completes APN entry reading
+        * @param TUint8 aIndex
+        * @return none
+        */
+        void CompleteGetAPNName( TUint8 aIndex );
+
+        /**
+        * Deletes APN entry from internal cache and writes
+        * the change to EFacl
+        * @param TUint8 aIndex index to be deleted
+        * @return KErrNone or error code
+        */
+        TInt UiccDeleteApnEntry( TInt aIndex );
+
+        /**
+        * Writes APN entries from internal cache to the EFAcl
+        * @param TUint8 aIndex index to be deleted
+        * @return KErrNone or error code
+        */
+        TInt UiccWriteEfAclReq();
+
+        /**
+        * Handles response for EFAcl writing
+        * @param aStatus status of the operation
+        * @return none
+        */
+        void UiccWriteEfAclResp( TInt aStatus );
+
+        /**
+        * Calculate total length of ACL.
+        * @param CDesC8ArrayFlat* aApnList
+        * @return TUint16 Total legtn of ACL.
+        */
+        TUint16 ACLLength( CDesC8ArrayFlat* aApnList ) const;
+
     private:
 
         /**
@@ -205,7 +356,8 @@ class CMmPhoneMessHandler:
             KRefreshCallForwardingFlags = 0x02,
             KRefreshOplRules = 0x04,
             KRefreshPnnRecord = 0x08,
-            KRefreshOnsName = 0x10
+            KRefreshOnsName = 0x10,
+            KRefreshServiceTable = 0x20
             };
 
         /**
@@ -269,6 +421,34 @@ class CMmPhoneMessHandler:
         void UiccProcessSpnNameInfo(
             TInt aStatus,
             const TDesC8& aFileData );
+
+        /**
+         * Handle UICC_REFRESH_IND ISI message
+         * @param aIsiMessage ISI message
+         * @return void
+         */
+        void UiccRefreshInd( const TIsiReceiveC &aIsiMessage );
+
+        /**
+         * Handle UICC_REFRESH_RESP ISI message
+         * @param aIsiMessage ISI message
+         * @return void
+         */
+        void UiccRefreshResp( const TIsiReceiveC &aIsiMessage );
+
+        /**
+         * Create UICC_REFRESH_REQ ISI message
+         * @param aStatus Status
+         * @return Symbian error code
+         */
+        TInt UiccRefreshReq( TUint8 aStatus );
+
+       /** Complete rerfesh handling
+        * @param aIsiMessage ISI message
+        * @return void
+        */
+       void HandleUiccRefresh( const TIsiReceiveC &aIsiMessage );
+
 
     //ATTRIBUTES
     public:
@@ -335,6 +515,14 @@ class CMmPhoneMessHandler:
 
         // Keeps track if any errors happened during re-reading of cached files
         TBool iRefreshError;
+
+        // Flag for refresh completing
+        TBool iCompleteRefresfDone;
+
+        // Stores temporarily ACL status going to be set
+        RMobilePhone::TAPNControlListServiceStatus iAclStatus;
+
+        TInt iOngoingAclIpc;
     };
 
 #endif // CMMPHONEMESSHANDLER_H

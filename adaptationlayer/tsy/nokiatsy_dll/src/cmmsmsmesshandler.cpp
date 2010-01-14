@@ -39,9 +39,9 @@
 #include "cmmphonemesshandler.h"
 #include "tsylogger.h"
 #include "cmmphonetsender.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmsmsmesshandlertraces.h"
+#include "cmmsmsmesshandlerTraces.h"
 #endif
 
 //  External Data Structures
@@ -82,6 +82,17 @@ const TUint8 KTpduCommandIndexUserDataLength( 7 );
 
 // const TUint8 KSizeOfAlphaTag( 34 ); Compiler warning removal
 const TUint8 KSmsScTimeStampMaxLength( 7 );
+
+// Constanst for SMS parameters
+const TUint8 KSmsMandatoryParamsLength( 28 );
+const TUint8 KSmsMaxAddressLength( 12 );
+const TUint8 KSmsParamsParamIndicatorOffset( 0 );
+const TUint8 KSmsParamsDestAddressOffset( 1 );
+const TUint8 KSmsParamsScAddressOffset( 13 );
+const TUint8 KSmsParamsProtocolIdOffset( 25 );
+const TUint8 KSmsParamsDcsOffset( 26 );
+const TUint8 KSmsParamsValidityPeriodOffset( 27 );
+const TUint8 KSizeOfAlphaTag( 62 );
 
 //  MODULE DATA STRUCTURES
 
@@ -175,6 +186,11 @@ OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_CONSTRUCTL, "CMmSmsMessHandler::Const
     iReceivedClass2ToBeReSent = EFalse;
     // default bearer setting is "CS preferred"
     iMobileSmsBearer = RMobileSmsMessaging::ESmsBearerCircuitPreferred;
+
+    iMemoryCapacityExceeded = EFalse;
+
+    // Reading of SMSP entries starts from record 1
+    iSmspRecordNumber = 1;
     }
 
 // -----------------------------------------------------------------------------
@@ -297,6 +313,26 @@ OstTraceExt1( TRACE_NORMAL,DUP18_CMMSMSMESSHANDLER_SMSMESSAGESENDREQ,"CMmSmsMess
     if ( RMobileSmsMessaging::KGsmTpduSize >= sendData.iMsgData->Length() )
         {
         msgData.Append( *sendData.iMsgData );
+
+        // Get TP-MTI (TP-Message-Type-Indicator) from first octet of TPDU
+        TUint8 tpMti( msgData[KTpduIndexMessageParameters] &
+            TSmsFirstOctet::ESmsMTIMask );
+        if ( TSmsFirstOctet::ESmsMTISubmitOrSubmitReport == tpMti )
+            {
+            subBlockId = SMS_SB_SUBMIT;
+            }
+        else if ( TSmsFirstOctet::ESmsMTIStatusReportOrCommand == tpMti )
+            {
+            subBlockId = SMS_SB_COMMAND;
+            }
+        else // Message type not supported
+            {
+            ret = CMmStaticUtility::EpocErrorCode(
+                KErrArgument,
+                KErrGsmSMSTpduNotSupported );
+TFLOGSTRING2("TSY: CMmSmsMessHandler::SmsMessageSendReq. Error! SMS type not supported: %d", tpMti);
+OstTraceExt1( TRACE_NORMAL, DUP3_CMMSMSMESSHANDLER_SMSMESSAGESENDREQ, "CMmSmsMessHandler::SmsMessageSendReq.Error! SMS type not supported;tpMti=%hhu", tpMti );
+            }
         }
     else
         {
@@ -317,26 +353,6 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_SMSMESSAGESENDREQ, "CMmSmsMessHa
             KErrGsmSMSTpduNotSupported );
 TFLOGSTRING3("TSY: CMmSmsMessHandler::SmsMessageSendReq. Error! Invalid TPDU format (%d) or data buffer format (%d)", msgAttr->iFlags, msgAttr->iDataFormat );
 OstTraceExt2( TRACE_NORMAL, DUP2_CMMSMSMESSHANDLER_SMSMESSAGESENDREQ, "CMmSmsMessHandler::SmsMessageSendReq.Error!;msgAttr->iFlags=%d;msgAttr->iDataFormat=%hhu", msgAttr->iFlags, msgAttr->iDataFormat );
-        }
-
-    // Get TP-MTI (TP-Message-Type-Indicator) from first octet of TPDU
-    TUint8 tpMti( msgData[KTpduIndexMessageParameters] &
-        TSmsFirstOctet::ESmsMTIMask );
-    if ( TSmsFirstOctet::ESmsMTISubmitOrSubmitReport == tpMti )
-        {
-        subBlockId = SMS_SB_SUBMIT;
-        }
-    else if ( TSmsFirstOctet::ESmsMTIStatusReportOrCommand == tpMti )
-        {
-        subBlockId = SMS_SB_COMMAND;
-        }
-    else // Message type not supported
-        {
-        ret = CMmStaticUtility::EpocErrorCode(
-            KErrArgument,
-            KErrGsmSMSTpduNotSupported );
-TFLOGSTRING2("TSY: CMmSmsMessHandler::SmsMessageSendReq. Error! SMS type not supported: %d", tpMti);
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMSMSMESSHANDLER_SMSMESSAGESENDREQ, "CMmSmsMessHandler::SmsMessageSendReq.Error! SMS type not supported;tpMti=%hhu", tpMti );
         }
 
 #if (NCP_COMMON_S60_VERSION_SUPPORT>S60_VERSION_32)
@@ -592,13 +608,11 @@ OstTrace1( TRACE_NORMAL, DUP10_CMMSMSMESSHANDLER_CREATESMSMESSAGESENDREQ, "CMmSm
                 tpUdl,
                 tpUserDataIndex,
                 defaultAlphabet,
-                msgOffset
-                );
+                msgOffset );
             numOfSubblocks++;
-            msgOffset += lengthOfSMSUserDataSb + 1; // Add one byte to put offset into
-                                                    // next free position.
-TFLOGSTRING("TSY: CMmSmsMessHandler::CreateSmsMessageSendReq. SMS_SB_USER_DATA created." );
-OstTrace0( TRACE_NORMAL, DUP7_CMMSMSMESSHANDLER_CREATESMSMESSAGESENDREQ, "CMmSmsMessHandler::CreateSmsMessageSendReq. SMS_SB_USER_DATA created." );
+            msgOffset += lengthOfSMSUserDataSb;
+TFLOGSTRING2("TSY: CMmSmsMessHandler::CreateSmsMessageSendReq. SMS_SB_USER_DATA created. Message offset: %d", msgOffset );
+OstTraceExt1( TRACE_NORMAL, DUP7_CMMSMSMESSHANDLER_CREATESMSMESSAGESENDREQ, "CMmSmsMessHandler::CreateSmsMessageSendReq. SMS_SB_USER_DATA created.;msgOffset=%hhu", msgOffset );
             }
 
         // Create SMS_SB_CHECK_INFO subblock if user data exists
@@ -649,6 +663,7 @@ OstTraceExt1( TRACE_NORMAL, CMMSMSMESSHANDLER_SMSRECEIVEMESSAGEREQ, "CMmSmsMessH
         {
         trId = ESmsMessagingResumeSmsReception;
         }
+
     TIsiSend isiMsg( iPhoNetSender->SendBufferDes() );
     isiMsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_SMS );
     isiMsg.Set8bit(
@@ -1215,6 +1230,15 @@ OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_SMSPPROUTINGRESP, "CMmSmsMessHandler:
         smsServerCauseType,
         smsServerCauseValue ) );
 
+    if ( KErrNone == epocError )
+        {
+        // even if client deactivates reception, next time it is activated
+        // SMS server will ask network to resend all NACKed MT SMs
+        // only query status does not affect this flag, but this action
+        // is not used
+        iMemoryCapacityExceeded = EFalse;
+        }
+
     // Compete active reception status
     if ( SMS_RECEPTION_ACTIVE == receptionStatus )
         {
@@ -1412,38 +1436,52 @@ void CMmSmsMessHandler::SmsReceivedMsgInd( const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmSmsMessHandler::SmsReceivedMsgInd");
 OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_SMSPPROUTINGNTF, "CMmSmsMessHandler::SmsReceivedMsgInd" );
-    TInt ret( KErrNone );
-    // Create a package
-    CMmDataPackage package;
 
-    TUint8 replaceTpPid( 0 ); // IsSmsClass2 also fills this
-    TBool receivedSmsClass2( IsSmsClass2( aIsiMsg, replaceTpPid ) );
-
-    // SIM SMS cache: incoming class 2 SMS
-    if ( receivedSmsClass2 )
+    if ( iMemoryCapacityExceeded )
         {
-        ret = SmsClass2ReceivedMsgInd( aIsiMsg, replaceTpPid );
+TFLOGSTRING("TSY: CMmSmsMessHandler::SmsReceivedMsgInd no storage - internal NACK");
+OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_SMSRECEIVEDMSGIND, "CMmSmsMessHandler::SmsReceivedMsgInd no storage - internal NACK" );
+        // error is ignored
+        SmsReceivedMsgReportReq(
+            EInternalNack,
+            NULL,
+            KErrGsmSMSMemoryCapacityExceeded );
         }
-    // Received SMS is not a class 2 SMS (it is a normal SMS)
     else
         {
-        ret = SmsClass1ReceivedMsgInd( aIsiMsg );
-        }
-    // There was an error, complete to upper level
-    if ( KErrNone != ret )
-        {
+        TInt ret( KErrNone );
+        // Create a package
+        CMmDataPackage package;
+
+        TUint8 replaceTpPid( 0 ); // IsSmsClass2 also fills this
+        TBool receivedSmsClass2( IsSmsClass2( aIsiMsg, replaceTpPid ) );
+
+        // SIM SMS cache: incoming class 2 SMS
+        if ( receivedSmsClass2 )
+            {
+            ret = SmsClass2ReceivedMsgInd( aIsiMsg, replaceTpPid );
+            }
+        // Received SMS is not a class 2 SMS (it is a normal SMS)
+        else
+            {
+            ret = SmsClass1ReceivedMsgInd( aIsiMsg );
+            }
+        // There was an error, complete to upper level
+        if ( KErrNone != ret )
+            {
 TFLOGSTRING2("TSY: CMmSmsMessHandler::SmsReceivedMsgInd;ret=%d", ret);
 OstTrace1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_SMSPPROUTINGNTF, "CMmSmsMessHandler::SmsReceivedMsgInd;ret=%d", ret );
-        TBool smsInd( ETrue );
-        TSmsMsg* nullSms = NULL;
+            TBool smsInd( ETrue );
+            TSmsMsg* nullSms = NULL;
 
-        package.PackData( &smsInd, &nullSms );
+            package.PackData( &smsInd, &nullSms );
 
-        // Complete request to client
-        iMessageRouter->Complete(
-            EMobileSmsMessagingReceiveMessage,
-            &package,
-            ret );
+            // Complete request to client
+            iMessageRouter->Complete(
+                EMobileSmsMessagingReceiveMessage,
+                &package,
+                ret );
+            }
         }
     }
 
@@ -1463,52 +1501,72 @@ void CMmSmsMessHandler::SmsReceivedMsgReportResp( const TIsiReceiveC& aIsiMsg )
 TFLOGSTRING3("TSY: CMmSmsMessHandler::SmsReceivedPpReportResp - traId: %d, cause: %d", traId, cause);
 OstTraceExt2( TRACE_NORMAL, CMMSMSMESSHANDLER_SMSRECEIVEDPPREPORTRESP, "CMmSmsMessHandler::SmsReceivedPpReportResp;traId=%hhu;cause=%hhu", traId, cause );
 
-    // Response for SmsReceivedPpReportReq (Ack)
-    if ( ESmsMessagingAckSmsStored == traId )
+    if ( iMemoryCapacityExceeded )
         {
-        iMessageRouter->Complete(
-            EMobileSmsMessagingAckSmsStored,
-            CMmStaticUtility::CSCauseToEpocError(
-                PN_SMS,
-                SMS_CAUSE_TYPE_COMMON,
-                cause ) );
-        }
-    // Response for SmsReceivedPpReportReq (Nack)
-    else if ( ESmsMessagingNackSmsStored == traId )
-        {
-        iMessageRouter->Complete(
-            EMobileSmsMessagingNackSmsStored,
-            CMmStaticUtility::CSCauseToEpocError(
-                PN_SMS,
-                SMS_CAUSE_TYPE_COMMON,
-                cause ) );
+        // ignore the response, this is response to self-NACK
+        // caused by client not having anymore storage space
+TFLOGSTRING("TSY: CMmSmsMessHandler::SmsReceivedPpReportResp - self-NACK");
+OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_SMSRECEIVEDMSGREPORTRESP, "CMmSmsMessHandler::SmsReceivedPpReportResp - self-NACK" );
         }
     else
         {
+        // Response for SmsReceivedPpReportReq (Ack)
+        if ( ESmsMessagingAckSmsStored == traId )
+            {
+            iMessageRouter->Complete(
+                EMobileSmsMessagingAckSmsStored,
+                CMmStaticUtility::CSCauseToEpocError(
+                    PN_SMS,
+                    SMS_CAUSE_TYPE_COMMON,
+                    cause ) );
+            }
+        // Response for SmsReceivedPpReportReq (Nack)
+        else if ( ESmsMessagingNackSmsStored == traId ||
+            ESmsMessagingNackSmsStoredCapacityExceeded == traId )
+            {
+            iMessageRouter->Complete(
+                EMobileSmsMessagingNackSmsStored,
+                CMmStaticUtility::CSCauseToEpocError(
+                    PN_SMS,
+                    SMS_CAUSE_TYPE_COMMON,
+                    cause ) );
+            }
+        else
+            {
 TFLOGSTRING2("TSY:CMmSmsMessHandler::SmsReceivedPpReportResp:Unexpected transaction ID %d.",traId);
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_SMSRECEIVEDPPREPORTRESP, "CMmSmsMessHandler::SmsReceivedPpReportResp;Unexpected  transaction ID=%hhu", traId );
-        }
+            }
 
-    if ( KErrNone != cause )
-        {
-        //Acknowledging failed.
-        //Complete possible receive message request with KErrGeneral and
-        //set routing activity to false. SMS Stack makes new ReceiveMessage
-        //request.
-        TBool smsInd( EFalse );
-        TSmsMsg* nullSms = NULL;
+        if ( SMS_OK != cause )
+            {
+            //Acknowledging failed.
+            //Complete possible receive message request with KErrGeneral and
+            //set routing activity to false. SMS Stack makes new ReceiveMessage
+            //request.
+            //Client continues receiving MT SM indications if NACKing failed
+            iMemoryCapacityExceeded = EFalse;
 
-        //Complete request to client
-        CMmDataPackage package;
-        package.PackData( &smsInd, &nullSms );
-        iSmsSlotLocation = 0;
+            TBool smsInd( EFalse );
+            TSmsMsg* nullSms = NULL;
 
-        // ISI message construction failed or phonet sender
-        // returned error
-        iMessageRouter->Complete(
-            EMobileSmsMessagingReceiveMessage,
-            &package,
-            KErrGeneral );
+            //Complete request to client
+            CMmDataPackage package;
+            package.PackData( &smsInd, &nullSms );
+            iSmsSlotLocation = 0;
+
+            // ISI message construction failed or phonet sender
+            // returned error
+            iMessageRouter->Complete(
+                EMobileSmsMessagingReceiveMessage,
+                &package,
+                KErrGeneral );
+            }
+        else if ( ESmsMessagingNackSmsStoredCapacityExceeded == traId )
+            {
+            // client succeeded NACKing MT SM
+            // it wont receive any further MT SM indications
+            iMemoryCapacityExceeded = ETrue;
+            }
         }
     }
 
@@ -1748,12 +1806,15 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_EXTFUNCL, "CMmSmsMessHandler::Ex
             }
         case EMobileSmsMessagingGetSmspListPhase1:
             {
-            // Lets delete TSY's internal temporary SMSP storage
+            // Reset internal temporary SMSP storage
             iSmspListArray->ResetAndDestroy();
+            // Start reading SMSP entries
+            ret = UiccGetSmspEntryReq();
             break;
             }
         case EMobileSmsMessagingStoreSmspList:
             {
+            ret = UiccSmsUpdateParameterReq( aDataPackage );
             break;
             }
         case EMobileSmsMessagingAckSmsStored:
@@ -1790,8 +1851,12 @@ TFLOGSTRING("TSY: CMmSmsMessHandler::ExtFuncL.Internal Nack handling started" );
 OstTrace0( TRACE_NORMAL, DUP3_CMMSMSMESSHANDLER_EXTFUNCL, "CMmSmsMessHandler::ExtFuncL, Internal Nack handling started" );
                 }
 
+            // NACK due to lack of storage space causes NTSY to reject further
+            // MT SMs until client resumes SMS reception
+            TUint8 traId = KErrGsmSMSMemoryCapacityExceeded == rpCause ?
+                ESmsMessagingNackSmsStoredCapacityExceeded : ESmsMessagingNackSmsStored;
             ret = SmsReceivedMsgReportReq(
-                ESmsMessagingNackSmsStored,
+                traId,
                 msgData,
                 rpCause );
             break;
@@ -1803,6 +1868,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMSMSMESSHANDLER_EXTFUNCL, "CMmSmsMessHandler::Ex
             }
         case EMobilePhoneStoreDeleteAll:
             {
+            iRecordId = 1; // Start fron 1st location
             ret = DeleteAllSms();
             break;
             }
@@ -1853,7 +1919,13 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMSMSMESSHANDLER_EXTFUNCL, "CMmSmsMessHandler::Ex
 
                 if ( smsFromCache )
                     {
-                    delete smsFromCache;
+                    if ( CheckSCTimestamp( *smsFromCache, scTime ) )
+                        {
+                        // Message with the same timestamp found,
+                        // update SIM flag.
+                        UiccUpdateSMSStatus( currentSlot );
+                        currentSlot = totalSlots; // we're done, exit loop
+                        }
                     }
                 currentSlot++;
                 }
@@ -1880,41 +1952,6 @@ OstTrace1( TRACE_NORMAL, DUP6_CMMSMSMESSHANDLER_EXTFUNCL, "CMmSmsMessHandler::Ex
     return ret;
     }
 
-// -----------------------------------------------------------------------------
-// CMmSmsMessHandler::InternalRetrieveSmspListL
-// Complete SmsParametersReadREQuest and call GetSmspList
-// or CompleteReadSmsp method
-// (other items were commented in header)
-// -----------------------------------------------------------------------------
-//
-void CMmSmsMessHandler::InternalRetrieveSmspListL( TSmsParameters* aParameters )
-    {
-TFLOGSTRING("TSY: CMmSmsMessHandler::InternalRetrieveSmspListL");
-OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_INTERNALRETRIEVESMSPLISTL, "CMmSmsMessHandler::InternalRetrieveSmspListL" );
-    // Add parameter sets information to the TSY's internal storage
-    iSmspListArray->AppendL( aParameters );
-
-    // Lets read next SMSP set
-    if ( iLocationOfSmspSet <= iAmountOfSmspSets )
-        {
-        iLocationOfSmspSet++;
-        }
-    else    // All SMSP sets read
-        {
-        //Pack data
-        CMmDataPackage package;
-        package.PackData( iSmspListArray );
-
-        //complete the request,
-        iMessageRouter->Complete(
-            EMobileSmsMessagingGetSmspListPhase1,
-            &package,
-            KErrNone );
-
-        //Delete array
-        iSmspListArray->ResetAndDestroy();
-        }
-    }
 
 // -----------------------------------------------------------------------------
 // CMmSmsMessHandler::CheckTpPidAndSenderAndServiceCenter
@@ -1939,9 +1976,11 @@ OstTraceExt1( TRACE_NORMAL, CMMSMSMESSHANDLER_CHECKTPPIDANDSENDERANDSERVICECENTE
 
     // Destination address length is integer representation
     // of the number of useful semi-octets of address field
-    messageReference = ( messageReference + 1 ) / 2;
+    // Add two mandatory bytes of TP-OA, too.
+
+    messageReference = ( ( messageReference + 1 ) / 2) + 2;
     offset += messageReference;
-    offset += 2; // Set offset to Protocol Id
+
     TUint8 protocolId( aSMSOnSIM->iMsgData[offset] );
     if ( protocolId == aReceivedTpPid )
         {
@@ -2127,7 +2166,43 @@ OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_DELETESMS, "CMmSmsMessHandler::Delete
         TInt index( 0 );
         //unpack data
         aDataPackage->UnPackData( index );
-        iSmsCache.SetDeleteLocation( index );
+        RMobileSmsStore::TMobileGsmSmsEntryV1* smsData(
+            iSmsCache.GetEntry( index ) );
+
+        if ( smsData )
+            {
+            iSmsCache.SetDeleteLocation( index );
+
+            // Set parameters for UICC_APPL_CMD_REQ message
+            TUiccWriteLinearFixed params;
+            params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+            params.trId = ETrIdDeleteSMS;
+            params.dataOffset = 0;
+            params.dataAmount = 0;
+            params.record = index;
+
+            params.fileId = KElemFileShortMessages;
+            params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+            params.serviceType = UICC_APPL_UPDATE_LINEAR_FIXED;
+
+            // File id path
+            params.filePath.Append( KMasterFileId >> 8 );
+            params.filePath.Append( KMasterFileId );
+            params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+            // Update file data with 0xFF
+            TBuf8<KSmsElemetaryFileRecordLength> fileDataBuf;
+            fileDataBuf.AppendFill( 0xFF, KSmsElemetaryFileRecordLength );
+
+            params.fileData.Append( fileDataBuf );
+
+            return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+            }
+        else
+            {
+            // Location empty or not in use.
+            iMessageRouter->Complete( EMobilePhoneStoreDelete, KErrNone );
+            }
         }
     else
         {
@@ -2151,6 +2226,50 @@ OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_DELETEALLSMS, "CMmSmsMessHandler::Del
     // SIM SMS cache: -- EMobilePhoneStoreDeleteAll
     if ( KErrNone == iSmsCache.Status() )
         {
+        if ( 0 < iSmsCache.TotalEntries() )
+            {
+            RMobileSmsStore::TMobileGsmSmsEntryV1* smsData(
+                iSmsCache.GetEntry( iRecordId ) );
+
+            if ( smsData )
+                {
+                iSmsCache.SetDeleteLocation( iRecordId );
+
+                // Set parameters for UICC_APPL_CMD_REQ message
+                TUiccWriteLinearFixed params;
+                params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+                params.trId = ETrIdDeleteAllSMSs;
+                params.dataOffset = 0;
+                params.dataAmount = 0;
+                params.record = iRecordId;
+
+                params.fileId = KElemFileShortMessages;
+                params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+                params.serviceType = UICC_APPL_UPDATE_LINEAR_FIXED;
+
+                // File id path
+                params.filePath.Append( KMasterFileId >> 8 );
+                params.filePath.Append( KMasterFileId );
+                params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+                // Update file data with 0xFF
+                TBuf8<KSmsElemetaryFileRecordLength> fileDataBuf;
+                fileDataBuf.AppendFill( 0xFF, KSmsElemetaryFileRecordLength );
+
+                params.fileData.Append( fileDataBuf );
+
+                return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+                }
+            else
+                {
+                // Location is empty. Check next location
+                UiccDeleteAllSMSResp( KErrNone );
+                }
+            }
+        else
+            {
+            iMessageRouter->Complete( EMobilePhoneStoreDeleteAll, KErrNone );
+            }
         }
     else
         {
@@ -2959,6 +3078,7 @@ TFLOGSTRING("TSY:CMmSmsMessHandler::BuildSmsSbUserData");
 OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_BUILDSMSSBUSERDATA, "CMmSmsMessHandler::BuildSmsSbUserData" );
 
     TUint8 dataLengthInOctets( 0 );
+    TUint8 subblockLength( 0 );
 
     // If data is 7-bit, then TP-UDL is integer representation of
     // the number of septets within the TP-UD field
@@ -2980,19 +3100,23 @@ OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_BUILDSMSSBUSERDATA, "CMmSmsMessHandle
         userDataBuf,
         SMS_SB_USER_DATA,
         EIsiSubBlockTypeId16Len16 );
-    userDataBuf.Append( KSmsPadding  );
+    userDataBuf.Append( KSmsPadding );
     userDataBuf.Append( dataLengthInOctets );
-    userDataBuf.Append( KSmsPadding  );
-    userDataBuf.Append( aTpUdl  );
+    userDataBuf.Append( KSmsPadding );
+    userDataBuf.Append( aTpUdl );
     userDataBuf.Append( dataBytes );
 
     aIsiMsg.CopyData( aMsgOffset, userData.CompleteSubBlock() );
 
+    subblockLength = userDataBuf.Length();
+
 TFLOGSTRING2( "TSY:CMmSmsMessHandler::BuildSmsSbUserData. User data length in octets: %d", dataLengthInOctets );
 TFLOGSTRING2( "TSY:CMmSmsMessHandler::BuildSmsSbUserData. User data character count: %d", aTpUdl );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_BUILDSMSSBUSERDATA, "CMmSmsMessHandler::BuildSmsSbUserData;dataLengthInOctets=%hhu;aTpUdl=%hhu", dataLengthInOctets, aTpUdl );
+TFLOGSTRING2( "TSY:CMmSmsMessHandler::BuildSmsSbUserData. Length of subblock: %d", subblockLength );
+OstTraceExt1( TRACE_NORMAL, DUP2_CMMSMSMESSHANDLER_BUILDSMSSBUSERDATA, "CMmSmsMessHandler::BuildSmsSbUserData;subblockLength=%hhu", subblockLength );
 
-    return dataLengthInOctets + 8; // 8 bytes sub block header data before data bytes
+    return subblockLength;
     }
 
 
@@ -3069,6 +3193,7 @@ OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_BUILDSMSCHECKINFO, "CMmSmsMessHandler
 TInt CMmSmsMessHandler::ProcessUiccMsg(
     TInt aTraId,
     TInt aStatus,
+    TUint8 /*aDetails*/,
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY:CMmSmsMessHandler::ProcessUiccMsg, aTraId: %d, status: %d", aTraId, aStatus );
@@ -3097,6 +3222,70 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_PROCESSUICCMSG, "CMmSmsMessHandl
         case ETrIdReadSMSRecordCount:
             {
             GetNumOfEFSMSRecordsResp( aStatus, aFileData );
+            break;
+            }
+        case ETrIdDeleteSMS:
+            {
+            UiccDeleteSMSResp( aStatus );
+            break;
+            }
+        case ETrIdDeleteAllSMSs:
+            {
+            UiccDeleteAllSMSResp( aStatus );
+            break;
+            }
+        case ETrIdUpdateSMSStatusReadSMS:
+            {
+            UiccUpdateSMSStatusReadSMSResp( aStatus, aFileData );
+            break;
+            }
+        case ETrIdUpdateSMSStatusWriteSMS:
+            {
+            UiccUpdateSMSStatusWriteSMSResp( aStatus );
+            break;
+            }
+        case ETrIdGetSmspEntries:
+            {
+            // If status is OK, save the entry and then try to read next record
+            if ( UICC_STATUS_OK == aStatus )
+                {
+                // Store the entry to the list
+                ret = UiccStoreSmspEntry( aFileData );
+                }
+
+            // If the first record was tried to read, but UICC server returned
+            // error or data was invalid, error is completed to commontsy
+            if ( 1 == iSmspRecordNumber &&
+                ( UICC_STATUS_OK != aStatus || KErrNone != ret ) )
+                {
+                iMessageRouter->Complete(
+                    EMobileSmsMessagingGetSmspListPhase1,
+                    KErrNotFound );
+                // Reset internal array
+                iSmspListArray->ResetAndDestroy();
+                }
+            // At least one SMS entry was read and stored successfully
+            else if( UICC_STATUS_OK != aStatus || KErrNone != ret )
+                {
+                CMmDataPackage package;
+                package.PackData( iSmspListArray );
+                iMessageRouter->Complete(
+                    EMobileSmsMessagingGetSmspListPhase1,
+                    &package,
+                    KErrNone );
+                // Reset internal array
+                iSmspListArray->ResetAndDestroy();
+                }
+            break;
+            }
+        case ETrIdWriteSmspEntry:
+            {
+            TInt error( KErrNone );
+            if ( UICC_STATUS_OK != aStatus )
+                {
+                error = KErrNotFound;
+                }
+            iMessageRouter->Complete( EMobileSmsMessagingStoreSmspList, error );
             break;
             }
         default:
@@ -3287,8 +3476,8 @@ OstTrace1( TRACE_NORMAL, DUP4_CMMSMSMESSHANDLER_UICCREADSMSRESP, "CMmSmsMessHand
             iSmsCache.Status() );
 
         // it is possible that re-caching was done due to sim refresh.
-//        iMessageRouter->GetPhoneMessHandler()->
-//            SmsCachingCompleted( iSmsCache.Status() );
+        iMessageRouter->GetPhoneMessHandler()->
+            SmsCachingCompleted( iSmsCache.Status() );
 
         // if cache is up and a message was received while cacheing then resume
         if ( KErrNone == iSmsCache.Status() && iReceivedClass2ToBeReSent )
@@ -3637,9 +3826,8 @@ OstTrace1( TRACE_NORMAL, CMMSMSMESSHANDLER_UICCWRITESMSRESP, "CMmSmsMessHandler:
     }
 
 // -----------------------------------------------------------------------------
-// CMmSmsMessHandler::SimStSmsGetNumOfLocReq
-// Construct a SIM_ST_SMS_GET_NUM_OF_LOC_REQ ISI message
-// to the SIM Server
+// CMmSmsMessHandler::GetNumOfEFSMSRecords
+//
 // -----------------------------------------------------------------------------
 //
 void CMmSmsMessHandler::GetNumOfEFSMSRecords( void )
@@ -3666,19 +3854,13 @@ void CMmSmsMessHandler::GetNumOfEFSMSRecordsResp(
 TFLOGSTRING("TSY: CMmSmsMessHandler::GetNumOfEFSMSRecordsResp" );
 OstTraceExt2( TRACE_NORMAL, CMMSMSMESSHANDLER_GETNUMOFEFSMSRECORDSRESP, "CMmSmsMessHandler::GetNumOfEFSMSRecordsResp;aStatus=%d;aFileData=%s", aStatus, aFileData );
 
-    TInt offSet( 0 );
-
     //Save number of SMS locations on SIM card
     TInt smsNumOfLoc( 0 );
 
     if ( KErrNone == aStatus )
         {
-        offSet = aFileData.Find( &KTagFCIFileDescriptor, 1 );
-        if( offSet != KErrNotFound )
-            {
-            smsNumOfLoc =
-                aFileData[offSet + UICC_FCI_EF_FDESC_OFFSET_NUM_ENTR];
-            }
+        TFci fci( aFileData );
+        smsNumOfLoc = fci.GetNumberOfRecords();
         }
 
     // Continue with reading all sms entries from sim
@@ -3710,6 +3892,596 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_GETNUMOFEFSMSRECORDSRESP, "CMmSm
             &data,
             KErrNoMemory );
         }
+    }
+
+// -----------------------------------------------------------------------------
+// CMmSmsMessHandler::UiccDeleteSMSResp
+//
+// -----------------------------------------------------------------------------
+//
+void CMmSmsMessHandler::UiccDeleteSMSResp( TInt aStatus )
+    {
+TFLOGSTRING2("TSY: CMmSmsMessHandler::UiccDeleteSMSResp aStatus: %d", aStatus );
+OstTrace1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_UICCDELETESMSRESP, "CMmSmsMessHandler::UiccDeleteSMSResp;aStatus=%d", aStatus );
+
+    // Create Package
+    CMmDataPackage package;
+
+    TInt error( CMmStaticUtility::UICCCSCauseToEpocError( aStatus ) );
+
+    if ( KErrNone == error )
+        {
+        iSmsCache.Delete();
+        }
+    iMessageRouter->Complete( EMobilePhoneStoreDelete, error );
+
+    }
+
+// -----------------------------------------------------------------------------
+// CMmSmsMessHandler::UiccDeleteAllSMSResp
+//
+// -----------------------------------------------------------------------------
+//
+void CMmSmsMessHandler::UiccDeleteAllSMSResp( TInt aStatus )
+    {
+TFLOGSTRING2("TSY: CMmSmsMessHandler::UiccDeleteSMSResp aStatus: %d", aStatus );
+OstTrace1( TRACE_NORMAL, CMMSMSMESSHANDLER_UICCDELETEALLSMSRESP, "CMmSmsMessHandler::UiccDeleteAllSMSResp;aStatus=%d", aStatus );
+
+    // Create Package
+    CMmDataPackage package;
+
+    TInt error( CMmStaticUtility::UICCCSCauseToEpocError( aStatus ) );
+
+    // Delete SMS from SIM one by one and then all from cache.
+    if ( ( iRecordId < iSmsCache.TotalEntries() ) &&
+         ( KErrNone == error ) )
+        {
+        iRecordId++; // Next record
+        error = DeleteAllSms();
+
+        if ( KErrNone != error )
+            {
+            iMessageRouter->Complete( EMobilePhoneStoreDeleteAll, error );
+            }
+        }
+    else
+        {
+        iSmsCache.DeleteAll();
+        iMessageRouter->Complete( EMobilePhoneStoreDeleteAll, error );
+        }
+
+    }
+// -----------------------------------------------------------------------------
+// CMmSmsMessHandler::CheckSCTimestamp
+// Returns ETrue if the SC timestamp in this message is equal to
+// the client's timestamp in aScTime.
+// -----------------------------------------------------------------------------
+//
+TBool CMmSmsMessHandler::CheckSCTimestamp(
+    const RMobileSmsStore::TMobileGsmSmsEntryV1& aEntry,
+    const TTime& aScTime )
+    {
+TFLOGSTRING("TSY: CMmSmsMessHandler::CheckSCTimestamp");
+OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp" );
+    TBool matchFound( EFalse );
+
+    TInt offset( 1 ); // Message Reference position
+    TInt messageReference( aEntry.iMsgData[offset] );
+    // Destination address length is integer representation
+    // of the number of useful semi-octets of address field
+    messageReference = ( messageReference + 1 ) / 2;
+    offset += messageReference;
+    offset += 4; // Service Centre Time Stamp
+
+    TBuf8<KSmsScTimeStampMaxLength> scTimeStamp;
+    scTimeStamp = aEntry.iMsgData.Mid( offset, KSmsScTimeStampMaxLength );
+
+    // Convert from the semi-octet representation to decimals.
+    for ( TUint8 i ( 0 ); i < KSmsScTimeStampMaxLength; i++ )
+        {
+        TUint8 lowDigit( static_cast<TUint8>( (
+            scTimeStamp[i] & 0xf0 ) >> 4 ) );
+        TUint8 highDigit( static_cast<TUint8>( scTimeStamp[i] & 0xf ) );
+        scTimeStamp[i] = static_cast<TUint8>( (10 * highDigit) + lowDigit );
+        }
+
+    // Ignore this messsage if month or day are zero (should not happen)
+    if ( ( 0 == scTimeStamp[1] ) || ( 0 == scTimeStamp[2] ) )
+        {
+TFLOGSTRING("TSY:CMmSmsMessHandler::CheckSCTimestamp:Invalid timestamp found, ignored.");
+OstTrace0( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp, Invalid timestamp found, ignored" );
+        matchFound = ETrue;
+        }
+
+    if ( !matchFound )
+        {
+        // Construct a string of the form YYYYMMDD:HHMMSS
+        TBuf<15> timeString;
+        // This is the same way Symbian GSMU does it,
+        // see GSMU's method TSmsServiceCenterTimeStamp::DecodeL.
+        if ( scTimeStamp[0]>95 )
+            {
+            timeString.Append( _L( "19" ) );
+            }
+        else
+            {
+            timeString.Append( _L( "20" ) );
+            }
+        //two digits for year, month, day, hour, minute, second
+        _LIT( KDateFormat, "%02d" );
+        //year
+        timeString.AppendFormat( KDateFormat,scTimeStamp[0] );
+        //month, starting at 0
+        timeString.AppendFormat( KDateFormat,scTimeStamp[1]-1 );
+        //day, starting at 0
+        timeString.AppendFormat( KDateFormat,scTimeStamp[2]-1 );
+        timeString.Append( _L(":" ) );
+        //hour
+        timeString.AppendFormat( KDateFormat,scTimeStamp[3] );
+        //minute
+        timeString.AppendFormat( KDateFormat,scTimeStamp[4] );
+        //second
+        timeString.AppendFormat( KDateFormat,scTimeStamp[5] );
+
+        TTime simStoredTime( 0 );
+        TInt err( simStoredTime.Set( timeString ) );
+
+        if ( KErrNone == err )
+            {
+            // Handle the timezone difference. The timezone is found in the
+            // last byte of the SC timestamp buffer.
+            TUint8 simTimezoneDiffRaw( scTimeStamp[6] );
+            // Highest bit is the algebraic sign (0=positive, 1=negative).
+            // Timezone is defined in 'quarters of an hour', but we allow
+            // only whole numbers.
+            TInt8 simTimezoneSign( ( simTimezoneDiffRaw & 0x80 ) ? -1 : 1 );
+            TInt8 simTimezoneDiff( static_cast<TInt8>(
+                simTimezoneSign * ( simTimezoneDiffRaw & 0x7F) / 4 ) );
+            // Substract timezone difference
+            TTimeIntervalHours simTimezoneInterval( simTimezoneDiff );
+            simStoredTime -= simTimezoneInterval;
+
+#ifdef _DEBUG
+            // debug print
+            TDateTime dt = simStoredTime.DateTime();
+TFLOGSTRING("TSY:CMmSmsMessHandler::CheckSCTimestamp:Message stored on SIM:");
+OstTrace0( TRACE_NORMAL, DUP2_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp, Message stored on SIM:" );
+TFLOGSTRING2("    year=%d",dt.Year());
+OstTrace1( TRACE_NORMAL, DUP3_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Year=%d", dt.Year() );
+TFLOGSTRING2("    month=%d",dt.Month()+1);
+OstTrace1( TRACE_NORMAL, DUP4_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Month=%d", ( dt.Month() + 1 ) );
+TFLOGSTRING2("    day=%d",dt.Day()+1);
+OstTrace1( TRACE_NORMAL, DUP5_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Day=%d", ( dt.Day() + 1 ) );
+TFLOGSTRING2("    hour=%d",dt.Hour());
+OstTrace1( TRACE_NORMAL, DUP6_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Hour=%d", dt.Hour() );
+TFLOGSTRING2("    minute=%d",dt.Minute());
+OstTrace1( TRACE_NORMAL, DUP7_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Minute=%d", dt.Minute() );
+TFLOGSTRING2("    second=%d",dt.Second());
+OstTrace1( TRACE_NORMAL, DUP8_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Second=%d", dt.Second() );
+TFLOGSTRING2("    timezone difference=%d",simTimezoneDiff);
+OstTraceExt1( TRACE_NORMAL, DUP9_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;simTimezoneDiff=%hhd", simTimezoneDiff );
+            dt = aScTime.DateTime();
+TFLOGSTRING("TSY:CMmSmsMessHandler::CheckSCTimestamp:Message opened on client side:");
+OstTrace0( TRACE_NORMAL, DUP10_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp, Message opened on client side:" );
+TFLOGSTRING2("    year=%d",dt.Year());
+OstTrace1( TRACE_NORMAL, DUP11_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Year=%d", ( dt.Year() + 1 ) );
+TFLOGSTRING2("    month=%d",dt.Month()+1);
+OstTrace1( TRACE_NORMAL, DUP12_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Month=%d", ( dt.Month() + 1 ) );
+TFLOGSTRING2("    day=%d",dt.Day()+1);
+OstTrace1( TRACE_NORMAL, DUP13_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Day=%d", ( dt.Day() + 1 ) );
+TFLOGSTRING2("    hour=%d",dt.Hour());
+OstTrace1( TRACE_NORMAL, DUP14_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Hour=%d", dt.Hour() );
+TFLOGSTRING2("    minute=%d",dt.Minute());
+OstTrace1( TRACE_NORMAL, DUP15_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Minute=%d", dt.Minute() );
+TFLOGSTRING2("    second=%d",dt.Second());
+OstTrace1( TRACE_NORMAL, DUP16_CMMSMSMESSHANDLER_CHECKSCTIMESTAMP, "CMmSmsMessHandler::CheckSCTimestamp;Second=%d", dt.Second() );
+            // debug print
+#endif // _DEBUG
+
+            if ( simStoredTime == aScTime )
+                {
+                matchFound = ETrue;
+                }
+            }
+        }
+
+    return matchFound;
+
+    }
+
+// -----------------------------------------------------------------------------
+// CMmSmsMessHandler::UiccUpdateSMSStatus
+// Write SMS to SIM
+// -----------------------------------------------------------------------------
+//
+TInt CMmSmsMessHandler::UiccUpdateSMSStatus(
+    const TUint8 aRecordId
+    )
+    {
+TFLOGSTRING2("TSY: CMmSmsMessHandler::UiccUpdateSMSStatusReq aRecordId: %d", aRecordId );
+OstTraceExt1( TRACE_NORMAL, CMMSMSMESSHANDLER_UICCUPDATESMSSTATUS, "CMmSmsMessHandler::UiccUpdateSMSStatus;aRecordId=%hhu", aRecordId );
+
+    // Read parameters from SIM
+    // Set parameters for UICC_APPL_CMD_REQ message
+    iRecordId = aRecordId;
+    TUiccReadLinearFixed params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdUpdateSMSStatusReadSMS;
+    params.dataOffset = 0;
+    params.dataAmount = 0;
+    params.record = aRecordId;
+
+    params.fileId = KElemFileShortMessages;
+    params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+    params.serviceType = UICC_APPL_READ_LINEAR_FIXED;
+
+    // File id path
+    params.filePath.Append( KMasterFileId >> 8 );
+    params.filePath.Append( KMasterFileId );
+    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+    return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+
+    }
+
+// -----------------------------------------------------------------------------
+// CMmSmsMessHandler::UiccUpdateSMSStatusReadSMSResp
+//
+// -----------------------------------------------------------------------------
+//
+void CMmSmsMessHandler::UiccUpdateSMSStatusReadSMSResp(
+    TInt aStatus,
+    const TDesC8& aFileData )
+    {
+TFLOGSTRING("TSY: CMmSmsMessHandler::UiccReadSMSResp" );
+OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_UICCUPDATESMSSTATUSREADSMSRESP, "CMmSmsMessHandler::UiccUpdateSMSStatusReadSMSResp" );
+
+    if ( KErrNone == aStatus )
+        {
+        if ( 0 != aFileData.Length() )
+            {
+           // Set parameters for UICC_APPL_CMD_REQ message
+            TUiccWriteLinearFixed params;
+            params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+            params.trId = ETrIdUpdateSMSStatusWriteSMS;
+            params.dataOffset = 0;
+            params.dataAmount = 0;
+            params.record = iRecordId;
+
+            params.fileId = KElemFileShortMessages;
+            params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+            params.serviceType = UICC_APPL_UPDATE_LINEAR_FIXED;
+
+            // File id path
+            params.filePath.Append( KMasterFileId >> 8 );
+            params.filePath.Append( KMasterFileId );
+            params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+            // Update status as read
+            // File data to be updated.
+            TBuf8<KSmsElemetaryFileRecordLength> fileDataBuf;
+            fileDataBuf = aFileData.Left( aFileData.Length() );
+            fileDataBuf[0] = KSimSmsMtRead;
+
+            TInt unfilledLength( fileDataBuf.MaxLength() - aFileData.Length() );
+            // Fill unused fields with FF
+            if ( 0 <  unfilledLength )
+                {
+                fileDataBuf.AppendFill( 0xFF, unfilledLength );
+                }
+
+            params.fileData.Append( fileDataBuf );
+
+            TInt ret( iMmUiccMessHandler->CreateUiccApplCmdReq( params ) );
+
+            if ( KErrNone != ret )
+                {
+                iMessageRouter->Complete(
+                    ECustomSetSimMessageStatusReadIPC,
+                    ret );
+                }
+            }
+        }
+    else
+        {
+        iMessageRouter->Complete(
+            ECustomSetSimMessageStatusReadIPC,
+            CMmStaticUtility::UICCCSCauseToEpocError( aStatus )  );
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// CMmSmsMessHandler::UiccUpdateSMSStatusWriteSMSResp
+//
+// -----------------------------------------------------------------------------
+//
+void CMmSmsMessHandler::UiccUpdateSMSStatusWriteSMSResp( TInt aStatus )
+    {
+TFLOGSTRING2("TSY: CMmSmsMessHandler::UiccUpdateSMSStatusReadSMSResp aStatus: %d", aStatus );
+OstTrace1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_UICCUPDATESMSSTATUSREADSMSRESP, "CMmSmsMessHandler::UiccUpdateSMSStatusReadSMSResp;aStatus=%d", aStatus );
+
+    iMessageRouter->Complete(
+        ECustomSetSimMessageStatusReadIPC,
+        CMmStaticUtility::UICCCSCauseToEpocError( aStatus )  );
+
+    // Update the same flag also in TSY's cache.
+    if ( KErrNone == aStatus )
+        {
+        iSmsCache.SetStorageStatus( iRecordId, RMobileSmsStore::EStoredMessageRead );
+        }
+
+    }
+
+// -----------------------------------------------------------------------------
+// CMmSmsMessHandler::UiccGetSmspEntryReq
+//
+// -----------------------------------------------------------------------------
+//
+TInt CMmSmsMessHandler::UiccGetSmspEntryReq()
+    {
+TFLOGSTRING("TSY: CMmSmsMessHandler::UiccGetSmspEntryReq" );
+OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_UICCREADNUMOFSMSPENTRIES, "CMmSmsMessHandler::UiccGetSmspEntryReq" );
+
+    // Set parameters for UICC_APPL_CMD_REQ message
+    TUiccReadLinearFixed params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdGetSmspEntries;
+    params.dataOffset = 0;
+    params.dataAmount = 0;
+    params.record = iSmspRecordNumber;
+    params.fileId = KElemFileSmsParams;
+    params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+    params.serviceType = UICC_APPL_READ_LINEAR_FIXED;
+
+    // File id path
+    params.filePath.Append( KMasterFileId >> 8 );
+    params.filePath.Append( KMasterFileId );
+    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+    return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    }
+
+
+// -----------------------------------------------------------------------------
+// CMmSmsMessHandler::UiccStoreSmspEntry
+//
+// -----------------------------------------------------------------------------
+//
+TInt CMmSmsMessHandler::UiccStoreSmspEntry( const TDesC8& aFileData )
+    {
+TFLOGSTRING("TSY: CMmSmsMessHandler::UiccStoreSmspEntry" );
+OstTrace0( TRACE_NORMAL, CMMSMSMESSHANDLER_UICCSTORESMSPENTRY, "CMmSmsMessHandler::UiccStoreSmspEntry" );
+
+    TInt ret( KErrNone );
+    TInt dataLength( aFileData.Length() );
+    TPtrC8 data( KNullDesC8 );
+    TSmsParameters* smsParam = new ( ELeave ) TSmsParameters();
+    CleanupStack::PushL( smsParam );
+
+    // SMS parameters are located in EF smsp, see 3GPP TS 31.102
+    // V8.3.0 chapter 4.2.27 EFSMSP (Short message service parameters)
+
+    // Alpha identifier is optional. Check if it exists.
+    if ( KSmsMandatoryParamsLength < dataLength )
+        {
+        // Copy mandatory fields to different buffer for later use
+        data.Set( aFileData.Right( KSmsMandatoryParamsLength ) );
+        smsParam->iAlphaTagPresent = ETrue;
+
+        // Alpha identifier length
+        TInt alphaLength( dataLength - KSmsMandatoryParamsLength );
+        if ( RMobileSmsMessaging::KMaxSmspTextSize < alphaLength )
+            {
+            alphaLength = RMobileSmsMessaging::KMaxSmspTextSize;
+            }
+
+        // Copy alpha identifier data as it is in SIM elementary file
+        TBuf8<RMobileSmsMessaging::KMaxSmspTextSize> alphaIdentifier;
+        alphaIdentifier.Copy( aFileData.Left( alphaLength ) );
+
+        // Coding of alpha identifier may be 7-bit default of one of UCS2 code
+        // options. At first convert data to 16-bit format
+        TBuf8<RMobileSmsMessaging::KMaxSmspTextSize> alphaIdentifierOutput;
+        CMmStaticUtility::ConvertGsmDataToUcs2(
+            alphaIdentifier,
+            alphaIdentifier.Length(),
+            alphaIdentifierOutput );
+
+        // Convert to 16-bit UNICODE string and copy to SMS parameters buffer
+        TBuf16<RMobileSmsMessaging::KMaxSmspTextSize> alphaBuf;
+        TIsiUtility::CopyFromBigEndian( alphaIdentifierOutput, alphaBuf );
+        smsParam->iAlphaTagData.Copy( alphaBuf );
+        }
+    // Only mandatory 28 bytes are included, no alpha identifier
+    else if ( KSmsMandatoryParamsLength == dataLength )
+        {
+        smsParam->iAlphaTagPresent = EFalse;
+        // Copy all the data
+        data.Set( aFileData );
+        }
+    else
+        {
+        ret = KErrNotFound;
+        }
+
+    if ( KErrNone == ret )
+        {
+        // Parameters indicator.
+        // In SIM card bit value "0" means that parameter is present,
+        // in S60 vice versa
+        TUint8 paramIndicators( data[0] );
+        paramIndicators = ~paramIndicators;
+        paramIndicators &= KSmsGsmParametersIndMask; // Mask 5 LSB
+        smsParam->iParameterIndicator = paramIndicators;
+
+        // Location where SMS parameters in EFsms were fetched
+        smsParam->iLocationNumber = iSmspRecordNumber;
+
+        // Service center address
+        if ( paramIndicators & KServiceCentreAddress )
+            {
+            TBuf8<KSmsMaxAddressLength>scAddress( data. Mid(
+                KSmsParamsScAddressOffset, KSmsMaxAddressLength ) );
+            CMmSmsGsmAddress::GsmConv0411AddrToUnicode(
+                smsParam->iServiceCenterAddress,
+                scAddress,
+                smsParam->iMobileScTON,
+                smsParam->iMobileScNPI );
+            }
+
+        // Destination address
+        if ( paramIndicators & KDestinationAddress )
+            {
+            TBuf8<KSmsMaxAddressLength>destAddress( data.Mid(
+                KSmsParamsDestAddressOffset, KSmsMaxAddressLength ) );
+            CMmSmsGsmAddress::GsmConv0340AddrToUnicode(
+                 smsParam->iDestinationAddress,
+                 destAddress,
+                 smsParam->iMobileDeTON,
+                 smsParam->iMobileDeNPI );
+            }
+
+        // Protocol ID
+        if ( paramIndicators & KProtocolID )
+            {
+            smsParam->iProtocolId = data[KSmsParamsProtocolIdOffset];
+            }
+
+        // Data coding scheme
+        if ( paramIndicators & KDataCodingScheme )
+            {
+            smsParam->iDataCodingScheme = data[KSmsParamsDcsOffset];
+            }
+
+        // Validity period
+        if ( paramIndicators & KValidityPeriod )
+            {
+            smsParam->iValidityPeriod = data[KSmsParamsValidityPeriodOffset];
+            }
+
+        // Add this parameter set to array
+        iSmspListArray->AppendL( smsParam );
+        // Read the next entry
+        iSmspRecordNumber++;
+        ret = UiccGetSmspEntryReq();
+        }
+    // Don't reset struct because it may be stored to CArrayPtrFlat.
+    // All structs will be reseted when request is completed.
+    CleanupStack::Pop( smsParam );
+    return ret;
+    }
+
+
+// -----------------------------------------------------------------------------
+// CMmSmsMessHandler::UiccSmsUpdateParameterReq
+// -----------------------------------------------------------------------------
+//
+TInt CMmSmsMessHandler::UiccSmsUpdateParameterReq(
+    const CMmDataPackage* aDataPackage )
+    {
+TFLOGSTRING("TSY: CMmSmsMessHandler::UiccSmsUpdateParameterReq");
+OstTrace0( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_UICCSTORESMSPENTRY, "CMmSmsMessHandler::UiccStoreSmspEntry" );
+
+    RMobileSmsMessaging::TMobileSmspEntryV1* smsParameters;
+    // Unpack data
+    aDataPackage->UnPackData( &smsParameters );
+
+    // Buffer for all the file data to be written to UICC
+    // (possible alpha tag + params )
+    TBuf8<KSmsMandatoryParamsLength + KSizeOfAlphaTag> smspBuffer;
+
+    // Check if there is alpha tag
+    TInt alphaTagLength( smsParameters->iText.Length() );
+    // Buffer for alpha tag
+    if ( 0 < alphaTagLength )
+        {
+        // Temporary buffer for alpha tag
+        TBuf8<KSizeOfAlphaTag> alphaTagData;
+        TIsiUtility::CopyToBigEndian( smsParameters->iText, alphaTagData );
+        smspBuffer.Append( 0x80 ); // First byte 0x80 means 16-bit UCS coding
+        smspBuffer.Append( alphaTagData );
+        }
+
+    // Temporary buffer for mandatory data, filled by FF (unused bytes)
+    TBuf8<KSmsMandatoryParamsLength> paramsData;
+    paramsData.Fill( 0xFF, KSmsMandatoryParamsLength );
+
+    // Fill SMS parameters to data buffer ( see 3GPP TS 31.102 V8.3.0
+    // 4.2.27  EFSMSP (Short message service parameters). Unused parameters
+    // are filled by 0xFF
+
+    // Parameter indicator
+    TUint8 paramInd( static_cast<TUint8>( smsParameters->iValidParams ) );
+    paramsData[KSmsParamsParamIndicatorOffset] = paramInd;
+
+    // Destination address
+    if ( KDestinationAddress & paramInd )
+        {
+        TBuf8<KSmsMaxAddressLength> deAddr;
+        // Fill address by 0x00 at first
+        BuildDeAddress( smsParameters->iDestination, deAddr );
+        // Add address data to buffer
+        paramsData.Replace(
+            KSmsParamsDestAddressOffset,
+            deAddr.Length(),
+            deAddr );
+        }
+
+    // Service center address
+    if ( KServiceCentreAddress & paramInd )
+        {
+        TBuf8<KSmsMaxAddressLength> scAddr;
+        // Fill address by 0x00 at first
+        BuildScAddress( smsParameters->iServiceCentre, scAddr );
+        // Add address data to buffer
+        paramsData.Replace(
+            KSmsParamsScAddressOffset,
+            scAddr.Length(),
+            scAddr );
+        }
+
+    // Protocol ID
+    if ( KProtocolID & paramInd )
+        {
+        paramsData[KSmsParamsProtocolIdOffset] = smsParameters->iProtocolId;
+        }
+
+    // Data coding scheme
+    if ( KDataCodingScheme & paramInd )
+        {
+        paramsData[KSmsParamsDcsOffset] = smsParameters->iDcs;
+        }
+
+    // If validity period is valid, set value
+    if ( KValidityPeriod & paramInd )
+        {
+        paramsData[KSmsParamsValidityPeriodOffset] =
+            smsParameters->iValidityPeriod;
+        }
+
+    smspBuffer.Append( paramsData );
+
+    // Set parameters for UICC_APPL_CMD_REQ message
+    TUiccWriteLinearFixed params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdWriteSmspEntry;
+    params.dataOffset = 0;
+    params.dataAmount = 0;
+    params.record = smsParameters->iIndex;
+
+    params.fileId = KElemFileSmsParams;
+    params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+    params.serviceType = UICC_APPL_UPDATE_LINEAR_FIXED;
+
+    // File id path
+    params.filePath.Append( KMasterFileId >> 8 );
+    params.filePath.Append( KMasterFileId );
+    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+    // File data
+    params.fileData.Append( smspBuffer );
+
+    return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
     }
 
 //  End of File

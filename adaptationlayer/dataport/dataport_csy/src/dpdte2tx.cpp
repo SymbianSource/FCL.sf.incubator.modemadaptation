@@ -26,9 +26,9 @@
 #include "dpescdetect.h"  // escape sequence detection
 #include "dprx2dte.h"     // moves data from rx buffer to client
 #include "dplog.h"        // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpdte2txtraces.h"
+#include "dpdte2txTraces.h"
 #endif
 
 // LOCAL FUNCTION PROTOTYPES

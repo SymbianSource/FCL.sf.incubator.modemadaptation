@@ -24,7 +24,7 @@
 #include "cmmcallmesshandler.h"
 #include "cmmmessagerouter.h"
 #include "tsylogger.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 
 #include <etelmm.h>
 #include <tisi.h>
@@ -32,7 +32,7 @@
 #include <ctsy/pluginapi/cmmdatapackage.h>
 
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmconferencecallmesshandlertraces.h"
+#include "cmmconferencecallmesshandlerTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

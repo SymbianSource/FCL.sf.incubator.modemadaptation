@@ -13,7 +13,9 @@
 * 
 * Description:
 * Name      : PN_SS [ 0x06 ] Resource Supplementary Services Server
-* Version   : 013.000
+* Version   : 014.000
+*
+* Documentation: www.wirelessmodemapi.com
 *
 */
 
@@ -21,7 +23,7 @@
 #ifndef _SYMBIAN_ISI_SS_WMISI_H_
 #define _SYMBIAN_ISI_SS_WMISI_H_
 
-#define SUPPLEMENTARY_SERVICES_SERVER_ISI_VERSION_Z	 13
+#define SUPPLEMENTARY_SERVICES_SERVER_ISI_VERSION_Z	 14
 #define SUPPLEMENTARY_SERVICES_SERVER_ISI_VERSION_Y	 0
 
 

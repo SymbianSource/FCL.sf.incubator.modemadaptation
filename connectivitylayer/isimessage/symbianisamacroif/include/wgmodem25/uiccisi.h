@@ -15,6 +15,8 @@
 * Name      : PN_UICC [ 0x8C ] Resource UICC Server
 * Version   : 003.000
 *
+* Documentation: www.wirelessmodemapi.com
+*
 */
 
 

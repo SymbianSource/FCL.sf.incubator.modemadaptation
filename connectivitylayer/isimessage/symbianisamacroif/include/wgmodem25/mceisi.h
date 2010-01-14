@@ -15,6 +15,8 @@
 * Name      : PN_MODEM_MCE [ 0xC2 ] Resource Modem Control Entity
 * Version   : 001.001
 *
+* Documentation: www.wirelessmodemapi.com
+*
 */
 
 
@@ -22,7 +24,7 @@
 #define _SYMBIAN_ISI_MCEISI_H_
 
 #define MODEM_CONTROL_ENTITY_ISI_VERSION_Z	 1
-#define MODEM_CONTROL_ENTITY_ISI_VERSION_Y	 1
+#define MODEM_CONTROL_ENTITY_ISI_VERSION_Y	 2
 
 
 //TABLES
@@ -195,5 +197,23 @@
 #define MCE_SLEEP_CONTROL_RESP_OFFSET_STATUS              	2 //size 1 byte(s)
 #define MCE_SLEEP_CONTROL_RESP_OFFSET_FILLERBYTE1         	3 //size 1 byte(s)
 #define SIZE_MCE_SLEEP_CONTROL_RESP                       	4
+
+
+//Definition for MCE_DVFS_CONTROL_REQ
+#define MCE_DVFS_CONTROL_REQ                              	0x10                                              	
+#define MCE_DVFS_CONTROL_REQ_OFFSET_TRANSID               	0 //size 1 byte(s)
+#define MCE_DVFS_CONTROL_REQ_OFFSET_MESSAGEID             	1 //size 1 byte(s)
+#define MCE_DVFS_CONTROL_REQ_OFFSET_TYPE                  	2 //size 1 byte(s)
+#define MCE_DVFS_CONTROL_REQ_OFFSET_FILLERBYTE1           	3 //size 1 byte(s)
+#define SIZE_MCE_DVFS_CONTROL_REQ                         	4
+
+
+//Definition for MCE_DVFS_CONTROL_RESP
+#define MCE_DVFS_CONTROL_RESP                             	0x11                                              	
+#define MCE_DVFS_CONTROL_RESP_OFFSET_TRANSID              	0 //size 1 byte(s)
+#define MCE_DVFS_CONTROL_RESP_OFFSET_MESSAGEID            	1 //size 1 byte(s)
+#define MCE_DVFS_CONTROL_RESP_OFFSET_STATUS               	2 //size 1 byte(s)
+#define MCE_DVFS_CONTROL_RESP_OFFSET_FILLERBYTE1          	3 //size 1 byte(s)
+#define SIZE_MCE_DVFS_CONTROL_RESP                        	4
 
 #endif

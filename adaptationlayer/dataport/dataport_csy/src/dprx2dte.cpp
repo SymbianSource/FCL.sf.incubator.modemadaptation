@@ -26,9 +26,9 @@
 #include "dpdataconfig.h" // configuration store
 #include "dptermdetect.h" // terminator detection
 #include "dplog.h"        // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dprx2dtetraces.h"
+#include "dprx2dteTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

@@ -17,16 +17,9 @@
 
 
 
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-#include <cmisi.h>                      // PN_COMMMG, PNS_SUBSCRIBED_RESOURCES_...
-#else
 #include <pn_eventmodem_extisi.h>       // PNS_SUBSCRIBED_RESOURCES_EXTEND_IND_...
-#endif
 #include <phonetisi.h>                  // For ISI_HEADER_SIZE
 #include <pn_const.h>                   // For PN_HEADER_SIZE
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-#include <mediaisi.h>                   // For PNS_MEDIA_SOS
-#endif
 #include "indicationhandler.h"
 #include "iadtrace.h"                   // For C_TRACE..
 #include "router.h"                     // For DRouter
@@ -78,9 +71,7 @@ void DIndicationHandler::Multicast(
     TUint32 resourceId( 0x00000000 );
     if( ptr[ ISI_HEADER_OFFSET_RESOURCEID ] == PN_PREFIX )
         {
-#ifdef NCP_COMMON_BRIDGE_FAMILY
-        TRACE_ASSERT_ALWAYS;// So called "perävalotakuu" for indications PN_PREFIX defined to PN_COMMGR see iscnokiadefinitions.h
-#endif
+        TRACE_ASSERT_ALWAYS;// indications PN_PREFIX defined to PN_COMMGR see iscnokiadefinitions.h
         C_TRACE( ( _T( "DIndicationHandler::Multicast PN_PREFIX 0x%x" ), &aIndication ) );
         OstTrace1( TRACE_NORMAL, DINDICATIONHANDLER_MULTICAST_PN_PREFIX, "DIndicationHandler::Multicast extended resource;aIndication=%x", (TUint)&(aIndication) );
         
@@ -500,11 +491,7 @@ TInt DIndicationHandler::SendSubscription(
     ASSERT_RESET_ALWAYS( KSubsriptionLength > ( ISI_HEADER_SIZE + PNS_SUBSCRIBED_RESOURCES_EXTEND_IND_OFFSET_RESOURCECOUNT ) , EIADOverTheLimits | EIADFaultIdentifier42 << KFaultIdentifierShift );                                                        	
 
     TUint8* ptr( const_cast<TUint8*>( desPtr.Ptr() ) );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-    ptr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_SOS;
-#else
     ptr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_MODEM_HOST_IF;
-#endif
     SET_RECEIVER_DEV( ptr, OTHER_DEVICE_1 );
     SET_SENDER_DEV( ptr, THIS_DEVICE );
     ptr[ ISI_HEADER_OFFSET_RESOURCEID ] = PN_COMMGR;

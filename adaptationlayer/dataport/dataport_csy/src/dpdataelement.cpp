@@ -22,9 +22,9 @@
 #include "dpdataclient.h"  // data client that access buffer
 #include "dpdef.h"         // dataport definitions
 #include "dplog.h"         // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpdataelementtraces.h"
+#include "dpdataelementTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES
@@ -377,7 +377,8 @@ TInt CDpDataElement::HandleWriteTypeReserve(
     TInt ret( KErrNone );
     iSize = aSize;
 
-    if ( iDB.iHead > iDB.iTreshold )
+    if ( iDB.iHead > iDB.iTreshold ||
+        ( iDB.iHead + aSize ) > iDB.iBuf->Length() )
         {
         iDB.iHead = 0;
         }

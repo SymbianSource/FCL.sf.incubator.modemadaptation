@@ -414,6 +414,7 @@ class CMmSecurityMessHandler
         TInt ProcessUiccMsg(
             TInt aTraId,
             TInt aStatus,
+            TUint8 aDetails,
             const TDesC8& aFileData );
 
         /**

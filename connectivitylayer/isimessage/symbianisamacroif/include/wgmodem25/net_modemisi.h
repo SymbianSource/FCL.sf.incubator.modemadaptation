@@ -13,7 +13,9 @@
 * 
 * Description:
 * Name      : PN_MODEM_NETWORK [ 0xC8 ] Resource Modem Network Select Server
-* Version   : 016.005
+* Version   : 016.009
+*
+* Documentation: www.wirelessmodemapi.com
 *
 */
 
@@ -22,11 +24,10 @@
 #define _SYMBIAN_ISI_NET_MODEMISI_H_
 
 #define MODEM_NETWORK_SELECT_SERVER_ISI_VERSION_Z	 16
-#define MODEM_NETWORK_SELECT_SERVER_ISI_VERSION_Y	 5
+#define MODEM_NETWORK_SELECT_SERVER_ISI_VERSION_Y	 9
 
 
 //CONSTANTS
-#define FTD_CLEAR_BTS_TEST                                	0xD05                                             	
 #define NET_INVALID_TIME                                  	0x64                                              	
 #define NET_FILL                                          	0x00                                                 	
 #define NET_ALPHA_TAG_LEN                                 	0x20                                              	
@@ -42,13 +43,6 @@
 
 
 //TABLES
-
-//ConstantTable for FtdTable
-#define FTD_SB_BTS_TEST                                   	0x1303                                            	
-#define FTD_SB_BTS_STATUS                                 	0x1304                                            	
-#define FTD_SB_FIRST_PREF                                 	0x1311                                            	
-#define FTD_SB_SECOND_PREF                                	0x1312                                            	
-#define FTD_SB_THIRD_PREF                                 	0x1313                                            	
 
 //ConstantTable for NET_MODEM_SUCCESS_CODES
 #define NET_CAUSE_OK                                      	0x00                                                 	
@@ -151,15 +145,18 @@
 #define NET_CONTEXT_UNKNOWN                               	0x00                                                 	
 #define NET_CONTEXT_GSM                                   	0x01                                                 	
 #define NET_CONTEXT_UMTS                                  	0x02                                                 	
+#define NET_CONTEXT_EPS                                   	0x04                                                 	
 
 //ConstantTable for NET_ACTIVE_RAT
 #define NET_ACTIVE_RAT_UNKNOWN                            	0x00                                                 	
 #define NET_ACTIVE_RAT_GSM                                	0x01                                                 	
 #define NET_ACTIVE_RAT_UMTS                               	0x02                                                 	
+#define NET_ACTIVE_RAT_EPS                                	0x04                                                 	
 
 //ConstantTable for NET_RAT_NAME
 #define NET_GSM_RAT                                       	0x01                                                 	
 #define NET_UMTS_RAT                                      	0x02                                                 	
+#define NET_EPS_RAT                                       	0x04                                                 	
 
 //ConstantTable for NET_RAT_TYPE
 #define NET_CURRENT_RAT                                   	0x00                                                 	
@@ -266,6 +263,20 @@
 #define NET_WCDMA_FDD_BAND_22_MASK                        	0x200000                                          	
 #define NET_WCDMA_FDD_BAND_23_MASK                        	0x400000                                          	
 #define NET_WCDMA_FDD_BAND_24_MASK                        	0x800000                                          	
+
+//BitmaskTables for NET_EUTRAN_BANDS_INFO_TBL
+#define NET_EUTRAN_NO_BANDS                               	0x00                                                 	
+#define NET_EUTRAN_BAND_1_MASK                            	0x01                                                 	
+#define NET_EUTRAN_BAND_2_MASK                            	0x02                                                 	
+#define NET_EUTRAN_BAND_3_MASK                            	0x04                                                 	
+#define NET_EUTRAN_BAND_4_MASK                            	0x08                                                 	
+#define NET_EUTRAN_BAND_5_MASK                            	0x10                                              	
+#define NET_EUTRAN_BAND_6_MASK                            	0x20                                              	
+#define NET_EUTRAN_BAND_7_MASK                            	0x40                                              	
+#define NET_EUTRAN_BAND_8_MASK                            	0x80                                              	
+#define NET_EUTRAN_BAND_9_MASK                            	0x100                                             	
+#define NET_EUTRAN_BAND_10_MASK                           	0x200                                             	
+#define NET_EUTRAN_BAND_11_MASK                           	0x400                                             	
 
 //ConstantTable for NET_MODEM_GPRS_NETWORK_MODE
 #define NET_GPRS_MODE_NONE                                	0x00                                                 	
@@ -448,7 +459,7 @@
 #define NET_MODEM_GSM_REG_INFO_OFFSET_HSDPAAVAILABLEINCELL	20 //size 1 byte(s)
 #define NET_MODEM_GSM_REG_INFO_OFFSET_HSUPAAVAILABLEINCELL	21 //size 1 byte(s)
 #define NET_MODEM_GSM_REG_INFO_OFFSET_CAMPEDINHPLMN       	22 //size 1 byte(s)
-#define NET_MODEM_GSM_REG_INFO_OFFSET_FILLERBYTE1         	23 //size 1 byte(s)
+#define NET_MODEM_GSM_REG_INFO_OFFSET_RATNAME             	23 //size 1 byte(s)
 #define SIZE_NET_MODEM_GSM_REG_INFO                       	24
 //NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
 
@@ -712,6 +723,23 @@
 #define NET_WCDMA_CELL_INFO_OFFSET_FILLERBYTE2            	18 //size 1 byte(s)
 #define NET_WCDMA_CELL_INFO_OFFSET_FILLERBYTE3            	19 //size 1 byte(s)
 #define SIZE_NET_WCDMA_CELL_INFO                          	20
+//NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
+
+
+//Definition for NET_EPS_CELL_INFO
+#define NET_EPS_CELL_INFO                                 	0x50                                              	
+#define NET_EPS_CELL_INFO_OFFSET_SUBBLOCKID               	0 //size 1 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_SUBBLOCKLENGTH           	1 //size 1 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_CURRENTTAC               	2 //size 2 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_CURRENTCELLID            	4 //size 4 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_NETEPSCELLINFOBAND       	8 //size 4 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_OPERATORCODE             	12 //size 3 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_SERVICESTATUS            	15 //size 1 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_NETWORKTYPE              	16 //size 1 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_FILLERBYTE1              	17 //size 1 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_FILLERBYTE2              	18 //size 1 byte(s)
+#define NET_EPS_CELL_INFO_OFFSET_FILLERBYTE3              	19 //size 1 byte(s)
+#define SIZE_NET_EPS_CELL_INFO                            	20
 //NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
 
 
@@ -1099,5 +1127,29 @@
 #define NET_NITZ_NAME_IND_OFFSET_SUBBLOCKCOUNT            	7 //size 1 byte(s)
 #define SIZE_NET_NITZ_NAME_IND                            	8
 //NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
+
+
+//Definition for NET_SOR_REQ
+#define NET_SOR_REQ                                       	0x44                                              	
+#define NET_SOR_REQ_OFFSET_TRANSID                        	0 //size 1 byte(s)
+#define NET_SOR_REQ_OFFSET_MESSAGEID                      	1 //size 1 byte(s)
+#define NET_SOR_REQ_OFFSET_LISTTAG                        	2 //size 1 byte(s)
+#define NET_SOR_REQ_OFFSET_DATALENGTH                     	3 //size 1 byte(s)
+#define NET_SOR_REQ_OFFSET_DATA                           	4 //size 1 byte(s)
+#define NET_SOR_REQ_OFFSET_FILLERBYTE1                    	5 //size 1 byte(s)
+#define NET_SOR_REQ_OFFSET_FILLERBYTE2                    	6 //size 1 byte(s)
+#define NET_SOR_REQ_OFFSET_FILLERBYTE3                    	7 //size 1 byte(s)
+#define SIZE_NET_SOR_REQ                                  	8
+//NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
+//NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
+
+
+//Definition for NET_SOR_RESP
+#define NET_SOR_RESP                                      	0x45                                              	
+#define NET_SOR_RESP_OFFSET_TRANSID                       	0 //size 1 byte(s)
+#define NET_SOR_RESP_OFFSET_MESSAGEID                     	1 //size 1 byte(s)
+#define NET_SOR_RESP_OFFSET_SUCCESSCODE                   	2 //size 1 byte(s)
+#define NET_SOR_RESP_OFFSET_FILLERBYTE1                   	3 //size 1 byte(s)
+#define SIZE_NET_SOR_RESP                                 	4
 
 #endif

@@ -24,9 +24,9 @@
 #include "dppif.h"          // dcs pipe interface
 #include <iscdefinitions.h>
 #include "dplog.h"          // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpflowctrltraces.h"
+#include "dpflowctrlTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES
@@ -169,6 +169,10 @@ void CDpFlowCtrl::RunL()
         if ( iDataPort.IsReadyToDestruct() )
             {
             iDataPort.DeleteDataPort();
+            }
+        else
+            {
+            RequestIscFlowControlNotification();
             }
         //no else
         }

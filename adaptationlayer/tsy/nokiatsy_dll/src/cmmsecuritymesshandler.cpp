@@ -23,9 +23,9 @@
 #include "cmmnetmesshandler.h"
 #include "cmmcallmesshandler.h"
 #include "tsylogger.h" // logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmsecuritymesshandlertraces.h"
+#include "cmmsecuritymesshandlerTraces.h"
 #endif
 
 #include <etelmm.h>
@@ -64,7 +64,6 @@ const TUint8 KIccServiceAdn       = 0x02; // service in EFsst
 const TUint8 KFdnStateMask        = 0x01;
 const TUint8 KServiceActivated    = 0x01;
 const TUint8 KServiceNotActivated = 0x00;
-const TUint8 KFileStatusIndex     = 0x0B;
 const TUint8 KInvalidated         = 0x00;
 const TUint8 KNotInvalidated      = 0x01;
 const TUint8 KInvalidateFlagMask  = 0x01;
@@ -2059,6 +2058,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_READEFEST, "CMmSecurityMessHandl
 TInt CMmSecurityMessHandler::ProcessUiccMsg(
     TInt aTraId,
     TInt aStatus,
+    TUint8 /*aDetails*/,
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::ProcessUiccMsg");
@@ -2403,7 +2403,8 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP, "CM
             // let's check the current FDN status. 
             // If EFadn is invalidated, FDN is enabled, otherwise FDN
             // is disabled
-            TUint8 invalidationFlag( aFileData[KFileStatusIndex] & KInvalidateFlagMask );
+            TFci fci( aFileData );
+            TUint8 invalidationFlag( fci.GetFileStatus() & KInvalidateFlagMask );
 
             if( ( KInvalidated == invalidationFlag && 
                   RMobilePhone::EFdnSetOn == iFdnSetting ) ||
@@ -2459,7 +2460,8 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNGETREADEFADNFILEINFORESP, "CM
         if( iMmUiccMessHandler->GetServiceStatus( KIccServiceFdn ) &&
             iMmUiccMessHandler->GetServiceStatus( KIccServiceAdn ) )
             {
-            TUint8 invalidationFlag( aFileData[KFileStatusIndex] & KInvalidateFlagMask );
+            TFci fci( aFileData );
+            TUint8 invalidationFlag( fci.GetFileStatus() & KInvalidateFlagMask );
 
             if( KInvalidated == invalidationFlag )
                 {

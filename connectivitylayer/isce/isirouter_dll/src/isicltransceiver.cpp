@@ -10,8 +10,8 @@
 * Nokia Corporation - initial contribution.
 *
 * Contributors:
-* 
-* Description: 
+*
+* Description:
 *
 */
 
@@ -75,11 +75,13 @@ DISICLTransceiver::~DISICLTransceiver()
     delete []iLinksArray;
     C_TRACE( ( _T( "DISICLTransceiver::~DISICLTransceiver<" ) ) );
     }
-    
-void DISICLTransceiver::SendCommIsaEntityNotReachableResp( TDes8& aMessage )
+
+TInt DISICLTransceiver::SendCommIsaEntityNotReachableResp( TDes8& aMessage )
     {
     C_TRACE( ( _T( "DISICLTransceiver::SendCommIsaEntityNotReachableResp 0x%x>" ), &aMessage ) );
     const TUint8* msgTmpPtr( aMessage.Ptr() );
+    TInt error = KErrAlreadyExists;
+
     // To avoid COMM_ISA_ENTITY_NOT_REACHABLE_RESP loop
     if( msgTmpPtr[ ISI_HEADER_OFFSET_MESSAGEID ] != COMMON_MESSAGE &&
         msgTmpPtr[ ISI_HEADER_OFFSET_SUBMESSAGEID ] != COMM_ISA_ENTITY_NOT_REACHABLE_RESP )
@@ -89,7 +91,7 @@ void DISICLTransceiver::SendCommIsaEntityNotReachableResp( TDes8& aMessage )
 		    TUint8 length( 16 );
 		    TDes8& tempPtr = MemApi::AllocBlock( ISI_HEADER_SIZE + SIZE_COMMON_MESSAGE_COMM_ISA_ENTITY_NOT_REACHABLE_RESP );
 		    ASSERT_RESET_ALWAYS( &tempPtr, ( EISICLTransceiverMemAllocFailure1 | EDISICLTransceiverTraceId << KClassIdentifierShift ) );
-  	    ASSERT_RESET_ALWAYS( ISI_HEADER_SIZE + SIZE_COMMON_MESSAGE_COMM_ISA_ENTITY_NOT_REACHABLE_RESP > ISI_HEADER_OFFSET_MESSAGEID, ( EISICLTransceiverOverTheLimits | EDISICLTransceiverTraceId << KClassIdentifierShift ) );    
+  	    ASSERT_RESET_ALWAYS( ISI_HEADER_SIZE + SIZE_COMMON_MESSAGE_COMM_ISA_ENTITY_NOT_REACHABLE_RESP > ISI_HEADER_OFFSET_MESSAGEID, ( EISICLTransceiverOverTheLimits | EDISICLTransceiverTraceId << KClassIdentifierShift ) );
   	    TUint8* ptr = const_cast<TUint8*>( tempPtr.Ptr() );
   	    // We start to append from transaction id.
   	    tempPtr.SetLength( ISI_HEADER_OFFSET_TRANSID );
@@ -117,23 +119,25 @@ void DISICLTransceiver::SendCommIsaEntityNotReachableResp( TDes8& aMessage )
 		    // Filler
 		    tempPtr.Append( 0x00 );
 		    // Filler
-        tempPtr.Append( 0x00 );
+            tempPtr.Append( 0x00 );
 		    RouteISIMessage( tempPtr );
-		    }
+            error = RouteISIMessage( tempPtr );
+   		    }
 		else
 		    {
 		    C_TRACE( ( _T( "DISICLTransceiver Not sending another CommIsaEntityNotReachableResp" ) ) );
 		    }
     C_TRACE( ( _T( "DISICLTransceiver::SendCommIsaEntityNotReachableResp 0x%x<" ), &aMessage ) );
+    return error;
     }
 
-void DISICLTransceiver::RouteISIMessage( TDes8& aMessage )
+TInt DISICLTransceiver::RouteISIMessage( TDes8& aMessage )
     {
-	  C_TRACE( ( _T( "DISICLTransceiver::RouteISIMessage 0x%x>" ), &aMessage ) );
-	  TInt error( ValidateISIMessage( aMessage ) ); //TODO what to do with error?
-	 	TBool sendOk( EFalse );
-	 	TUint8* messageBlockPtr( const_cast<TUint8*>( aMessage.Ptr() ) );
-	  switch( messageBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] )
+	 C_TRACE( ( _T( "DISICLTransceiver::RouteISIMessage 0x%x>" ), &aMessage ) );
+	TInt error( ValidateISIMessage( aMessage ) );
+    TBool sendOk( EFalse );
+	TUint8* messageBlockPtr( const_cast<TUint8*>( aMessage.Ptr() ) );
+    switch( messageBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] )
         {
         case PN_DEV_APE:
             {
@@ -154,7 +158,7 @@ void DISICLTransceiver::RouteISIMessage( TDes8& aMessage )
             TUint8 linkId = MapDeviceToMedia( messageBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] );
 	          ASSERT_RESET_ALWAYS( linkId < EISIAmountOfMedias, ( EISICLTransceiverNotSupportedMedia | EDISICLTransceiverTraceId << KClassIdentifierShift ) );
             MISIRouterLinkIf* link = iLinksArray[ linkId ];
-            ASSERT_RESET_ALWAYS( link, ( EISICLTransceiverNULLPtr | EDISICLTransceiverTraceId << KClassIdentifierShift ) );  
+            ASSERT_RESET_ALWAYS( link, ( EISICLTransceiverNULLPtr | EDISICLTransceiverTraceId << KClassIdentifierShift ) );
             sendOk = link->Send( aMessage );
             C_TRACE( ( _T( "DISIRouter link sendOk %d" ), sendOk ) );
             break;
@@ -164,8 +168,9 @@ void DISICLTransceiver::RouteISIMessage( TDes8& aMessage )
         {
         SendCommIsaEntityNotReachableResp( aMessage );
         MemApi::DeallocBlock( aMessage );
-        }   
+        }
 	  C_TRACE( ( _T( "DISICLTransceiver::RouteISIMessage 0x%x<" ), &aMessage ) );
+    return error;
     }
 
 // KErrBadDescriptor, if message length too small
@@ -189,7 +194,7 @@ TInt DISICLTransceiver::ValidateISIMessage(
     // If the ISI message length is bigger that the largest supported.
     msgOk = ( ( msgOk == KErrNone && isiMsgLength > KMaxISIMsgSize ) ? KErrUnderflow : msgOk );
     TRACE_ASSERT_INFO( msgOk == KErrNone, msgOk );
-    // If the ISI message length with PN_HEADER_SIZE is less or equal than ISI_HEADER_OFFSET_MESSAGEID. 
+    // If the ISI message length with PN_HEADER_SIZE is less or equal than ISI_HEADER_OFFSET_MESSAGEID.
     msgOk = ( ( msgOk == KErrNone && isiMsgLength <= ISI_HEADER_OFFSET_MESSAGEID ) ? KErrUnderflow : msgOk );
     TRACE_ASSERT_INFO( msgOk == KErrNone, msgOk );
     TRACE_ASSERT_INFO( msgOk == KErrNone, msgOk );

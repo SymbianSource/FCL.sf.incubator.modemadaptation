@@ -56,6 +56,7 @@ class CMmNetMessHandler;
 class CMmNetOperatorNameHandler;
 class CMmSupplServMessHandler;
 class CMmPhoneBookStoreMessHandler;
+class CMmENStoreMessHandler;
 class CMmPacketServiceMessHandler;
 class CMmPacketContextMessHandler;
 class CMmPacketQoSMessHandler;
@@ -245,6 +246,9 @@ class CMmMessageRouter :
 
         // pointer to PhoneBook store message handler
         CMmPhoneBookStoreMessHandler* iMmPhoneBookStoreMessHandler;
+
+        // pointer to emergency number store message handler
+        CMmENStoreMessHandler* iMmENStoreMessHandler;
 
         // pointer to Phonet/ISA interface
         RIscApi iPhoNet;

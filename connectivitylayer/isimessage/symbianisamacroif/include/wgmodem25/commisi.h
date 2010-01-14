@@ -15,6 +15,8 @@
 * Name      : [ 0x00 ] Resource Common Messages
 * Version   : 000.031
 *
+* Documentation: www.wirelessmodemapi.com
+*
 */
 
 

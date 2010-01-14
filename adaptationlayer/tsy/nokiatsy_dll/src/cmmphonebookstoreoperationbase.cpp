@@ -24,14 +24,15 @@
 #include "cmmphonebookstoreoperationbase.h"
 #include "cmmphonemesshandler.h"
 #include "cmmuiccmesshandler.h"
+#include "cmmstaticutility.h"
 
 #ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
 #include "cmmphonebookalphastring.h"
 #endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmphonebookstoreoperationbasetraces.h"
+#include "cmmphonebookstoreoperationbaseTraces.h"
 #endif
 // EXTERNAL DATA STRUCTURES
     // None
@@ -44,9 +45,6 @@
 
 
 // MACROS
-    // None
-
-// LOCAL CONSTANTS AND MACROS
     // None
 
 // MODULE DATA STRUCTURES
@@ -69,8 +67,7 @@
 //
 CMmPhoneBookStoreOperationBase::CMmPhoneBookStoreOperationBase()
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::\
-        CMmPhoneBookStoreOperationBase");
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::CMmPhoneBookStoreOperationBase");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOPERATIONBASE, "CMmPhoneBookStoreOperationBase::CMmPhoneBookStoreOperationBase" );
 
     iRet = KErrNone;
@@ -87,8 +84,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOPERATI
 //
 CMmPhoneBookStoreOperationBase::~CMmPhoneBookStoreOperationBase()
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::\
-        ~CMmPhoneBookStoreOperationBase");
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::~CMmPhoneBookStoreOperationBase");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOPERATIONBASE, "CMmPhoneBookStoreOperationBase::~CMmPhoneBookStoreOperationBase" );
     }
 
@@ -97,10 +93,10 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOP
 // Cancels the operation. Canceling of canceled operation is allowed.
 // ---------------------------------------------------------------------------
 //
-void CMmPhoneBookStoreOperationBase::CancelReq()
+void CMmPhoneBookStoreOperationBase::CancelReq( TName& /*aPhoneBook*/ )
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::CancelReq - does nothing");
-    OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CANCELREQ, "CMmPhoneBookStoreOperationBase::CancelReq - does nothing" );
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::CancelReq - does nothing");
+OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CANCELREQ, "CMmPhoneBookStoreOperationBase::CancelReq - does nothing" );
     }
 
 // ---------------------------------------------------------------------------
@@ -113,8 +109,8 @@ TInt CMmPhoneBookStoreOperationBase::PrepareReq(
         const CMmDataPackage* /*aDataPackage*/
         )
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::PrepareReq - not supported");
-    OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKSTOREOPERATIONBASE_PREPAREREQ, "CMmPhoneBookStoreOperationBase::PrepareReq - not supported" );
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::PrepareReq - not supported");
+OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKSTOREOPERATIONBASE_PREPAREREQ, "CMmPhoneBookStoreOperationBase::PrepareReq - not supported" );
     return KErrNotSupported;
     }
 
@@ -125,8 +121,8 @@ TInt CMmPhoneBookStoreOperationBase::PrepareReq(
 //
 TBool CMmPhoneBookStoreOperationBase::IsPrepared() const
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::IsPrepared");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_ISPREPARED, "CMmPhoneBookStoreOperationBase::IsPrepared" );
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::IsPrepared");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_ISPREPARED, "CMmPhoneBookStoreOperationBase::IsPrepared" );
     return EFalse;
     }
 
@@ -137,8 +133,8 @@ TBool CMmPhoneBookStoreOperationBase::IsPrepared() const
 //
 TInt CMmPhoneBookStoreOperationBase::LaunchReq()
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::LaunchReq - not supported");
-    OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKSTOREOPERATIONBASE_LAUNCHREQ, "CMmPhoneBookStoreOperationBase::LaunchReq - not supported" );
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::LaunchReq - not supported");
+OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKSTOREOPERATIONBASE_LAUNCHREQ, "CMmPhoneBookStoreOperationBase::LaunchReq - not supported" );
     return KErrNotSupported;
     }
 
@@ -149,24 +145,24 @@ TInt CMmPhoneBookStoreOperationBase::LaunchReq()
 //
 TInt CMmPhoneBookStoreOperationBase::CompleteReq( TInt /*aErrorCode*/ )
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::CompleteReq - not supported");
-    OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_COMPLETEREQ, "CMmPhoneBookStoreOperationBase::CompleteReq - not supported" );
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::CompleteReq - not supported");
+OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_COMPLETEREQ, "CMmPhoneBookStoreOperationBase::CompleteReq - not supported" );
     return KErrNotSupported;
     }
 
+
 // ---------------------------------------------------------------------------
-// TUint8 CMmPhoneBookStoreOperationBase::TransId
-// Gets transactionId
+// CMmPhoneBookStoreOperationBase::GetPhoneBookName
+// Cancels the operation. Canceling of canceled operation is allowed.
 // ---------------------------------------------------------------------------
 //
-TUint8 CMmPhoneBookStoreOperationBase::TransId()
+const TName& CMmPhoneBookStoreOperationBase::GetPhoneBookName()const
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::TransId");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_TRANSID, "CMmPhoneBookStoreOperationBase::TransId" );
-
-    return iTransactionId;
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetPhoneBookName - PhoenbookName");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_GETPHONEBOOKNAME, "CMmPhoneBookStoreOperationBase::GetPhoneBookName - PhoneBookName" );
+    
+    return iPhoneBookTypeName;
     }
-
 
 
 // ---------------------------------------------------------------------------
@@ -177,8 +173,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_TRANSID, "CMmPhoneBookSt
 TUint16 CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType(
     const TUint8 aPbMask )
     {
-    TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::\
-        ConvertToSimPhoneBookType SourcePBType: 0x%x", aPbMask);
+TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType SourcePBType: 0x%x", aPbMask);
 OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBOOKTYPE, "CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType;aPbMask=%hhx", aPbMask );
 
     TUint16 phoneBookType( KMaskUnspecifiedType );
@@ -222,9 +217,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBO
             break;
             }
         }
-
-    TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::\
-        ConvertToSimPhoneBookType phoneBookType: 0x%x" ,phoneBookType );
+TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType phoneBookType: 0x%x" ,phoneBookType );
 OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBOOKTYPE, "CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType;phoneBookType=%x", phoneBookType );
 
     return phoneBookType;
@@ -303,12 +296,324 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBTYPE, "CMmPho
         pbMask = KMaskUnspecifiedType;
         }
 
-    TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBtype \
-        phonebooktype: %d", pbMask);
+TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBtype : phonebooktype: %d", pbMask);
 OstTraceExt1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBTYPE, "CMmPhoneBookStoreOperationBase::ConvertToPBtype;pbMask=%hhx", pbMask );
 
     return pbMask;
     }
+
+
+// ---------------------------------------------------------------------------
+// CMmPhoneBookStoreOperationBase::ConvertToPBfileId
+// Converts client phonebook type to internal phonebook mask
+// ---------------------------------------------------------------------------
+//
+TUint16 CMmPhoneBookStoreOperationBase::ConvertToPBfileId(
+    const TName& aPBType, TUint16 &aFileIdExt )
+    {
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBfileId");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID, "CMmPhoneBookStoreOperationBase::ConvertToPBfileId" );
+
+    TUint16 fileId( 0 );
+
+    if ( 0 == aPBType.CompareF( KETelIccAdnPhoneBook ) )
+        {
+        fileId = PB_ADN_FID;
+        aFileIdExt = PB_EXT1_FID;
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccBdnPhoneBook ) )
+        {
+        fileId = PB_BDN_FID;
+        aFileIdExt = 0x0000;
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccSdnPhoneBook ) )
+        {
+        fileId = PB_SDN_FID;
+        aFileIdExt = PB_EXT3_FID;
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccFdnPhoneBook ) )
+        {
+        fileId = PB_FDN_FID;
+        aFileIdExt = PB_EXT2_FID;
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccVoiceMailBox ) )
+        {
+        fileId = PB_VMBX_FID;
+        aFileIdExt = PB_EXT1_FID;
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccMbdnPhoneBook ) )
+        {
+        fileId = PB_MBDN_FID;
+        aFileIdExt = PB_EXT6_FID;
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccMsisdnPhoneBook ) )
+        {
+        fileId = PB_MSISDN_FID;
+        aFileIdExt = PB_EXT1_FID;
+        }
+    else
+        {
+        // none
+        fileId = UICC_ILLEGAL_FILE_ID;
+        }
+TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBfileId phonebookfileid: %d", fileId);
+OstTraceExt1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID, "CMmPhoneBookStoreOperationBase::ConvertToPBfileId;fileId=%hu", fileId );
+    
+
+    return fileId;
+    }
+
+
+
+// ---------------------------------------------------------------------------
+// CMmPhoneBookStoreOperationBase::ConvertToConfArrayIndex
+// Converts File id to Array index, in which Initialization configuration data stored
+// ---------------------------------------------------------------------------
+//
+TUint8 CMmPhoneBookStoreOperationBase::ConvertToConfArrayIndex(
+    const TUint16 aFileId )
+    {
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToConfArrayIndex");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOCONFARRAYINDEX, "CMmPhoneBookStoreOperationBase::ConvertToConfArrayIndex" );
+    TUint8 index( 0 );
+    switch(aFileId)
+        {
+        case PB_ADN_FID:
+            index = EPhonebookTypeAdn;
+            break;
+        case PB_FDN_FID:
+            index = EPhonebookTypeFdn;
+            break;
+        case PB_SDN_FID:
+            index = EPhonebookTypeSdn;
+            break;
+        case PB_MBDN_FID:
+            index = EPhonebookTypeMBDN;
+            break;
+        case PB_MSISDN_FID:
+            index = EPhonebookTypeMSISDN;
+            break;
+        case PB_VMBX_FID:
+            index = EPhonebookTypeVMBX;
+            break;
+        }
+    return index;
+    }
+
+
+// ---------------------------------------------------------------------------
+// CMmPhoneBookStoreOperationBase::GetTransId
+// Converts client phonebook type to internal phonebook mask
+// needds to be remove after dynamis transaction ID allocation
+// ---------------------------------------------------------------------------
+//
+TUint8 CMmPhoneBookStoreOperationBase::GetTransId(
+    const TName& aPBType, const TUint8 aOperation  )
+    {
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetTransId");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId" );
+    
+
+    TUint8 transId( 0 );
+
+    if ( 0 == aPBType.CompareF( KETelIccAdnPhoneBook ) )
+        {
+        switch( aOperation)
+            {
+            case KOperationRead:
+                {
+                transId = ETrIdPbReadAdn;
+                break;
+                }
+            case KOperationWrite:
+                {
+                //transId = ETrIdPbWriteAdn;
+                break;
+                }
+            case KOperationDelete:
+                {
+                //transId = ETrIdPbDeleteAdn;
+                break;
+                }
+            case KOperationDeleteAll:
+                {
+                //transId = ETrIdPbDeleteAllAdn;
+                break;
+                }
+            case KOperationDeleteWrite:
+                {
+                //transId = ETrIdPbDeleteWriteAdn;
+                break;
+                }
+            default:
+                {
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetTransId - NO operation supported for ADN PhoneBook");
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId - No Operation supported for ADN PhoneBook" );
+                break;
+                }
+            }
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccBdnPhoneBook ) )
+        {
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccSdnPhoneBook ) )
+        {
+        switch( aOperation)
+            {
+            case KOperationRead:
+                {
+                transId = ETrIdPbReadSdn;
+                break;
+                }
+            case KOperationWrite:
+                {
+                //transId = ETrIdPbWriteSdn;
+                break;
+                }
+            case KOperationDelete:
+                {
+                //transId = ETrIdPbDeleteSdn;
+                break;
+                }
+            case KOperationDeleteAll:
+                {
+                //transId = ETrIdPbDeleteAllSdn;
+                break;
+                }
+            case KOperationDeleteWrite:
+                {
+                //transId = ETrIdPbDeleteWriteSdn;
+                break;
+                }
+            default:
+                {
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetTransId - NO operation supported for SDN PhoneBook ");
+OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId - No operation supported for SDN PhoneBook" );
+
+                }
+                break;
+            }
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccFdnPhoneBook ) )
+        {
+        switch( aOperation)
+            {
+            case KOperationRead:
+                {
+                transId = ETrIdPbReadFdn;
+                break;
+                }
+            case KOperationWrite:
+                {
+                //transId = ETrIdPbWriteFdn;
+                break;
+                }
+            case KOperationDelete:
+                {
+                //transId = ETrIdPbDeleteFdn;
+                break;
+                }
+            case KOperationDeleteAll:
+                {
+                //transId = ETrIdPbDeleteAllFdn;
+                break;
+                }
+            case KOperationDeleteWrite:
+                {
+                //transId = ETrIdPbDeleteWriteFdn;
+                break;
+                }
+            default:
+                {
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetTransId - NO operation supported for FDN PhoneBook ");
+OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId - NO operation supported for FDN PhoneBook" );
+                
+                break;
+                }
+            }
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccVoiceMailBox ) )
+        {
+        switch( aOperation)
+            {
+            case KOperationRead:
+                {
+                transId = ETrIdPbReadVmbx;
+                break;
+                }
+            case KOperationWrite:
+                {
+                //transId = ETrIdPbWriteVmbx;
+                break;
+                }
+            case KOperationDelete:
+                {
+                //transId = ETrIdPbDeleteVmbx;
+                }
+                break;
+            case KOperationDeleteAll:
+                {
+                //transId = ETrIdPbDeleteAllVmbx;
+                break;
+                }
+            case KOperationDeleteWrite:
+                {
+                //transId = ETrIdPbDeleteWriteVmbx;
+                break;
+                }
+            default:
+                {
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetTransId - NO operation supported for VMBX PhoneBook ");
+OstTrace0( TRACE_NORMAL, DUP5_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId - NO operation supported for VMBX Phonebook" );
+                break;
+                }
+            }
+        }
+    else if ( 0 == aPBType.CompareF( KETelIccMbdnPhoneBook ) )
+        {
+        switch( aOperation)
+            {
+            case KOperationRead:
+                {
+                transId = ETrIdPbReadMbdn;
+                break;
+                }
+            case KOperationWrite:
+                {
+                //transId = ETrIdPbWriteMbdn;
+                break;
+                }
+            case KOperationDelete:
+                {
+                //transId = ETrIdPbDeleteMbdn;
+                break;
+                }
+            case KOperationDeleteAll:
+                {
+                //transId = ETrIdPbDeleteAllMbdn;
+                break;
+                }
+            case KOperationDeleteWrite:
+                {
+                //transId = ETrIdPbDeleteWriteMbdn;
+                break;
+                }
+            default:
+                {
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetTransId - NO operation supported for MBDN PhoneBook ");
+OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId - No operation supported for MBDN Phoenbook" );
+                break;
+                }
+            }
+        }
+
+TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::GetTransId : Get transaction id: %d", transId);
+OstTraceExt1( TRACE_NORMAL, DUP4_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId;transId=%hhu", transId );
+    
+    return transId;
+    }
+
+
 
 // ---------------------------------------------------------------------------
 // CMmPhoneBookStoreOperationBase::ConvertToPBname
@@ -319,8 +624,7 @@ void CMmPhoneBookStoreOperationBase::ConvertToPBname(
     const TUint8 aTrans,
     TName& aName )
     {
-    TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname \
-        source: %d" ,aTrans );
+TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname : source: %d" ,aTrans );
 OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname;source=%hhu", aTrans );
 
     // get number of phonebook type from transaction Id
@@ -328,50 +632,43 @@ OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMm
 
     if ( KMaskAdnType == numOfPbType )
         {
-        TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname \
-            - ADN");
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - ADN");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - ADN" );
         aName = KETelIccAdnPhoneBook;
         }
     else if ( KMaskFdnType == numOfPbType )
         {
-        TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname \
-            - FDN");
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - FDN");
 OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - FDN" );
         aName = KETelIccFdnPhoneBook;
         }
     else if ( KMaskSdnType == numOfPbType )
         {
-        TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname \
-            - SDN");
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - SDN");
 OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - SDN" );
         aName = KETelIccSdnPhoneBook;
         }
     else if ( KMaskBdnType == numOfPbType )
         {
-        TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname \
-            - BDN");
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - BDN");
 OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - BDN" );
         aName = KETelIccBdnPhoneBook;
         }
     else if ( KMaskVoiceMailBox == numOfPbType )
         {
-        TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname \
-            - VMBX");
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - VMBX");
 OstTrace0( TRACE_NORMAL, DUP5_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - VMBX" );
         aName = KETelIccVoiceMailBox;
         }
     else if ( KMaskMbdnType == numOfPbType )
         {
-        TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname \
-            - MBDN");
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - MBDN");
 OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - MBDN" );
         aName = KETelIccMbdnPhoneBook;
         }
     else
         {
-        TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname \
-            - unknown -> Error situation!" );
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - unknown -> Error situation!" );
 OstTrace0( TRACE_NORMAL, DUP7_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - unknown -> Error situation!" );
         //Nothing can do.
         }
@@ -379,81 +676,6 @@ OstTrace0( TRACE_NORMAL, DUP7_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "C
 
 
 
-
-// ---------------------------------------------------------------------------
-// CMmPhoneBookStoreOperationBase::SeparatePhoneBookEntryFromIsiMsgL
-// Separate phonebook entry from ISI message
-// ---------------------------------------------------------------------------
-//
-TInt CMmPhoneBookStoreOperationBase::SeparatePhoneBookEntryFromUiccMsgL(
-    const TDesC8& aFileData,      // ISI message
-    TDes8& aNameBuf,
-    TUint16 aSimPhonebookType)        // Entry to be filled
-    {
-    TInt ret( KErrNone );
-    TBool nameNumberFound (ETrue);
-    TUint8 nameLength (0);
-    TUint8 numLength(0);
-    
-    // Maximum record length will be RecordLength -14 
-    // Actual string length can be find the first FF , which indicates that after
-    // that its empty
-    nameLength = aFileData.Find(&KTagUnusedbyte,1);
-    // minus 1 is for TON/NPI digit , which is 1 byte long
-    numLength = aFileData[iRecordLength -14 + 1] - 1;
-    
-    if(nameLength == 1 && numLength == 1)
-        nameNumberFound = EFalse;
-    
-    switch(aSimPhonebookType)
-        {
-        case PB_FDN_FID:
-        case PB_BDN_FID:
-        case PB_MBDN_FID:
-        case PB_MSISDN_FID:
-        case PB_VMBX_FID:
-            {
-            // Save name
-            if ( KMinLength < nameLength )
-                {
-                TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::\
-                    SeparatePhoneBookEntryFromIsiMsgL. Saving name.");
-        OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_SEPARATEPHONEBOOKENTRYFROMISIMSGL, "CMmPhoneBookStoreOperationBase::SeparatePhoneBookEntryFromIsiMsgL, Saving name" );
-
-                aNameBuf.Copy(aFileData.Mid(0,nameLength));
-                }
-            //no else
-
-            // Save number
-            if ( KMinLength < numLength )
-                {
-                // Store number in buffer
-                iNumberBuf.Append(aFileData.Mid(10,numLength));
-                }
-            //no else
-
-            }
-            break;
-        default:
-            // None
-            break;
-        }
-    
-    if(!nameNumberFound)
-        ret = KErrNotFound;
-
-    return ret;
-            
-        }
-
-
-void CMmPhoneBookStoreOperationBase::StorePhonebookEntry(
-        TDes8& /*aName*/,
-        TDes8& /*aNumber*/,
-        CPhoneBookStoreEntry& /*aEntry*/)
-    {
-    
-    }
 
 // ---------------------------------------------------------------------------
 // CMmPhoneBookStoreOperationBase::ConvertOperationToClientIPCType
@@ -464,8 +686,7 @@ void CMmPhoneBookStoreOperationBase::ConvertOperationToClientIPCType(
     TInt& aDestination,
     const TUint8 aSource )
     {
-    TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::\
-        ConvertOperationToClientIPCType - source: %d", aSource );
+TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertOperationToClientIPCType - source: %d", aSource );
 OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTOPERATIONTOCLIENTIPCTYPE, "CMmPhoneBookStoreOperationBase::ConvertOperationToClientIPCType;aSource=%hhu", aSource );
 
     switch( aSource )
@@ -509,8 +730,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTOPERATIONTOCLI
             }
         default: //KOperationUnknown
             {
-            TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::\
-                ConvertOperationToClientIPCType - Default case" );
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertOperationToClientIPCType - Default case" );
 OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTOPERATIONTOCLIENTIPCTYPE, "CMmPhoneBookStoreOperationBase::ConvertOperationToClientIPCType, Default case" );
             aDestination = KErrNotFound;
             break;
@@ -520,135 +740,25 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTOPERATIONTOC
 
 
 
-// ---------------------------------------------------------------------------
-// CMmPhoneBookStoreOperationBase::HandleFcpData
-// Handles FCP data for both SIm and USIM card
-// to get the different parameters
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// CMmPhoneBookOperationRead::EmptyEntryCheck
+// Check for Entry is Empty or not
+// -----------------------------------------------------------------------------
 //
-TInt CMmPhoneBookStoreOperationBase::HandleFcpData( const TDesC8 &aFileData, TInt& aValue , TUint8 aParam )
+TInt CMmPhoneBookStoreOperationBase::EmptyEntryCheck( const TDesC8 &aFileData)
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::HandleFcpData");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_HANDLEFCPDATA, "CMmPhoneBookStoreOperationBase::HandleFcpData" );
+TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::EmptyEntryCheck");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_EMPTYENTRYCHECK, "CMmPhoneBookStoreOperationBase::EmptyEntryCheck" );
     
+
+    TInt ret( KErrNone);
     
-    TInt ret(KErrNone);
-    if(UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
+    if(( 0xFF == aFileData[0]) 
+       || (0xFF == aFileData[1]))
         {
-        switch(aParam)
-            {
-            case KRecordLength:
-                {
-                // get the offset for File Descriptor for all EF's
-                TUint8 offset = aFileData.Find(&KTagFCIFileDescriptor,1);
-                Get16bit(aValue, aFileData, (offset+4) );
-                }
-                break;
-            case KNoOfRecords:
-                {
-                // get the no of records
-                TUint8 offset = aFileData.Find(&KTagFCIFileDescriptor,1);
-                aValue = aFileData[offset + 6];
-                }
-                break;
-            case KFileSize:
-                {
-                // get the file size tith tag value "85"
-                TUint8 offset = aFileData.Find(&KTagFCIFileSize,1);
-                aValue = aFileData[offset + 2];
-                }
-                break;
-            case KFileIdentifier:
-                {
-                TUint8 offset = aFileData.Find(&KTagFCIFileIdentifier,1);
-                Get16bit(aValue, aFileData, (offset+2) );
-                }
-                break;
-            default:
-                {
-                TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::HandleFcpData - No such parameter exist in UICC");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_HANDLEFCPDATA, "CMmPhoneBookStoreOperationBase::HandleFcpData - No such parameter exist in UICC" );
-                }
-                break;
-            }
-        }
-    else if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
-        {
-        switch(aParam)
-            {
-            case KRecordLength:
-                {
-                // 14 is the index for record length Data
-                aValue = aFileData[14];
-                }
-                break;
-            case KNoOfRecords:
-                {
-                // 2 is the index value for File Size Data
-                TInt fileSize(0);
-                Get16bit(fileSize, aFileData, 2 );
-                
-                // 14 is the index for record Length Data
-                TInt recordLength(0);
-                recordLength = aFileData[14];
-                
-                // get the No of records
-                
-                aValue = (fileSize/recordLength);
-                }
-                break;
-            case KFileSize:
-                {
-                // 2 is the index location for File Size which is 2 bytes long
-                Get16bit(aValue, aFileData, 2 );
-                }
-                break;
-            case KFileIdentifier:
-                {
-                // 4 is the index location for File ID which is 2 bytes long
-                Get16bit(aValue, aFileData, 4 );
-                }
-                break;
-            case KFileStatus:
-                {
-                // 11 is index value for File Status
-                aValue = aFileData[11];
-                }
-            default:
-                TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::HandleFcpData - No such parameter exist in ICC");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_HANDLEFCPDATA, "CMmPhoneBookStoreOperationBase::HandleFcpData - No such parameter exist in ICC Card" );
-                break;
-            }
+        ret = KErrNotFound;
         }
     return ret;
     }
-
-
-
-// -----------------------------------------------------------------------------
-// CMmPhoneBookStoreOperationBase::Get16bit
-// Copies unsigned 16-bit word from source descriptor from location pointed
-// by index
-// -----------------------------------------------------------------------------
-//
-void CMmPhoneBookStoreOperationBase::Get16bit
-        (
-        TInt& aTarget,   //Target
-        const TDesC8& aSource,    //Source
-        TInt aIndex         //Index
-        )
-    {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::Get16bit");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_GET16BIT, "CMmPhoneBookStoreOperationBase::Get16bit" );
-    
-    
-    if ( aIndex + 1 < aSource.Length() )
-        {
-        aTarget = TUint16( aSource[aIndex] ) << 8;
-        aTarget = TUint16( aTarget | aSource[aIndex + 1] );
-        }
-    }
-
-
 
 // End of File

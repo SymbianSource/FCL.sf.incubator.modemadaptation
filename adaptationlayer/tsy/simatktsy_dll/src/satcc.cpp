@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -25,15 +25,16 @@
 #include "ber_tlv.h"            // sat ber-tlv classes
 #include "satutil.h"            // sat utility class
 
+#include <satcs.h>
 #include <pn_const.h>           // server id constants
 #include <tisi.h>               // isi message
 #include <ss_wmisi.h>           // Modem SS server
 #include <call_modemisi.h>      // Modem Call server
 #include <gpdsisi.h>            // GPDS server
 #include <uiccisi.h>            // UICC server
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "satcctraces.h"
+#include "satccTraces.h"
 #endif
 
 
@@ -60,6 +61,7 @@ const TInt KMaximumCcBufferSize =
     252 +   //CALL_MODEM_SB_DESTINATION_ADDRESS
     252 +   //CALL_MODEM_SB_DESTINATION_SUBADDRESS
     252 +   //CALL_MODEM_SB_BC
+    4 +     //CALL_MODEM_SB_CAUSE
     4;      //CALL_MODEM_SB_CAUSE
 
 const TUint8 KMSBMask = 0x80;
@@ -136,7 +138,7 @@ CSatCC::~CSatCC()
     {
     OstTrace0( TRACE_NORMAL, DUP1_CSATCC_CSATCC, "CSatCC::~CSatCC" );
     TFLOGSTRING("TSY: CSatCC::~CSatCC");
-    
+
     if( iCallControlArray )
         {
         iCallControlArray->Close();
@@ -416,7 +418,7 @@ TInt CSatCC::SendUSSDEnvelope
             // send CC event response.
             TPtrC8 atkData;
             SendSsResourceControlReq( aCcstruct, KError, atkData );
-            
+
             TInt index( GetArrayIndexById( aCcstruct.iTransId ) );
             if ( index != KErrNotFound )
                 {
@@ -458,7 +460,7 @@ TInt CSatCC::SendCallEnvelope
        CALL_MODEM_SB_DESTINATION_ADDRESS,
        EIsiSubBlockTypeId8Len8,
        sbStartOffset ) );
-    
+
     if ( KErrNone == retValue )
         {
         envelope.AddTag( KTlvAddressTag );
@@ -483,10 +485,10 @@ TInt CSatCC::SendCallEnvelope
         {
         envelope.AddTag( KTlvSubaddressTag );
         // Subaddress is given in same form as expected in envelope
-        addressLength = aIsiMessage.Get8bit( sbStartOffset + 
+        addressLength = aIsiMessage.Get8bit( sbStartOffset +
             CALL_MODEM_SB_DESTINATION_SUBADDRESS_OFFSET_ADDRLEN );
-        envelope.AddData( aIsiMessage.GetData( sbStartOffset + 
-            CALL_MODEM_SB_DESTINATION_SUBADDRESS_OFFSET_ADDR, 
+        envelope.AddData( aIsiMessage.GetData( sbStartOffset +
+            CALL_MODEM_SB_DESTINATION_SUBADDRESS_OFFSET_ADDR,
             addressLength ) );
         }
     // Add mandatory location information
@@ -526,7 +528,6 @@ TInt CSatCC::SendPdpContextActivationEnvelope
     return iSatMessHandler->UiccCatReqEnvelope( aPdpCcEnvelopeTid,
         envelope.End() );
     }
-
 
 // -----------------------------------------------------------------------------
 // CSatCC::UiccCatRespEnvelopeReceived
@@ -716,9 +717,9 @@ void CSatCC::MessageReceivedL
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_IND");
     OstTrace0( TRACE_NORMAL, DUP1_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_IND" );
-                
-                if ( CALL_MODEM_RES_CONF_STARTUP == 
-                    aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
+
+                if ( CALL_MODEM_RES_CONF_STARTUP ==
+                    aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                         CALL_MODEM_RESOURCE_CONF_IND_OFFSET_CONFSTATUS ) )
                     {
                     // configure resource control if CC enabled in (U)SIM
@@ -744,14 +745,14 @@ void CSatCC::MessageReceivedL
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP");
     OstTrace0( TRACE_NORMAL, DUP2_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP" );
-    
-                if ( CALL_MODEM_RES_CONF_SET == 
-                    aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
+
+                if ( CALL_MODEM_RES_CONF_SET ==
+                    aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                         CALL_MODEM_RESOURCE_CONF_RESP_OFFSET_CONFOPERATION ) )
                     {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP Resource configured");
     OstTrace0( TRACE_NORMAL, DUP3_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP Resource configured" );
-    
+
                     }
                 break;
                 }
@@ -759,7 +760,7 @@ void CSatCC::MessageReceivedL
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_RESP Resource control sequence done");
     OstTrace0( TRACE_NORMAL, DUP4_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_RESP Resource control sequence done" );
-    
+
                 break;
                 }
             default:
@@ -783,9 +784,9 @@ void CSatCC::MessageReceivedL
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_IND");
     OstTrace0( TRACE_NORMAL, DUP5_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_IND" );
-    
-                if ( SS_RESOURCE_CONF_READY  == 
-                    aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
+
+                if ( SS_RESOURCE_CONF_READY  ==
+                    aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                         SS_RESOURCE_CONF_IND_OFFSET_CONFSTATUS  ) )
                     {
                     // configure resource control if CC enabled in (U)SIM
@@ -798,19 +799,19 @@ void CSatCC::MessageReceivedL
                 }
             case SS_RESOURCE_CONF_RESP:
                 {
-                if ( SS_RESOURCE_CONF_SET == 
-                        aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
+                if ( SS_RESOURCE_CONF_SET ==
+                        aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                             SS_RESOURCE_CONF_RESP_OFFSET_CONFOPERATION  ) )
                     {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_RESP Resource configured");
     OstTrace0( TRACE_NORMAL, DUP6_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_RESP Resource configured" );
-    
+
                     }
                 break;
                 }
             case SS_STATUS_IND:
                 {
-                TUint8 status( aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
+                TUint8 status( aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                     SS_STATUS_IND_OFFSET_SSSTATUSINDICATION  ) );
 
                 if ( SS_STATUS_REQUEST_SERVICE_FAILED == status
@@ -866,8 +867,8 @@ void CSatCC::MessageReceivedL
                 }
             case GPDS_RESOURCE_CONF_RESP:
                 {
-                if ( GPDS_RESOURCE_CONF_SET == 
-                        aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
+                if ( GPDS_RESOURCE_CONF_SET ==
+                        aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                             GPDS_RESOURCE_CONF_RESP_OFFSET_CONFOPERATION  ) )
                     {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONF_RESP Resource configured");
@@ -1028,17 +1029,17 @@ void CSatCC::CallModemResourceInd( const TIsiReceiveC& aIsiMessage )
            EIsiSubBlockTypeId8Len8,
            sbStartOffset ) );
 
-    if ( KErrNone == retValue 
+    if ( KErrNone == retValue
         && CALL_MODEM_RES_ID_MO_INIT & aIsiMessage.Get16bit( sbStartOffset +
             CALL_MODEM_SB_RESOURCE_OFFSET_RES  ) )
         {
         TCallControl callcontrol;
         // store traid's
-        callcontrol.iTransId = aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
+        callcontrol.iTransId = aIsiMessage.Get8bit( ISI_HEADER_SIZE +
             CALL_MODEM_RESOURCE_IND_OFFSET_TRID );
         callcontrol.iRecourceId = aIsiMessage.Get8bit(
             ISI_HEADER_OFFSET_RESOURCEID);
-        callcontrol.iCallId = aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
+        callcontrol.iCallId = aIsiMessage.Get8bit( ISI_HEADER_SIZE +
             CALL_MODEM_RESOURCE_IND_OFFSET_CALLID );
 
         retValue = aIsiMessage.FindSubBlockOffsetById(
@@ -1048,7 +1049,7 @@ void CSatCC::CallModemResourceInd( const TIsiReceiveC& aIsiMessage )
            sbStartOffset );
         if( KErrNone == retValue )
             {
-            callcontrol.iResourceSeqId = aIsiMessage.Get8bit( sbStartOffset + 
+            callcontrol.iResourceSeqId = aIsiMessage.Get8bit( sbStartOffset +
                 CALL_MODEM_SB_RESOURCE_SEQ_ID_OFFSET_SEQUENCEID );
             }
 
@@ -1059,9 +1060,9 @@ void CSatCC::CallModemResourceInd( const TIsiReceiveC& aIsiMessage )
             sbStartOffset );
         if( KErrNone == retValue )
             {
-            callcontrol.iCallMode.Append( aIsiMessage.Get8bit( sbStartOffset + 
+            callcontrol.iCallMode.Append( aIsiMessage.Get8bit( sbStartOffset +
                 CALL_MODEM_SB_MODE_OFFSET_MODE ) );
-            callcontrol.iCallMode.Append( aIsiMessage.Get8bit( sbStartOffset + 
+            callcontrol.iCallMode.Append( aIsiMessage.Get8bit( sbStartOffset +
                 CALL_MODEM_SB_MODE_OFFSET_MODEINFO ) );
             }
 
@@ -1074,8 +1075,8 @@ void CSatCC::CallModemResourceInd( const TIsiReceiveC& aIsiMessage )
             {
             TInt bearerLength( aIsiMessage.Get8bit( sbStartOffset +
                 CALL_MODEM_SB_BC_OFFSET_BCLENGTH ) );
-            
-            callcontrol.iBearerCapabilities.Copy( aIsiMessage.GetData( 
+
+            callcontrol.iBearerCapabilities.Copy( aIsiMessage.GetData(
                 sbStartOffset + CALL_MODEM_SB_BC_OFFSET_BCDATA,
                 bearerLength ) );
             }
@@ -1092,11 +1093,21 @@ void CSatCC::CallModemResourceInd( const TIsiReceiveC& aIsiMessage )
                 CALL_MODEM_SB_DESTINATION_ADDRESS_OFFSET_ADDRTYPE );
             TUint8 addressLength( aIsiMessage.Get8bit( sbStartOffset +
                 CALL_MODEM_SB_DESTINATION_ADDRESS_OFFSET_ADDRLEN ) );
-            callcontrol.iString.Copy( aIsiMessage.GetData( sbStartOffset + 
+            callcontrol.iString.Copy( aIsiMessage.GetData( sbStartOffset +
                 CALL_MODEM_SB_DESTINATION_ADDRESS_OFFSET_ADDR,
                 addressLength * 2 ) );
             }
 
+        retValue = aIsiMessage.FindSubBlockOffsetById(
+           ISI_HEADER_SIZE + SIZE_CALL_MODEM_RESOURCE_IND ,
+           CALL_MODEM_SB_CHECK_INFO,
+           EIsiSubBlockTypeId8Len8,
+           sbStartOffset );
+        if( KErrNone == retValue )
+            {
+            callcontrol.iCheckInfo = aIsiMessage.GetData( sbStartOffset,
+                SIZE_CALL_MODEM_SB_CHECK_INFO );
+            }
         if( CALL_MODEM_MODE_EMERGENCY == callcontrol.iCallMode[0] )
             {
             // Do not make SIM call control, allow emergency calls always
@@ -1151,15 +1162,15 @@ void CSatCC::SendCallModemResourceReq(
     // Modem Call ID [M]: the unique call ID or CALL_ID_NONE.
     isiMessage.Append( aTcc.iCallId );
     // CALL_MODEM_SB_RESOURCE [M]: resource. Shall be same as in the corresponding indication.
-    TIsiSubBlock resource( 
+    TIsiSubBlock resource(
         isiMessage,
         CALL_MODEM_SB_RESOURCE,
         EIsiSubBlockTypeId8Len8 );
     TSatUtility::AppendWord( CALL_MODEM_RES_ID_MO_INIT, isiMessage );
     resource.CompleteSubBlock();
-    
+
     // CALL_MODEM_SB_RESOURCE_SEQ_ID [M]: Sequence ID. Shall be same as in the corresponding indication.
-    TIsiSubBlock resourceSeqId( 
+    TIsiSubBlock resourceSeqId(
         isiMessage,
         CALL_MODEM_SB_RESOURCE_SEQ_ID,
         EIsiSubBlockTypeId8Len8 );
@@ -1192,8 +1203,8 @@ void CSatCC::SendCallModemResourceReq(
             {
             // First check if this has been modified to a new SS/USSD action
             CTlv ssServerString;
-            
-            if ( KErrNone == response.TlvByTagValue( &ssServerString, 
+
+            if ( KErrNone == response.TlvByTagValue( &ssServerString,
                 KTlvSsStringTag ) ||
                 KErrNone == response.TlvByTagValue( &ssServerString,
                 KTlvUssdStringTag ) )
@@ -1221,7 +1232,7 @@ void CSatCC::SendCallModemResourceReq(
     if ( KRejected == internalCcResult || KChanged == internalCcResult )
         {
         // CALL_MODEM_SB_CAUSE sb is needed in rejected cases
-        TIsiSubBlock cause( 
+        TIsiSubBlock cause(
             isiMessage,
             CALL_MODEM_SB_CAUSE,
             EIsiSubBlockTypeId8Len8 );
@@ -1230,18 +1241,18 @@ void CSatCC::SendCallModemResourceReq(
         cause.CompleteSubBlock();
         sbcount++;
         }
-    
+
     // CALL_MODEM_SB_MODE [M]: call mode.
-    TIsiSubBlock mode( 
+    TIsiSubBlock mode(
         isiMessage,
         CALL_MODEM_SB_MODE,
         EIsiSubBlockTypeId8Len8 );
     // 2 byte buffer
     isiMessage.Append( aTcc.iCallMode );
     mode.CompleteSubBlock();
-    
+
     // CALL_MODEM_SB_BC [M]: Bearer Capabilities for the call.
-    TIsiSubBlock bearer( 
+    TIsiSubBlock bearer(
         isiMessage,
         CALL_MODEM_SB_BC,
         EIsiSubBlockTypeId8Len8 );
@@ -1263,7 +1274,7 @@ void CSatCC::SendCallModemResourceReq(
         }
     bearer.CompleteSubBlock();
 
-    TIsiSubBlock address( 
+    TIsiSubBlock address(
         isiMessage,
         CALL_MODEM_SB_DESTINATION_ADDRESS ,
         EIsiSubBlockTypeId8Len8 );
@@ -1280,7 +1291,7 @@ void CSatCC::SendCallModemResourceReq(
             isiMessage.Append( addressTlv.GetValue()[ 0 ] ^KMSBMask );
             isiMessage.Append( KPadding );
             isiMessage.Append( KPadding );
-            
+
             // Temp storage for address
             TBuf8<2 * KCallServerMaxAddressLenght> asciiAddress;
             TSatUtility::BCDToAscii( addressTlv.GetValue().Mid( 1 ),
@@ -1291,20 +1302,20 @@ void CSatCC::SendCallModemResourceReq(
             TSatUtility::ConvertSms7ToUnicode16( unicodeNumber, asciiAddress );
             TBuf8<2 * KCallServerMaxAddressLenght> temp;
             TIsiUtility::CopyToBigEndian( unicodeNumber, temp );
-            
+
             // Address length = Number of Unicode characters in address
             isiMessage.Append( temp.Length()/2 );
             isiMessage.Append( temp );
-            
+
             address.CompleteSubBlock();
             sbcount++;
             }
-        
+
         CTlv subAddressTlv;
         ret = response.TlvByTagValue( &subAddressTlv, KTlvSubaddressTag );
         if ( KErrNone == ret )
             {
-            TIsiSubBlock subAddress( 
+            TIsiSubBlock subAddress(
                 isiMessage,
                 CALL_MODEM_SB_DESTINATION_SUBADDRESS,
                 EIsiSubBlockTypeId8Len8 );
@@ -1327,9 +1338,24 @@ void CSatCC::SendCallModemResourceReq(
         sbcount++;
         }
 
+    // CALL_MODEM_SB_CHECK_INFO[O]: bitfield saying if some checks
+    // should be ignored in Call Modem Server
+    if ( aTcc.iCheckInfo.Length() )
+        {
+        isiMessage.Append( aTcc.iCheckInfo );
+        sbcount++;
+        }
     TBuf8<1> numOfSubblocks;
     numOfSubblocks.Append( sbcount);
     isiMessage.Insert( 1, numOfSubblocks );
+
+    // before sending the call control result to call server,
+    // inform NTSY about call control CALL_ID and call control result
+    CMmDataPackage dataPackage;
+    TUint8 callId( aTcc.iCallId );
+    dataPackage.PackData( &callId, &ccresult );
+    iSatMessaging->GetMessageRouter()->ExtFuncL( 
+        ESatNotifyCallControlRequest, &dataPackage );
     // send request
     iSatMessHandler->CallModemResourceReq( aTcc.iTransId, isiMessage );
 
@@ -1356,8 +1382,8 @@ void CSatCC::SsResourceControlInd( const TIsiReceiveC& aIsiMessage )
     TCallControl callcontrol;
     TInt stringLength;
     // store traid's
-    callcontrol.iTransId = aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
-        SS_RESOURCE_CONTROL_IND_OFFSET_TRANSID );    
+    callcontrol.iTransId = aIsiMessage.Get8bit( ISI_HEADER_SIZE +
+        SS_RESOURCE_CONTROL_IND_OFFSET_TRANSID );
     callcontrol.iRecourceId = aIsiMessage.Get8bit(
         ISI_HEADER_OFFSET_RESOURCEID);
 
@@ -1367,42 +1393,42 @@ void CSatCC::SsResourceControlInd( const TIsiReceiveC& aIsiMessage )
        SS_SB_RESOURCE_SEQ_ID,
        EIsiSubBlockTypeId8Len8,
        sbStartOffset ) );
-    
+
     if( KErrNone == retValue )
         {
-        callcontrol.iResourceSeqId = aIsiMessage.Get8bit( sbStartOffset + 
+        callcontrol.iResourceSeqId = aIsiMessage.Get8bit( sbStartOffset +
             SS_SB_RESOURCE_SEQ_ID_OFFSET_SEQUENCEID );
         }
-    
+
     retValue = aIsiMessage.FindSubBlockOffsetById(
         ISI_HEADER_SIZE + SIZE_SS_RESOURCE_CONTROL_IND,
         SS_SB_SS_CONTROL,
         EIsiSubBlockTypeId8Len8,
         sbStartOffset );
-    
+
     if( KErrNone == retValue )
         {
         stringLength = aIsiMessage.Get8bit( sbStartOffset +
             SS_SB_SS_CONTROL_OFFSET_SSSTRINGLENGTH );
-        callcontrol.iString.Copy( aIsiMessage.GetData( 
+        callcontrol.iString.Copy( aIsiMessage.GetData(
             sbStartOffset + SS_SB_SS_CONTROL_OFFSET_SSSTRING,
             stringLength) );
         }
-    
+
     retValue = aIsiMessage.FindSubBlockOffsetById(
         ISI_HEADER_SIZE + SIZE_SS_RESOURCE_CONTROL_IND,
         SS_SB_USSD_CONTROL,
         EIsiSubBlockTypeId8Len8,
         sbStartOffset );
-    
+
     if( KErrNone == retValue )
         {
         callcontrol.iUssdCodingInfo = aIsiMessage.Get8bit( sbStartOffset +
             SS_SB_USSD_CONTROL_OFFSET_CODINGINFO );
         stringLength = aIsiMessage.Get8bit( sbStartOffset +
             SS_SB_USSD_CONTROL_OFFSET_USSDSTRINGLENGTH  );
-       
-        callcontrol.iUssdString.Copy( aIsiMessage.GetData( 
+
+        callcontrol.iUssdString.Copy( aIsiMessage.GetData(
             sbStartOffset + SS_SB_USSD_CONTROL_OFFSET_USSDSTRING,
             stringLength ) );
         }
@@ -1424,7 +1450,7 @@ void CSatCC::SsResourceControlInd( const TIsiReceiveC& aIsiMessage )
 // Creates resource control response for modem SS server
 // -----------------------------------------------------------------------------
 //
-void CSatCC::SendSsResourceControlReq( 
+void CSatCC::SendSsResourceControlReq(
         const TCallControl& aTcc,
         const TUint8 aResult,
         TPtrC8 aApduData )
@@ -1455,15 +1481,15 @@ void CSatCC::SendSsResourceControlReq(
     // Add mandatory data
     isiMessage.Append( KPadding );
     // SS_SB_RESOURCE [M]: resource. Shall be same as in the corresponding indication.
-    TIsiSubBlock resource( 
+    TIsiSubBlock resource(
         isiMessage,
         SS_SB_RESOURCE ,
         EIsiSubBlockTypeId8Len8 );
     TSatUtility::AppendWord( SS_RES_ID_MO_SS_OPERATION, isiMessage );
     resource.CompleteSubBlock();
-    
+
     // SS_SB_RESOURCE_SEQ_ID [M]: [M]: Sequence ID. Shall be same as in the corresponding indication.
-    TIsiSubBlock resourceSeqId( 
+    TIsiSubBlock resourceSeqId(
         isiMessage,
         SS_SB_RESOURCE_SEQ_ID,
         EIsiSubBlockTypeId8Len8 );
@@ -1497,8 +1523,8 @@ void CSatCC::SendSsResourceControlReq(
             // First check if this has been modified to a new CALL
             CTlv address;
 
-            if ( KErrNone == response.TlvByTagValue(
-                &address, KTlvAddressTag ) )
+            if ( KErrNone == response.TlvByTagValue( &address,
+                    KTlvAddressTag ) )
                 {
                 // Original action has been modified to call
                 isiMessage.Append( SS_RESOURCE_DENIED );
@@ -1517,7 +1543,8 @@ void CSatCC::SendSsResourceControlReq(
                     internalCcResult = KChanged;
                     changedSsServerAction = ETrue;
                     }
-                else
+                else if ( KErrNone == response.TlvByTagValue( &ssServerString,
+                    KTlvSsStringTag ) )
                     {
                     // original SS string has been modified to new SS string
                     isiMessage.Append( SS_RESOURCE_ALLOWED );
@@ -1536,7 +1563,8 @@ void CSatCC::SendSsResourceControlReq(
                     internalCcResult = KChanged;
                     changedSsServerAction = ETrue;
                     }
-                else
+                else if ( KErrNone == response.TlvByTagValue( &ssServerString,
+                    KTlvUssdStringTag ) )
                     {
                     // USSD string has been modified to new USSD string
                     isiMessage.Append( SS_RESOURCE_ALLOWED );
@@ -1567,7 +1595,7 @@ void CSatCC::SendSsResourceControlReq(
                     isiMessage,
                     SS_SB_SS_CONTROL,
                     EIsiSubBlockTypeId8Len8 );
-                
+
                 TUint8 tonNpi( ssStringTlv.GetValue()[0] );
                 TPtrC8 ssString( ssStringTlv.GetValue().Mid(1) );
 
@@ -1625,7 +1653,7 @@ void CSatCC::SendSsResourceControlReq(
                 }
             }
         }
-    
+
     TBuf8<1> numOfSubblocks;
     numOfSubblocks.Append( sbcount);
     isiMessage.Insert( 1, numOfSubblocks );
@@ -1664,8 +1692,8 @@ void CSatCC::GpdsResourceControlInd( const TIsiReceiveC& aIsiMessage )
     TInt paramsLength;
     TBuf8<KPdpContextActivationParamsMaxSize> paramsBuffer;
     // store traid's
-    callcontrol.iTransId = aIsiMessage.Get8bit( ISI_HEADER_SIZE + 
-        GPDS_RESOURCE_CONTROL_REQ_OFFSET_UTID );    
+    callcontrol.iTransId = aIsiMessage.Get8bit( ISI_HEADER_SIZE +
+        GPDS_RESOURCE_CONTROL_REQ_OFFSET_UTID );
     callcontrol.iRecourceId = aIsiMessage.Get8bit(
         ISI_HEADER_OFFSET_RESOURCEID);
     callcontrol.iResourceSeqId = aIsiMessage.Get8bit( ISI_HEADER_SIZE +
@@ -1686,7 +1714,7 @@ void CSatCC::GpdsResourceControlInd( const TIsiReceiveC& aIsiMessage )
         {
         paramsLength = aIsiMessage.Get16bit( sbStartOffset +
             GPDS_ACTIVATE_PDP_CONTEXT_REQUEST_OFFSET_DATALENGTH );
-        paramsBuffer.Copy( aIsiMessage.GetData( 
+        paramsBuffer.Copy( aIsiMessage.GetData(
             sbStartOffset + GPDS_ACTIVATE_PDP_CONTEXT_REQUEST_OFFSET_DATA,
             paramsLength) );
         }
@@ -1702,9 +1730,9 @@ void CSatCC::GpdsResourceControlInd( const TIsiReceiveC& aIsiMessage )
 // Creates resource control response for modem GPDS server
 // -----------------------------------------------------------------------------
 //
-void CSatCC::SendGpdsResourceControlReq( 
+void CSatCC::SendGpdsResourceControlReq(
         const TCallControl& aTcc,
-        const TUint8 aResult, 
+        const TUint8 aResult,
         TPtrC8 aAtkData )
     {
     TFLOGSTRING("TSY: CSatCC::SendGpdsResourceControlReq");
@@ -1750,7 +1778,7 @@ void CSatCC::SendGpdsResourceControlReq(
                 {
                 // response is modified in GPDS server terminology only if
                 // new PDP params are provided
-                if ( KCcEmptyResponseLenght < aAtkData.Length() 
+                if ( KCcEmptyResponseLenght < aAtkData.Length()
                     && KErrNone == response.TlvByTagValue( &paramsTlv,
                         KTlvPdpContextActivationParametersTag ) )
                     {
@@ -1785,7 +1813,7 @@ void CSatCC::SendGpdsResourceControlReq(
         // Resource is GPDS_CC_FOR_GPRS and Result is GPDS_MODIFIED
         if ( RSat::EAllowedWithModifications == internalCcResult )
             {
-            TIsiSubBlock contextParams( 
+            TIsiSubBlock contextParams(
                 isiMessage,
                 GPDS_ACTIVATE_PDP_CONTEXT_REQUEST,
                 EIsiSubBlockTypeId8Len16 );

@@ -22,7 +22,7 @@
 
 enum TP2PSyncRequest
     {
-    EP2PClose = 0,
+    EP2PClose = 1,
     EP2PSend,
     EP2PAllocateBlock,
     EP2PDeallocateBlock,

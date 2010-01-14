@@ -13,7 +13,9 @@
 * 
 * Description:
 * Name      : PN_GPDS [ 0x31 ] Resource General Packet Data Server
-* Version   : 019.000
+* Version   : 019.001
+*
+* Documentation: www.wirelessmodemapi.com
 *
 */
 
@@ -22,7 +24,7 @@
 #define _SYMBIAN_ISI_GPDSISI_H_
 
 #define GENERAL_PACKET_DATA_SERVER_ISI_VERSION_Z	 19
-#define GENERAL_PACKET_DATA_SERVER_ISI_VERSION_Y	 0
+#define GENERAL_PACKET_DATA_SERVER_ISI_VERSION_Y	 1
 
 
 //CONSTANTS

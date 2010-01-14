@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -34,18 +34,15 @@
 
 /**
 *  CUsbPNClassController
-*  This class implements the Usb Isa class controller used to control the usb media.
-*  See Lotus Notes:
-*  TSW Docman / Core Components Factory / USB PhoNet Link / Design
-*  ID:
+*  This class implementation needed for USB Manager to start and stop the service.
 */
 class CUsbPNClassController : public CUsbClassControllerPlugIn
     {
-    public: // New functions.
+    public:
         /**
-        * Constructs a CUsbIsaClassController object.
+        * Constructs a CUsbPNClassController object.
         * @param MUsbClassControllerNotify& aOwner  USB Device that owns and manages the class
-        * @return static CUsbIsaClassController*    A new CUsbIsaClassController object
+        * @return static CUsbPNClassController*     A new CUsbPNClassController object
         */
         static CUsbPNClassController* NewL(MUsbClassControllerNotify& aOwner);
 
@@ -106,5 +103,6 @@ class CUsbPNClassController : public CUsbClassControllerPlugIn
 
     };
 
+#endif // USBPNCLASSCONTROLLER_H
 
-#endif // #ifndef USBPNCLASSCONTROLLER_H
+// End of File

@@ -19,9 +19,9 @@
 #include "tisi.h"
 #include "isimessagetrace.h"
 #include <pn_const.h>
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "tisitraces.h"
+#include "tisiTraces.h"
 #endif
 
 
@@ -554,43 +554,21 @@ EXPORT_C TDes8& TIsiSend::Complete
     C_TRACE( ( _T ( "TIsiSend::Complete, length: 0x%x, calcfinallength: 0x%x" ), length, calcFinalLength ) );
     OstTraceExt2( TRACE_NORMAL, DUP1_TISISEND_COMPLETE, "TIsiSend::Complete;length=%hu;calcFinalLength=%hu", length, calcFinalLength );
     
-    #if defined( __WINS__ ) || defined( __WINSCW__ )
-        {
-         if( iFinalLength == 0 )    // TIsiSend alternative constructor used
-            {
-                TUint8 byte1 = ( TUint8 )( ( length & 0xff00 ) >> 8 );
-                TUint8 byte2 = ( TUint8 )( length & 0x00ff );        
-                this->Set8bit( ISI_HEADER_OFFSET_LENGTH, byte1 );        // BE
-                this->Set8bit( ISI_HEADER_OFFSET_LENGTH + 1, byte2 );    // BE
-            }
-         else
-            {
-                TUint8 byte1 = ( TUint8 )( ( calcFinalLength & 0xff00 ) >> 8 );
-                TUint8 byte2 = ( TUint8 )( calcFinalLength & 0x00ff );        
-                this->Set8bit( ISI_HEADER_OFFSET_LENGTH, byte1 );        // BE
-                this->Set8bit( ISI_HEADER_OFFSET_LENGTH + 1, byte2 );    // BE               
-                iBuffer.SetLength( iFinalLength );
-            }
-        }
-    #else
-        {
-         if( iFinalLength == 0 )    // TIsiSend alternative constructor used
-                {
-                TUint8 byte1 = ( TUint8 )( ( length & 0xff00 ) >> 8 );
-                TUint8 byte2 = ( TUint8 )( length & 0x00ff );        
-                this->Set8bit( ISI_HEADER_OFFSET_LENGTH, byte2 );        // LE
-                this->Set8bit( ISI_HEADER_OFFSET_LENGTH + 1, byte1 );    // LE
-                }
-            else
-                {
-                TUint8 byte1 = ( TUint8 )( ( calcFinalLength & 0xff00 ) >> 8 );
-                TUint8 byte2 = ( TUint8 )( calcFinalLength & 0x00ff );        
-                this->Set8bit( ISI_HEADER_OFFSET_LENGTH, byte2 );        // LE
-                this->Set8bit( ISI_HEADER_OFFSET_LENGTH + 1, byte1 );    // LE               
-                iBuffer.SetLength( iFinalLength );
-                }
-        }
-    #endif    
+    if( iFinalLength == 0 )    // TIsiSend alternative constructor used
+       {
+           TUint8 byte1 = ( TUint8 )( ( length & 0xff00 ) >> 8 );
+           TUint8 byte2 = ( TUint8 )( length & 0x00ff );        
+           this->Set8bit( ISI_HEADER_OFFSET_LENGTH, byte1 );        // BE
+           this->Set8bit( ISI_HEADER_OFFSET_LENGTH + 1, byte2 );    // BE
+       }
+    else
+       {
+           TUint8 byte1 = ( TUint8 )( ( calcFinalLength & 0xff00 ) >> 8 );
+           TUint8 byte2 = ( TUint8 )( calcFinalLength & 0x00ff );        
+           this->Set8bit( ISI_HEADER_OFFSET_LENGTH, byte1 );        // BE
+           this->Set8bit( ISI_HEADER_OFFSET_LENGTH + 1, byte2 );    // BE               
+           iBuffer.SetLength( iFinalLength );
+       }
 
     C_TRACE( ( _T ( "TIsiSend::Complete, byte2: 0x%x, byte1: 0x%x" ), iBuffer[5], iBuffer[4] ) );
     OstTraceExt2( TRACE_NORMAL, DUP2_TISISEND_COMPLETE, "TIsiSend::Complete;byte2=%hhu;byte1=%hhu", iBuffer[5], iBuffer[4] );

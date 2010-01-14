@@ -32,9 +32,9 @@
 #include <gpds_sharedisi.h>
 #include <ctsy/serviceapi/gsmerror.h>
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmpacketservicemesshandlertraces.h"
+#include "cmmpacketservicemesshandlerTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

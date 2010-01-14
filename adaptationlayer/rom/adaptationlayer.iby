@@ -19,18 +19,11 @@
 #ifndef ADAPTATIONLAYER_IBY
 #define ADAPTATIONLAYER_IBY
 
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-#include <dataport.iby>
-#endif
-
-#include <modematadaptation.iby>
 #include <bcaiscadapter.iby>
-
-#ifdef NCP_COMMON_BRIDGE_FAMILY
+#include <modematadaptation.iby>
+#include <devicemodecontroller.iby>
 #include <sspluginsadaptation.iby>
 #include <tsy.iby>
-#include <devicemodecontroller.iby>
-#endif
 
 #endif // ADAPTATIONLAYER_IBY
 

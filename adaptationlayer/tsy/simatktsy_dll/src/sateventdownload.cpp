@@ -27,9 +27,9 @@
 #include <tisi.h>               // isi message
 #include <net_modemisi.h>       // net server
 #include <call_modemisi.h>      // Call Modem server
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "sateventdownloadtraces.h"
+#include "sateventdownloadTraces.h"
 #endif
 
 

@@ -29,7 +29,7 @@
 //ISCE
 #include "isirouterlinkifs.h"       // For MLinkRouterIf
 //ISCE
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT 
 class DPipeHandler;
 #endif
 //ISCE class MIAD2ISTApi;
@@ -137,18 +137,15 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
             EPipeMsg,
             EMediaMsg,
             EIndicationMsg,
-            EControlMsg,
-            EPnNameAddRespMsg,
             ENotKnownMsg,
+            EUsbPhonetMsg
             };
 
         enum TWaitingType
             {
             ENormalOpen = 1,
-            EDrmOpen,
-            ENameAddOpen
 #if (NCP_COMMON_SOS_VERSION_SUPPORT >= SOS_VERSION_95)
-            ,ELoan
+            ELoan
 #endif
             };
 
@@ -158,9 +155,6 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
 
         void HandleMediaMessage( TDes8& aMsg );
 
-        void HandleControlMessage( TDes8& aMsg );
-
-        void HandlePnsNameAddResp( TDes8& aMsg );
 
         void SendCommIsaEntityNotReachableResp( const TDesC8& aMsg );
 
@@ -171,24 +165,25 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
     public:
         static void CheckRouting( DRouter& aTmp, TDes8& aMsg );
 
+        static DRouter* iThisPtr;
+        MISIRouterObjectIf* iNameService;
+        MISIRouterObjectIf* iCommunicationManager;
+
     private:
         static void CommonRxDfc( TAny* aPtr );
 
         static void InitCmtDfc( TAny* aPtr );
-#ifdef NCP_COMMON_BRIDGE_FAMILY
+
         void InitConnectionOk();
-#endif
-        void InitCmtConnection();
-
-        void SendDrmReq( const TUint16 aChannelId );
-
-        void SendPnsNameAddReq( const TUint16 aChannel, const TDesC8& aOpenInfo );
 
         static void NotifyObjLayerConnStatDfc( TAny* aPtr );
 
         void NotifyObjLayerConnStat( const TIADConnectionStatus aStatus );
 
         void SetSenderInfo( TDes8& aMessage, const TUint16 aCh );
+
+        //From objectapi
+        TInt Send( TDes8& aMessage, const TUint8 aObjId );
 
       // Member data
     private:
@@ -214,11 +209,7 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
 
         enum TISIMedias
             {
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-            EISIMediaSOS            = 0x00,
-#else
             EISIMediaHostSSI        = 0x00,
-#endif
             EISIAmountOfMedias
             };
 // ISCE
@@ -226,7 +217,7 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
         // owned
         // APE <-> CMT connection status ok/nok.
         TIADConnectionStatus                            iConnectionStatus;
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
         DPipeHandler*                                   iPipeHandler;
 #endif
         DIndicationHandler*                             iIndicationHandler;

@@ -15,13 +15,15 @@
 * Name      : PN_MODEM_LCS [ 0x90 ] Resource Modem LCS Server
 * Version   : 006.000
 *
+* Documentation: www.wirelessmodemapi.com
+*
 */
 
 
 #ifndef _SYMBIAN_ISI_LOCATION_WMISI_H_
 #define _SYMBIAN_ISI_LOCATION_WMISI_H_
 
-#define MODEM_LCS_SERVER_ISI_VERSION_Z	 6
+#define MODEM_LCS_SERVER_ISI_VERSION_Z	 7
 #define MODEM_LCS_SERVER_ISI_VERSION_Y	 0
 
 
@@ -411,9 +413,6 @@
 //ConstantTable for MODEM_LCS_HW_PIN_CTRL_ID
 
 //ConstantTable for MODEM_LCS_HW_PIN_CTRL_STATE
-#define MODEM_LCS_PIN_LOW                                 	0x01                                                 	
-#define MODEM_LCS_PIN_HIGH                                	0x02                                                 	
-#define MODEM_LCS_PIN_RELEASE                             	0x03                                                 	
 
 //ConstantTable for MODEM_LCS_W_OPTIONAL_TAG
 #define MODEM_LCS_W_OPTIONAL_NOT_PRESENT                  	0x00                                                 	
@@ -1501,42 +1500,6 @@
 #define SIZE_MODEM_LCS_SB_SS_PRIVACY_SUPPORT_STATUS       	8
 
 
-//Definition for MODEM_LCS_SB_PROD_TEST_TXP_SET
-#define MODEM_LCS_SB_PROD_TEST_TXP_SET                    	0x700                                             	
-#define MODEM_LCS_SB_PROD_TEST_TXP_SET_OFFSET_SBID        	0 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TXP_SET_OFFSET_SBLEN       	2 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TXP_SET_OFFSET_STATE       	4 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TXP_SET_OFFSET_FILLERBYTE1 	6 //size 2 byte(s)
-#define SIZE_MODEM_LCS_SB_PROD_TEST_TXP_SET               	8
-
-
-//Definition for MODEM_LCS_SB_PROD_TEST_TIME_STAMP_SET
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_SET             	0x701                                             	
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_SET_OFFSET_SBID 	0 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_SET_OFFSET_SBLEN	2 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_SET_OFFSET_STATE	4 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_SET_OFFSET_FILLERBYTE1	6 //size 2 byte(s)
-#define SIZE_MODEM_LCS_SB_PROD_TEST_TIME_STAMP_SET        	8
-
-
-//Definition for MODEM_LCS_SB_PROD_TEST_TXP_RESULT
-#define MODEM_LCS_SB_PROD_TEST_TXP_RESULT                 	0x702                                             	
-#define MODEM_LCS_SB_PROD_TEST_TXP_RESULT_OFFSET_SBID     	0 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TXP_RESULT_OFFSET_SBLEN    	2 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TXP_RESULT_OFFSET_STATUS   	4 //size 1 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TXP_RESULT_OFFSET_FILLERBYTE1	5 //size 3 byte(s)
-#define SIZE_MODEM_LCS_SB_PROD_TEST_TXP_RESULT            	8
-
-
-//Definition for MODEM_LCS_SB_PROD_TEST_TIME_STAMP_RESULT
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_RESULT          	0x703                                             	
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_RESULT_OFFSET_SBID	0 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_RESULT_OFFSET_SBLEN	2 //size 2 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_RESULT_OFFSET_STATUS	4 //size 1 byte(s)
-#define MODEM_LCS_SB_PROD_TEST_TIME_STAMP_RESULT_OFFSET_FILLERBYTE1	5 //size 3 byte(s)
-#define SIZE_MODEM_LCS_SB_PROD_TEST_TIME_STAMP_RESULT     	8
-
-
 //MESSAGES
 
 
@@ -1732,24 +1695,6 @@
 #define MODEM_LCS_SS_PRIVACY_TIMEOUT_IND_OFFSET_SESSION   	2 //size 1 byte(s)
 #define MODEM_LCS_SS_PRIVACY_TIMEOUT_IND_OFFSET_FILLERBYTE1	3 //size 1 byte(s)
 #define SIZE_MODEM_LCS_SS_PRIVACY_TIMEOUT_IND             	4
-
-
-//Definition for MODEM_LCS_TEST_HW_PIN_CTRL_REQ
-#define MODEM_LCS_TEST_HW_PIN_CTRL_REQ                    	0x15                                              	
-#define MODEM_LCS_TEST_HW_PIN_CTRL_REQ_OFFSET_TRANSID     	0 //size 1 byte(s)
-#define MODEM_LCS_TEST_HW_PIN_CTRL_REQ_OFFSET_MESSAGEID   	1 //size 1 byte(s)
-#define MODEM_LCS_TEST_HW_PIN_CTRL_REQ_OFFSET_FILLERBYTE1 	2 //size 1 byte(s)
-#define MODEM_LCS_TEST_HW_PIN_CTRL_REQ_OFFSET_SBCOUNT     	3 //size 1 byte(s)
-#define SIZE_MODEM_LCS_TEST_HW_PIN_CTRL_REQ               	4
-
-
-//Definition for MODEM_LCS_TEST_HW_PIN_CTRL_RESP
-#define MODEM_LCS_TEST_HW_PIN_CTRL_RESP                   	0x16                                              	
-#define MODEM_LCS_TEST_HW_PIN_CTRL_RESP_OFFSET_TRANSID    	0 //size 1 byte(s)
-#define MODEM_LCS_TEST_HW_PIN_CTRL_RESP_OFFSET_MESSAGEID  	1 //size 1 byte(s)
-#define MODEM_LCS_TEST_HW_PIN_CTRL_RESP_OFFSET_FILLERBYTE1	2 //size 1 byte(s)
-#define MODEM_LCS_TEST_HW_PIN_CTRL_RESP_OFFSET_SBCOUNT    	3 //size 1 byte(s)
-#define SIZE_MODEM_LCS_TEST_HW_PIN_CTRL_RESP              	4
 
 
 //Definition for MODEM_LCS_GSM_TIME_STAMP_REQ

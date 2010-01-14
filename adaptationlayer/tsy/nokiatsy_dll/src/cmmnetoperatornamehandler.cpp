@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -34,9 +34,9 @@
 #include <tisi.h>
 //#include <permisi.h> To be done in CPS
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmnetoperatornamehandlertraces.h"
+#include "cmmnetoperatornamehandlerTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES
@@ -150,7 +150,8 @@ OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_CMMNETOPERATORNAMEHANDLER, "C
 //
 CMmNetOperatorNameHandler* CMmNetOperatorNameHandler::NewL
         (
-        CMmNetMessHandler* aNetMessHandler // Pointer to the NetMessHandler.
+        CMmNetMessHandler* aNetMessHandler, // Pointer to the NetMessHandler.
+        CMmUiccMessHandler* aUiccMessHandler
         )
     {
 TFLOGSTRING("TSY: CMmNetOperatorNameHandler::NewL");
@@ -162,6 +163,7 @@ OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_NEWL, "CMmNetOperatorNameHand
     CleanupStack::PushL( netOperatorNameHandler );
 
     netOperatorNameHandler->iNetMessHandler = aNetMessHandler;
+    netOperatorNameHandler->iMmUiccMessHandler = aUiccMessHandler;
     netOperatorNameHandler->ConstructL();
 
     CleanupStack::Pop( netOperatorNameHandler );
@@ -219,6 +221,8 @@ OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_CONSTRUCTL, "CMmNetOperatorNa
     iFromGetManualSearchOperatorName = EFalse;
 
     iManualSearchIndexValue = 0;
+    iOplRecordCount = 0;
+    iOplRecordNumber = 1; //Reading starts from record 1
 
     // Initialization of PP bit value, initialized to non used value.
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
@@ -226,7 +230,7 @@ OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_CONSTRUCTL, "CMmNetOperatorNa
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
     // TO BE DONE WITH INFO_PP_DATA_READ_RESP
     iInfoPpEonsFeatValue = INFO_PP_EONS_FEAT_0;
-    
+
     // Read INFO_PP_EONS_FEAT PP bit value.
     InfoPpReadReq();
 
@@ -663,12 +667,20 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMNETOPERATORNAMEHANDLER_GETOPERATORNAME, "CMmNet
                 // This flag is needed to handle correct IPC value.
                 iFromGetOperatorName = ETrue;
 
+                // This PNN record has not been read earlier.
+                SendReadPnnReq(
+                    tempMCC,
+                    tempMNC,
+                    tempPnnIdentifier,
+                    aLocationArea,
+                    aNetworkName );
+
                 // No need to check NITZ.
                 checkNitzName = EFalse;
 
                 // Set EFalse as completing will be done after
-                // SimOperatorRespReadPnn message is handled.
-                // completeNow = EFalse;
+                // UiccOperatorRespReadPnn message is handled.
+                completeNow = EFalse;
                 }
             }
         }
@@ -728,11 +740,19 @@ OstTrace0( TRACE_NORMAL, DUP11_CMMNETOPERATORNAMEHANDLER_GETOPERATORNAME, "CMmNe
                     // This flag is needed to handle correct IPC value.
                     iFromGetOperatorName = ETrue;
 
+                    // This PNN record has not been read earlier.
+                    SendReadPnnReq(
+                        tempMCC,
+                        tempMNC,
+                        tempPnnIdentifier,
+                        aLocationArea,
+                        aNetworkName );
+
                     // No need to check NITZ.
                     checkNitzName = EFalse;
 
                     // Set EFalse as completing will be done after
-                    // SimOperatorRespReadPnn message is handled.
+                    // UiccOperatorRespReadPnn message is handled.
                     completeNow = EFalse;
                     }
                 }
@@ -1179,9 +1199,17 @@ OstTrace0( TRACE_NORMAL, DUP8_CMMNETOPERATORNAMEHANDLER_GETMANUALSEARCHOPERATORN
                     // This flag is needed to handle correct IPC value.
                     iFromGetManualSearchOperatorName = ETrue;
 
+                    // This PNN record has not read been earlier.
+                    SendReadPnnReq(
+                        mcc,
+                        mnc,
+                        tempPnnIdentifier,
+                        locationArea,
+                        networkName );
+
                     // Set EFalse as completing will be done after
-                    // SimOperatorRespReadPnn message is handled.
-                    // completeNow = EFalse;
+                    // UiccOperatorRespReadPnn message is handled.
+                    completeNow = EFalse;
                     }
                 }
             // No else.
@@ -1238,9 +1266,17 @@ OstTrace0( TRACE_NORMAL, DUP13_CMMNETOPERATORNAMEHANDLER_GETMANUALSEARCHOPERATOR
                         // This flag is needed to handle correct IPC value.
                         iFromGetManualSearchOperatorName = ETrue;
 
+                        // This PNN record has not been read earlier.
+                        SendReadPnnReq(
+                            mcc,
+                            mnc,
+                            tempPnnIdentifier,
+                            locationArea,
+                            networkName );
+
                         // Set EFalse as completing will be done after
-                        // SimOperatorRespReadPnn message is handled.
-                        // completeNow = EFalse;
+                        // UiccOperatorRespReadPnn message is handled.
+                        completeNow = EFalse;
                         }
                     }
                 // No else.
@@ -1394,7 +1430,7 @@ void CMmNetOperatorNameHandler::InfoPpReadResp
     {
     // Get status.
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-// TO BE DONE WITH INFO_PP_DATA_READ_RESP  
+// TO BE DONE WITH INFO_PP_DATA_READ_RESP
     TUint8 status( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + INFO_PP_READ_RESP_OFFSET_STATUS ) );
 
@@ -2134,7 +2170,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "C
         iOplRuleMatch = EFalse;
         }
 TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - OPL Rule Match value T/F: %d", iOplRuleMatch);
-OstTraceExt1( TRACE_NORMAL, DUP5_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - OPL Rule Match value T/F=%hhu", iOplRuleMatch );
+OstTrace1( TRACE_NORMAL, DUP6_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker;iOplRuleMatch=%d", iOplRuleMatch );
     }
 
 // -----------------------------------------------------------------------------
@@ -2575,6 +2611,700 @@ TFLOGSTRING("TSY: CMmNetOperatorNameHandler::GetPnnRecordIdentifierValue");
 OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_GETPNNRECORDIDENTIFIERVALUE, "CMmNetOperatorNameHandler::GetPnnRecordIdentifierValue" );
     return iEonsName.iPNNIdentifier;
     }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::UiccReadOplRecordCount
+// Reads record count of EFopl
+// -----------------------------------------------------------------------------
+//
+void CMmNetOperatorNameHandler::UiccReadOplRecordCount()
+    {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccReadOplRecordCount");
+OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_UICCREADOPLRECORDCOUNT, "CMmNetOperatorNameHandler::UiccReadOplRecordCount" );
+    // Initialize to default value
+    iOplListAvailable = EFalse;
+
+    TUint8 fileIdSfi( 0x1A ); // Default value for 3G
+    // Get card type to define SFI
+    TUint8 cardType( iMmUiccMessHandler->GetCardType() );
+    if ( UICC_CARD_TYPE_ICC == cardType )
+        {
+        fileIdSfi = UICC_SFI_NOT_PRESENT;
+        }
+
+    // Set parameters for UICC_APPL_CMD_REQ message
+    TUiccParamsBase params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdReadOplRecordCount;
+    params.fileId = KElemFileOpl;
+    params.fileIdSfi = fileIdSfi;
+    params.serviceType = UICC_APPL_FILE_INFO;
+
+    // File path
+    params.filePath.Append( KMasterFileId >> 8 );
+    params.filePath.Append( KMasterFileId );
+    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+    iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::UiccOplRecordCountResponse
+// Response handling for record count of EFopl
+// -----------------------------------------------------------------------------
+//
+void CMmNetOperatorNameHandler::UiccOplRecordCountResponse(
+    TInt aStatus,
+    const TDesC8& aFileData )
+    {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOplRecordCountResponse");
+OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_UICCOPLRECORDCOUNTRESPONSE, "CMmNetOperatorNameHandler::UiccOplRecordCountResponse" );
+
+    TBool checkRefresh( ETrue );
+    if ( UICC_STATUS_OK == aStatus )
+        {
+        TFci fci( aFileData );
+        iOplRecordCount = fci.GetNumberOfRecords();
+
+        // If there is at least one record, start to read EFopl records
+        if ( 0 < iOplRecordCount )
+            {
+            // Reset array that it can be reused.
+            iOperatorPlmnListTable.Reset();
+            // Start reading from the first record
+            UiccReadOplReq();
+            // Don't check refresh yet because reading continues
+            checkRefresh = EFalse;
+            }
+        else
+            {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOplRecordCountResponse - No OPL records on (U)SIM");
+OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_UICCOPLRECORDCOUNTRESPONSE, "CMmNetOperatorNameHandler::UiccOplRecordCountResponse - No OPL records on (U)SIM" );
+            }
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOplRecordCountResponse - Reading of OPL record count failed");
+OstTrace0( TRACE_NORMAL, DUP2_CMMNETOPERATORNAMEHANDLER_UICCOPLRECORDCOUNTRESPONSE, "CMmNetOperatorNameHandler::UiccOplRecordCountResponse - Reading of OPL record count failed" );
+        }
+
+    // There was error reading OPL or record number was zero.
+    if ( checkRefresh )
+        {
+        // Complete refresh. Refresh status is checked in complete.
+        TBool retOplRefreshOngoing = iNetMessHandler->
+            GetMessageRouter()->
+            GetPhoneMessHandler()->
+            OplRulesCachingCompleted( KErrNotFound );
+
+        // If OPL request is done in boot phase we need handle possible
+        // queued Net messages. In refresh situation this is not
+        // allowed to call.
+        if ( !retOplRefreshOngoing )
+            {
+            // OPL Rules read in boot, start handle queued messsages.
+            iNetMessHandler->ContinueHandlingNetModemRegStatusMessages();
+            }
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::UiccReadOplReq
+// Request ro read a record of EFopl
+// -----------------------------------------------------------------------------
+//
+void CMmNetOperatorNameHandler::UiccReadOplReq()
+    {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccReadOplResp");
+OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_UICCREADOPLREQ, "CMmNetOperatorNameHandler::UiccReadOplReq" );
+
+    TUint8 fileIdSfi( 0x1A ); // Default value for 3G
+    // Get card type to define SFI
+    TUint8 cardType( iMmUiccMessHandler->GetCardType() );
+    if ( UICC_CARD_TYPE_ICC == cardType )
+        {
+        fileIdSfi = UICC_SFI_NOT_PRESENT;
+        }
+
+    // Set parameters for UICC_APPL_CMD_REQ message
+    TUiccReadLinearFixed params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdReadOplRecord;
+    params.dataOffset = 0;
+    params.dataAmount = 0;
+    params.record = iOplRecordNumber;
+    params.fileId = KElemFileOpl;
+    params.fileIdSfi = fileIdSfi;
+    params.serviceType = UICC_APPL_READ_LINEAR_FIXED;
+
+    // File path
+    params.filePath.Append( KMasterFileId >> 8 );
+    params.filePath.Append( KMasterFileId );
+    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+    iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::UiccReadOplResp
+// Request ro read a record of EFopl
+// -----------------------------------------------------------------------------
+//
+void CMmNetOperatorNameHandler::UiccReadOplResp( const TDesC8& aFileData )
+    {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccReadOplResp");
+OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_UICCREADOPLRESP, "CMmNetOperatorNameHandler::UiccReadOplResp" );
+    if ( 8 == aFileData.Length() )
+        {
+        // Temp data
+        TOperatorPLMNList tempOperatorPlmnList;
+
+        // See structure of EFopl from 3GPP TS 31.102 V8.3.0
+        // Chapter 4.2.59   EFOPL (Operator PLMN List)
+        // Get the operator code BCD string. Length is 3 bytes.
+        tempOperatorPlmnList.iOperCodeBCD = aFileData.Mid( 0, 3 );
+
+        // Get the lower limit of location area code.
+        tempOperatorPlmnList.iLACLowerLimit =
+            ( aFileData[3] << 8 ) | aFileData[4];
+
+        // Get the upper limit of location area code.
+        tempOperatorPlmnList.iLACUpperLimit =
+            ( aFileData[5] << 8 ) | aFileData[6];
+
+        // Get the PNN Identifier.
+        tempOperatorPlmnList.iPNNIdentifier = aFileData[7];
+
+        // Add operator PLMN list data to record list.
+        iOperatorPlmnListTable.Append( tempOperatorPlmnList );
+
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::SimOperatorRespReadOpl, OPL Record saved to OPL List index: %d", (iOplRecordNumber - 2 ) );
+TFLOGSTRING4("TSY: CMmNetOperatorNameHandler::SimOperatorRespReadOpl, Operator Code BCD string: %02X %02X %02X", tempOperatorPlmnList.iOperCodeBCD[0], tempOperatorPlmnList.iOperCodeBCD[1], tempOperatorPlmnList.iOperCodeBCD[2]);
+TFLOGSTRING3("TSY: CMmNetOperatorNameHandler::SimOperatorRespReadOpl, LAC between: %d - %d", tempOperatorPlmnList.iLACUpperLimit, tempOperatorPlmnList.iLACLowerLimit);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::SimOperatorRespReadOpl, PNN Identifier: %d", tempOperatorPlmnList.iPNNIdentifier);
+OstTraceExt1( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_UICCREADOPLRESP, "CMmNetOperatorNameHandler::UiccReadOplResp;iOplRecordNumber=%hhu", iOplRecordNumber );
+OstTraceExt3( TRACE_NORMAL, DUP2_CMMNETOPERATORNAMEHANDLER_UICCREADOPLRESP, "CMmNetOperatorNameHandler::UiccReadOplResp;tempOperatorPlmnList.iOperCodeBCD[0]=%hhx;tempOperatorPlmnList.iOperCodeBCD[1]=%hhx;tempOperatorPlmnList.iOperCodeBCD[2]=%hhx", tempOperatorPlmnList.iOperCodeBCD[0], tempOperatorPlmnList.iOperCodeBCD[1], tempOperatorPlmnList.iOperCodeBCD[2] );
+OstTraceExt2( TRACE_NORMAL, DUP3_CMMNETOPERATORNAMEHANDLER_UICCREADOPLRESP, "CMmNetOperatorNameHandler::UiccReadOplResp;tempOperatorPlmnList.iLACUpperLimit=%u;tempOperatorPlmnList.iLACLowerLimit=%u", tempOperatorPlmnList.iLACUpperLimit, tempOperatorPlmnList.iLACLowerLimit );
+OstTraceExt1( TRACE_NORMAL, DUP4_CMMNETOPERATORNAMEHANDLER_UICCREADOPLRESP, "CMmNetOperatorNameHandler::UiccReadOplResp;tempOperatorPlmnList.iPNNIdentifier=%hhd", tempOperatorPlmnList.iPNNIdentifier );
+
+        // Clear buffer before next round
+        tempOperatorPlmnList.iOperCodeBCD.Zero();
+
+        // At least one record was saved successfully
+        iOplListAvailable = ETrue;
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccReadOplResp - Invalid data in OPL record");
+OstTrace0( TRACE_NORMAL, DUP5_CMMNETOPERATORNAMEHANDLER_UICCREADOPLRESP, "CMmNetOperatorNameHandler::UiccReadOplResp - Invalid data in OPL record" );
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::UiccOperatorReq
+// Read operator name from (U)SIM
+// -----------------------------------------------------------------------------
+//
+void CMmNetOperatorNameHandler::UiccOperatorReq()
+    {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorReq" );
+OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_UICCOPERATORREQ, "CMmNetOperatorNameHandler::UiccOperatorReq" );
+
+    // Set parameters for UICC_APPL_CMD_REQ message
+    TUiccReadTransparent params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdReadOperatorName;
+    params.dataOffset = 0;
+    params.dataAmount = 0;
+    params.fileId = KElemFileOperatorName;
+    params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+    params.serviceType = UICC_APPL_READ_TRANSPARENT;
+
+    // File id path
+    params.filePath.Append( KMasterFileId >> 8 );
+    params.filePath.Append( KMasterFileId );
+    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+    iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::UiccOperatorResp
+// Handle response for operator neme reading
+// -----------------------------------------------------------------------------
+//
+void CMmNetOperatorNameHandler::UiccOperatorResp(
+    TInt aStatus,
+    const TDesC8& aFileData
+    )
+    {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorResp");
+OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESP, "CMmNetOperatorNameHandler::UiccOperatorResp" );
+
+    if ( UICC_STATUS_OK == aStatus )
+        {
+        // Reset ONS name.
+        iOperatorNameString.Zero();
+
+        // Get length of operator name. Coded as SMS default 7-bit coded alphabet
+        // as defined in GSM 03.38 with bit 8 set to 0
+        TInt nameLength( aFileData.Length() );
+        if ( KOnsNameMaxLength < nameLength )
+            {
+            nameLength = KOnsNameMaxLength;
+            }
+
+        // Save operator name string to internal buffer as 16-bit
+        for ( TUint8 i( 0 ); i < nameLength; i++ )
+            {
+            iOperatorNameString.Append( static_cast<TUint16> ( aFileData[i] ) );
+            }
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorResp, ONS Name: %S", &iOperatorNameString);
+OstTraceExt1( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESP, "CMmNetOperatorNameHandler::UiccOperatorResp;iOperatorNameString=%S", iOperatorNameString );
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorResp - Error occured, data not available");
+OstTrace0( TRACE_NORMAL, DUP2_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESP, "CMmNetOperatorNameHandler::UiccOperatorResp- Error occured, data not available" );
+        // Data not available.
+        iOperatorNameString.Zero();
+        }
+
+    // Complete refresh.
+    // Refresh status is checked in complete.
+    iNetMessHandler->
+        GetMessageRouter()->
+        GetPhoneMessHandler()->
+        OnsNameCachingCompleted( aStatus );
+    }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::ProcessUiccMsg
+// Handles data received from UICC server
+// -----------------------------------------------------------------------------
+//
+TInt CMmNetOperatorNameHandler::ProcessUiccMsg(
+    TInt aTraId,
+    TInt aStatus,
+    TUint8 /*aDetails*/,
+    const TDesC8& aFileData )
+    {
+TFLOGSTRING3("TSY:CMmNetOperatorNameHandler::ProcessUiccMsg, aTraId: %d, status: %d", aTraId, aStatus );
+OstTraceExt2( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_PROCESSUICCMSG, "CMmNetOperatorNameHandler::ProcessUiccMsg;aTraId=%d;aStatus=%d", aTraId, aStatus );
+
+    TInt ret( KErrNone );
+    TInt status( KErrNone );
+
+    switch ( aTraId )
+        {
+        case ETrIdReadOplRecordCount:
+            {
+            UiccOplRecordCountResponse( aStatus, aFileData );
+            break;
+            }
+        case ETrIdReadOplRecord:
+            {
+            // Decrease amount of records left and increase record number
+            // to be read next
+            iOplRecordCount--;
+            iOplRecordNumber++;
+
+            // OPL record was read successfully, handle response data
+            if ( UICC_STATUS_OK == aStatus )
+                {
+                UiccReadOplResp( aFileData );
+                }
+            else
+                {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::ProcessUiccMsg(ETrIdReadOplRecord) - Error occured when reading OPL record");
+OstTrace0( TRACE_NORMAL, DUP3_CMMNETOPERATORNAMEHANDLER_PROCESSUICCMSG, "CMmNetOperatorNameHandler::ProcessUiccMsg - - Error occured when reading OPL record" );
+                }
+
+            // There are still records left. Continue reading regardless of
+            // the previous read was failed or not
+            if ( 0 < iOplRecordCount)
+                {
+                UiccReadOplReq();
+                }
+            else // All records were read
+                {
+                iOplRulesRead = ETrue;
+                iOplRecordNumber = 1; // Default value
+
+                // None of the records was read successfully
+                if ( ! iOplListAvailable )
+                    {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::ProcessUiccMsg(ETrIdReadOplRecord) - No OPL records available");
+OstTrace0( TRACE_NORMAL, DUP2_CMMNETOPERATORNAMEHANDLER_PROCESSUICCMSG, "CMmNetOperatorNameHandler::ProcessUiccMsg - No OPL records available" );
+                    // Reset array
+                    iOperatorPlmnListTable.Reset();
+                    status = KErrNotFound;
+                    }
+
+                // Complete refresh. Refresh status is checked in complete.
+                TBool retOplRefreshOngoing = iNetMessHandler->
+                    GetMessageRouter()->
+                    GetPhoneMessHandler()->
+                    OplRulesCachingCompleted( status );
+
+                // If OPL request is done in boot phase we need handle possible
+                // queued Net messages. In refresh situation this is not
+                // allowed to call.
+                if ( !retOplRefreshOngoing )
+                    {
+                    // OPL Rules read in boot, start handle queued messsages.
+                    iNetMessHandler->ContinueHandlingNetModemRegStatusMessages();
+                    }
+                }
+            break;
+            }
+        case ETrIdReadOperatorName:
+            {
+            UiccOperatorResp( aStatus, aFileData );
+            break;
+            }
+        case ETrIdReadPnn:
+            {
+            UiccOperatorRespReadPnnL( aStatus, aFileData );
+            break;
+            }
+        default:
+            {
+TFLOGSTRING("TSY:CMmNetOperatorNameHandler::ProcessUiccMsg - unknown transaction ID" );
+OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_PROCESSUICCMSG, "CMmNetOperatorNameHandler::ProcessUiccMsg - unknown transaction ID" );
+            break;
+            }
+        }
+    return ret;
+    }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::SendReadPnnReq
+//
+// -----------------------------------------------------------------------------
+//
+void CMmNetOperatorNameHandler::SendReadPnnReq
+        (
+        TUint aMCC, // Mobile Country Code
+        TUint aMNC, // Mobile Network Code
+        TUint8 aPnnIdentifier, // PNN record identifier
+        const RMobilePhone::TMobilePhoneLocationAreaV1& aLocationAreaData, // LAC
+        const RMobilePhone::TMobilePhoneNetworkInfoV5& aNetworkData // Network data
+        )
+    {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::SendReadPnnReq");
+OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_SENDREADPNNREQ, "CMmNetOperatorNameHandler::SendReadPnnReq" );
+
+    // Store Country code and Network code.
+    iEonsName.iMCC = aMCC;
+    iEonsName.iMNC = aMNC;
+    // Store PNN record number.
+    iEonsName.iPNNIdentifier = aPnnIdentifier;
+
+    // Storing Location Area data for later use.
+    iLocationAreaData = aLocationAreaData;
+
+    // Storing Network data for later use.
+    iNetworkData = aNetworkData;
+
+    // Read PNN record from (U)SIM for getting EONS name
+    // for network.
+    UiccOperatorReqReadPnn( iEonsName.iPNNIdentifier );
+    }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::UiccOperatorReqReadPnn
+// Creates UICC_APPL_CMD_REQ ISI message and sends it through phonet.
+// This request is used to read the PLMN Network Name from EFpnn on (U)SIM.
+// -----------------------------------------------------------------------------
+//
+void CMmNetOperatorNameHandler::UiccOperatorReqReadPnn( TUint8 aPnnIdentifier )
+    {
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorReqReadPnn, PNN Identifier: %d", aPnnIdentifier);
+OstTraceExt1( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_UICCOPERATORREQREADPNN, "CMmNetOperatorNameHandler::UiccOperatorReqReadPnn;aPnnIdentifier=%hhu", aPnnIdentifier );
+
+    TUint8 fileIdSfi( 0x19 ); // Default value for 3G
+    // Get card type to define SFI
+    TUint8 cardType( iMmUiccMessHandler->GetCardType() );
+    if ( UICC_CARD_TYPE_ICC == cardType )
+        {
+        fileIdSfi = UICC_SFI_NOT_PRESENT;
+        }
+
+    // Set parameters for UICC_APPL_CMD_REQ message
+    TUiccReadLinearFixed params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdReadPnn;
+    params.dataOffset = 0;
+    params.dataAmount = 0;
+    params.record = aPnnIdentifier;
+    params.fileId = KElemFilePlmnNetworkName;
+    params.fileIdSfi = fileIdSfi;
+    params.serviceType = UICC_APPL_READ_LINEAR_FIXED;
+
+    // File path
+    params.filePath.Append( KMasterFileId >> 8 );
+    params.filePath.Append( KMasterFileId );
+    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+    iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    }
+
+// -----------------------------------------------------------------------------
+// CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL
+// Handles the PLMN Network Name from EFpnn on (U)SIM.
+// -----------------------------------------------------------------------------
+//
+void CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL(
+    TInt aStatus,
+    const TDesC8& aFileData )
+    {
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Status value: %d", aStatus);
+OstTrace1( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_UICCOPERATORREQREADPNN, "CMmNetOperatorNameHandler::UiccOperatorReqReadPnn;aStatus=%d", aStatus );
+
+    // Is there PNN record available. Value initialize to EFalse.
+    TBool pnnRecordAvailable( EFalse );
+
+    // Get length of the record.
+    TInt dataLength( aFileData.Length() );
+
+    // See structure of EF 6FC5 from 3GPP TS 31.102 V8.3.0 Chapter 4.2.58.
+    if ( UICC_STATUS_OK == aStatus && dataLength > 2 && aFileData[0] == 0x43 )
+        {
+        // Reset EONS names.
+        iEonsName.iLongName.Zero();
+        iEonsName.iShortName.Zero();
+
+        // Temporary buffer for full EONS name. Full name is mandatory.
+        TBuf<KMaxLengthOfOperatorName> longEonsName;
+        // Get the length of full EONS name
+        TUint8 lengthOfFullName( aFileData[1] );
+        // Get full EONS name from the record. Name string starts from index 2
+        TPtrC8 eonsFullNameData( aFileData.Mid( 2, lengthOfFullName ) );
+        // Convert EONS data field to EONS operator name.
+        ConvertOperatorName(
+            ENetEonsName,
+            iEonsName.iMCC,
+            eonsFullNameData,
+            longEonsName );
+        // Store EONS long name.
+        iEonsName.iLongName.Copy( longEonsName.Left(
+            iEonsName.iLongName.MaxLength() ) );
+        // Check if long name was read succesfully.
+        if ( 0 < iEonsName.iLongName.Length() )
+            {
+            // PNN record read successfully.
+            pnnRecordAvailable = ETrue;
+            }
+
+        // Short name is optional. If it exists file data length is more
+        // than full name bytes
+        TUint8 fullNameBytes( lengthOfFullName + 2 );
+        if ( dataLength > fullNameBytes && aFileData[fullNameBytes] == 0x45 )
+            {
+            // Temporary buffer for short EONS name.
+            TBuf<KMaxLengthOfOperatorName> shortEonsName;
+            // Get length of short EONS name.
+            TUint8 lengthOfShortName( aFileData[fullNameBytes + 1] );
+            // Get EONS short name string from the record.
+            TPtrC8 eonsShortNameData(
+                aFileData.Mid( fullNameBytes + 2, lengthOfShortName ) );
+            // Convert EONS data field to EONS operator name.
+            ConvertOperatorName(
+                ENetEonsName,
+                iEonsName.iMCC,
+                eonsShortNameData,
+                shortEonsName );
+            // Store EONS Short name.
+            iEonsName.iShortName.Copy( shortEonsName.Left(
+                iEonsName.iShortName.MaxLength() ) );
+            }
+
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iEonsName.iMCC: %d", iEonsName.iMCC);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iEonsName.iMNC: %d", iEonsName.iMNC);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iEonsName.iLongName: %S", &iEonsName.iLongName);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iEonsName.iShortName: %S", &iEonsName.iShortName);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iEonsName.iPNNIdentifier: %d", iEonsName.iPNNIdentifier);
+OstTrace1( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iMCC=%u", iEonsName.iMCC );
+OstTrace1( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iMNC=%u", iEonsName.iMNC );
+OstTraceExt1( TRACE_NORMAL, DUP2_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iLongName=%S", iEonsName.iLongName );
+OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iShortName=%S", iEonsName.iShortName );
+OstTraceExt1( TRACE_NORMAL, DUP4_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iPNNIdentifier=%hhu", iEonsName.iPNNIdentifier );
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Error occured, data not available");
+OstTrace0( TRACE_NORMAL, DUP5_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL- Error occured, data not available" );
+
+        // Data not available. Cause may be that file does not exist
+        // on (U)SIM card, or requested record does not exist in file.
+        // Reset EONS names.
+        iEonsName.iLongName.Zero();
+        iEonsName.iShortName.Zero();
+        }
+
+    // This completes NetModemRegStatusInd method IPC
+    // EMobilePhoneNotifyCurrentNetworkChange value with EONS name.
+    if ( iFromGetOperatorName )
+        {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL, continue to complete NotifyCurrentNetworkChange");
+OstTrace0( TRACE_NORMAL, DUP6_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnLcontinue to complete NotifyCurrentNetworkChange" );
+
+        // Set flag back to EFalse.
+        iFromGetOperatorName = EFalse;
+
+        // If the EONS long or/and short names doesn't exist
+        // then NITZ long or/and short names will be added if
+        // NITZ data match current network.
+        // Otherwise long and short names will be left empty as
+        // there are no names for them. Only hard coded name
+        // will be sent (iDisplayTag).
+
+        // Is PNN record available.
+        if ( pnnRecordAvailable )
+            {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - EONS name available");
+OstTrace0( TRACE_NORMAL, DUP7_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL- EONS name available" );
+            // EONS names found.
+            CopyEonsName( iNetworkData );
+            }
+        else
+            {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - EONS name not available, NITZ name will checked");
+OstTrace0( TRACE_NORMAL, DUP8_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL- EONS name not available, NITZ name will checked" );
+
+            // Need to check NITZ name as EONS name not available.
+
+            // Initialize.
+            TUint tempMCC( 0 ); // Country Code.
+            TUint tempMNC( 0 ); // Network Code.
+            // Convert descriptor contained number to integer.
+            CMmStaticUtility::GetIntFromDescriptor(
+                tempMCC,
+                iNetworkData.iCountryCode );
+            CMmStaticUtility::GetIntFromDescriptor(
+                tempMNC,
+                iNetworkData.iNetworkId );
+
+            // Check if NITZ long/short name exist and will match for
+            // current Country and Network codes.
+            NitzNameChecker( tempMCC, tempMNC, iNetworkData );
+            }
+
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Completing");
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL, Operator display tag: %S", &iNetworkData.iDisplayTag);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL, Operator long name: %S", &iNetworkData.iLongName);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL, Operator short name: %S", &iNetworkData.iShortName);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL, RMmCustomAPI::TOperatorNameInfo, Name: %S", &iOperNameInfo.iName);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL, RMmCustomAPI::TOperatorNameInfo, Type: %d", iOperNameInfo.iType);
+OstTrace0( TRACE_NORMAL, DUP9_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Completing" );
+OstTraceExt1( TRACE_NORMAL, DUP10_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iNetworkData.iDisplayTag=%S", iNetworkData.iDisplayTag );
+OstTraceExt1( TRACE_NORMAL, DUP11_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iNetworkData.iLongName=%S", iNetworkData.iLongName );
+OstTraceExt1( TRACE_NORMAL, DUP12_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iNetworkData.iShortName=%S", iNetworkData.iShortName );
+OstTraceExt1( TRACE_NORMAL, DUP13_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iOperNameInfo.iName=%S", iOperNameInfo.iName );
+OstTrace1( TRACE_NORMAL, DUP14_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iOperNameInfo.iType=%d", iOperNameInfo.iType );
+
+        // Complete ECustomGetOperatorNameIPC.
+        // Packed parameter: a RMmCustomAPI::TOperatorNameInfo.
+        CMmDataPackage dataPackage;
+        dataPackage.PackData( &iOperNameInfo );
+
+        iNetMessHandler->GetMessageRouter()->Complete(
+            ECustomGetOperatorNameIPC,
+            &dataPackage,
+            KErrNone );
+
+        // Complete EMobilePhoneNotifyCurrentNetworkChange with
+        // operator names.
+        iNetMessHandler->CompleteMobilePhoneNotifyCurrentNetworkChange(
+            iLocationAreaData,
+            iNetworkData );
+
+        // Reset operator name info data as these are completed.
+        iOperNameInfo.iType = RMmCustomAPI::EOperatorNameFlexiblePlmn;
+        iOperNameInfo.iName.Zero();
+        }
+
+    // Add EONS names to correct index and then continue
+    // handling of manual network search list.
+    if ( iFromGetManualSearchOperatorName )
+        {
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL, continue handling Manual Network search - Index value: %d", iManualSearchIndexValue);
+OstTraceExt1( TRACE_NORMAL, DUP15_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iManualSearchIndexValue=%hhu", iManualSearchIndexValue );
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Operator display tag: %S", &iNetworkData.iDisplayTag);
+OstTraceExt1( TRACE_NORMAL, DUP16_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Operator display tag;iNetworkData.iDisplayTag=%S", iNetworkData.iDisplayTag );
+
+        // Set flag back to EFalse.
+        iFromGetManualSearchOperatorName = EFalse;
+
+        // Is PNN record available.
+        if ( pnnRecordAvailable )
+            {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Manual search - EONS name available");
+OstTrace0( TRACE_NORMAL, DUP17_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL- Manual search - EONS name available" );
+
+            // Check is EONS Long name exist.
+            // If no Long EONS name there is no short EONS name either.
+            if ( 0 < iEonsName.iLongName.Length() )
+                {
+                // Copy EONS Long name to correct index.
+                iManualSearchNetworkList[iManualSearchIndexValue].iLongName.Copy(
+                    iEonsName.iLongName );
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Operator long name: %S", &iEonsName.iLongName);
+OstTraceExt1( TRACE_NORMAL, DUP18_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL- Operator long name;iEonsName.iLongName=%S", iEonsName.iLongName );
+
+
+                // Check is EONS Short name exist.
+                if ( 0 < iEonsName.iShortName.Length() )
+                    {
+                    // Copy EONS Short name to correct index.
+                    iManualSearchNetworkList[iManualSearchIndexValue].iShortName.Copy(
+                        iEonsName.iShortName );
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Operator short name: %S", &iEonsName.iShortName);
+OstTraceExt1( TRACE_NORMAL, DUP19_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iShortName=%S", iEonsName.iShortName );
+                    }
+                }
+            }
+        else
+            {
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Manual search, No EONS name available, DisplayTag name added to Long and Short names");
+OstTrace0( TRACE_NORMAL, DUP20_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL- Manual search, No EONS name available, DisplayTag name added to Long and Short names" );
+
+            // If no EONS name, copy DisplayTag to long and short name
+            // buffers.
+            iNetworkData.iLongName.Copy(
+                iNetworkData.iDisplayTag.Left(
+                iNetworkData.iLongName.MaxLength() ) );
+            iNetworkData.iShortName.Copy(
+                iNetworkData.iDisplayTag.Left(
+                iNetworkData.iShortName.MaxLength() ) );
+
+            iManualSearchNetworkList[iManualSearchIndexValue].iLongName.Copy(
+                iNetworkData.iLongName );
+            iManualSearchNetworkList[iManualSearchIndexValue].iShortName.Copy(
+                iNetworkData.iShortName );
+
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Operator long name: %S", &iNetworkData.iLongName);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - Operator short name: %S", &iNetworkData.iShortName);
+OstTraceExt1( TRACE_NORMAL, DUP21_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iNetworkData.iLongName=%S", iNetworkData.iLongName );
+OstTraceExt1( TRACE_NORMAL, DUP22_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iNetworkData.iLongName=%S", iNetworkData.iLongName );
+            }
+
+        // Update index value.
+        iManualSearchIndexValue++;
+
+        // Continue handling of Manual network search list.
+        GetManualSearchOperatorNameL();
+        }
+
+    // Complete refresh.
+    // Refresh status is checked in complete.
+    iNetMessHandler->
+        GetMessageRouter()->
+        GetPhoneMessHandler()->
+        PnnRecordCachingCompleted( aStatus );
+    }
+
 
 // ========================== OTHER EXPORTED FUNCTIONS =========================
     //None

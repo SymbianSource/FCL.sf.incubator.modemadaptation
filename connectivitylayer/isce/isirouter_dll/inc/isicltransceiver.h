@@ -10,8 +10,8 @@
 * Nokia Corporation - initial contribution.
 *
 * Contributors:
-* 
-* Description: 
+*
+* Description:
 *
 */
 
@@ -26,24 +26,24 @@ class DISIRouter;
 
 NONSHARABLE_CLASS( DISICLTransceiver ) : public DBase, public MISILinkRouterIf
     {
-    
+
     public:
-    
+
         DISICLTransceiver( DISIRouter* aPtr );
-    
+
         ~DISICLTransceiver();
-    
+
         TInt ValidateISIMessage( TDes8& aMessage );
-    
-        void SendCommIsaEntityNotReachableResp( TDes8& aMessage );
-    
+
+        TInt SendCommIsaEntityNotReachableResp( TDes8& aMessage );
+
         TUint8 MapDeviceToMedia( const TUint8 aDevice );
-    
+
         //From MISILinkRouterIf
-        void RouteISIMessage( TDes8& aMessage );
+        TInt RouteISIMessage( TDes8& aMessage );
 
     private:
-    
+
         enum TISIMedias
             {
             EISIMediaSharedMemory = 0x00,
@@ -53,7 +53,7 @@ NONSHARABLE_CLASS( DISICLTransceiver ) : public DBase, public MISILinkRouterIf
 
         MISIRouterLinkIf**   iLinksArray;
         DISIRouter*          iRouter;
-        
+
     };
 
 #endif /* __ISICLTRANSCEIVER_H__ */

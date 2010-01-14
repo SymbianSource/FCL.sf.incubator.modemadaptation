@@ -23,9 +23,9 @@
 #include "satmessaging.h"   // sat messaging
 #include "satmesshandler.h" // sat message handler class
 #include "satutil.h"        // sat utility class
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "saticontraces.h"
+#include "saticonTraces.h"
 #endif
 
 

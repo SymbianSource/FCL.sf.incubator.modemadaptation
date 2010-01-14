@@ -879,5 +879,14 @@ void DISAKernelChannel::Close(
     OstTrace0( TRACE_NORMAL, DISAKERNELCHANNEL_CLOSE_EXIT, "<DISAKernelChannel::Close" );
     }
 
+//From objectapi
+void DISAKernelChannel::Receive(
+        const TDesC8& aMessage
+        )
+    {
+    C_TRACE( ( _T( "DISAKernelChannel::Receive 0x%x ->" ), &aMessage ) );
+    ReceiveMsg( aMessage );
+    C_TRACE( ( _T( "DISAKernelChannel::Receive 0x%x <-" ), &aMessage ) );
+    }
 // End of file.
 

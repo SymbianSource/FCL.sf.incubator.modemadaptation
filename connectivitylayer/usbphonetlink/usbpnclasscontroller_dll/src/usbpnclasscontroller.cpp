@@ -20,7 +20,7 @@
 #include "usbpndefinitions.h"
 #include "usbpntrace.h"
 
-#include "osttracedefinitions.h"    // For tracing
+#include "OstTraceDefinitions.h"    // For tracing
 #ifdef OST_TRACE_COMPILER_IN_USE
 #include "usbpnclasscontrollerTraces.h"
 #endif

@@ -22,9 +22,9 @@
 #include <ctsy/serviceapi/mmtsy_ipcdefs.h>
 #include "cmmmessagerouter.h"
 #include "cmmphonebookoperationinit.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmphonebookoperationinittraces.h"
+#include "cmmphonebookoperationinitTraces.h"
 #include "cmmphonebookoperationinit3G_adn.h"
 #endif
 
@@ -67,6 +67,8 @@ CMmPhoneBookOperationInit::CMmPhoneBookOperationInit
     {
     TFLOGSTRING("TSY: CmmPhonebookOperatorInit::CmmPhonebookOperatorInit");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_CMMPHONEBOOKOPERATIONINIT, "CMmPhoneBookOperationInit::CMmPhoneBookOperationInit" );
+
+    iTypeOfReading = EBasicEfRead;
     }
 
 // -----------------------------------------------------------------------------
@@ -112,7 +114,7 @@ CMmPhoneBookOperationInit* CMmPhoneBookOperationInit::NewL
 
     phoneBookData->GetPhoneBookName( phonebookTypeName );
     //Store phonebook name
-    mmPhoneBookOperationInit->iPhonebookType = phonebookTypeName;
+    mmPhoneBookOperationInit->iPhoneBookTypeName = phonebookTypeName;
 
     if( 0 == phonebookTypeName.CompareF( KInternalPhoneBookType ) )
         {
@@ -120,7 +122,6 @@ CMmPhoneBookOperationInit* CMmPhoneBookOperationInit::NewL
         }
     else // Full construction is not needed in case of internal initilization
         {
-        mmPhoneBookOperationInit->iTransactionId = ETrIdPbInit;
         mmPhoneBookOperationInit->ConstructL( );
         }
 
@@ -184,7 +185,8 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONINIT_CONSTRUCTL, "CMmPhoneBoo
 TInt CMmPhoneBookOperationInit::UICCCreateReq
     (
     TInt aIpc,
-    const CMmDataPackage* /*aDataPackage*/
+    const CMmDataPackage* /*aDataPackage*/,
+    TUint8 aTransId
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCCreateReq");
@@ -204,7 +206,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_UICCCREATEREQ, "CMmPhoneBookO
                     iInternalInit = ETrue;
                     }
                 iServiceType = UICC_APPL_FILE_INFO;
-                iExtensionPresent = EFalse; // Default EXT File is not present
 
                 // Start Initialization for 2G phonebooks
                 // Check for ADN Phonebook is available and activated
@@ -216,7 +217,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_UICCCREATEREQ, "CMmPhoneBookO
                     {
                     iIniPhase = GetNextAvailablePbIcc(ICC_ADN_SERVICE_NUM);
                     }
-                ret = UICCInitializeReq();
+                ret = UICCInitializeReq(aTransId);
                 }
             else  // else for if internalInit goign on
                 {
@@ -243,7 +244,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_UICCCREATEREQ, "CMmPhone
 // Creates phonebook initialize request data for SIM
 // -----------------------------------------------------------------------------
 //
-TInt CMmPhoneBookOperationInit::UICCInitializeReq()
+TInt CMmPhoneBookOperationInit::UICCInitializeReq( TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq");
 OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq" );
@@ -252,9 +253,8 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
         TInt appFileID ( APPL_FILE_ID );   // Application File id for DFphonebook
         TUiccReadLinearFixed cmdParams;
 
-        cmdParams.messHandlerPtr =
-            static_cast<MUiccOperationBase*>(iMmPhoneBookStoreMessHandler);
-        cmdParams.trId = ETrIdPbInit;
+        cmdParams.messHandlerPtr = static_cast<MUiccOperationBase*>(iMmPhoneBookStoreMessHandler);
+        cmdParams.trId = static_cast<TUiccTrId>( aTransId );
 
         cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
         cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
@@ -268,7 +268,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
             case EPBInitPhaseADN:
                 {
                 // Create Data for ADN EF read
-                if( !iExtensionPresent )
+                if( EBasicEfRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - ADN Init for Fileinfo OR FileData");
                     OstTrace0( TRACE_FATAL, DUP1_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - ADN Init for Fileinfo OR FileData" );
@@ -277,7 +277,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                     cmdParams.serviceType = iServiceType;
                     cmdParams.record = 0;
                     }
-                else
+                else if( EExtensionRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - ADN Phonebook Init Extension request");
                     OstTrace0( TRACE_FATAL, DUP2_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - ADN Phonebook Init Extension request" );
@@ -292,7 +292,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
             case EPBInitPhaseFDN:
                 {
                 // Create Data for FDN EF read
-                if( !iExtensionPresent )
+                if( EBasicEfRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - FDN Init FileInfo OR FileData request");
                     OstTrace0( TRACE_FATAL, DUP3_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq -  FDN Init FileInfo OR FileData request" );
@@ -301,7 +301,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                     cmdParams.serviceType = iServiceType;
                     cmdParams.record = 0;
                     }
-                else
+                else if( EExtensionRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - FDN Init Extension request");
                     OstTrace0( TRACE_FATAL, DUP4_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - FDN Init Extension request" );
@@ -315,7 +315,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 }
             case EPBInitPhaseSDN:
                 {
-                if( !iExtensionPresent )
+                if( EBasicEfRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init FileInfo OR FileData request");
                     OstTrace0( TRACE_FATAL, DUP5_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init FileInfo OR FileData request" );
@@ -324,7 +324,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                     cmdParams.serviceType = iServiceType;
                     cmdParams.record = 0;
                     }
-                else
+                else if(  EExtensionRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init Extension request");
                     OstTrace0( TRACE_FATAL, DUP6_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init Extension request" );
@@ -338,21 +338,31 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 }
             case EPBInitPhaseMBDN:
                 {
-                if( !iExtensionPresent )
+                // Start with MBI reading
+                if( EBasicEfRead == iTypeOfReading )
                     {
-                    TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init FileInfo OR FileData request");
-                    OstTrace0( TRACE_FATAL, DUP7_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init FileInfo OR FileData request" );
+TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init FileInfo OR FileData request");
+OstTrace0( TRACE_FATAL, DUP7_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init FileInfo OR FileData request" );
 
                     cmdParams.fileId = PB_MBDN_FID;
                     cmdParams.serviceType = iServiceType;
                     cmdParams.record = 0;
                     }
-                else
+                else if( EExtensionRead == iTypeOfReading )
                     {
-                    TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init Extension request");
-                    OstTrace0( TRACE_FATAL, DUP8_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init Extension request" );
+TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init Extension request");
+OstTrace0( TRACE_FATAL, DUP8_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init Extension request" );
 
                     cmdParams.fileId = PB_EXT6_FID;
+                    cmdParams.serviceType = iServiceType;
+                    cmdParams.record = 0;
+                    }
+                else if( EMailboxIdRead == iTypeOfReading )
+                    {
+TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init MBI request");
+OstTrace0( TRACE_FATAL, DUP14_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init MBI request" );
+
+                    cmdParams.fileId = PB_MBI_FID;
                     cmdParams.serviceType = iServiceType;
                     cmdParams.record = 0;
                     }
@@ -360,21 +370,30 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 }
             case EPBInitPhaseMSISDN:
                 {
-                if( !iExtensionPresent )
+                if( EBasicEfRead == iTypeOfReading )
                     {
-                    TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init FileInfo OR FileData request");
-                    OstTrace0( TRACE_FATAL, DUP9_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init FileInfo OR FileData request" );
+TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init FileInfo OR FileData request");
+OstTrace0( TRACE_FATAL, DUP9_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init FileInfo OR FileData request" );
 
                     cmdParams.fileId = PB_MSISDN_FID;
                     cmdParams.serviceType = iServiceType;
                     cmdParams.record = 0;
                     }
-                else
+                else if( EExtensionRead == iTypeOfReading )
                     {
-                    TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init Extension request");
-                    OstTrace0( TRACE_NORMAL, DUP10_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq" );
+TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init Extension request");
+OstTrace0( TRACE_NORMAL, DUP10_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq" );
 
-                    cmdParams.fileId = PB_EXT5_FID;
+                    if ( UICC_CARD_TYPE_ICC == 
+                    	       iMmUiccMessHandler->GetCardType() )
+                        {
+                        cmdParams.fileId = PB_EXT1_FID;
+                        }
+                    else if ( UICC_CARD_TYPE_UICC == 
+                    	            iMmUiccMessHandler->GetCardType() )
+                    	  {                    
+                        cmdParams.fileId = PB_EXT5_FID;
+                        }
                     cmdParams.serviceType = iServiceType;
                     cmdParams.record = 0;
                     }
@@ -382,19 +401,19 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 }
             case EPBInitPhaseVMBX:
                 {
-                if( !iExtensionPresent )
+                if( EBasicEfRead == iTypeOfReading )
                     {
-                    TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init FileInfo OR FileData request");
-                    OstTrace0( TRACE_FATAL, DUP11_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init FileInfo OR FileData request" );
+TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init FileInfo OR FileData request");
+OstTrace0( TRACE_FATAL, DUP11_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init FileInfo OR FileData request" );
 
                     cmdParams.fileId = PB_VMBX_FID;
                     cmdParams.serviceType = iServiceType;
                     cmdParams.record = 0;
                     }
-                else
+                else if( EExtensionRead == iTypeOfReading )
                     {
-                    TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init Extension request");
-                    OstTrace0( TRACE_NORMAL, DUP13_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init Extension request" );
+TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init Extension request");
+OstTrace0( TRACE_NORMAL, DUP13_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init Extension request" );
 
                     cmdParams.fileId = PB_EXT1_FID;
                     cmdParams.serviceType = iServiceType;
@@ -404,8 +423,8 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 }
             default:
                 {
-                TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - PhoneBook not supported ");
-                OstTrace0( TRACE_NORMAL, DUP12_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - PhoneBook not supported" );
+TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - PhoneBook not supported ");
+OstTrace0( TRACE_NORMAL, DUP12_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - PhoneBook not supported" );
                 break;
                 }
             }
@@ -416,7 +435,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
     if( EPBIniPhase_PBInitialized != iIniPhase )
         {
         ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->CreateUiccApplCmdReq( cmdParams );
-        TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
+TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
         }
     return ret;
     }
@@ -434,38 +453,39 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
 // Handle Response for SIM
 // -----------------------------------------------------------------------------
 //
-TInt CMmPhoneBookOperationInit::HandleUICCPbRespL
+TBool CMmPhoneBookOperationInit::HandleUICCPbRespL
     (
-    TBool &aComplete,
     TInt aStatus,
+    TUint8 /*aDetails*/,
     const TDesC8 &aFileData,
-    TInt /*aTransId*/
+    TInt aTransId
     )
     {
     TInt ret( KErrNone );
+    TBool complete( EFalse );
     // break immediatelly in case of internal init
     if ( iInternalInit )
         {
-        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleUICCPbRespL. Internal Init->Break");
+TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleUICCPbRespL. Internal Init->Break");
 OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEUICCPBRESPL, "CMmPhoneBookOperationInit::HandleUICCPbRespL, Internal Init->Break" );
 
         iIniPhase = EPBIniPhase_Unknown;
 
         // set flag to indicate that we can remove this operation from array
-        aComplete = ETrue;
+        complete = ETrue;
         iInternalInit = EFalse;
         return KErrNone;
         }
 
     // Handle recponse from UICC server
-        ret = HandlePBRespL(aFileData,aStatus);
+        ret = HandlePBRespL(aFileData,aStatus, aTransId);
 
 
          // Complete, if phonebook initalization is complete or there is some error in UICC server
          if (KErrNone != ret || EPBIniPhase_PBInitialized == iIniPhase )
              {
              CPhoneBookDataPackage phoneBookData;
-             phoneBookData.SetPhoneBookName( iPhonebookType );
+             phoneBookData.SetPhoneBookName( iPhoneBookTypeName );
              phoneBookData.PackData( iPBStoreInfoData );
 
              if ( KErrNone != ret )
@@ -477,9 +497,9 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEUICCPBRESPL, "CMmP
                      EMmTsyPhoneBookStoreInitIPC,
                      &phoneBookData,
                      ret );
-             aComplete = ETrue;
+             complete = ETrue;
              }
-    return ret;
+    return complete;
     }
 
 
@@ -490,26 +510,30 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEUICCPBRESPL, "CMmP
 // Further Handle Response for SIM
 // -----------------------------------------------------------------------------
 //
-TInt CMmPhoneBookOperationInit::HandlePBRespL(const TDesC8& aFileData, TInt aStatus )
+TInt CMmPhoneBookOperationInit::HandlePBRespL(const TDesC8& aFileData, TInt aStatus, TUint8 aTransId )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandlePBRespL");
     OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_HANDLEPBRESPL, "CMmPhoneBookOperationInit::HandlePBRespL" );
 
     TInt ret(KErrNone);
 
-    if(!iExtensionPresent)
+    if( EBasicEfRead == iTypeOfReading )
         {
         ret = HandleFileResp(aFileData, aStatus);
         }
-    else
+    else if( EExtensionRead == iTypeOfReading )
         {
         // For Extension File
-        ret = HandleEXTFileResp(aFileData, aStatus);
+        ret = HandleEXTFileResp( aFileData, aStatus );
+        }
+    else
+        {
+        ret = HandleMBIFileResp( aFileData, aStatus );
         }
 
     if(KErrNone == ret)
         {
-        ret = UICCInitializeReq();
+        ret = UICCInitializeReq( aTransId );
         }
 
     return ret;
@@ -538,27 +562,17 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
         {
         if(UICC_APPL_FILE_INFO == iServiceType)
             {
-            // get the ecord length
-            HandleFcpData(aFileData,recordLength,KRecordLength);
-
-            // Get the no of entries
-            HandleFcpData(aFileData,numOfEntries,KNoOfRecords);
-
+            // get the record length and number of entries
+            TFci fci( aFileData );
+            recordLength = fci.GetRecordLength();
+            numOfEntries = fci.GetNumberOfRecords();
+ 
             // get Text length
             textLength = (recordLength - 14);
 
             // To get the total length of number, need to read Ext2 file
             // IF EXT2 is not present then only 20 BCD digits can be stored
             numLength =  UICC_NO_EXT_MAX_NUM_LEN;
-            }
-        else if(UICC_APPL_READ_LINEAR_FIXED == iServiceType)
-            {
-            TUint8 infoEXT ( aFileData[(textLength + 14)] );
-            if( 0xFF != infoEXT)
-                {
-                // Send Request to read File info from EXT file
-                iExtensionPresent = ETrue;
-                }
             }
         }
 
@@ -574,7 +588,8 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                         OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for ADN Phonebook" );
                         // Check for ADN phone book is incalidated by Fdn phonebook or not
                         TInt status(0);
-                        HandleFcpData(aFileData,status,KFileStatus);
+                        TFci fci( aFileData );
+                        status = fci.GetFileStatus();
 
                         // check for ADN is invalidated or not
                         if(!(status & 0x01))
@@ -585,8 +600,6 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                                 iPBStoreInfoData->iADNNumOfEntries = numOfEntries;
                                 iPBStoreInfoData->iADNNumberLengthMax = numLength;
                                 iPBStoreInfoData->iADNTextLengthMax = textLength;
-                                // Change ServiceType to read File Data to get final number length
-                                iServiceType = UICC_APPL_READ_LINEAR_FIXED;
                                 }
                             else   // when ADN is not updatable
                                 {
@@ -599,25 +612,29 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                             iPBStoreInfoData->iADNNumOfEntries = numOfEntries;
                             iPBStoreInfoData->iADNNumberLengthMax = numLength;
                             iPBStoreInfoData->iADNTextLengthMax = textLength;
-                            // Change ServiceType to read File Data to get final number length
-                            iServiceType = UICC_APPL_READ_LINEAR_FIXED;
                             }
                         }
-                    else if(UICC_APPL_READ_LINEAR_FIXED == iServiceType)
+                    if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT1_SERVICE_NUM))
                         {
-                        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for ADN Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for ADN Phonebook" );
+                        // Store ADN Phone book configuration in local array if EXT is not present
+                        TPrimitiveInitInfo primConfAdn;
+                        primConfAdn.iAlphaStringlength = iPBStoreInfoData->iADNTextLengthMax;
+                        primConfAdn.iExtension = EFalse;
+                        primConfAdn.iNumlength = iPBStoreInfoData->iADNNumberLengthMax;
+                        primConfAdn.iNoOfRecords = iPBStoreInfoData->iADNNumOfEntries;
 
-                        iServiceType = UICC_APPL_FILE_INFO;
+                        iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeAdn] = primConfAdn;
 
-                        if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT1_SERVICE_NUM) || (!iExtensionPresent) )
-                            {
-                            iExtensionPresent = EFalse;
-                            iIniPhase = GetNextAvailablePbIcc(ICC_ADN_SERVICE_NUM);
-                            }
-                        // ADN Phonebook is initilized
-                        iADNPbInitilized = ETrue;
+                        iTypeOfReading = EBasicEfRead;
+                        iIniPhase = GetNextAvailablePbIcc(ICC_ADN_SERVICE_NUM);
                         }
+                    else
+                        {
+                        // When Service is available
+                        iTypeOfReading = EExtensionRead;
+                        }
+                    // ADN Phonebook is initilized
+                    iADNPbInitilized = ETrue;
                     }
                 else
                     {
@@ -626,8 +643,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                     iPBStoreInfoData->iADNNumberLengthMax = -1;
                     iPBStoreInfoData->iADNTextLengthMax = -1;
 
-                    // Set ADn intialized flag to False
-
+                    // Set ADN intialized flag to False
                     iADNPbInitilized = EFalse;
                     }
                 }
@@ -644,36 +660,54 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                         iPBStoreInfoData->iFDNNumOfEntries = numOfEntries;
                         iPBStoreInfoData->iFDNNumberLengthMax = numLength;
                         iPBStoreInfoData->iFDNTextLengthMax = textLength;
-                        // Change ServiceType to read File Data to get final number length
-                        iServiceType = UICC_APPL_READ_LINEAR_FIXED;
                         }
-                    else if(UICC_APPL_READ_LINEAR_FIXED == iServiceType)
+                    if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
                         {
-                        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for FDN Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for ADN Phonebook" );
+                        // Check for Exension
+                        // Check for EXT2 Service is present or not
+                        if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT2_SERVICE_NUM ) )
+                            {
+                            // Store FDN Phone book configuration in local array if EXT is not present in ICC Card
+                            TPrimitiveInitInfo primConfFdn;
+                            primConfFdn.iAlphaStringlength = iPBStoreInfoData->iFDNTextLengthMax;
+                            primConfFdn.iExtension = EFalse;
+                            primConfFdn.iNumlength = iPBStoreInfoData->iFDNNumberLengthMax;
+                            primConfFdn.iNoOfRecords = iPBStoreInfoData->iFDNNumOfEntries;
 
-                        if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
-                            {
-                            // Check for Exension
-                            // Check for EXT1 Service is present or not
-                            if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT2_SERVICE_NUM) || (!iExtensionPresent))
-                                {
-                                iExtensionPresent = EFalse;
-                                iIniPhase = GetNextAvailablePbIcc(ICC_FDN_SERVICE_NUM);
-                                }
+                            iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeFdn] = primConfFdn;
+
+                            iTypeOfReading = EBasicEfRead;
+                            iIniPhase = GetNextAvailablePbIcc(ICC_FDN_SERVICE_NUM);
                             }
-                        else if(UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
+                        else
                             {
-                            // Chekc for Extension
-                            // Check for EXT1 Service is present or not
-                            if( !iMmUiccMessHandler->GetServiceStatus( UICC_EXT2_SERVICE_NUM) || (!iExtensionPresent))
-                                {
-                                iExtensionPresent = EFalse;
-                                iIniPhase = GetNextAvailablePbUicc(UICC_FDN_SERVICE_NUM);
-                                }
+                            iTypeOfReading = EExtensionRead ;
                             }
-                        iServiceType = UICC_APPL_FILE_INFO;
                         }
+                    else if(UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
+                        {
+                        // Chekc for Extension
+                        // Check for EXT1 Service is present or not
+                        if( !iMmUiccMessHandler->GetServiceStatus( UICC_EXT2_SERVICE_NUM ) )
+                            {
+                            // Store FDN Phone book configuration in local array if EXT is not present in UICC Card
+                            TPrimitiveInitInfo primConfFdn;
+                            primConfFdn.iAlphaStringlength = iPBStoreInfoData->iFDNTextLengthMax;
+                            primConfFdn.iExtension = EFalse;
+                            primConfFdn.iNumlength = iPBStoreInfoData->iFDNNumberLengthMax;
+                            primConfFdn.iNoOfRecords = iPBStoreInfoData->iFDNNumOfEntries;
+
+                            iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeFdn] = primConfFdn;
+
+                            iTypeOfReading = EBasicEfRead;
+                            iIniPhase = GetNextAvailablePbUicc(UICC_FDN_SERVICE_NUM);
+                            }
+                        else
+                            {
+                            iTypeOfReading = EExtensionRead;
+                            }
+                        }
+                    iServiceType = UICC_APPL_FILE_INFO;
                     }
                 else
                     {
@@ -702,36 +736,54 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                         iPBStoreInfoData->iSDNNumOfEntries = numOfEntries;
                         iPBStoreInfoData->iSDNNumberLengthMax = numLength;
                         iPBStoreInfoData->iSDNTextLengthMax = textLength;
-                        // Change ServiceType to read File Data to get final number length
-                        iServiceType = UICC_APPL_READ_LINEAR_FIXED;
                         }
-                    else if(UICC_APPL_READ_LINEAR_FIXED == iServiceType)
+                    if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
                         {
-                        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for SDN Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for ADN Phonebook" );
+                        // Check for Exension
+                        // Check for EXT1 Service is present or not
+                        if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT3_SERVICE_NUM ) )
+                            {
+                            // Store SDN Phone book configuration in local array if EXT is not present in UICC Card
+                            TPrimitiveInitInfo primConfSdn;
+                            primConfSdn.iAlphaStringlength = iPBStoreInfoData->iSDNTextLengthMax;
+                            primConfSdn.iExtension = EFalse;
+                            primConfSdn.iNumlength = iPBStoreInfoData->iSDNNumberLengthMax;
+                            primConfSdn.iNoOfRecords = iPBStoreInfoData->iSDNNumOfEntries;
 
-                        if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
-                            {
-                            // Check for Exension
-                            // Check for EXT1 Service is present or not
-                            if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT3_SERVICE_NUM) || (!iExtensionPresent))
-                                {
-                                iExtensionPresent = EFalse;
-                                iIniPhase = GetNextAvailablePbIcc(ICC_SDN_SERVICE_NUM);
-                                }
+                            iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeSdn] = primConfSdn;
+
+                            iTypeOfReading = EBasicEfRead;
+                            iIniPhase = GetNextAvailablePbIcc(ICC_SDN_SERVICE_NUM);
                             }
-                        else if(UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
+                        else
                             {
-                            // Chekc for Extension
-                            // Check for EXT1 Service is present or not
-                            if( !iMmUiccMessHandler->GetServiceStatus( UICC_EXT3_SERVICE_NUM ) || (!iExtensionPresent))
-                                {
-                                iExtensionPresent = EFalse;
-                                iIniPhase = GetNextAvailablePbUicc(UICC_SDN_SERVICE_NUM);
-                                }
+                            iTypeOfReading = EExtensionRead;
                             }
-                        iServiceType = UICC_APPL_FILE_INFO;
                         }
+                    else if(UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
+                        {
+                        // Chekc for Extension
+                        // Check for EXT3 Service is present or not
+                        if( !iMmUiccMessHandler->GetServiceStatus( UICC_EXT3_SERVICE_NUM ) )
+                            {
+                            // Store SDN Phone book configuration in local array if EXT is not present in UICC Card
+                            TPrimitiveInitInfo primConfSdn;
+                            primConfSdn.iAlphaStringlength = iPBStoreInfoData->iSDNTextLengthMax;
+                            primConfSdn.iExtension = EFalse;
+                            primConfSdn.iNumlength = iPBStoreInfoData->iSDNNumberLengthMax;
+                            primConfSdn.iNoOfRecords = iPBStoreInfoData->iSDNNumOfEntries;
+
+                            iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeSdn] = primConfSdn;
+
+                            iTypeOfReading = EBasicEfRead;
+                            iIniPhase = GetNextAvailablePbUicc(UICC_SDN_SERVICE_NUM);
+                            }
+                        else
+                            {
+                            iTypeOfReading = EExtensionRead;
+                            }
+                        }
+                    iServiceType = UICC_APPL_FILE_INFO;
                     }
                 else
                     {
@@ -754,23 +806,9 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                         iPBStoreInfoData->iMBDNNumOfEntries = numOfEntries;
                         iPBStoreInfoData->iMBDNNumberLengthMax = numLength;
                         iPBStoreInfoData->iMBDNTextLengthMax = textLength;
-                        // Change ServiceType to read File Data to get final number length
-                        iServiceType = UICC_APPL_READ_LINEAR_FIXED;
                         }
-                    else if( UICC_APPL_READ_LINEAR_FIXED == iServiceType)
-                        {
-                        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for MBDN Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP8_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for MBDN Phonebook" );
-
-                        if(!iExtensionPresent)
-                            {
-                            if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
-                                iIniPhase = GetNextAvailablePbIcc(ICC_MBDN_SERVICE_NUM);
-                            else if(UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
-                                iIniPhase = GetNextAvailablePbUicc(UICC_MBDN_SERVICE_NUM);
-                            }
-                        iServiceType = UICC_APPL_FILE_INFO;
-                        }
+                    iTypeOfReading = EExtensionRead;
+                    iServiceType = UICC_APPL_FILE_INFO;
                     }
                 else
                     {
@@ -793,36 +831,54 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                         iPBStoreInfoData->iMSISDNNumOfEntries = numOfEntries;
                         iPBStoreInfoData->iMSISDNNumberLengthMax = numLength;
                         iPBStoreInfoData->iMSISDNTextLengthMax = textLength;
-                        // Change ServiceType to read File Data to get final number length
-                        iServiceType = UICC_APPL_READ_LINEAR_FIXED;
                         }
-                    else if(UICC_APPL_READ_LINEAR_FIXED == iServiceType)
-                        {
-                        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for MSISDN Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP10_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for MSISDN Phonebook" );
-
                         if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
                             {
                             // Check for Exension
                             // Check for EXT1 Service is present or not
-                            if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT1_SERVICE_NUM ) || (!iExtensionPresent))
+                            if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT1_SERVICE_NUM ) )
                                 {
-                                iExtensionPresent= EFalse;
+                                // Store MSISDN Phone book configuration in local array if EXT is not present in ICC Card
+                                TPrimitiveInitInfo primConfMsisdn;
+                                primConfMsisdn.iAlphaStringlength = iPBStoreInfoData->iMSISDNTextLengthMax;
+                                primConfMsisdn.iExtension = EFalse;
+                                primConfMsisdn.iNumlength = iPBStoreInfoData->iMSISDNNumberLengthMax;
+                                primConfMsisdn.iNoOfRecords = iPBStoreInfoData->iMSISDNNumOfEntries;
+
+                                iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeMSISDN] = primConfMsisdn;
+
+                                iTypeOfReading = EBasicEfRead;
                                 iIniPhase = GetNextAvailablePbIcc(ICC_MSISDN_SERVICE_NUM);
+                                }
+                            else
+                                {
+                                iTypeOfReading = EExtensionRead;
                                 }
                             }
                         else if(UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
                             {
                             // Chekc for Extension
                             // Check for EXT1 Service is present or not
-                            if( !iMmUiccMessHandler->GetServiceStatus( UICC_EXT5_SERVICE_NUM ) || (!iExtensionPresent))
+                            if( !iMmUiccMessHandler->GetServiceStatus( UICC_EXT5_SERVICE_NUM ) || ( iTypeOfReading  == EBasicEfRead ))
                                 {
-                                iExtensionPresent = EFalse;
+                                // Store MSISDN Phone book configuration in local array if EXT is not present in UICC Card
+                                TPrimitiveInitInfo primConfMsisdn;
+                                primConfMsisdn.iAlphaStringlength = iPBStoreInfoData->iMSISDNTextLengthMax;
+                                primConfMsisdn.iExtension = EFalse;
+                                primConfMsisdn.iNumlength = iPBStoreInfoData->iMSISDNNumberLengthMax;
+                                primConfMsisdn.iNoOfRecords = iPBStoreInfoData->iMSISDNNumOfEntries;
+
+                                iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeMSISDN] = primConfMsisdn;
+
+                                iTypeOfReading = EBasicEfRead;
                                 iIniPhase = GetNextAvailablePbUicc(UICC_MSISDN_SERVICE_NUM);
+                                }
+                            else
+                                {
+                                iTypeOfReading = EExtensionRead;
                                 }
                             }
                         iServiceType = UICC_APPL_FILE_INFO;
-                        }
                     }
                 else
                     {
@@ -842,26 +898,32 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                         TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for VMBX Phonebook");
                         OstTrace0( TRACE_NORMAL, DUP13_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for VMBX Phonebook" );
 
+                        // update Data in CommonTSY buffer
                         iPBStoreInfoData->iVMBXNumOfEntries = numOfEntries;
                         iPBStoreInfoData->iVMBXNumberLengthMax = numLength;
                         iPBStoreInfoData->iVMBXTextLengthMax = textLength;
-                        // Change ServiceType to read File Data to get final number length
-                        iServiceType = UICC_APPL_READ_LINEAR_FIXED;
                         }
-                    else if(UICC_APPL_READ_LINEAR_FIXED == iServiceType)
+                    // Check for Exension
+                    // Check for EXT1 Service is present or not
+                    if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT1_SERVICE_NUM))
                         {
-                        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for VMBX Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP11_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Data for VMBX Phonebook" );
+                        // Store VMBX Phone book configuration in local array if EXT is not present
+                        TPrimitiveInitInfo primConfVmbx;
+                        primConfVmbx.iAlphaStringlength = iPBStoreInfoData->iVMBXTextLengthMax;
+                        primConfVmbx.iExtension = EFalse;
+                        primConfVmbx.iNumlength = iPBStoreInfoData->iVMBXNumberLengthMax;
+                        primConfVmbx.iNoOfRecords = iPBStoreInfoData->iVMBXNumOfEntries;
 
-                            // Check for Exension
-                            // Check for EXT1 Service is present or not
-                            if( !iMmUiccMessHandler->GetServiceStatus( ICC_EXT1_SERVICE_NUM) || ( !iExtensionPresent ))
-                                {
-                                iExtensionPresent = EFalse;
-                                iIniPhase = EPBIniPhase_PBInitialized;
-                                }
-                        iServiceType = UICC_APPL_FILE_INFO;
+                        iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeVMBX] = primConfVmbx;
+                                
+                        iTypeOfReading = EBasicEfRead;
+                        iIniPhase = EPBIniPhase_PBInitialized;
                         }
+                    else
+                        {
+                        iTypeOfReading = EExtensionRead;
+                        }
+                    iServiceType = UICC_APPL_FILE_INFO;
                     }
                 else
                     {
@@ -910,7 +972,8 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
         // no of records in EXT2 EF
         TInt noOfRecords(0);
         // get the no of records
-        HandleFcpData(aFileData,noOfRecords,KNoOfRecords);
+        TFci fci( aFileData );
+        noOfRecords = fci.GetNumberOfRecords();
 
         // To get the total length of number
         // Where multiply by 11 is the no of bytes in extension data and multiply by 2 is for BCD coding while
@@ -918,7 +981,7 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
         TInt numLength =  UICC_NO_EXT_MAX_NUM_LEN + (11*noOfRecords*2);
 
         // Change Extension present to read PhoneBook EF file info
-        iExtensionPresent = EFalse;
+        iTypeOfReading = EBasicEfRead;
         iServiceType = UICC_APPL_FILE_INFO;
 
         switch(iIniPhase)
@@ -929,6 +992,17 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
                 OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - For ADN Phone book" );
 
                 iPBStoreInfoData->iADNNumberLengthMax = numLength;
+                
+                // Store ADN Phone book configuration in local array if EXT is present
+                TPrimitiveInitInfo primConfAdn;
+                primConfAdn.iAlphaStringlength = iPBStoreInfoData->iADNTextLengthMax;
+                primConfAdn.iExtension = ETrue;
+                primConfAdn.iNumlength = iPBStoreInfoData->iADNNumberLengthMax;
+                primConfAdn.iNoOfRecords = iPBStoreInfoData->iADNNumOfEntries;
+                primConfAdn.iExtNoOfRec = noOfRecords;
+                
+                iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeAdn] = primConfAdn;
+
                 // Change the Initialization Phase to next
                 // Get next available phonebook in UST table
                 iIniPhase =  GetNextAvailablePbIcc(UICC_FDN_SERVICE_NUM);
@@ -940,6 +1014,16 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
                 OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp  -For FDN PhoneBoo" );
 
                 iPBStoreInfoData->iFDNNumberLengthMax = numLength;
+
+                // Store FDN Phone book configuration in local array if EXT is present
+                TPrimitiveInitInfo primConfFdn;
+                primConfFdn.iAlphaStringlength = iPBStoreInfoData->iFDNTextLengthMax;
+                primConfFdn.iExtension = ETrue;
+                primConfFdn.iNumlength = iPBStoreInfoData->iFDNNumberLengthMax;
+                primConfFdn.iNoOfRecords = iPBStoreInfoData->iFDNNumOfEntries;
+                primConfFdn.iExtNoOfRec = noOfRecords;
+                
+                iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeFdn] = primConfFdn;
 
                 if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
                     {
@@ -957,6 +1041,16 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
                 OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - For SDN PhoneBook" );
 
                 iPBStoreInfoData->iSDNNumberLengthMax = numLength;
+
+                // Store SDN Phone book configuration in local array if EXT is present
+                TPrimitiveInitInfo primConfSdn;
+                primConfSdn.iAlphaStringlength = iPBStoreInfoData->iSDNTextLengthMax;
+                primConfSdn.iExtension = ETrue;
+                primConfSdn.iNumlength = iPBStoreInfoData->iSDNNumberLengthMax;
+                primConfSdn.iNoOfRecords = iPBStoreInfoData->iSDNNumOfEntries;
+                primConfSdn.iExtNoOfRec = noOfRecords;
+                
+                iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeSdn] = primConfSdn;
 
                 if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
                     {
@@ -976,6 +1070,17 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
 
                 iPBStoreInfoData->iMBDNNumberLengthMax = numLength;
 
+                // Store MBDN Phone book configuration in local array if EXT is present
+                TPrimitiveInitInfo primConfMbdn;
+                primConfMbdn.iAlphaStringlength = iPBStoreInfoData->iMBDNTextLengthMax;
+                primConfMbdn.iExtension = ETrue;
+                primConfMbdn.iNumlength = iPBStoreInfoData->iMBDNNumberLengthMax;
+                primConfMbdn.iNoOfRecords = iPBStoreInfoData->iMBDNNumOfEntries;
+                primConfMbdn.iExtNoOfRec = noOfRecords;
+                primConfMbdn.iMbiRecLen = iMbiRecLen;
+                
+                iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeMBDN] = primConfMbdn;
+
                 if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
                     {
                     iIniPhase = GetNextAvailablePbIcc(ICC_MBDN_SERVICE_NUM);
@@ -992,6 +1097,17 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
                 OstTrace0( TRACE_NORMAL, DUP5_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - for MSISDN Phonebook" );
 
                 iPBStoreInfoData->iMSISDNNumberLengthMax = numLength;
+                
+                // Store MSISDN Phone book configuration in local array if EXT is present
+                TPrimitiveInitInfo primConfMsisdn;
+                primConfMsisdn.iAlphaStringlength = iPBStoreInfoData->iMSISDNTextLengthMax;
+                primConfMsisdn.iExtension = ETrue;
+                primConfMsisdn.iNumlength = iPBStoreInfoData->iMSISDNNumberLengthMax;
+                primConfMsisdn.iNoOfRecords = iPBStoreInfoData->iMSISDNNumOfEntries;
+                primConfMsisdn.iExtNoOfRec = noOfRecords;
+                
+                iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeMSISDN] = primConfMsisdn;
+
 
                 if(UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
                     {
@@ -1009,6 +1125,18 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
                 OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - For VMBX PhoneBook" );
 
                 iPBStoreInfoData->iVMBXNumberLengthMax = numLength;
+                
+                // Store VMBX Phone book configuration in local array if EXT is present
+                TPrimitiveInitInfo primConfVmbx;
+                primConfVmbx.iAlphaStringlength = iPBStoreInfoData->iVMBXTextLengthMax;
+                primConfVmbx.iExtension = ETrue;
+                primConfVmbx.iNumlength = iPBStoreInfoData->iVMBXNumberLengthMax;
+                primConfVmbx.iNoOfRecords = iPBStoreInfoData->iVMBXNumOfEntries;
+                primConfVmbx.iExtNoOfRec = noOfRecords;
+                
+                iMmPhoneBookStoreMessHandler->iPBStoreConf[EPhonebookTypeVMBX] = primConfVmbx;
+
+                
                 iIniPhase = EPBIniPhase_PBInitialized;
                 }
                 break;
@@ -1031,7 +1159,28 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
 
 
 
-
+// -----------------------------------------------------------------------------
+// CMmPhoneBookOperationInit::HandleMBIFileResp
+// Handle MBI File response
+// by index
+// -----------------------------------------------------------------------------
+//
+TInt CMmPhoneBookOperationInit::HandleMBIFileResp( const TDesC8 &aFileData , TInt aStatus )
+    {
+    
+    TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleMBIFileResp");
+    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_HANDLEMBIFILERESP, "CMmPhoneBookOperationInit::HandleMBIFileResp" );
+    
+    TInt ret(KErrNone);
+    if(UICC_STATUS_OK == aStatus)
+        {
+        // get the no of records
+        TFci fci( aFileData );
+        iMbiRecLen = fci.GetRecordLength();
+        iTypeOfReading = EBasicEfRead;
+        }
+    return ret ;
+    }
 
 // -----------------------------------------------------------------------------
 // CMmPhoneBookOperationInit::GetNextAvailablePbUicc
@@ -1158,6 +1307,11 @@ TUint8 CMmPhoneBookOperationInit::GetNextAvailablePbIcc(TUint8 aPBook)
             }
             break;
         }
+    
+    if( EPBInitPhaseMBDN == aPBook )
+        {
+        iTypeOfReading = EMailboxIdRead;
+        }
     return aPBook;
     }
 
@@ -1232,6 +1386,12 @@ TUint8 CMmPhoneBookOperationInit::GetNextAvailablePbUicc(TUint8 aPBook)
         default:
             break;
         }
+    
+    if( EPBInitPhaseMBDN == aPBook )
+        {
+        iTypeOfReading = EMailboxIdRead;
+        }
+
     return aPBook;
     }
 

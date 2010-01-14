@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -63,9 +63,7 @@ class CUsbPnIsaSender : public CActive, public MUsbPnControlObserver
 
         /**
         * From MUsbPnControlObserver. Adds packet to send queue.
-        * @since Series ?XX ?SeriesXX_version
-        * @param ?arg1 ?description
-        * @return ?description
+        * @param aPacket
         */
         void Send( CUsbPnPacket& aPacket );
 

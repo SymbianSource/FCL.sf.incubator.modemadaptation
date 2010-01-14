@@ -20,7 +20,7 @@
 #include "modemat_atext.h"
 #include "modemattrace.h"
 
-const TInt KMaxCommandCount(160);
+const TInt KMaxCommandCount(137);
 
 const char* const atCommands[] =
     {
@@ -158,29 +158,6 @@ const char* const atCommands[] =
     ("AT+CGTFT"),
     ("AT+CGCMOD"),
     ("AT+CBCIE"),
-    ("AT*NAUTODISC"),
-    ("AT*NRLP"),
-    ("AT*NSYNCSEQ"),
-    ("AT*NVTMODE"),
-    ("AT*NTRACE"),
-    ("AT*NNET"),
-    ("AT*NOKIAFBUS"),
-    ("AT*NPTTLOGIN"),
-    ("AT*NPTTLOGOFF"),
-    ("AT*NPTTATTACH"),
-    ("AT*NPTTDETACH"),
-    ("AT*NPTT"),
-    ("AT*NTESTSYSTEM"),
-    ("AT*NLOGGING"),
-    ("AT*NBALOCK"),
-    ("AT*NCHLOCK"),
-    ("AT*NCELLBARR"),
-    ("AT*NEOTD"),
-    ("AT*NTESTAUDIO"),
-    ("AT*NSECLOCK"),
-    ("AT*NSYSLOCK"),
-    ("AT*NUMAMODE"),
-    ("AT*NSMSROUTE"),
     ("AT"),
     ("LAST")
     };

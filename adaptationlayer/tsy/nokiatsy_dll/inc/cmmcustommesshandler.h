@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -517,7 +517,7 @@ class CMmCustomMessHandler :
         * Handles responses to UICC_APDU_RESP
         * @param aStatus Status
         * @param aFileData File data
-        * @param aTraId transaction id 
+        * @param aTraId transaction id
         * @return none
         */
         void UiccSendAPDUResp(
@@ -671,6 +671,7 @@ class CMmCustomMessHandler :
         TInt ProcessUiccMsg(
             TInt aTraId,
             TInt aStatus,
+            TUint8 aDetails,
             const TDesC8& aFileData );
 
     protected: // New functions
@@ -782,6 +783,13 @@ class CMmCustomMessHandler :
             RMmCustomAPI::TNetworkModeCaps aNetworkModeCaps );
 
         /**
+        * Request for current RAT
+        * @param TUInt8 aTransId: Transaction Id
+        * @return TInt : result
+        */
+        TInt GssCsServiceReq( TUint8 aTransId );
+
+        /**
         * Breaks received GSS_CS_SERVICE_RESP ISI message
         * @param const TIsiReceiveC& aIsiMessage: The received ISI message
         * @return void : None
@@ -794,26 +802,6 @@ class CMmCustomMessHandler :
         * @return void : None
         */
         void GssCsServiceFailResp( const TIsiReceiveC& aIsiMessage );
-
-        /**
-        * MtcRat Query
-        * @param TUInt8 aTransId: Transaction Id
-        * @return TInt : result
-        */
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-        // Removed for Bridge camp!
-        TInt MtcRatQueryReq( TUint8 aTransId );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-        /**
-        * MtcRat Query Response
-        * @param TIsiReceiveC& aIsiMessage: ISI message
-        * @return void : None
-        */
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-        // Removed for Bridge camp!
-        void MtcRatQueryResp( const TIsiReceiveC& aIsiMessage );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
         /**
         * Handles the ReadViagHomeZoneParamsResp response message.
@@ -975,13 +963,13 @@ class CMmCustomMessHandler :
         * read.
         */
         TInt  GetTotalLifeTimerValue();
-        
+
         /**
         * Constructs and sends AUTHENTICATE APDU to the UICC
         * @param aDataPackage: data containing authentication parameters
         * @return TInt: KErrNone / Error value from phonet
         */
-        TInt CMmCustomMessHandler::UiccSendAuthenticateApdu( 
+        TInt CMmCustomMessHandler::UiccSendAuthenticateApdu(
             const CMmDataPackage& aDataPackage );
 
 
@@ -994,7 +982,7 @@ class CMmCustomMessHandler :
         * @return void: none
         */
         void UiccCreateRunGsmAlgorithmApdu(
-            TUiccSendApdu& aParams, 
+            TUiccSendApdu& aParams,
             const TDesC8& aRand,
             TUiccTrId aTraId );
 
@@ -1016,8 +1004,8 @@ class CMmCustomMessHandler :
         * @param aDataPackage: data containing authentication parameters
         * @return void: none
         */
-        void UiccCreateGsmSecurityContextApdu( 
-            TUiccSendApdu& params, 
+        void UiccCreateGsmSecurityContextApdu(
+            TUiccSendApdu& params,
             const CMmDataPackage& aDataPackage );
 
         /**
@@ -1040,9 +1028,9 @@ class CMmCustomMessHandler :
         * @param aTraId: tr id used in UICC request
         * @return void: none
         */
-        void UiccCreate3GSecurityContextApdu( 
-            TUiccSendApdu& aParams, 
-            const TDesC8& aRand, 
+        void UiccCreate3GSecurityContextApdu(
+            TUiccSendApdu& aParams,
+            const TDesC8& aRand,
             const TDesC8& aAuth,
             TUiccTrId aTraId );
 
@@ -1065,11 +1053,11 @@ class CMmCustomMessHandler :
         * @return void: none
         */
         void UiccCreateGBABootstrappingApdu(
-            TUiccSendApdu& aParams, 
+            TUiccSendApdu& aParams,
             const CMmDataPackage& aDataPackage );
 
         /**
-        * Handles response APDU for GBA security context AUTHENTICATE 
+        * Handles response APDU for GBA security context AUTHENTICATE
         * APDU (bootstrapping mode)
         * @param aTraId: transaction id of received message
         * @param aStatus: status of the response
@@ -1082,7 +1070,7 @@ class CMmCustomMessHandler :
             const TDesC8& aFileData );
 
         /**
-        * Starts GBA bootstrap operation by reading elementary file EFgba. After reading 
+        * Starts GBA bootstrap operation by reading elementary file EFgba. After reading
         * is done, B-Tid and keylifetime is updated to EFgba
         * @param aDataPackage: data containing parameters going to be written
         *                      to the EFgba
@@ -1109,18 +1097,18 @@ class CMmCustomMessHandler :
         void UiccGBABootstrapUpdateResp( TInt aStatus );
 
         /**
-        * Constructs GBA security context AUTHENTICATE APDU 
+        * Constructs GBA security context AUTHENTICATE APDU
         * (NAF derivation mode)
         * @param aParams: parameter where the apdu is constructed
         * @param aDataPackage: data containing authentication parameters
         * @return void: none
         */
         void UiccCreateGBABootstrapNafDerivationApdu(
-            TUiccSendApdu& aParams, 
+            TUiccSendApdu& aParams,
             const CMmDataPackage& aDataPackage );
 
         /**
-        * Handles response APDU for GBA security context AUTHENTICATE 
+        * Handles response APDU for GBA security context AUTHENTICATE
         * APDU (NAF derivation mode)
         * @param aTraId: transaction id of received message
         * @param aStatus: status of the response
@@ -1133,18 +1121,18 @@ class CMmCustomMessHandler :
             const TDesC8& aFileData );
 
         /**
-        * Constructs MBMS security context AUTHENTICATE APDU 
+        * Constructs MBMS security context AUTHENTICATE APDU
         * (MSK Update Mode)
         * @param params: parameter where the apdu is constructed
         * @param aDataPackage: data containing authentication parameters
         * @return void: none
         */
         void UiccCreateMbmsMskUpdateApdu(
-            TUiccSendApdu& params, 
+            TUiccSendApdu& params,
             const CMmDataPackage& aDataPackage );
 
         /**
-        * Handles response APDU for MBMS security context AUTHENTICATE 
+        * Handles response APDU for MBMS security context AUTHENTICATE
         * APDU (MSK Update Mode)
         * @param aTraId: transaction id of received message
         * @param aStatus: status of the response
@@ -1156,18 +1144,18 @@ class CMmCustomMessHandler :
             const TDesC8& aFileData );
 
         /**
-        * Constructs MBMS security context AUTHENTICATE APDU 
+        * Constructs MBMS security context AUTHENTICATE APDU
         * (MTK Generation Mode)
         * @param params: parameter where the apdu is constructed
         * @param aDataPackage: data containing authentication parameters
         * @return void: none
         */
         void UiccCreateMbmsMtkGenerationApdu(
-            TUiccSendApdu& params, 
+            TUiccSendApdu& params,
             const CMmDataPackage& aDataPackage );
 
         /**
-        * Handles response APDU for MBMS security context AUTHENTICATE 
+        * Handles response APDU for MBMS security context AUTHENTICATE
         * APDU (MTK Generation Mode)
         * @param aStatus: status of the response
         * @param aFileData: response apdu
@@ -1178,18 +1166,18 @@ class CMmCustomMessHandler :
             const TDesC8& aFileData );
 
         /**
-        * Constructs MBMS security context AUTHENTICATE APDU 
+        * Constructs MBMS security context AUTHENTICATE APDU
         * (MSK Deletion Mode)
         * @param params: parameter where the apdu is constructed
         * @param aDataPackage: data containing authentication parameters
         * @return void: none
         */
         void UiccCreateMbmsMskDeletionApdu(
-            TUiccSendApdu& params, 
+            TUiccSendApdu& params,
             const CMmDataPackage& aDataPackage );
 
         /**
-        * Handles response APDU for MBMS security context AUTHENTICATE 
+        * Handles response APDU for MBMS security context AUTHENTICATE
         * APDU (MSK Deletion Mode)
         * @param aStatus: status of the response
         * @param aFileData: response apdu
@@ -1207,7 +1195,7 @@ class CMmCustomMessHandler :
         void CMmCustomMessHandler::UiccCreateFirstBlockOfAuthRespApdu( TUiccTrId aTrId );
 
         /**
-        * Maps sw1 and sw2 from response authenticate apdu to result 
+        * Maps sw1 and sw2 from response authenticate apdu to result
         * @param sw1: status of the response
         * @param sw2: response apdu
         * @return TUint8: command result
@@ -1218,17 +1206,17 @@ class CMmCustomMessHandler :
         * Validates received apdu
         * @param aTraId: Identifies the apdu
         * @param aApdu: APDU to be verified
-        * @return TUint8: KApduOk if verified successfully, 
+        * @return TUint8: KApduOk if verified successfully,
         *                 otherwise KApduNok
         */
-        TUint8 ValidateReceivedAuthenticateApdu( 
-            TInt aTraId, 
+        TUint8 ValidateReceivedAuthenticateApdu(
+            TInt aTraId,
             const TDesC8& aApdu );
 
         /**
         * Validates received gsm security context apdu for authenticate
         * @param aApdu: APDU to be verified
-        * @return TUint8: KApduOk if verified successfully, 
+        * @return TUint8: KApduOk if verified successfully,
         *                 otherwise KApduNok
         */
         TUint8 ValidateGsmSecurityContextApduResp( const TDesC8& aApdu );
@@ -1236,7 +1224,7 @@ class CMmCustomMessHandler :
         /**
         * Validates received 3G security context apdu for authenticate
         * @param aApdu: APDU to be verified
-        * @return TUint8: KApduOk if verified successfully, 
+        * @return TUint8: KApduOk if verified successfully,
         *                 otherwise KApduNok
         */
         TUint8 Validate3GSecurityContextApduResp( const TDesC8& aApdu );
@@ -1245,7 +1233,7 @@ class CMmCustomMessHandler :
         * Validates received GBA security context apdu (GBA bootstrapping mode)
         * for authenticate
         * @param aApdu: APDU to be verified
-        * @return TUint8: KApduOk if verified successfully, 
+        * @return TUint8: KApduOk if verified successfully,
         *                 otherwise KApduNok
         */
         TUint8 ValidateGBABootstrappingApduResp( const TDesC8& aApdu );
@@ -1254,7 +1242,7 @@ class CMmCustomMessHandler :
         * Validates received GBA security context apdu (GBA NAF derivation mode)
         * for authenticate
         * @param aApdu: APDU to be verified
-        * @return TUint8: KApduOk if verified successfully, 
+        * @return TUint8: KApduOk if verified successfully,
         *                 otherwise KApduNok
         */
         TUint8 ValidateGBANafDerivationApduResp( const TDesC8& aApdu );
@@ -1262,7 +1250,7 @@ class CMmCustomMessHandler :
         /**
         * Validates received RUN GSM ALGORITHM apdu for authenticate
         * @param aApdu: APDU to be verified
-        * @return TUint8: KApduOk if verified successfully, 
+        * @return TUint8: KApduOk if verified successfully,
         *                 otherwise KApduNok
         */
         TUint8 ValidateRunGsmAlgorithmApduResp( const TDesC8& aApdu );
@@ -1288,7 +1276,7 @@ class CMmCustomMessHandler :
         * @param aMbmsData: APDU data
         * @return void: none
         */
-        void UiccMskUpdateHandleOMABcastOperationData( 
+        void UiccMskUpdateHandleOMABcastOperationData(
             RMmCustomAPI::TSimAuthenticationMgvMskUpdate& aMskUpdate,
             TDesC8& aMbmsData );
 
@@ -1300,7 +1288,7 @@ class CMmCustomMessHandler :
         * @param aMbmsData: APDU data
         * @return void: none
         */
-        void UiccMtkGenHandleMbmsOperationData( 
+        void UiccMtkGenHandleMbmsOperationData(
             RMmCustomAPI::TSimAuthenticationMgvMtkGeneration& aMtkGen,
             TDesC8& aMbmsData );
 
@@ -1312,7 +1300,7 @@ class CMmCustomMessHandler :
         * @param aMbmsData: APDU data
         * @return void: none
         */
-        void UiccMtkGenHandleOMABcastOperationData( 
+        void UiccMtkGenHandleOMABcastOperationData(
             RMmCustomAPI::TSimAuthenticationMgvMtkGeneration& aMtkGen,
             TDesC8& aMbmsData );
 
@@ -1320,7 +1308,7 @@ class CMmCustomMessHandler :
         * Finds tlv objects from BER TLV object
         * @param aTlvTag: tag of teh tlv object to be search
         * @param aBerTlv: BER TLV object where to search
-        * @param aTlvObject: tlv object data is copied to this 
+        * @param aTlvObject: tlv object data is copied to this
         *                    parameter, if it's found
         * @return TBool: ETrue if tlv object found, otherwise EFalse
         */
@@ -1337,7 +1325,7 @@ class CMmCustomMessHandler :
         * @param aKc:     Kc which is used in calculation
         * @return void: none
         */
-        void DeriveCkFromKc( 
+        void DeriveCkFromKc(
             TDes8& aCk,
             const TDesC8& aKc );
 

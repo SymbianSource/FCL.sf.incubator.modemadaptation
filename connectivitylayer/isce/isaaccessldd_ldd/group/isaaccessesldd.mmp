@@ -29,6 +29,8 @@ UID             0x100000AF 0x1028312A
 VENDORID        VID_DEFAULT
 FEATUREVARIANT
 
+SMPSAFE
+
 SOURCEPATH      ../src
 SOURCE          isauserdevice.cpp
 SOURCE          isauserchannel.cpp

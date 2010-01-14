@@ -24,9 +24,9 @@
 #include    "dpdataelement.h"           // data elements
 #include    "dpdataclient.h"            // data client that access buffer
 #include    "dplog.h"                   // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpdatabuffertraces.h"
+#include "dpdatabufferTraces.h"
 #endif
 
 // LOCAL FUNCTION PROTOTYPES

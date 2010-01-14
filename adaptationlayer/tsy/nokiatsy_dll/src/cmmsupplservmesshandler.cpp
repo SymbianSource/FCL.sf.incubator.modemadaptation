@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -38,10 +38,11 @@
 #include "cmmsupplservmesshandler.h"
 #include "tssparser.h" // for parsing service string
 #include "tsylogger.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #include "cmmuiccmesshandler.h"
+#include "cmmphonemesshandler.h"  // for CallForwFlagsCachingCompleted
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmsupplservmesshandlertraces.h"
+#include "cmmsupplservmesshandlerTraces.h"
 #endif
  // logging
 #include <satcs.h>
@@ -597,7 +598,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMes
             UiccReadCallFwdFlagsRel4Req();
             break;
             }
-        case ESatNotifyCallControlRequest:
+        case ESatNotifySendSsPCmd:
             {
             // SIM ATK TSY has informed that next SS request coming from
             // Etel is SAT originated and FDN check should not be done.
@@ -633,6 +634,7 @@ OstTrace1( TRACE_NORMAL, DUP5_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMes
 TInt CMmSupplServMessHandler::ProcessUiccMsg(
     TInt aTraId,
     TInt aStatus,
+    TUint8 /*aDetails*/,
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY: CMmSupplServMessHandler::ProcessUiccMsg, transaction ID: %d, status: %d", aTraId, aStatus );
@@ -3973,6 +3975,9 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP, "CM
             &customDataPackage,
             KErrNone );
 
+TFLOGSTRING("TSY: CMmSupplServMessHandler::SimCallFwdRespL - Check possible refresh status");
+OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP, "CMmSupplServMessHandler::UiccHandleCallFwdFlagsResp - Check possible refresh status" );
+        iMessageRouter->GetPhoneMessHandler()->CallForwFlagsCachingCompleted( aStatus );
         }
     else if ( !iGetCallForwardingNumber ) // EMobilePhoneSetCallForwardingStatus
         {

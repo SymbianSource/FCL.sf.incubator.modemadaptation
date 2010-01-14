@@ -16,7 +16,7 @@
 */
 
 
-#include <PhonetIsi.h>              // For phonet-header offsets like ISI_HEADER_OFFSET_MESSAGEID
+#include <phonetisi.h>              // For phonet-header offsets like ISI_HEADER_OFFSET_MESSAGEID
 #include <pipeisi.h>                // For PEP_IND_BUSY etc..
 #include <pipe_sharedisi.h>         // For PN_MULTI_CREDIT_FLOW_CONTROL etc..
 #include "pep.h"

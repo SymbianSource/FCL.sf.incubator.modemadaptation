@@ -42,10 +42,12 @@ class MDataMessageStatus
 
 #include "iadinternaldefinitions.h"    // For TIADConnectionStatus
 //#include "mist2iadapi.h"  // For TIADConnectionStatus // 
+#include "misiobjectrouterif.h"
+#include "misirouterobjectif.h"
 
 // abstract interface for both channels user & kernel 
 // called by extension, provided by extension
-class MIAD2ChannelApi // TODO: MDataRx2ChannelApi?
+class MIAD2ChannelApi : public MISIRouterObjectIf
     {
     
     public:
@@ -110,7 +112,7 @@ class MIAD2ChannelApi // TODO: MDataRx2ChannelApi?
 // *called by LDD
 // *provided from extension
 // *must take care of syncronization, LDD and kernel channels using this
-class MChannel2IADApi
+class MChannel2IADApi : public MISIObjectRouterIf
     {
 
     public:

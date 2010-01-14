@@ -25,15 +25,16 @@
 #include "cmmphonebookoperationinit3G_adn.h"
 #include "cmmphonebookoperationcache.h"
 #include "cmmphonebookoperationread.h"
+#include "cmmphonebookoperationread3g_adn.h"
 #include "cmmphonebookoperationwrite.h"
 #include "cmmphonebookoperationdelete.h"
 #include "cmmphonebookoperationcustom.h"
 
 //For CMmPhoneMessHandler::EServiceTableRequestTypePhonebookMBI
 #include "cmmphonemesshandler.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmphonebookstoreoperationlisttraces.h"
+#include "cmmphonebookstoreoperationlistTraces.h"
 #endif
 
 
@@ -86,10 +87,12 @@ CMmPhoneBookStoreOperationList::~CMmPhoneBookStoreOperationList()
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::\
         ~CMmPhoneBookStoreOperationList");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONLIST_CMMPHONEBOOKSTOREOPERATIONLIST, "CMmPhoneBookStoreOperationList::~CMmPhoneBookStoreOperationList" );
+    OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONLIST_CMMPHONEBOOKSTOREOPERATIONLIST, "CMmPhoneBookStoreOperationList::~CMmPhoneBookStoreOperationList" );
 
-    iPtrOperationArray.Reset();
-    iPtrOperationArray.Close();
+    iPtrOperationArrayNew.DeleteAll();
+    // resets all elements to 
+    iPtrOperationArrayNew.Reset();
+
     }
 
 // ---------------------------------------------------------------------------
@@ -128,152 +131,25 @@ void CMmPhoneBookStoreOperationList::ConstructL()
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CONSTRUCTL, "CMmPhoneBookStoreOperationList::ConstructL" );
     }
 
+
 // ---------------------------------------------------------------------------
-// CMmPhoneBookStoreOperationList::Build
-// Separate request and create correct object
+// CMmPhoneBookStoreOperationList::AddOperation
+// Add Creted operation to List
 // ---------------------------------------------------------------------------
 //
-CMmPhoneBookStoreOperationBase* CMmPhoneBookStoreOperationList::BuildL(
-    const CMmDataPackage* aDataPackage,
-    TInt aIpc
-    )
+void CMmPhoneBookStoreOperationList::AddOperation(
+    TUint8 aTrans,
+    CMmPhoneBookStoreOperationBase* aOperation )
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::Build");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_BUILDL, "CMmPhoneBookStoreOperationList::BuildL" );
+    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::AddOperation");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_ADDOPERATION, "CMmPhoneBookStoreOperationList::AddOperation" );
 
-    CMmPhoneBookStoreOperationBase* pointer( NULL );
-
-    switch( aIpc )
+    if( (( aTrans - ETrIdPbOperationStart ) >= 0)&& ((aTrans - ETrIdPbOperationStart) < KMaxPbTrIdCount ))
         {
-        case EMmTsyPhoneBookStoreInitIPC:
-            {
-            
-            // Get Card type from uiccmesshandler
-            // if SIM, phonebook is 2G and located under DFtelecom and ADN pb contains only name/number entries
-            // if USIM, phonebook can be 3G local or 3G private. ADN pb entry can contain additional entries
-            // 3G local is located under DFtelecom and 3G private under ADFusim, both have same structure however
-            // only the path is different? 7F10 vs. 7FFF
-            // Here in UICCCreateReq only 3G local has been handled
-            // So for both SIM and USIM Phonebook will be under DFtelecom (whose address is 7F10)
-            
-
-            // Chekc for Card type to Create Class for Phonebook Init
-            if(UICC_CARD_TYPE_UICC == iUiccMessHandler->GetCardType())
-                {
-                //call CmmPhonebookOperatorInit3G_ADN Phonebook
-                pointer = CMmPhoneBookOperationInit3G_adn::NewL(
-                        iMmPhoneBookStoreMessHandler,
-                        iUiccMessHandler,
-                        aDataPackage
-                        );
-                CleanupStack::PushL( pointer );
-                // Add pointer to array
-                iPtrOperationArray.AppendL( pointer );
-                CleanupStack::Pop( pointer );
-                
-                }
-            else if(UICC_CARD_TYPE_ICC ==  iUiccMessHandler->GetCardType())
-                {
-                //call CmmPhonebookOperatorInit
-                pointer = CMmPhoneBookOperationInit::NewL(
-                    iMmPhoneBookStoreMessHandler,
-                    iUiccMessHandler,
-                    aDataPackage
-                    );
-                CleanupStack::PushL( pointer );
-                // Add pointer to array
-                iPtrOperationArray.AppendL( pointer );
-                CleanupStack::Pop( pointer );
-                }
-            break;
-            }
-            /*
-        case EMmTsyPhoneBookStoreGetInfoIPC:
-        case EMmTsyPhoneBookStoreCacheIPC:
-            {
-            //call CmmPhonebookOperatorCache
-            pointer = CMmPhoneBookOperationCache::NewL(
-                iMmPhoneBookStoreMessHandler,
-                aIpc, aDataPackage );
-            CleanupStack::PushL( pointer );
-            // Add pointer to array
-            iPtrOperationArray.AppendL( pointer );
-            CleanupStack::Pop( pointer );
-            break;
-            }
-            */
-        case EMmTsyPhoneBookStoreReadIPC:
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-        case ECustomReadAlphaStringIPC:
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-            {
-            //call CmmPhonebookOperatorRead
-            pointer = CMmPhoneBookOperationRead::NewL(
-                iMmPhoneBookStoreMessHandler,
-                aDataPackage );
-            CleanupStack::PushL( pointer );
-            // Add pointer to array
-            iPtrOperationArray.AppendL( pointer );
-            CleanupStack::Pop( pointer );
-            break;
-            }
-            /*
-        case EMmTsyPhoneBookStoreWriteIPC:
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-        case ECustomWriteAlphaStringIPC:
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-            {
-            //call CmmPhonebookOperationWrite
-            pointer = CMmPhoneBookOperationWrite::NewL(
-                iMmPhoneBookStoreMessHandler,
-                aDataPackage );
-            CleanupStack::PushL( pointer );
-            // Add pointer to array
-            iPtrOperationArray.AppendL( pointer );
-            CleanupStack::Pop( pointer );
-            break;
-            }
-        case EMmTsyPhoneBookStoreDeleteIPC:
-        case EMmTsyPhoneBookStoreDeleteAllIPC:
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-        case ECustomDeleteAlphaStringIPC:
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-            {
-            //call CmmPhonebookOperatorDelete
-            pointer = CMmPhoneBookOperationDelete::NewL(
-                iMmPhoneBookStoreMessHandler,
-                aDataPackage );
-            CleanupStack::PushL( pointer );
-            // Add pointer to array
-            iPtrOperationArray.AppendL( pointer );
-            CleanupStack::Pop( pointer );
-            break;
-            }
-        case EMobilePhoneGetMailboxNumbers:
-            {
-            pointer =  new ( ELeave )CMmPhonebookOperationCustom(
-                iMmPhoneBookStoreMessHandler );
-            CleanupStack::PushL( pointer );
-            // Add pointer to array
-            iPtrOperationArray.AppendL( pointer );
-            CleanupStack::Pop( pointer );
-            break;
-            }
-            */
-        default:
-            {
-            // Nothing to do here
-            TFLOGSTRING2("TSY: CMmPhoneBookStoreMessHandler::ExtFuncL - \
-                Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONLIST_BUILDL, "CMmPhoneBookStoreOperationList::BuildL;Unknown aIpc=%d", aIpc );
-            break;
-            }
+        iPtrOperationArrayNew[aTrans - ETrIdPbOperationStart] = aOperation;
         }
-
-    //return pointer to right operation
-    return pointer;
     }
+
 
 // ---------------------------------------------------------------------------
 // CMmPhoneBookStoreOperationList::Find
@@ -281,37 +157,19 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONLIST_BUILDL, "CMmPhoneBo
 // ---------------------------------------------------------------------------
 //
 CMmPhoneBookStoreOperationBase* CMmPhoneBookStoreOperationList::Find(
-    TUint8 aTrans,
-    const CMmPhoneBookStoreOperationBase* aSearchFrom/*=NULL*/ )
+    TUint8 aTrans )
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::Find");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_FIND, "CMmPhoneBookStoreOperationList::Find" );
 
     CMmPhoneBookStoreOperationBase* basePointer( NULL );
-
-    // search correct pointer from array using aTrans
-    TUint ind( 0 );
-    if ( NULL != aSearchFrom )
+    //transaction id is basically just an index to operation array + start offset
+    //of phonebook operations
+    TInt ind ( aTrans - ETrIdPbOperationStart );
+    
+    if( (ind >= 0)&& (ind < KMaxPbTrIdCount ))
         {
-        // if object to search from specified, find its index at first
-        for ( ; ind < iPtrOperationArray.Count(); ind++ )
-            {
-            if ( aSearchFrom == iPtrOperationArray[ind] )
-                {
-                ind++;
-                break;
-                }
-            }
-        }
-    // looking for object with given transaction id
-    // starting index may be not 0 if aSearchFrom is specified
-    for ( ; ind < iPtrOperationArray.Count(); ind++)
-        {
-        if( ( iPtrOperationArray[ind] )->TransId() == aTrans )
-            {
-            basePointer = iPtrOperationArray[ind];
-            break;
-            }
+        basePointer = iPtrOperationArrayNew[aTrans - ETrIdPbOperationStart];
         }
     // return pointer if found otherwise NULL
     return basePointer;
@@ -325,94 +183,64 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_FIND, "CMmPhoneBookStore
 void CMmPhoneBookStoreOperationList::RemoveOperationFromList(
     TUint8 aTrans )  // transactionId
     {
-    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::\
-        RemoveOperationFromList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_REMOVEOPERATIONFROMLIST, "CMmPhoneBookStoreOperationList::RemoveOperationFromList" );
+    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::RemoveOperationFromList");
+    OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONLIST_REMOVEOPERATIONFROMLIST, "CMmPhoneBookStoreOperationList::RemoveOperationFromList" );
+    
 
-    TUint ind( 0 );
-    TUint operationCount( iPtrOperationArray.Count() );
+    delete iPtrOperationArrayNew[aTrans - ETrIdPbOperationStart];
+    iPtrOperationArrayNew[aTrans - ETrIdPbOperationStart] = NULL;
+            
+    TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationList -Phonebook operation removed succesfully from index: %d" , ( aTrans - ETrIdPbOperationStart ) );
 
-    // search correct pointer from array using aTrans
-    while ( ind < operationCount )
-        {
-        if( ( iPtrOperationArray[ind] )->TransId() == aTrans )
-            {
-            delete iPtrOperationArray[ind];
-            iPtrOperationArray.Remove( ind );
-            iPtrOperationArray.Compress();
-            TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationList -Phonebook \
-                operation removed succesfully from index: %d" ,ind );
-            break;
-            }
-        ind++;
-        }
-    TF_ASSERT( ind < operationCount );
+    TF_ASSERT( ( aTrans - ETrIdPbOperationStart ) < KMaxPbTrIdCount );
     }
 
+
+
 // ---------------------------------------------------------------------------
-// CMmPhoneBookStoreOperationList::RemoveLastOperationFromList
-// Removes last operation from operation list.
+// CMmPhoneBookStoreOperationList::FindEmptyIndexTransId
+// Check for the empty Index available in operation array
 // ---------------------------------------------------------------------------
 //
-TInt CMmPhoneBookStoreOperationList::RemoveLastOperationFromList()
+TInt CMmPhoneBookStoreOperationList::FindEmptyIndexTransId()
     {
-TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::RemoveLastOperationFromList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_REMOVELASTOPERATIONFROMLIST, "CMmPhoneBookStoreOperationList::RemoveLastOperationFromList" );
-
-    TInt ret( KErrNone );
-    TInt count( iPtrOperationArray.Count() );
-
-    if ( 0 < count )
+    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::FindEmptyIndexTransId");
+    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_FINDEMPTYINDEXTRANSID, "CMmPhoneBookStoreOperationList::FindEmptyIndexTransId" );
+    
+    TInt transId = -1;
+    for( TInt count = 0 ; count < KMaxPbTrIdCount ; count++)
         {
-        iPtrOperationArray.Remove( count - 1 );
-        }
-    else
-        {
-TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::RemoveLastOperationFromList - no operation to remove");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONLIST_REMOVELASTOPERATIONFROMLIST, "CMmPhoneBookStoreOperationList::RemoveLastOperationFromList - no operation to remove" );
-
-        ret = KErrNotFound;
-        }
-
-    return ret;
-    }
-
-// ---------------------------------------------------------------------------
-// CMmPhoneBookStoreOperationList::CalculateTransactionId
-// Calculates transaction Id from IPC number and data package
-// ---------------------------------------------------------------------------
-//
-TInt CMmPhoneBookStoreOperationList::CalculateTransactionId(
-    TInt aIpc,
-    const CMmDataPackage* /*aDataPackage*/,
-    TUint8& /*aTransactionId*/
-    )
-    {
-    TInt ret( KErrNone );
-
-    TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationList::CalculateTransactionId;aIpc=%d", aIpc);
-OstTrace1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CALCULATETRANSACTIONID, "CMmPhoneBookStoreOperationList::CalculateTransactionId;aIpc=%d", aIpc );
-
-    switch ( aIpc )
-        {
-        	/*
-        case EMmTsyPhoneBookStoreGetInfoIPC:
-        case EMmTsyPhoneBookStoreCacheIPC:
+        if( iPtrOperationArrayNew[count] == NULL )
             {
-            ret = CMmPhoneBookOperationCache::CalculateTransactionId(
-                      aIpc, aDataPackage, aTransactionId );
+            transId = count + ETrIdPbOperationStart ;
             break;
             }
-            */
-        default:
+        }
+    return transId;
+    }
+
+
+// ---------------------------------------------------------------------------
+// CMmPhoneBookStoreOperationList::CancelOperation
+// Cancel all operation with same phonebook name
+// ---------------------------------------------------------------------------
+//
+void CMmPhoneBookStoreOperationList::CancelOperation( TName &aPhoneBook)
+    {
+    TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::CancelOperation");
+    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CANCELOPERATION, "CMmPhoneBookStoreOperationList::CancelOperation" );
+  
+    // Chekc for all operation which have the same phonebook name
+    for( TInt count = 0 ; count < KMaxPbTrIdCount ; count++)
+        {
+        if( iPtrOperationArrayNew[count]!= NULL )
             {
-            TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::CalculateTransactionId;unknown ipc");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONLIST_CALCULATETRANSACTIONID, "CMmPhoneBookStoreOperationList::CalculateTransactionId; unknown ipc" );
-            ret = KErrNotSupported;
+            // Call Cancel function for that operation
+            iPtrOperationArrayNew[count]->CancelReq( aPhoneBook );
             }
         }
-
-    return ret;
     }
+
+
 
 // End of File

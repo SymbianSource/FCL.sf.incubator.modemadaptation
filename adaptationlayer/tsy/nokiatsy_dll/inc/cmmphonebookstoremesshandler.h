@@ -8,9 +8,9 @@
 *
 * Initial Contributors:
 * Nokia Corporation - initial contribution.
-* 
+*
 * Contributors:
-* 
+*
 * Description:
 *
 */
@@ -38,10 +38,96 @@
     //none
 
 //  MACROS
-    //none
+
+#define UICC_MAX_PB_NUM      8
+
+// LOCAL CONSTANTS AND MACROS
+#define TON_NPI_NO_TEL_NBR          0xFF
+#define TON_NPI_INTERNATIONAL       0x91
+#define TON_NPI_UNKNOWN             0x00
+#define TON_INTERNATIONAL           0x10
+
+#define MASK_TON_FROM_TON_NPI_BYTE(a) ((a) & 0x70)
+#define MASK_LOWER_NIBBLE_OF_BCD(a) ((a) & 0x0f)      /* B0000_1111 */
+
+#define UICC_DTMF_CONTROL_DIGIT_CHAR_wait   'w'
+#define UICC_DTMF_CONTROL_DIGIT_CHAR  'p'
+#define UICC_WILD_VALUE_CHAR          '?'
+#define UICC_WILD_VALUE_CHAR_ADN      'w'
+#define UICC_EXPANSION_CHAR           'e'
+#define UICC_INTERNATIONAL_NUM        '+'
+
+#define UICC_EF_MAX_NAME_LEN                241
 
 //  DATA TYPES
-    //none
+    //enum
+
+enum TPBConfData
+    {
+    ADNConfData = 0,
+    FDNConfData,
+    SDNConfData,
+    MBDNConfData,
+    VMBXConfData,
+    MSISDNConfData,
+    };
+
+struct TPBEntry
+    {
+    RArray<TInt> PBEntryExtRecord;
+    TBool iEntryPresent;
+    TUint8 iEntryIndex;
+    };
+
+struct TPBEntryList
+    {
+    RArray< TPBEntry* > iEntryList;
+    };
+
+
+class TPrimitiveInitInfo
+    {
+public:
+    TPrimitiveInitInfo();
+    
+    void GetPBEntryFromUICCData( const TDesC8 &aFileData, TDes8& aNumber, TDes8& aName);
+    
+    
+    TUint16 iNoOfRecords;          // 2 byte long
+    TUint16 iAlphaStringlength;    // 2 byte long
+    TUint16 iNumlength;          // 2 byte long
+    TUint16 iExtNoOfRec;
+    TUint8 iMbiRecLen;          
+    TBool iExtension;
+    };
+
+
+// Struct 
+
+
+// look up table for BCD digits
+
+const TUint8 LookupArray[16]= 
+      {    
+              '0','1','2','3','4','5','6','7','8','9',    /* 0-9 */
+              '*',                                        /* 0xA */
+              '#',                                        /* 0xB */
+              UICC_DTMF_CONTROL_DIGIT_CHAR,            /* 0xC, DTMF control digit * separator  */
+              UICC_WILD_VALUE_CHAR,                    /* 0xD, 'Wild' value */
+              UICC_EXPANSION_CHAR,                     /* 0xE, Expansion digit */
+      };
+
+const TUint8 LookupArrayAdn[16]= 
+      {    
+              '0','1','2','3','4','5','6','7','8','9',    /* 0-9 */
+              '*',                                        /* 0xA */
+              '#',                                        /* 0xB */
+              UICC_DTMF_CONTROL_DIGIT_CHAR,            /* 0xC, DTMF control digit * separator  */
+              UICC_WILD_VALUE_CHAR_ADN,                /* 0xD, 'Wild' value */
+              UICC_EXPANSION_CHAR,                     /* 0xE, Expansion digit */
+      };
+
+
 
 //  EXTERNAL DATA STRUCTURES
 
@@ -107,74 +193,100 @@ class CMmPhoneBookStoreMessHandler
         * @param aFileData reference to Data received in message
         * @return KErrNone or error code
         */
-        TInt ProcessUiccMsg( TInt aTransactionId, TInt aStatus, const TDesC8 &aFileData );
+        TInt ProcessUiccMsg( TInt aTransactionId, TInt aStatus, TUint8 aDetails, const TDesC8 &aFileData );
         
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
         /**
-        * Gets pointer to list of Group Alpha String
+        * Creates entry point to correct operation.
         *
-        * @return Pointer to CMmPhoNetSender object.
+        * @param aDataPackage Packaged data
+        * @param aIpc Identify number of request.
+        * @return Pointer to operation.
         */
-        CArrayPtrSeg<CMmPhonebookAlphaString>* Gas();
+        CMmPhoneBookStoreOperationBase* CreateNewOperationL(
+            const CMmDataPackage* aDataPackage,
+            TInt aIpc );
+        
+        /**
+        * Store Phonebook Entry from UICC -message
+        *
+        * @param aName Name
+        * @param aNumber Number
+        * @param aEntry Received UICC data
+        * @param aFileId File ID
+        * @param const TInt aIndexToRead Index of file
+        * @param const TBool aMailboxIdExist Is there a mailbox id
+        * @return none
+        */
+        static void StorePhonebookEntryL( TDes8& aName,
+                                          TDes8& aNumber,
+                                          CPhoneBookStoreEntry& aEntry,
+                                          const TUint16 aFileId,
+                                          const TInt aIndexToRead,
+                                          const TBool aMailboxIdExist );
 
         /**
-        * Update list of Group Alpha String.
+        * Handle number to convert in Ascii Format
+        * @param const TDesC8& aSource: Message to be converted in Ascii
+        * @param TDes16 aTarget : After conversion data to be staored in
+        */
+        static void ConvertToUcs2FromBCD( const TDesC8 &aSource,TDes16 &aTarget, const TUint16 aFileData );
+        
+        /**
+        * Handle number to convert in BCD format from UCS2 Format
+        * @param const TDesC16& aSource: Message to be converted in BCD
+        * @param TDes8 aTarget : After conversion data to be stored in target buffer
+        */
+        static TInt ConvertToBCDFromUCS2( TDes16 &aSource, TDes8 &aTarget, TUint16 aFileId );
+        
+        /**
+        * Handle number to convert in BCD format from UCS2 Format
+        * @param TInt16 aUCSCharacter: Character to be converted
+        * @param const TUint16 aFileId :File id
+        * @return The BCD number
+        */
+        static TInt GetBCDCodeforUCS( TUint16 aUCSCharacter, TUint16 aFileId );
+        
+        /**
+        * Sets PhoneBook Entry to PhoneBook Entry List.
         *
-        * @param aAas New list.
+        * @param aStoreEntry.
         * @return None
         */
-        void SetGas( CArrayPtrSeg<CMmPhonebookAlphaString>* aGas );
+        void StoreEntryToPhoneBookList( TPBEntry* aStoreEntry, TUint8 aPBIndex );
 
         /**
-        * Gets pointer to list of Additional Alpha String
+        * Reset phonebook entry in phoneBook entry list.
         *
-        * @param None
-        * @return Pointer to CMmPhoNetSender object.
-        */
-        CArrayPtrSeg<CMmPhonebookAlphaString>* Aas();
-
-        /**
-        * Update list of Additional Alpha String
-        *
-        * @param aAas New list.
+        * @param aPbIndex Phonebook index
+        * @param aPbIndex Entry index
         * @return None
         */
-        void SetAas( CArrayPtrSeg<CMmPhonebookAlphaString>* aAas );
+        void ResetEntryInPhoneBookList( TUint8 aPbIndex, TInt aEntryIndex );
 
         /**
-        * Gets number of GAS
+        * Sets PhoneBook Entry to PhoneBook Entry List.
         *
-        * @param None
-        * @return Number of GAS.
-        */
-        TInt MaxNumberOfGAS();
-
-        /**
-        * Sets number of GAS.
-        *
-        * @param aMaxNumberOfGAS Number of GAS
+        * @param aStoreEntry.
         * @return None
         */
-        void SetMaxNumberOfGAS( TInt aMaxNumberOfGAS );
+        TBool IndexCheckInPBList( TUint8 aIndex, TUint8 aPBIndex, TPBEntry& aEntry );
 
         /**
-        * Gets number on AAS entries.
+        * Find Index for Present Entry
         *
-        * @param
-        * @return Number of AAS entries.
+        * @param aIndex
+        * @param aPBIndex
+        * @return Index for Entry
         */
-        TInt MaxNumOfAasEntries();
+        TInt GetIndexForPresentEntry( TUint8 aIndex, TUint8 aPBIndex );
 
         /**
-        * Sets maximum number os AAS entries
+        * Finds free entry in the List.
         *
-        * @param aMaxNumOfAasEntries maximum number os AAS entries
-        * @return None
+        * @param TUint8 Phonebook index for Phonebook confoguration list
+        * @return TInt Index number for free entry
         */
-        void SetMaxNumOfAasEntries( TInt aMaxNumOfAasEntries );
-
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
+        TInt EmptyEntryCheckInPBList( TUint8 aPBIndex );
 
         /**
         * Gets MBDN phonebook flag.
@@ -201,6 +313,22 @@ class CMmPhoneBookStoreMessHandler
         void SetNumberOfFdnInfoResps( TUint8 aNumber );
 
         /**
+        * Remove the main Entry Information from Stored list 
+        *
+        * @param aIndex - Index to be removed.
+        * @return None
+        */
+        void UpdateEntryFromList( TPBEntry* aEntry, TUint8 aIndex , TUint8 aPBIndex);
+
+        /**
+        * Remove the EXT records Information from Stored list 
+        *
+        * @param aIndex - Index of Ext record to be removed.
+        * @return None
+        */
+        void RemoveExtEntryFromList( TUint8 aIndex, TUint8 aPBIndex);
+        
+        /**
         * Gets pointer to CMmMessageRouter class.
         *
         * @param None
@@ -225,15 +353,6 @@ class CMmPhoneBookStoreMessHandler
         */
         CMmPhoNetSender* PhoNetSender();
         
-        /**
-        * Gets pointer to CMmUiccMesshandler class.
-        *
-        * @param None
-        * @return Pointer to CMmMessageRouter object.
-        */
-        //CMmUiccMesshandler* UiccMessHandler();
-        
-
     protected:
         // None
 
@@ -260,7 +379,8 @@ class CMmPhoneBookStoreMessHandler
         void SimInd( const TIsiReceiveC& aIsiMessage );
 
     public:     // Data
-        // None
+        // table for All phone books Configuration Data
+       TPrimitiveInitInfo  iPBStoreConf[UICC_MAX_PB_NUM];
 
     protected:  //Data
         // None
@@ -285,28 +405,8 @@ class CMmPhoneBookStoreMessHandler
         // to store CardType 
         TUint8 iCardType;
         
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-
-        // Keeps track of readed location of AAS/GAS
-        TUint16 iCount;
-
-        // Holds information for AAS and GAS
-        RMmCustomAPI::TAlphaStringParams iAlphaStringParams;
-
-        // Max number of GAS
-        TInt iMaxNumberOfGAS;
-
-        // Keeps track of max number of AAS
-        TInt iMaxNumOfAasEntries;
-
-        // Array for storing aas texts
-        CArrayPtrSeg<CMmPhonebookAlphaString>* iAas;
-
-        // Array for storing GAS texts
-        CArrayPtrSeg<CMmPhonebookAlphaString>* iGas;
-
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
+        // Array to Store PhoneBook Entry Status and EXT record no list
+        TFixedArray< TPBEntryList,UICC_MAX_PB_NUM > iPBEntryList;
 };
 
 #endif // CMMPHONEBOOKSTOREMESSHANDLER_H

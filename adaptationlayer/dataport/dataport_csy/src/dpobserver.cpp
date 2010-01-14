@@ -21,9 +21,9 @@
 #include    "dpdef.h"                   // dataport definitions
 #include    "dpobserver.h"              // abstract observer class
 #include    "dplog.h"                   // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpobservertraces.h"
+#include "dpobserverTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

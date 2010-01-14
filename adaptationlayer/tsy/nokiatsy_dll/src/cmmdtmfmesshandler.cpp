@@ -24,9 +24,9 @@
 #include "cmmstaticutility.h"
 #include "cmmmessagerouter.h"
 #include "tsylogger.h" // logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmdtmfmesshandlertraces.h"
+#include "cmmdtmfmesshandlerTraces.h"
 #endif
 
 #include <etelmm.h>

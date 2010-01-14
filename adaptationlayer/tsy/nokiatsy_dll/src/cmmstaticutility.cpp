@@ -39,9 +39,9 @@
 #include <in_sock.h>
 #include <f32file.h>
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmstaticutilitytraces.h"
+#include "cmmstaticutilityTraces.h"
 #endif
 
 #include "cmmuiccmesshandler.h"
@@ -3351,6 +3351,807 @@ OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GETUNICODEGSM, "CMmStaticUtility::GetU
 
     return ret;
     }
+
+
+
+// -----------------------------------------------------------------------------
+// CMmStaticUtility::ConvertUcs2ToGsmUcs2Data
+// Convert data to UCS2 format. See ETSI TS 102.221 Annex A
+// -----------------------------------------------------------------------------
+//
+void CMmStaticUtility::ConvertUcs2ToGsmUcs2Data(
+    TDesC16& aInputString,
+    TDes8& aGsmDataString )
+    {
+TFLOGSTRING("TSY: CMmStaticUtility::ConvertUcs2ToGsmData");
+OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTUCS2TOGSMDATA, "CMmStaticUtility::ConvertUcs2ToGsmData" );
+
+    if ( 0 < aInputString.Length() )
+        {
+        // Check if there is any GSM default alphabet
+        if( GetCodingScheme( aInputString ))
+            {
+            // Store as one of the UCS2 Coding scheme
+            // Append the GSM data with 0x80
+            aGsmDataString.Append( 0x80 );
+            for( TInt count = 0; count < aInputString.Length(); count++)
+                {
+                // get MSB Byte in the first place
+                aGsmDataString.Append( aInputString[count]>>8);
+                aGsmDataString.Append( aInputString[count] );
+                }
+            }  // End of check the encoding type
+        else
+            {
+            // Store string in GSM default coding scheme
+            for( TInt count = 0; count < aInputString.Length(); count++)
+                {
+                // get the GSM defalut Character for UCS character
+                TUint8 gsmChar = GetGsmForUnicode( aInputString[count] );
+                if( gsmChar > 0x7F )
+                    {
+                    aGsmDataString.Append( 0x1B );
+                    }
+                aGsmDataString.Append(gsmChar & 0x7F);
+                }
+            // Append 0xFF for End of the String
+            aGsmDataString.Append( 0xFF );
+            }
+        }   // End of if there is no Input String
+    } // End of function
+
+
+// -----------------------------------------------------------------------------
+// CMmStaticUtility::GetCodingScheme
+// GEt the Coding scheme GSM default or UCS2
+// -----------------------------------------------------------------------------
+//
+TBool CMmStaticUtility::GetCodingScheme( TDesC16& aInputString )
+    {
+    TFLOGSTRING("TSY: CMmStaticUtility::GetCodingScheme");
+    OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GETCODINGSCHEME, "CMmStaticUtility::GetCodingScheme" );
+    TInt ret ( ETrue );
+    TInt count(0);
+    
+    while( count < aInputString.Length() )
+        {
+        TUint16 unicodeChar = aInputString[count];
+        TUint8 gsmCode = GetGsmForUnicode( unicodeChar );
+        if( gsmCode > 0x80 )
+            {
+            ret = EFalse;
+            }
+        count++;
+        }
+    return ret;
+    
+    }
+
+
+
+// -----------------------------------------------------------------------------
+// CMmStaticUtility::GetGsmForUnicode
+// convert from Unicode character to GSM unicode character
+// -----------------------------------------------------------------------------
+//
+TUint8 CMmStaticUtility::GetGsmForUnicode( TUint16 aUniCode )
+    {
+    TUint8 ret ( 0 );
+    switch ( aUniCode )
+        {
+        case 0x0040:
+            {
+            ret = 0x00;
+            break;
+            }
+        case 0x00A3:
+            {
+            ret = 0x01;
+            break;
+            }
+        case 0x0024:
+            {
+            ret = 0x02;
+            break;
+            }
+        case 0x00A5:
+            {
+            ret = 0x03;
+            break;
+            }
+        case 0x00E8:
+            {
+            ret = 0x04;
+            break;
+            }
+        case 0x00E9:
+            {
+            ret = 0x05;
+            break;
+            }
+        case 0x00F9:
+            {
+            ret = 0x06;
+            break;
+            };
+        case 0x00EC:
+            {
+            ret = 0x07;
+            break;
+            }
+        case 0x00F2:
+            {
+            ret = 0x08;
+            break;
+            }
+        case 0x00C7:
+            {
+            ret = 0x09;
+            break;
+            }
+        case 0x000A:
+            {
+            ret = 0x0A;
+            break;
+            }
+        case 0x00D8:
+            {
+            ret = 0x0B;
+            break;
+            }
+        case 0x00F8:
+            {
+            ret = 0x0C;
+            break;
+            }
+        case 0x000D:
+            {
+            ret = 0x0D;
+            break;
+            }
+        case 0x00C5:
+            {
+            ret = 0x0E;
+            break;
+            }
+        case 0x00E5:
+            {
+            ret = 0x0F;
+            break;
+            }
+        case 0x0394:
+            {
+            ret = 0x10;
+            break;
+            }
+        case 0x005F:
+            {
+            ret = 0x11;
+            break;
+            }
+        case 0x03A6:
+            {
+            ret = 0x12;
+            break;
+            }
+        case 0x0393:
+            {
+            ret = 0x13;
+            break;
+            }
+        case 0x039B:
+            {
+            ret = 0x14;
+            break;
+            }
+        case 0x03A9:
+            {
+            ret = 0x15;
+            break;
+            }
+        case 0x03A0:
+            {
+            ret = 0x16;
+            break;
+            }
+        case 0x03A8:
+            {
+            ret = 0x17;
+            break;
+            }
+        case 0x03A3:
+            {
+            ret = 0x18;
+            break;
+            }
+        case 0x0398:
+            {
+            ret = 0x19;
+            break;
+            }
+        case 0x039E:
+            {
+            ret = 0x1A;
+            break;
+            }
+        case 0x00C6:
+            {
+            ret = 0x1C;
+            break;
+            }
+        case 0x00E6:
+            {
+            ret = 0x1D;
+            break;
+            }
+        case 0x00DF:
+            {
+            ret = 0x1E;
+            break;
+            }
+        case 0x00C9:
+            {
+            ret = 0x1F;
+            break;
+            }
+        case 0x0020:
+            {
+            ret = 0x20;
+            break;
+            }
+        case 0x0021:
+            {
+            ret = 0x21;
+            break;
+            }
+        case 0x0022:
+            {
+            ret = 0x22;
+            break;
+            }
+        case 0x0023:
+            {
+            ret = 0x23;
+            break;
+            }
+        case 0x00A4:
+            {
+            ret = 0x24;
+            break;
+            }
+        case 0x0025:
+            {
+            ret = 0x25;
+            break;
+            }
+        case 0x0026:
+            {
+            ret = 0x26;
+            break;
+            }
+        case 0x0027:
+            {
+            ret = 0x27;
+            break;
+            }
+        case 0x0028:
+            {
+            ret = 0x28;
+            break;
+            }
+        case 0x0029:
+            {
+            ret = 0x29;
+            break;
+            }
+        case 0x002A:
+            {
+            ret = 0x2A;
+            break;
+            }
+        case 0x002B:
+            {
+            ret = 0x2B;
+            break;
+            }
+        case 0x002C:
+            {
+            ret = 0x2C;
+            break;
+            }
+        case 0x002D:
+            {
+            ret = 0x2D;
+            break;
+            }
+        case 0x002E:
+            {
+            ret = 0x2E;
+            break;
+            }
+        case 0x002F:
+            {
+            ret = 0x2F;
+            break;
+            }
+        case 0x0030:
+            {
+            ret = 0x30;
+            break;
+            }
+        case 0x0031:
+            {
+            ret = 0x31;
+            break;
+            }
+        case 0x0032:
+            {
+            ret = 0x32;
+            break;
+            }
+        case 0x0033:
+            {
+            ret = 0x33;
+            break;
+            }
+        case 0x0034:
+            {
+            ret = 0x34;
+            break;
+            }
+        case 0x0035:
+            {
+            ret = 0x35;
+            break;
+            }
+        case 0x0036:
+            {
+            ret = 0x36;
+            break;
+            }
+        case 0x0037:
+            {
+            ret = 0x37;
+            break;
+            }
+        case 0x0038:
+            {
+            ret = 0x38;
+            break;
+            }
+        case 0x0039:
+            {
+            ret = 0x39;
+            break;
+            }
+        case 0x003A:
+            {
+            ret = 0x3A;
+            break;
+            }
+        case 0x003B:
+            {
+            ret = 0x3B;
+            break;
+            }
+        case 0x003C:
+            {
+            ret = 0x3C;
+            break;
+            }
+        case 0x003D:
+            {
+            ret = 0X3D;
+            break;
+            }
+        case 0x003E:
+            {
+            ret = 0X3E;
+            break;
+            }
+        case 0x003F:
+            {
+            ret = 0X3F;
+            break;
+            }
+        case 0x00A1:
+            {
+            ret = 0X40;
+            break;
+            }
+        case 0x0041:
+            {
+            ret = 0X41;
+            break;
+            }
+        case 0x0042:
+            {
+            ret = 0X42;
+            break;
+            }
+        case 0x0043:
+            {
+            ret = 0X43;
+            break;
+            }
+        case 0x0044:
+            {
+            ret = 0X44;
+            break;
+            }
+        case 0x0045:
+            {
+            ret = 0X45;
+            break;
+            }
+        case 0x0046:
+            {
+            ret = 0X46;
+            break;
+            }
+        case 0x0047:
+            {
+            ret = 0X47;
+            break;
+            }
+        case 0x0048:
+            {
+            ret = 0X48;
+            break;
+            }
+        case 0x0049:
+            {
+            ret = 0X49;
+            break;
+            }
+        case 0x004A:
+            {
+            ret = 0X4A;
+            break;
+            }
+        case 0x004B:
+            {
+            ret = 0X4B;
+            break;
+            }
+        case 0x004C:
+            {
+            ret = 0X4C;
+            break;
+            }
+        case 0x004D:
+            {
+            ret = 0X4D;
+            break;
+            }
+        case 0x004E:
+            {
+            ret = 0X4E;
+            break;
+            }
+        case 0x004F:
+            {
+            ret = 0X4F;
+            break;
+            }
+        case 0x0050:
+            {
+            ret = 0X50;
+            break;
+            }
+        case 0x0051:
+            {
+            ret = 0X51;
+            break;
+            }
+        case 0x0052:
+            {
+            ret = 0X52;
+            break;
+            }
+        case 0x0053:
+            {
+            ret = 0X53;
+            break;
+            }
+        case 0x0054:
+            {
+            ret = 0X54;
+            break;
+            }
+        case 0x0055:
+            {
+            ret = 0X55;
+            break;
+            }
+        case 0x0056:
+            {
+            ret = 0X56;
+            break;
+            }
+        case 0x0057:
+            {
+            ret = 0X57;
+            break;
+            }
+        case 0x0058:
+            {
+            ret = 0X58;
+            break;
+            }
+        case 0x0059:
+            {
+            ret = 0X59;
+            break;
+            }
+        case 0x005A:
+            {
+            ret = 0X5A;
+            break;
+            }
+        case 0x00C4:
+            {
+            ret = 0X5B;
+            break;
+            }
+        case 0x00D6:
+            {
+            ret = 0X5C;
+            break;
+            }
+        case 0x00D1:
+            {
+            ret = 0X5D;
+            break;
+            }
+        case 0x00DC:
+            {
+            ret = 0X5E;
+            break;
+            }
+        case 0x00A7:
+            {
+            ret = 0X5F;
+            break;
+            }
+        case 0x00BF:
+            {
+            ret = 0X60;
+            break;
+            }
+        case 0x0061:
+            {
+            ret = 0X61;
+            break;
+            }
+        case 0x0062:
+            {
+            ret = 0X62;
+            break;
+            }
+        case 0x0063:
+            {
+            ret = 0X63;
+            break;
+            }
+        case 0x0064:
+            {
+            ret = 0X64;
+            break;
+            }
+        case 0x0065:
+            {
+            ret = 0X65;
+            break;
+            }
+        case 0x0066:
+            {
+            ret = 0X66;
+            break;
+            }
+        case 0x0067:
+            {
+            ret = 0X67;
+            break;
+            }
+        case 0x0068:
+            {
+            ret = 0X68;
+            break;
+            }
+        case 0x0069:
+            {
+            ret = 0X69;
+            break;
+            }
+        case 0x006A:
+            {
+            ret = 0X6A;
+            break;
+            }
+        case 0x006B:
+            {
+            ret = 0X6B;
+            break;
+            }
+        case 0x006C:
+            {
+            ret = 0X6C;
+            break;
+            }
+        case 0x006D:
+            {
+            ret = 0X6D;
+            break;
+            }
+        case 0x006E:
+            {
+            ret = 0X6E;
+            break;
+            }
+        case 0x006F:
+            {
+            ret = 0X6F;
+            break;
+            }
+        case 0x0070:
+            {
+            ret = 0X70;
+            break;
+            }
+        case 0x0071:
+            {
+            ret = 0X71;
+            break;
+            }
+        case 0x0072:
+            {
+            ret = 0X72;
+            break;
+            }
+        case 0x0073:
+            {
+            ret = 0X73;
+            break;
+            }
+        case 0x0074:
+            {
+            ret = 0X74;
+            break;
+            }
+        case 0x0075:
+            {
+            ret = 0X75;
+            break;
+            }
+        case 0x0076:
+            {
+            ret = 0X76;
+            break;
+            }
+        case 0x0077:
+            {
+            ret = 0X77;
+            break;
+            }
+        case 0x0078:
+            {
+            ret = 0X78;
+            break;
+            }
+        case 0x0079:
+            {
+            ret = 0X79;
+            break;
+            }
+        case 0x007A:
+            {
+            ret = 0X7A;
+            break;
+            }
+        case 0x00E4:
+            {
+            ret = 0X7B;
+            break;
+            }
+        case 0x00F6:
+            {
+            ret = 0X7C;
+            break;
+            }
+        case 0x00F1:
+            {
+            ret = 0X7D;
+            break;
+            }
+        case 0x00FC:
+            {
+            ret = 0X7E;
+            break;
+            }
+        case 0x00E0:
+            {
+            ret = 0X7F;
+            break;
+            }
+        case 0x005E:
+            {
+            ret = 0X94;  /* ^ */
+            break;
+            }
+        case 0x007B:
+            {
+            ret = 0XA8; /* { */
+            break;
+            }
+        case 0x007D:
+            {
+            ret = 0XA9; /* } */
+            break;
+            }
+        case 0x005C:
+            {
+            ret = 0XAF; /* \ */
+            break;
+            }
+        case 0x007E:
+            {
+            ret = 0XBD; /* ~ */
+            break;
+            }
+        case 0x005B:
+            {
+            ret = 0XBC; /* [ */
+            break;
+            }
+        case 0x005D:
+            {
+            ret = 0XBE; /* ] */
+            break;
+            }
+        case 0x007C:
+            {
+            ret = 0XC0; /* | */
+            break;
+            }
+        case 0x20AC:
+            {
+            ret = 0XE5; /* The euro character */
+            break;
+            }
+        default:
+            {
+            ret = 0X9B; /* If illegal gsm char return space */
+            break;
+            }
+       }
+
+    return ret;
+    }
+// -----------------------------------------------------------------------------
+// CMmStaticUtility::Get16Bit
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt CMmStaticUtility::Get16Bit
+    (
+    const TDesC8& aSource, //Source
+    TInt aIndex            //Index
+    )
+ {
+ TFLOGSTRING("TSY: CMmStaticUtility::Get16bit");
+ OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GET16BIT, "CMmStaticUtility::Get16Bit" );
+
+ TInt target( 0 );
+
+ if ( aIndex + 1 < aSource.Length() )
+     {
+     target = TUint16( aSource[aIndex] ) << 8;
+     target = TUint16( target | aSource[aIndex + 1] );
+     }
+     
+ return target;
+ }
 
 // ==================== OTHER EXPORTED FUNCTIONS ===============================
     //None

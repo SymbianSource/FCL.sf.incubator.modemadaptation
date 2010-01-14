@@ -279,7 +279,7 @@ EXPORT_C TBool DReqQueue::Add( TIADReq aReq )
     NKern::FMWait( iQueueMutex );
     // If queue get's overfilled throw kernel fault.
     ASSERT_RESET_ALWAYS( ( iCount < iSize ), EIADQueueOutOfSync | EIADFaultIdentifier11 << KFaultIdentifierShift );
-    ASSERT_RESET_ALWAYS( EIADAsyncLast > aReq.iRequest, EIADOverTheLimits | EIADFaultIdentifier11 << KFaultIdentifierShift );
+    ASSERT_RESET_ALWAYS( EIADAsyncLast > aReq.iRequest, EIADOverTheLimits | EIADFaultIdentifier11 << KFaultIdentifierShift | (TUint8)aReq.iRequest << KExtraInfoShift);
     if( iReqList[ aReq.iRequest ] )
         {
         // Place the buffer into the queue.
@@ -351,7 +351,7 @@ EXPORT_C void DReqQueue::SetReq( TIADAsyncRequest aReqToSet, TRequestStatus* aSt
     // If setting same request twice.
     C_TRACE( ( _T( "DReqQueue::SetReq 0x%x %d 0x%x 0x%x TBR" ), this, aReqToSet, aStatus, iReqList[ aReqToSet ] ) );
     //jos !NULL ja !NULL fault
-    ASSERT_RESET_ALWAYS( !( !iReqList[ aReqToSet ] && aStatus == NULL ), EIADCommon );
+    ASSERT_RESET_ALWAYS( !( !iReqList[ aReqToSet ] && aStatus == NULL ), EIADCommon | (TUint8)aReqToSet << KExtraInfoShift );
     iReqList[ aReqToSet ] = aStatus;
     C_TRACE( ( _T( "DReqQueue::SetReq 0x%x %d 0x%x <-" ), this, aReqToSet, aStatus ) );
 
@@ -365,7 +365,7 @@ EXPORT_C TRequestStatus* DReqQueue::GetReq( TIADAsyncRequest aReqToGet )
     {
     OstTraceExt2( TRACE_NORMAL, DREQQUEUE_GETREQ_ENTRY, ">DReqQueue::GetReq;aReqToGet=%x;this=%x", (TUint)this, ( TUint )&( aReqToGet ) );
 
-    ASSERT_RESET_ALWAYS( aReqToGet < EIADAsyncLast, EIADWrongRequest | EIADFaultIdentifier14 << KFaultIdentifierShift );
+    ASSERT_RESET_ALWAYS( aReqToGet < EIADAsyncLast, EIADWrongRequest | EIADFaultIdentifier14 << KFaultIdentifierShift | (TUint8)aReqToGet << KExtraInfoShift );
     
     C_TRACE( ( _T( "DReqQueue::GetReq 0x%x 0x%x %d <->" ), this, iReqList[ aReqToGet ], aReqToGet ) );
     

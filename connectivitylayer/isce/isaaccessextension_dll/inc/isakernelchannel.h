@@ -90,6 +90,9 @@ NONSHARABLE_CLASS( DISAKernelChannel ) : public MIAD2ChannelApi
 
         // Checking context.
         void CheckDfc();
+        
+        //From objectapi
+        void Receive( const TDesC8& aMessage );
 
   private:
 

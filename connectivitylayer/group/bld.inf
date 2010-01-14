@@ -22,11 +22,8 @@ PRJ_PLATFORMS
 DEFAULT
 
 #include "../usbphonetlink/group/bld.inf"
-
-#ifdef NCP_COMMON_BRIDGE_FAMILY
 #include "../isce/group/bld.inf"
 #include "../isimessage/group/bld.inf"
-#endif
 
 PRJ_EXPORTS
 ../rom/connectivitylayer.iby					NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(connectivitylayer.iby)

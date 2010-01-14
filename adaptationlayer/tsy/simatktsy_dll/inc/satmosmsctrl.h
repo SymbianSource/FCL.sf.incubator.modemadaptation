@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -137,8 +137,8 @@ class CSatMoSmsCtrl : public CBase
         * @param aAddressData2 TP address
         * @return none
         */
-        void SendMoSmsCtrlEnvelope( TUint8 aTraId, TDes8& aAddressData1,
-            TDes8& aAddressData2 );
+        void SendMoSmsCtrlEnvelope( TUint8 aTraId, const TDesC8& aAddressData1,
+            const TDesC8& aAddressData2 );
 
         /*
         * Handles UICC_CAT_RESP, which comes from SIM as a reply

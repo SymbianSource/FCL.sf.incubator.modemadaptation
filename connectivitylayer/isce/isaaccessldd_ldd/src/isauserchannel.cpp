@@ -82,7 +82,7 @@ void DISAUserChannel::CheckDfc()
     }
 
 #ifdef _DEBUG
-#define    ASSERT_DFCTHREAD_INLDD() CheckDfc()
+#define    ASSERT_DFCTHREAD_INLDD()// CheckDfc()
 #else
 #define    ASSERT_DFCTHREAD_INLDD()
 #endif
@@ -1654,5 +1654,15 @@ OstTraceExt3( TRACE_NORMAL, DISAUSERCHANNEL_DOCANCEL_ENTRY, ">DISAUserChannel::D
     OstTrace0( TRACE_NORMAL, DISAUSERCHANNEL_DOCANCEL_EXIT, "<DISAUserChannel::DoCancel" );
     }
 
+//From objectapi
+void DISAUserChannel::Receive(
+        const TDesC8& aMessage
+        )
+    {
+    C_TRACE( ( _T( "DISAUserChannel::Receive 0x%x ->" ), &aMessage ) );
+    ReceiveMsg( aMessage );
+    C_TRACE( ( _T( "DISAUserChannel::Receive 0x%x <-" ), &aMessage ) );
+    } 
+    
 
 

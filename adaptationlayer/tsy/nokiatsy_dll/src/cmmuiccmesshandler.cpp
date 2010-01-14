@@ -22,6 +22,8 @@
 #include "cmmphonetsender.h"
 #include "tsylogger.h"
 #include "cmmmessagerouter.h"
+#include "cmmstaticutility.h"
+#include "cmmphonemesshandler.h"
 
 #include <ctsy/serviceapi/mmtsy_ipcdefs.h>
 #include <e32cmn.h>
@@ -215,6 +217,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CONSTRUCTL, "CMmUiccMessHandler::Con
     iIsimApplicationId = UICC_APPL_ID_UNKNOWN;
     iIsimApplicationStatus = UICC_STATUS_APPL_NOT_ACTIVE;
     iIsimApplicationFound = EFalse;
+    iCompleteSimStatusReady = ETrue;
     iPin1Id = 0;
     iPin2Id = 0;
     iActivePin = RMobilePhone::ESecurityCodePin1;
@@ -266,6 +269,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CMMUICCMESSHANDLER, "CMmUiccMessHand
 void CMmUiccMessHandler::ReceiveMessageL( const TIsiReceiveC& aIsiMsg )
     {
     TInt status( KErrNone );
+    TUint8 details ( UICC_NO_DETAILS );
     TUint8 messageId( aIsiMsg.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
     TUint8 trId( aIsiMsg.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
     TUint8 serviceType( 0 );
@@ -351,6 +355,10 @@ OstTraceExt2( TRACE_NORMAL, CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMessHand
             {
             status = aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_APPL_CMD_RESP_OFFSET_STATUS );
+            
+            details = aIsiMsg.Get8bit(
+                    ISI_HEADER_SIZE + UICC_APPL_CMD_RESP_OFFSET_DETAILS );
+            
             TInt8 serviceType( aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_APPL_CMD_RESP_OFFSET_SERVICETYPE ) );
 
@@ -458,7 +466,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMessHa
             {
             iMessHandlerPrtList[trId] = NULL;
             }
-        messHandler->ProcessUiccMsg( trId, status, fileData );
+        messHandler->ProcessUiccMsg( trId, status, details, fileData );
         }
     else
         {
@@ -1272,15 +1280,23 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_HANDLEUICCAPPLICATIONRESP, "CMmUiccM
                     EIsiSubBlockTypeId16Len16,
                     uiccSbFciOffset ) )
                     {
-                    TInt fileDataLength( aIsiMsg.Get16bit(
-                        uiccSbFciOffset + UICC_SB_FCI_OFFSET_FCILENGTH ) );
-                    if ( 0 < fileDataLength )
+                    // Check is the SIM UICC
+                    TPtrC8 data( KNullDesC8 );
+
+                    // The whole sub block is returned
+                    TInt sbLength( aIsiMsg.Get16bit(
+                        uiccSbFciOffset + UICC_SB_FCI_OFFSET_SBLEN ) );
+                    data.Set( aIsiMsg.GetData(
+                        uiccSbFciOffset,
+                        sbLength ) );
+
+                    TFci fci( data );
+                    if( UICC_CARD_TYPE_UICC == fci.GetTypeOfCard() )
                         {
-                        StorePinKeyReferences( aIsiMsg.GetData(
-                            uiccSbFciOffset + UICC_SB_FCI_OFFSET_FCI,
-                            fileDataLength ) );
+                        StorePinKeyReferences( data );
                         }
                     }
+
                 // In case of ICC there is two UICC_SB_CHV subblocks
                 // that contain PIN IDs for ICC application
                 TUint uiccSbChvOffset( 0 );
@@ -1341,11 +1357,12 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETFILEFCI, "CMmUiccMessHandler::Get
         EIsiSubBlockTypeId16Len16,
         uiccSbFileDataOffset ) )
         {
-        TInt fileDataLength( aIsiMsg.Get16bit(
-            uiccSbFileDataOffset + UICC_SB_FCI_OFFSET_FCILENGTH ) );
+        // The whole sub block is returned
+        TInt sbLength( aIsiMsg.Get16bit(
+            uiccSbFileDataOffset + UICC_SB_FCI_OFFSET_SBLEN ) );
         data.Set( aIsiMsg.GetData(
-            uiccSbFileDataOffset + UICC_SB_FCI_OFFSET_FCI,
-            fileDataLength ) );
+            uiccSbFileDataOffset,
+            sbLength ) );
         }
     return data;
     }
@@ -1647,11 +1664,15 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATECARDREQ, "CMmUiccMessHandler::
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void CMmUiccMessHandler::InitializeSimServiceTableCache()
+void CMmUiccMessHandler::InitializeSimServiceTableCache( TBool aComplete )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::InitializeSimServiceTableCache" );
 OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_INITIALIZESIMSERVICETABLECACHE, "CMmUiccMessHandler::InitializeSimServiceTableCache" );
 
+    // Service table internal cacheing is done during strtup  and SIM refresh.
+    // Completing of IPC EMmTsyBootNotifySimStatusReadyIPC is done only
+    // in case of startup.
+    iCompleteSimStatusReady = aComplete;
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccReadTransparent params;
     params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
@@ -1710,10 +1731,20 @@ TFLOGSTRING2("TSY: CMmUiccMessHandler::SimServiceTableCacheResp: reading failed 
 OstTrace1( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_SIMSERVICETABLECACHERESP, "CMmUiccMessHandler::SimServiceTableCacheResp: reading failed (%x)", aStatus );
         }
 
-    //Complete Notify SIM Ready
-    iMessageRouter->Complete(
-        EMmTsyBootNotifySimStatusReadyIPC,
-        KErrNone );
+    // Cacheing during startup
+    if ( iCompleteSimStatusReady )
+        {
+        //Complete Notify SIM Ready
+        iMessageRouter->Complete(
+            EMmTsyBootNotifySimStatusReadyIPC,
+            KErrNone );
+        }
+    else // Cacheing from SIM refresh
+        {
+        iMessageRouter->GetPhoneMessHandler()->
+            ServiceTableCachingCompleted( aStatus );
+        iCompleteSimStatusReady = ETrue; // Default value
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -1807,6 +1838,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_GETSERVICESTATUS, "CMmUiccMessH
 TInt CMmUiccMessHandler::ProcessUiccMsg(
     TInt aTraId,
     TInt aStatus,
+    TUint8 /*aDetails*/,
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY: CMmUiccMessHandler::ProcessUiccMsg, transaction ID: %d, status: %d", aTraId, aStatus );
@@ -1847,36 +1879,40 @@ void CMmUiccMessHandler::StorePinKeyReferences( const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::StorePinKeyReferences" );
 OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_STOREPINKEYREFERENCES, "CMmUiccMessHandler::StorePinKeyReferences" );
+
+    // Get offset for PIN Status Template DO
+    TFci fci( aFileData );
+    TInt pSTDoOffset( fci.GetOffsetOfTLV( KPINStatusTemplateDO ) );
+
     // See ETSI TS 102 221 V7.11.0 (2008-07)chapter 9.5.2
     // There is only one PIN1/PIN2/UPIN per application
-    TUint8 lengthOfPs( aFileData[3] ); // Number of PS bytes is in index 3
+    TUint8 lengthOfPs( aFileData[( pSTDoOffset + 3 )] ); // Number of PS bytes is in index 3
 
     // Get PS_DO for PIN statuses
     TPtrC8 psDo;
-    psDo.Set( aFileData.Mid( 4, lengthOfPs ) );
+    psDo.Set( aFileData.Mid( ( pSTDoOffset + 4 ), lengthOfPs ) );
 
     // Update index to point the first PIN
-    TUint8 index( 4 + lengthOfPs );
-    // Copy PIN related data to new buffer
-    TPtrC8 pinDataBuffer;
-    pinDataBuffer.Set( aFileData.Mid( index ) );
-    TInt length( pinDataBuffer.Length() );
+    TUint8 index( pSTDoOffset + 4 + lengthOfPs );
     TUint8 pinId( 0 );
     TUint8 orderNum( 0 ); // Used for shifting PIN status byte
     TBool upinExists( EFalse );
     TBool pin1Active( EFalse );
 
-    index = 0; // Start of new buffer
-    while( length )
+    TInt totalLength( aFileData[( pSTDoOffset + 1 )]);
+    // Length of PIN data is total length - PS_DO tag - PS_DO tag length -
+    // PS_DO tag bytes.
+    TInt length( totalLength - 1 - 1 - lengthOfPs );
+    for ( TInt i( 0 ); i < length; i++ )
         {
         // Check if usage qualifier exists ( tag '95'). In that case skip it
-        if ( 0x95 == pinDataBuffer[index] )
+        if ( 0x95 == aFileData[index] )
             {
             index += 3;
             length -= 3;
             }
         // PIN key reference
-        pinId = pinDataBuffer[index + 2];
+        pinId = aFileData[index + 2];
         index += 3; // Skip PIN key reference data element
         length -= 3;
 
@@ -2014,7 +2050,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP, "CMmUiccMe
     if ( UICC_STATUS_OK == aStatus )
         {
         // First byte of CPHS information is for CPHS phase, lbut
-        // we are interested in only CPHS table, so we skip the 
+        // we are interested in only CPHS table, so we skip the
         // first byte and we just copy the CPHS table data
         TUint8 dataSize( aFileData.Length() - 1 );
         if( KEfCphsInfoSize >= dataSize )
@@ -2084,5 +2120,331 @@ OstTrace1( TRACE_NORMAL, CMMUICCMESSHANDLER_GETCPHSINFORMATIONSTATUS, "CMmUiccMe
     return ret;
     }
 
+// -----------------------------------------------------------------------------
+// TFci::GetLength
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt TFci::GetLength()
+    {
+    TInt lengthOfFCISb( 0 );
+
+    lengthOfFCISb = CMmStaticUtility::Get16Bit( iData,
+                                                UICC_SB_FCI_OFFSET_SBLEN );
+TFLOGSTRING2("TSY: TFci::GetLength lengthOfFCISb = %d", lengthOfFCISb );
+OstTrace1( TRACE_NORMAL, TFCI_GETLENGTH, "TFci::GetLength;lengthOfFCISb=%d", lengthOfFCISb );
+
+    return lengthOfFCISb;
+    }
+
+// -----------------------------------------------------------------------------
+// TFci::GetTypeOfCard
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TUint8 TFci::GetTypeOfCard()
+    {
+    TUint8 uiccCardType( iData[UICC_SB_FCI_OFFSET_CARDTYPE] );
+TFLOGSTRING2("TSY: TFci::GetTypeOfCard uiccCardType = %d", uiccCardType );
+OstTraceExt1( TRACE_NORMAL, TFCI_GETTYPEOFCARD, "TFci::GetTypeOfCard;uiccCardType=%hhu", uiccCardType );
+
+    return uiccCardType;
+    }
+
+// -----------------------------------------------------------------------------
+// TFci::::GetOffsetOfTLV
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt TFci::GetOffsetOfTLV( const TUint8 aDescription )
+    {
+TFLOGSTRING("TSY: TFci::::GetOffsetOfTLV" );
+OstTrace0( TRACE_NORMAL, TFCI_GETOFFSETOFTLV, "TFci::GetOffsetOfTLV" );
+
+    TInt indexOfData( 0 );
+    TInt length( GetLength() );
+
+    // Length is    1 or 2 bytes long
+    // (see TS 102 221 11.1.1.3 Response Data)
+    // If the 1st byte of length is 0x81 the length is 2 bytes long
+
+    // Length starts from the 2nd byte of the FCI
+    indexOfData = UICC_SB_FCI_OFFSET_FCI + 1;
+
+    // Length is 2 bytes ? Skip the 1st byte
+    if ( 0x81 == iData[indexOfData] )
+        {
+        indexOfData++;
+        }
+    // Skip the length (1st or 2nd byte depending on the length)
+    indexOfData++;
+
+    while ( indexOfData < length )
+        {
+        if ( aDescription == iData[indexOfData] )
+            {
+            // Return indexOfData
+            break;
+            }
+        else
+            {
+            // Move index to the start of next descriptor
+            indexOfData++; // Length of current descriptor
+            indexOfData += iData[indexOfData] + 1;
+            }
+        }
+
+    // Not found
+    if ( indexOfData >= length )
+        {
+        indexOfData = 0;
+        }
+
+    return indexOfData;
+    }
+
+// -----------------------------------------------------------------------------
+// TFci::GetNumberOfRecords
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt TFci::GetNumberOfRecords()
+    {
+TFLOGSTRING("TSY: TFci::GetNumberOfRecords" );
+OstTrace0( TRACE_NORMAL, TFCI_GETNUMBEROFRECORDS, "TFci::GetNumberOfRecords" );
+
+    TInt numberOfRecords( 0 );
+    TUint8 uiccCardType( GetTypeOfCard());
+
+    if ( UICC_CARD_TYPE_UICC == uiccCardType )
+        {
+        // Get 3G SIM data see TS 102 221 11.1.1.4.3 File Descriptor
+        TInt indexOfData( GetOffsetOfTLV( KFileDescriptor ) );
+
+        if ( 0 != indexOfData )
+            {
+            indexOfData++; // index of the data length
+            // if data length is 5 there is record count in the 6th byte
+            if ( 5 == iData[indexOfData] )
+                {
+                indexOfData += 5;
+                numberOfRecords = iData[indexOfData];
+                }
+            }
+        }
+    else if ( UICC_CARD_TYPE_ICC == uiccCardType )
+        {
+        TInt fileSize( 0 );
+        fileSize = CMmStaticUtility::Get16Bit(
+                         iData,
+                         ( UICC_SB_FCI_OFFSET_FCI + KFileSize2 ) );
+
+        TInt recordLength( 0 );
+        recordLength = iData[( UICC_SB_FCI_OFFSET_FCI + KRecordLength2 )];
+
+        // get the No of records
+        numberOfRecords = ( fileSize/recordLength );
+        }
+    else
+        {
+TFLOGSTRING("TSY: TFci::GetNumberOfRecords: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL, DUP2_TFCI_GETNUMBEROFRECORDS, "TFci::GetNumberOfRecords: UNKNOWN CARD TYPE" );
+        }
+
+TFLOGSTRING2("TSY: TFci::GetNumberOfRecords numberOfRecords = %d", numberOfRecords );
+OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETNUMBEROFRECORDS, "TFci::GetNumberOfRecords;numberOfRecords=%d", numberOfRecords );
+
+    return numberOfRecords;
+    }
+
+// -----------------------------------------------------------------------------
+// TFci::GetRecordLength
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt TFci::GetRecordLength()
+    {
+TFLOGSTRING("TSY: TFci::GetRecordLength" );
+OstTrace0( TRACE_NORMAL, TFCI_GETRECORDLENGTH, "TFci::GetRecordLength" );
+
+    TInt recordLength( 0 );
+    TUint8 uiccCardType( GetTypeOfCard());
+
+    if ( UICC_CARD_TYPE_UICC == uiccCardType )
+        {
+        // Get 3G SIM data see TS 102 221 11.1.1.4.3 File Descriptor
+        TInt indexOfData( GetOffsetOfTLV( KFileDescriptor ) );
+
+        if ( 0 != indexOfData )
+            {
+            indexOfData++; // index of the data length
+            // if data length is 5 there is record length in the
+            // 4th and 5th byte
+            if ( 5 == iData[indexOfData] )
+                {
+                indexOfData += 3;
+                recordLength = CMmStaticUtility::Get16Bit( iData,
+                                                           indexOfData );
+                }
+            }
+        }
+    else if ( UICC_CARD_TYPE_ICC == uiccCardType )
+        {
+        recordLength = iData[( UICC_SB_FCI_OFFSET_FCI + KRecordLength2 )];
+        }
+    else
+        {
+TFLOGSTRING("TSY: TFci::GetRecordLength: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL, DUP2_TFCI_GETRECORDLENGTH, "TFci::GetRecordLength: UNKNOWN CARD TYPE" );
+        }
+
+TFLOGSTRING2("TSY: TFci::GetRecordLength recordLength = %d", recordLength );
+OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETRECORDLENGTH, "TFci::GetRecordLength;recordLength=%d", recordLength );
+
+    return recordLength;
+    }
+
+// -----------------------------------------------------------------------------
+// TFci::GetSizeOfFile
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt TFci::GetSizeOfFile()
+    {
+TFLOGSTRING("TSY: TFci::GetSizeOfFile" );
+OstTrace0( TRACE_NORMAL, TFCI_GETSIZEOFFILE, "TFci::GetSizeOfFile" );
+
+    TInt fileSize( 0 );
+    TUint8 uiccCardType( GetTypeOfCard() );
+
+    if ( UICC_CARD_TYPE_UICC == uiccCardType )
+        {
+        // Get 3G SIM data see TS 102 221 11.1.1.4.1 File Size
+        TInt indexOfData( GetOffsetOfTLV( KFileSize ) );
+
+        if ( 0 != indexOfData )
+            {
+            indexOfData++; // index of the data length
+            // Data length must be 2 !
+            if ( 2 == iData[indexOfData] )
+                {
+                indexOfData++;
+                fileSize = CMmStaticUtility::Get16Bit( iData, indexOfData );
+                }
+            }
+        }
+    else if ( UICC_CARD_TYPE_ICC == uiccCardType )
+        {
+        fileSize = CMmStaticUtility::Get16Bit(
+                         iData,
+                         ( UICC_SB_FCI_OFFSET_FCI + KFileSize2 ) );
+        }
+    else
+        {
+TFLOGSTRING("TSY: TFci::GetFileSize: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL, DUP2_TFCI_GETSIZEOFFILE, "TFci::GetSizeOfFile: UNKNOWN CARD TYPE" );
+        }
+
+
+TFLOGSTRING2("TSY: TFci::GetSizeOfFile fileSize = %d", fileSize );
+OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETSIZEOFFILE, "TFci::GetSizeOfFile;fileSize=%d", fileSize );
+
+    return fileSize;
+    }
+
+// -----------------------------------------------------------------------------
+// TFci::GetFileIdentifier
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt TFci::GetFileIdentifier()
+    {
+TFLOGSTRING("TSY: TFci::GetFileIdentifier" );
+OstTrace0( TRACE_NORMAL, TFCI_GETFILEIDENTIFIER, "TFci::GetFileIdentifier" );
+
+    TInt fileIdentifier( 0 );
+    TUint8 uiccCardType( GetTypeOfCard());
+
+    if ( UICC_CARD_TYPE_UICC == uiccCardType )
+        {
+        // Get 3G SIM data see TS 102 221 11.1.1.4.4 File Identifier
+        TInt indexOfData( GetOffsetOfTLV( KFileIdentifier ) );
+
+        if ( 0 != indexOfData )
+            {
+            indexOfData++; // index of the data length
+            // Data length must be 2 !
+            if ( 2 == iData[indexOfData] )
+                {
+                indexOfData++;
+                fileIdentifier = CMmStaticUtility::Get16Bit( iData,
+                                                               indexOfData );
+                }
+            }
+        }
+    else if ( UICC_CARD_TYPE_ICC == uiccCardType )
+        {
+        // 4 is the index location for File ID which is 2 bytes long
+        fileIdentifier =
+            CMmStaticUtility::Get16Bit( iData,
+                                          ( UICC_SB_FCI_OFFSET_FCI + KFileId ) );
+        }
+    else
+        {
+TFLOGSTRING("TSY: TFci::GetFileIdentifier: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL, DUP2_TFCI_GETFILEIDENTIFIER, "TFci::GetFileIdentifier: UNKNOWN CARD TYPE" );
+        }
+
+TFLOGSTRING2("TSY: TFci::GetFileIdentifier fileIdentifier = %d", fileIdentifier );
+OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETFILEIDENTIFIER, "TFci::GetFileIdentifier;fileIdentifier=%d", fileIdentifier );
+
+    return fileIdentifier;
+    }
+
+// -----------------------------------------------------------------------------
+// TFci::GetFileStatus
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TUint8 TFci::GetFileStatus()
+    {
+TFLOGSTRING("TSY: TFci::GetFileStatus" );
+OstTrace0( TRACE_NORMAL, TFCI_GETFILESTATUS, "TFci::GetFileStatus" );
+
+    TUint8 fileStatus( 0 );
+    TUint8 uiccCardType( GetTypeOfCard());
+
+    if ( UICC_CARD_TYPE_UICC == uiccCardType )
+        {
+        TFLOGSTRING("TSY: TFci::GetFileStatus: NOT IN UICC" );
+        }
+    else if ( UICC_CARD_TYPE_ICC == uiccCardType )
+        {
+        // Get 2G SIM data
+        fileStatus = iData[( UICC_SB_FCI_OFFSET_FCI + KFileStatus )];
+        }
+    else
+        {
+TFLOGSTRING("TSY: TFci::GetFileStatus: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL, DUP1_TFCI_GETFILESTATUS, "TFci::GetFileStatus: UNKNOWN CARD TYPE" );
+        }
+
+TFLOGSTRING2("TSY: TFci::GetFileStatus fileStatus = %d", fileStatus );
+OstTraceExt1( TRACE_NORMAL, DUP2_TFCI_GETFILESTATUS, "TFci::GetFileStatus;fileStatus=%hhu", fileStatus );
+
+    return fileStatus;
+    }
+
+// -----------------------------------------------------------------------------
+// CMmUiccMessHandler::GetUiccClientId
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TUint8 CMmUiccMessHandler::GetUiccClientId()
+    {
+TFLOGSTRING("TSY: CMmUiccMessHandler::GetUiccClientId" );
+OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETUICCCLIENTID, "CMmUiccMessHandler::GetUiccClientId" );
+    return iUiccClientId;
+    }
 
 //  End of File

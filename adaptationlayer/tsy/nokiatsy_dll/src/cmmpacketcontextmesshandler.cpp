@@ -43,9 +43,9 @@
 #if (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
 #include <cmmcommonstaticutility.h>
 #endif // (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmpacketcontextmesshandlertraces.h"
+#include "cmmpacketcontextmesshandlerTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

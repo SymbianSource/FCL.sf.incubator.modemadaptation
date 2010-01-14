@@ -29,9 +29,9 @@
 #include <smsisi.h>             // sms server
 #include <etelmm.h>             // etel multimode api
 #include <uiccisi.h>            // UICC server
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "satdatadownloadtraces.h"
+#include "satdatadownloadTraces.h"
 #endif
 
 

@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -32,12 +32,6 @@
 #include <call_modemisi.h>
 #include <csdisi.h>
 #include <gssisi.h>
-
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-// Removed for Bridge camp!
-#include <mtcisi.h>
-#endif
-
 #include <infoisi.h>
 #include <net_modemisi.h>
 #include <uiccisi.h>
@@ -52,9 +46,9 @@
 #include <ctsy/serviceapi/gsmerror.h>
 #include <etelmmerr.h>
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmcustommesshandlertraces.h"
+#include "cmmcustommesshandlerTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES
@@ -283,15 +277,6 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NEWL, "CMmCustomMessHandler::NewL"
         PN_GSS,
         GSS_HSXPA_USER_SETTING_IND );
 
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-    // MTC
-    // Removed for Bridge camp
-    aPhoNetReceiver->RegisterL(
-        customMessHandler,
-        PN_MTC,
-        MTC_RAT_QUERY_RESP );
-#endif
-
     // PMM
     /* To be done in CPS
     aPhoNetReceiver->RegisterL( customMessHandler,
@@ -344,7 +329,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CONSTRUCTL, "CMmCustomMessHandler:
 
     // Initialize Call Life Timer value.
     iCallLifeTimer = KCallLifeTimerNotSet;
-    
+
     // initialize ISim application activation status
     iIsimApplActivated = EFalse;
     }
@@ -509,28 +494,6 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMe
                 }
             break;
             }
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-        // Removed for Bridge camp
-        case PN_MTC:
-            {
-            switch( messageId )
-                {
-                case MTC_RAT_QUERY_RESP:
-                    {
-                    MtcRatQueryResp( aIsiMessage );
-                    break;
-                    }
-                default:
-                    {
-TFLOGSTRING("TSY: CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_MTC, switch messageId - default");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_MTC, switch messageId - default" );
-                    break;
-                    }
-                }
-            break;
-            }
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
         case PN_INFO:
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
@@ -2019,7 +1982,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLEMERGENCYNBRCHECKRESP, "CMmCus
   // packed parameter: TBool result
   CMmDataPackage dataPackage;
   dataPackage.PackData( &result );
-  
+
   TFLOGSTRING2( "TSY: TSY: CMmCustomMessHandler::CallEmergencyNbrCheckResp status: %d", status);
   TFLOGSTRING2( "TSY: TSY: CMmCustomMessHandler::CallEmergencyNbrCheckResp emergency number: %S", &telNumber);
     //we complete with KErrNone as there is always a value to return
@@ -2871,7 +2834,8 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETRATRESP, "CMmCustomMessHan
 // -----------------------------------------------------------------------------
 // CMmCustomMessHandler::GssCsServiceResp
 // Breaks a GSS_CS_SERVICE_RESP ISI message.
-// completes ECustomSetSystemNetworkModeIPC, ECustomSetBandSelectionIPC or
+// completes ECustomSetSystemNetworkModeIPC,
+// ECustomGetCurrentSystemNetworkModesIPC, ECustomSetBandSelectionIPC or
 // ECustomGetBandSelectionIPC with KErrNone to SOS layer.
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
@@ -2879,40 +2843,93 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETRATRESP, "CMmCustomMessHan
 void CMmCustomMessHandler::GssCsServiceResp (
         const TIsiReceiveC& aIsiMessage ) // Received isi message
     {
-    TFLOGSTRING( "TSY: CMmCustomMessHandler::GssCsServiceResp" );
+TFLOGSTRING( "TSY: CMmCustomMessHandler::GssCsServiceResp" );
 OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp" );
 
     TUint8 transactId ( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + GSS_CS_SERVICE_RESP_OFFSET_TRANSID ) );
 
-    TUint8 operation ( aIsiMessage.Get8bit(
-        ISI_HEADER_SIZE + GSS_CS_SERVICE_RESP_OFFSET_OPERATION ) );
-
-    // GSS_SELECTED_RAT_WRITE (0x0E)
-    if ( KCustomTransId == transactId && GSS_SELECTED_RAT_WRITE == operation )
+    if ( KCustomTransId == transactId )
         {
-        //completion ResetGssServer method (no packed parameters)
-        TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetSystemNetworkModeIPC");
+        TUint8 operation ( aIsiMessage.Get8bit(
+            ISI_HEADER_SIZE + GSS_CS_SERVICE_RESP_OFFSET_OPERATION ) );
+
+        // GSS_SELECTED_RAT_WRITE (0x0E)
+        if ( GSS_SELECTED_RAT_WRITE == operation )
+            {
+TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetSystemNetworkModeIPC");
 OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetSystemNetworkModeIPC" );
-        iMessageRouter->Complete( ECustomSetSystemNetworkModeIPC, KErrNone );
-        }
-
-// not suppoted for S60 ver 3.2
+            //completion ResetGssServer method (no packed parameters)
+            iMessageRouter->Complete( ECustomSetSystemNetworkModeIPC, KErrNone );
+            }
+        // GSS_SELECTED_RAT_READ (0x9C)
+        else if ( GSS_SELECTED_RAT_READ == operation )
+            {
+TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Complete ECustomGetCurrentSystemNetworkModesIPC");
+OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp - Complete ECustomGetCurrentSystemNetworkModesIPC" );
+            TInt err( KErrNone );
+            TUint32 ratMode ( RMmCustomAPI::KCapsNetworkModeDual );
+            TUint subblockOffset( 0 );
+            if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+                ISI_HEADER_SIZE + SIZE_GSS_CS_SERVICE_RESP,
+                GSS_RAT_INFO,
+                EIsiSubBlockTypeId8Len8,
+                subblockOffset ) )
+                {
+                TUint8 mode = aIsiMessage.Get8bit( subblockOffset +
+                    GSS_RAT_INFO_OFFSET_FUNCTION );
+                switch ( mode )
+                    {
+                    case GSS_GSM_RAT:
+                        {
+                        ratMode = RMmCustomAPI::KCapsNetworkModeGsm;
+                        break;
+                        }
+                    case GSS_UMTS_RAT:
+                        {
+                        ratMode = RMmCustomAPI::KCapsNetworkModeUmts;
+                        break;
+                        }
+                    case GSS_DUAL_RAT:
+                        {
+                        ratMode = RMmCustomAPI::KCapsNetworkModeDual;
+                        break;
+                        }
+                    default:
+                        {
+TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Unrecognized RAT");
+OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp - Unrecognized RAT" );
+                        err = KErrGeneral;
+                        break;
+                        }
+                    }
+                }
+            else
+                {
+                err = KErrGeneral;
+                }
+            CMmDataPackage dataPackage;
+            dataPackage.PackData( &ratMode );
+            //completion ResetNetServer method (packed parameters)
+            iMessageRouter->Complete( ECustomGetCurrentSystemNetworkModesIPC,
+                &dataPackage, err );
+            }
+    // not suppoted for S60 ver 3.2
 #if ( NCP_COMMON_S60_VERSION_SUPPORT != S60_VERSION_32 )
-
-    // GSS_SELECTED_BANDS_WRITE (0x9D)
-    else if ( GSS_SELECTED_BANDS_WRITE == operation )
-        {
-        TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetBandSelectionIPC");
+        // GSS_SELECTED_BANDS_WRITE (0x9D)
+        else if ( GSS_SELECTED_BANDS_WRITE == operation )
+            {
+TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetBandSelectionIPC");
 OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetBandSelectionIPC" );
-        iMessageRouter->Complete( ECustomSetBandSelectionIPC, KErrNone );
-        }
-    // GSS_SELECTED_BANDS_READ (0x9E)
-    else if ( GSS_SELECTED_BANDS_READ == operation )
-        {
-        CompleteGetBandSelection( aIsiMessage );
-        }
+            iMessageRouter->Complete( ECustomSetBandSelectionIPC, KErrNone );
+            }
+        // GSS_SELECTED_BANDS_READ (0x9E)
+        else if ( GSS_SELECTED_BANDS_READ == operation )
+            {
+            CompleteGetBandSelection( aIsiMessage );
+            }
 #endif // NCP_COMMON_S60_VERSION_SUPPORT
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -3116,6 +3133,30 @@ OstTraceExt1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICEREQ, "CMmCustomMess
     }
 
 // -----------------------------------------------------------------------------
+// CMmCustomMessHandler::GssCsServiceReq
+// Constructs GSS_CS_SERVICE_REQ ISI message from input parameters and
+// sends it through phonet.
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt CMmCustomMessHandler::GssCsServiceReq
+        (
+        TUint8 aTransId   //transaction Id
+        )
+    {
+TFLOGSTRING( "TSY: CMmCustomMessHandler::GssCsServiceReq" );
+OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICEREQ, "CMmCustomMessHandler::GssCsServiceReq" );
+
+    TBuf8<KTwo> messageData;
+
+    messageData.Append( GSS_SELECTED_RAT_READ );
+    messageData.Append( 0 ); // number of subblocks
+
+    // Sending message to phonet
+    return iPhoNetSender->Send( PN_GSS, aTransId, GSS_CS_SERVICE_REQ, messageData );
+    }
+
+// -----------------------------------------------------------------------------
 // CMmCustomMessHandler::ExtFuncL
 // Forwards requests coming from the Symbian OS layer to the
 // specific method.
@@ -3305,16 +3346,12 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_EXTFUNCL, "CMmCustomMessHandl
             ret = GssCsServiceReq( transId, networkModeCaps  );
             break;
             }
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
         // Current network modes
-        // Removed for Bridge camp!
         case ECustomGetCurrentSystemNetworkModesIPC:
             {
-            ret = MtcRatQueryReq( transId );
+            ret = GssCsServiceReq( transId );
             break;
             }
-#endif /*  INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
         // Get GSM/WCDMA cell info
         case ECustomGetCellInfoIPC:
             {
@@ -3504,6 +3541,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_EXTFUNCL, "CMmCustomMessHandl
 TInt CMmCustomMessHandler::ProcessUiccMsg(
     TInt aTraId,
     TInt aStatus,
+    TUint8 /*aDetails*/,
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY: CMmCustomMessHandler::ProcessUiccMsg, transaction ID: %d, status: %d", aTraId, aStatus );
@@ -3675,91 +3713,6 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_PROCESSUICCMSG, "CMmCustomMes
         }
     return ret;
     }
-
-// -----------------------------------------------------------------------------
-// CMmCustomMessHandler::MtcRatQueryReq
-// Constructs MTC_RAT_QUERY_REQ ISI message from input parameters and
-// sends it through phonet.
-// (other items were commented in a header).
-// -----------------------------------------------------------------------------
-//
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-// Removed for Bridge camp
-TInt CMmCustomMessHandler::MtcRatQueryReq
-        (
-        TUint8 aTransId   //transaction Id
-        )
-    {
-    TFLOGSTRING("TSY: CMmCustomMessHandler::MtcRatQueryReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_MTCRATQUERYREQ, "CMmCustomMessHandler::MtcRatQueryReq" );
-
-    TBuf8<KTwo> messageData;
-
-    //append padding bytes
-    messageData.Append( 0 );
-    messageData.Append( 0 );
-
-    // Sending message to phonet
-    return iPhoNetSender->Send( PN_MTC, aTransId, MTC_RAT_QUERY_REQ, messageData );
-    }
-
-// -----------------------------------------------------------------------------
-// CMmCustomMessHandler::MtcRatQueryResp
-// Breaks a MTC_RAT_QUERY_RESP ISI message.
-// This method get the ratMode and complete the request with error value
-// to SOS layer.
-// (other items were commented in a header).
-// -----------------------------------------------------------------------------
-//
-// Removed for Bridge camp
-void CMmCustomMessHandler::MtcRatQueryResp
-        (
-        const TIsiReceiveC& aIsiMessage // Received isi message
-        )
-    {
-    TInt ret ( KErrNone );
-
-    TUint32 ratMode ( RMmCustomAPI::KCapsNetworkModeDual );
-    TUint8 mode = aIsiMessage.Get8bit( ISI_HEADER_SIZE + MTC_RAT_QUERY_RESP_OFFSET_RAT );
-
-TFLOGSTRING3("TSY: CMmCustomMessHandler::MtcRatQueryResp. RatMode:%d, mode:%d", ratMode, mode);
-OstTraceExt2( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_MTCRATQUERYRESP, "CMmCustomMessHandler::MtcRatQueryResp;mode=%hhu;ratMode=%u", mode, ratMode );
-
-    switch ( mode )
-        {
-        case MTC_GSM_RAT:
-            {
-            ratMode = RMmCustomAPI::KCapsNetworkModeGsm;
-            break;
-            }
-        case MTC_UMTS_RAT:
-            {
-            ratMode = RMmCustomAPI::KCapsNetworkModeUmts;
-            break;
-            }
-        case MTC_NO_RAT_SELECTION: //this means dual mode
-            {
-            //value already initalized to dual
-            break;
-            }
-        default: // MTC_UNKNOWN_RAT
-            {
-            TFLOGSTRING("TSY: CMmCustomMessHandler::MtcRatQueryResp, switch mode - default.\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_MTCRATQUERYRESP, "CMmCustomMessHandler::MtcRatQueryResp, switch mode - default" );
-            ret = KErrGeneral;
-            break;
-            }
-        }
-
-    CMmDataPackage dataPackage;
-    dataPackage.PackData( &ratMode );
-
-    //completion ResetNetServer method (packed parameters)
-    iMessageRouter->Complete( ECustomGetCurrentSystemNetworkModesIPC,
-        &dataPackage, ret );
-
-    }
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
 // -----------------------------------------------------------------------------
 // CMmCustomMessHandler::UiccReadViagHomeZoneParametersReq
@@ -5961,7 +5914,7 @@ OstTraceExt1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCIND, "CMmCustomMessHandler:
 // Constructs and sends AUTHENTICATE APDU to the UICC server
 // -----------------------------------------------------------------------------
 //
-TInt CMmCustomMessHandler::UiccSendAuthenticateApdu( 
+TInt CMmCustomMessHandler::UiccSendAuthenticateApdu(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu.\n" );
@@ -6024,9 +5977,9 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCust
             else if( UICC_CARD_TYPE_UICC == cardType )
                 {
                 // In 3G we need to send command AUTHENTICATE to the UICC
-                UiccCreate3GSecurityContextApdu( 
-                    params, 
-                    eapAka.iRandomParameters, 
+                UiccCreate3GSecurityContextApdu(
+                    params,
+                    eapAka.iRandomParameters,
                     eapAka.iAUTN,
                     ETrIdEEapAkaAuthenticate );
                 apduSendNeeded = ETrue;
@@ -6037,7 +5990,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCust
             {
             serviceStatus = iMmUiccMessHandler->GetServiceStatus( KServiceGBA );
 
-            if( UICC_CARD_TYPE_UICC == cardType && 
+            if( UICC_CARD_TYPE_UICC == cardType &&
                 EFalse != serviceStatus )
                 {
                 UiccCreateGBABootstrappingApdu( params, aDataPackage );
@@ -6056,7 +6009,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
             {
             serviceStatus = iMmUiccMessHandler->GetServiceStatus( KServiceGBA );
 
-            if( UICC_CARD_TYPE_UICC == cardType && 
+            if( UICC_CARD_TYPE_UICC == cardType &&
                 EFalse != serviceStatus )
                 {
                 UiccGBABootstrapUpdate( aDataPackage );
@@ -6074,7 +6027,7 @@ OstTraceExt2( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
             {
             serviceStatus = iMmUiccMessHandler->GetServiceStatus( KServiceGBA );
 
-            if( UICC_CARD_TYPE_UICC == cardType && 
+            if( UICC_CARD_TYPE_UICC == cardType &&
                 EFalse != serviceStatus )
                 {
                 UiccCreateGBABootstrapNafDerivationApdu( params, aDataPackage );
@@ -6093,7 +6046,7 @@ OstTraceExt2( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
             {
             serviceStatus = iMmUiccMessHandler->GetServiceStatus( KServiceMBMSsecurity );
 
-            if( UICC_CARD_TYPE_UICC == cardType && 
+            if( UICC_CARD_TYPE_UICC == cardType &&
                 EFalse != serviceStatus )
                 {
                 UiccCreateMbmsMskUpdateApdu( params, aDataPackage );
@@ -6112,7 +6065,7 @@ OstTraceExt2( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
             {
             serviceStatus = iMmUiccMessHandler->GetServiceStatus( KServiceMBMSsecurity );
 
-            if( UICC_CARD_TYPE_UICC == cardType && 
+            if( UICC_CARD_TYPE_UICC == cardType &&
                 EFalse != serviceStatus )
                 {
                 UiccCreateMbmsMtkGenerationApdu( params, aDataPackage );
@@ -6131,7 +6084,7 @@ OstTraceExt2( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
             {
             serviceStatus = iMmUiccMessHandler->GetServiceStatus( KServiceMBMSsecurity );
 
-            if( UICC_CARD_TYPE_UICC == cardType && 
+            if( UICC_CARD_TYPE_UICC == cardType &&
                 EFalse != serviceStatus )
                 {
                 UiccCreateMbmsMskDeletionApdu( params, aDataPackage );
@@ -6157,7 +6110,7 @@ OstTrace0( TRACE_NORMAL, DUP7_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CM
     if( EFalse != apduSendNeeded )
         {
         // send the apdu to the UICC server
-        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params ); 
+        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
         }
     else
         {
@@ -6173,8 +6126,8 @@ OstTrace0( TRACE_NORMAL, DUP8_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CM
 // Constructs GSM context AUTHENTICATE APDU
 // -----------------------------------------------------------------------------
 //
-void CMmCustomMessHandler::UiccCreateRunGsmAlgorithmApdu( 
-    TUiccSendApdu& aParams, 
+void CMmCustomMessHandler::UiccCreateRunGsmAlgorithmApdu(
+    TUiccSendApdu& aParams,
     const TDesC8& aRand,
     TUiccTrId aTraId )
     {
@@ -6269,8 +6222,8 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, 
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp: Security conditions not satisfied\n" );
 OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp: Security conditions not satisfied" );
-            ret = CMmStaticUtility::EpocErrorCode( 
-                KErrAccessDenied, 
+            ret = CMmStaticUtility::EpocErrorCode(
+                KErrAccessDenied,
                 KErrGsm0707SimPin1Required );
             }
         else
@@ -6321,8 +6274,8 @@ OstTrace1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, 
 // Constructs GSM context AUTHENTICATE APDU
 // -----------------------------------------------------------------------------
 //
-void CMmCustomMessHandler::UiccCreateGsmSecurityContextApdu( 
-    TUiccSendApdu& params, 
+void CMmCustomMessHandler::UiccCreateGsmSecurityContextApdu(
+    TUiccSendApdu& params,
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateGsmSecurityContextApdu.\n" );
@@ -6424,16 +6377,16 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURES
 // Constructs 3G security context AUTHENTICATE APDU
 // -----------------------------------------------------------------------------
 //
-void CMmCustomMessHandler::UiccCreate3GSecurityContextApdu( 
-    TUiccSendApdu& aParams, 
-    const TDesC8& aRand, 
+void CMmCustomMessHandler::UiccCreate3GSecurityContextApdu(
+    TUiccSendApdu& aParams,
+    const TDesC8& aRand,
     const TDesC8& aAuth,
     TUiccTrId aTraId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreate3GSecurityContextApdu.\n" );
 OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATE3GSECURITYCONTEXTAPDU, "CMmCustomMessHandler::UiccCreate3GSecurityContextApdu" );
 
-    // len of data is sizeof RAND + sizeof AUTN + two length fields 
+    // len of data is sizeof RAND + sizeof AUTN + two length fields
     // (one for RAND len and one for AUTN len)
     TUint8 lc( aRand.Size() + aAuth.Size() + 2 );
 
@@ -6442,7 +6395,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATE3GSECURITYCONTEXTAPDU, "
     aParams.apdu.Append( KEvenInstructionCode ); // INS
     aParams.apdu.Append( 0 ); // P1 is set to 0 in case of even instruction
     aParams.apdu.Append( K3GAuthenticationContext ); // P2
-    aParams.apdu.Append( lc );                       // Lc 
+    aParams.apdu.Append( lc );                       // Lc
     aParams.apdu.Append( aRand.Size() ); // len of RAND
     aParams.apdu.Append( aRand );        // RAND
     aParams.apdu.Append( aAuth.Size() );             // len of AUTN
@@ -6503,7 +6456,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CM
                         eapAka.iIK.Copy( aFileData.Mid( index, len ) );
                         index += len;
 
-                        // Kc is not supported at the moment because of 
+                        // Kc is not supported at the moment because of
                         // RMmCustomAPI::TSimAuthenticationEapAka doesn't
                         // have parameter for that
                         }
@@ -6550,7 +6503,7 @@ TFLOGSTRING("TSY: CMmCustomMessHandler::Uicc3GSecurityContextApduResp: APDU vali
 OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: APDU validation failed" );
                 ret = KErrMMEtelAuthenticateFailed;
                 }
-            }            
+            }
         else if( KAppAuthErrorIncorrectMac == result )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Uicc3GSecurityContextApduResp: incorrect MAC\n" );
@@ -6562,8 +6515,8 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Uicc3GSecurityContextApduResp: Security conditions not satisfied\n" );
 OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: Security conditions not satisfied" );
-            ret = CMmStaticUtility::EpocErrorCode( 
-                KErrAccessDenied, 
+            ret = CMmStaticUtility::EpocErrorCode(
+                KErrAccessDenied,
                 KErrGsm0707SimPin1Required );
             }
         else
@@ -6580,8 +6533,8 @@ OstTrace1( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP
         ret = ETrIdEEapAkaAuthenticateIms == aTraId ? KErrGeneral : KErrMMEtelAuthenticateFailed;
         }
 
-    if( KErrNone == ret || 
-        KErrMMEtelSqnVerificationFailed == ret || 
+    if( KErrNone == ret ||
+        KErrMMEtelSqnVerificationFailed == ret ||
         KErrMMEtelMacVerificationFailed == ret )
         {
         CMmDataPackage dataPackage;
@@ -6598,7 +6551,7 @@ OstTrace1( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP
         iMessageRouter->Complete(
             ipc,
             &dataPackage,
-            ret );	
+            ret );
         }
     else
         {
@@ -6615,7 +6568,7 @@ OstTrace1( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccCreateGBABootstrappingApdu(
-    TUiccSendApdu& aParams, 
+    TUiccSendApdu& aParams,
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateGBABootstrappingApdu.\n" );
@@ -6624,7 +6577,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPPINGAPDU, "C
     RMmCustomAPI::TSimAuthenticationGbaBootstrap gbaBootstrap;
     aDataPackage.UnPackData( gbaBootstrap );
 
-    // len of data is GBA bootstrapping mode tag (1 byte) + sizeof RAND 
+    // len of data is GBA bootstrapping mode tag (1 byte) + sizeof RAND
     // + sizeof AUTN + two length fields (one for RAND len and one for AUTN len)
     TUint8 lc( 1 + gbaBootstrap.iRandomParameters.Size() + gbaBootstrap.iAUTN.Size() + 2 );
 
@@ -6633,7 +6586,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPPINGAPDU, "C
     aParams.apdu.Append( KEvenInstructionCode ); // INS
     aParams.apdu.Append( 0 ); // P1 is set to 0 in case of even instruction
     aParams.apdu.Append( KGBAAuthenticationContext ); // P2
-    aParams.apdu.Append( lc );                        // Lc 
+    aParams.apdu.Append( lc );                        // Lc
     aParams.apdu.Append( KGBABootstappingModeTag );   // GBA bootstrapping mode tag
     aParams.apdu.Append( gbaBootstrap.iRandomParameters.Size() ); // len of RAND
     aParams.apdu.Append( gbaBootstrap.iRandomParameters );        // RAND
@@ -6644,7 +6597,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPPINGAPDU, "C
 
 // -----------------------------------------------------------------------------
 // CMmCustomMessHandler::UiccGBABootstrappingApduResp
-// Handles response APDU for GBA security context AUTHENTICATE APDU 
+// Handles response APDU for GBA security context AUTHENTICATE APDU
 // (bootstrapping mode)
 // -----------------------------------------------------------------------------
 //
@@ -6721,8 +6674,8 @@ OstTrace1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP,
         ret = KErrMMEtelAuthenticateFailed;
         }
 
-    if( KErrNone == ret || 
-        KErrMMEtelSqnVerificationFailed == ret || 
+    if( KErrNone == ret ||
+        KErrMMEtelSqnVerificationFailed == ret ||
         KErrMMEtelMacVerificationFailed == ret )
         {
         CMmDataPackage dataPackage;
@@ -6731,7 +6684,7 @@ OstTrace1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP,
         iMessageRouter->Complete(
             ECustomGetSimAuthenticationDataIPC,
             &dataPackage,
-            ret );	
+            ret );
         }
     else
         {
@@ -6785,14 +6738,14 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPUPDATE, "CMmCustom
     params.filePath.Append( KMasterFileId );
     params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
 
-    iMmUiccMessHandler->CreateUiccApplCmdReq( params ); 
+    iMmUiccMessHandler->CreateUiccApplCmdReq( params );
     }
 
 // -----------------------------------------------------------------------------
 // CMmCustomMessHandler::UiccGBABootstrapReadResp
 // Handles response to elementary file EFgba read operation
 // -----------------------------------------------------------------------------
-//  
+//
 void CMmCustomMessHandler::UiccGBABootstrapReadResp(
     TInt aStatus,
     const TDesC8& aFileData )
@@ -6808,9 +6761,9 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP, "CMmCust
         TUint32 index( 0 );
         TUint8 randLen( aFileData[index++] );
 
-        if( aFileData.Length() >= randLen + 
-            iBTidBuf.Length() + 
-            iKeyLifetimeBuf.Length() + 
+        if( aFileData.Length() >= randLen +
+            iBTidBuf.Length() +
+            iKeyLifetimeBuf.Length() +
             3 )
             {
             // store rand temporarily so that we can complete it
@@ -6905,7 +6858,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPUPDATERESP, "CMmCu
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccCreateGBABootstrapNafDerivationApdu(
-    TUiccSendApdu& aParams, 
+    TUiccSendApdu& aParams,
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateGBABootstrapNafDerivationApdu.\n" );
@@ -6914,11 +6867,11 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPNAFDERIVATIO
     RMmCustomAPI::TSimAuthenticationGbaNafDerivation gbaBootstrapNafDerivation;
     aDataPackage.UnPackData( gbaBootstrapNafDerivation );
 
-    // len of data is GBA NAF derivation mode tag (1 byte) + sizeof NAFId 
+    // len of data is GBA NAF derivation mode tag (1 byte) + sizeof NAFId
     // + sizeof IMPI + two length fields (one for NAFId len and one for IMPI len)
-    TUint8 lc( 1 + 
-               gbaBootstrapNafDerivation.iNafId.Size() + 
-               gbaBootstrapNafDerivation.iImpi.Size() + 
+    TUint8 lc( 1 +
+               gbaBootstrapNafDerivation.iNafId.Size() +
+               gbaBootstrapNafDerivation.iImpi.Size() +
                2 );
 
     aParams.trId = ETrIdEGbaNafDerivation;
@@ -6926,7 +6879,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPNAFDERIVATIO
     aParams.apdu.Append( KEvenInstructionCode ); // INS
     aParams.apdu.Append( 0 ); // P1 is set to 0 in case of even instruction
     aParams.apdu.Append( KGBAAuthenticationContext ); // P2
-    aParams.apdu.Append( lc );                        // Lc 
+    aParams.apdu.Append( lc );                        // Lc
     aParams.apdu.Append( KGBANAFDerivationModeTag );   // GBA bootstrapping mode tag
     aParams.apdu.Append( gbaBootstrapNafDerivation.iNafId.Size() ); // len of NAFId
     aParams.apdu.Append( gbaBootstrapNafDerivation.iNafId );        // NAFId
@@ -6938,7 +6891,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPNAFDERIVATIO
 
 // -----------------------------------------------------------------------------
 // CMmCustomMessHandler::UiccGBABootstrapNafDerivationApduResp
-// Handles response APDU for GBA security context AUTHENTICATE APDU 
+// Handles response APDU for GBA security context AUTHENTICATE APDU
 // (NAF derivation mode)
 // -----------------------------------------------------------------------------
 //
@@ -6966,7 +6919,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP, "CMm
             if( KApduOk == ValidateReceivedAuthenticateApdu( aTraId, aFileData ) )
                 {
                 // Let's skip "Successful GBA operation" tag
-                // and start with Length of Length of Ks ext NAF 
+                // and start with Length of Length of Ks ext NAF
                 TUint32 index( 1 );
 
                 // get the Ks ext NAF
@@ -7006,7 +6959,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP,
         iMessageRouter->Complete(
             ECustomGetSimAuthenticationDataIPC,
             &dataPackage,
-            ret );	
+            ret );
         }
     else
         {
@@ -7023,7 +6976,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP,
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccCreateMbmsMskUpdateApdu(
-    TUiccSendApdu& params, 
+    TUiccSendApdu& params,
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateMbmsMskUpdateApdu.\n" );
@@ -7031,7 +6984,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKUPDATEAPDU, "CMmC
 
     // Note. MBMS functionality is not tested in real hardware and in real environmen
     //  because of there is no users for this authentication type. So this is implemented
-    // with the best knowledge at the moment and it can contain some bugs which 
+    // with the best knowledge at the moment and it can contain some bugs which
     // can be found when this is tested in real environment.
 
     RMmCustomAPI::TSimAuthenticationMgvMskUpdate mskUpdate;
@@ -7047,7 +7000,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKUPDATEAPDU, "CMmC
     params.apdu.Append( KOddInstructionCode );  // INS
     params.apdu.Append( KFirstBlockOfAuthenticationData ); // P1
     params.apdu.Append( KMBMSAuthenticationContext ); // P2
-    params.apdu.Append( lc );                         // Lc 
+    params.apdu.Append( lc );                         // Lc
     params.apdu.Append( KMBMSDataObjectTag );          // MBMS Data object tag
     params.apdu.Append( mskUpdate.iMikey.Size() + 1 ); // MBMS data obj len
     params.apdu.Append( KMskUpdateMode );              // MBMS Security Context Mode
@@ -7057,7 +7010,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKUPDATEAPDU, "CMmC
 
 // -----------------------------------------------------------------------------
 // CMmCustomMessHandler::UiccMbmsMskUpdateApduResp
-// Handles response APDU for MBMS security context AUTHENTICATE APDU 
+// Handles response APDU for MBMS security context AUTHENTICATE APDU
 // (MSK Update Mode)
 // -----------------------------------------------------------------------------
 //
@@ -7069,8 +7022,8 @@ TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMbmsMskUpdateApduResp.\n" );
 OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMSKUPDATEAPDURESP, "CMmCustomMessHandler::UiccMbmsMskUpdateApduResp" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environment
-    // because of at the moment there is no users for this authentication type. 
-    // So this is implemented with the best knowledge at the moment and it can contain 
+    // because of at the moment there is no users for this authentication type.
+    // So this is implemented with the best knowledge at the moment and it can contain
     // some bugs which can be found when this is tested in real environment.
 
     TInt ret( KErrGeneral );
@@ -7163,7 +7116,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMSKUPDATEAPDURESP, "C
             iMessageRouter->Complete(
                 ECustomGetSimAuthenticationDataIPC,
                 &dataPackage,
-                ret );	
+                ret );
             }
         else
             {
@@ -7191,13 +7144,13 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMSKUPDATEHANDLEMBMSOPERATIONDA
     TUint32 objLen( aMbmsData.Length() );
 
     if( KSuccessfullMbmsOperationTag == aMbmsData[index] &&
-        1 <= objLen && 
+        1 <= objLen &&
         ( KMaxMbmsMikeyLen + 1 ) >= objLen  ) // + 1 for 0xDB TLV tag
         {
         index++;
 
-        // len of MIKEY is obj len - 1 because of 
-        // obj data contains 1 byte for 
+        // len of MIKEY is obj len - 1 because of
+        // obj data contains 1 byte for
         // Successfull Mbms Operation Tag
         TUint8 mikeyLen = objLen - 1;
         if( 0 < mikeyLen )
@@ -7213,7 +7166,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMSKUPDATEHANDLEMBMSOPERATIONDA
 // Handles OMA BCAST operation data from authenticate APDU
 // -----------------------------------------------------------------------------
 //
-void CMmCustomMessHandler::UiccMskUpdateHandleOMABcastOperationData( 
+void CMmCustomMessHandler::UiccMskUpdateHandleOMABcastOperationData(
                 RMmCustomAPI::TSimAuthenticationMgvMskUpdate& aMskUpdate,
                 TDesC8& aMbmsData )
     {
@@ -7256,15 +7209,15 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMSKUPDATEHANDLEOMABCASTOPERATI
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccCreateMbmsMtkGenerationApdu(
-    TUiccSendApdu& params, 
+    TUiccSendApdu& params,
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateMbmsMtkGenerationApdu.\n" );
 OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMTKGENERATIONAPDU, "CMmCustomMessHandler::UiccCreateMbmsMtkGenerationApdu" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environment
-    // because of at the moment there is no users for this authentication type. 
-    // So this is implemented with the best knowledge at the moment and it can contain 
+    // because of at the moment there is no users for this authentication type.
+    // So this is implemented with the best knowledge at the moment and it can contain
     // some bugs which can be found when this is tested in real environment.
 
     RMmCustomAPI::TSimAuthenticationMgvMtkGeneration mtkGen;
@@ -7280,7 +7233,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMTKGENERATIONAPDU, "
     params.apdu.Append( KOddInstructionCode );  // INS
     params.apdu.Append( KFirstBlockOfAuthenticationData ); // P1
     params.apdu.Append( KMBMSAuthenticationContext ); // P2
-    params.apdu.Append( lc );                         // Lc 
+    params.apdu.Append( lc );                         // Lc
     params.apdu.Append( KMBMSDataObjectTag );          // MBMS Data object tag
     params.apdu.Append( mtkGen.iMikey.Size() + 1 ); // MBMS data obj len
     params.apdu.Append( KMtkGenerationMode );          // MBMS Security Context Mode
@@ -7290,7 +7243,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMTKGENERATIONAPDU, "
 
 // -----------------------------------------------------------------------------
 // CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp
-// Handles response APDU for MBMS security context AUTHENTICATE APDU 
+// Handles response APDU for MBMS security context AUTHENTICATE APDU
 // (MTK Generation Mode)
 // -----------------------------------------------------------------------------
 //
@@ -7302,8 +7255,8 @@ TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp.\n" );
 OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMTKGENERATIONAPDURESP, "CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environment
-    // because of at the moment there is no users for this authentication type. 
-    // So this is implemented with the best knowledge at the moment and it can contain 
+    // because of at the moment there is no users for this authentication type.
+    // So this is implemented with the best knowledge at the moment and it can contain
     // some bugs which can be found when this is tested in real environment.
 
     TInt ret( KErrGeneral );
@@ -7325,7 +7278,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMTKGENERATIONAPDURESP, "CM
                 {
                 TBuf8<KMaxApduSize> mbmsOperationData;
 
-                if( FindTlvObject( KMbmsOperationResponseTag53, aFileData.Mid( 0, aFileData.Length() - 2 ), mbmsOperationData ) || 
+                if( FindTlvObject( KMbmsOperationResponseTag53, aFileData.Mid( 0, aFileData.Length() - 2 ), mbmsOperationData ) ||
                     FindTlvObject( KMbmsOperationResponseTag73, aFileData.Mid( 0, aFileData.Length() - 2 ), mbmsOperationData ) )
                     {
                     ret = KErrNone;
@@ -7390,7 +7343,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMTKGENERATIONAPDURESP
             iMessageRouter->Complete(
                 ECustomGetSimAuthenticationDataIPC,
                 &dataPackage,
-                ret );	
+                ret );
             }
         else
             {
@@ -7407,7 +7360,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMTKGENERATIONAPDURESP
 // Handles MBMS operation data from MTK Generation authenticate APDU
 // -----------------------------------------------------------------------------
 //
-void CMmCustomMessHandler::UiccMtkGenHandleMbmsOperationData( 
+void CMmCustomMessHandler::UiccMtkGenHandleMbmsOperationData(
     RMmCustomAPI::TSimAuthenticationMgvMtkGeneration& aMtkGen,
     TDesC8& aMbmsData )
     {
@@ -7418,13 +7371,13 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMTKGENHANDLEMBMSOPERATIONDATA,
     TUint32 objLen( aMbmsData.Length() );
 
     if( KSuccessfullMbmsOperationTag == aMbmsData[index] &&
-        1 <= objLen && 
+        1 <= objLen &&
         ( KMaxMbmsSaltLen + 1 ) >= objLen  ) // + 1 for 0xDB TLV tag
         {
         index++;
 
-        // len of SALT is obj len - 1 because of 
-        // obj data contains 1 byte for 
+        // len of SALT is obj len - 1 because of
+        // obj data contains 1 byte for
         // Successfull Mbms Operation Tag
         TUint8 saltLen( objLen - 1 );
         if( 0 < saltLen )
@@ -7440,7 +7393,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMTKGENHANDLEMBMSOPERATIONDATA,
 // Handles OMA BCAST operation data from authenticate APDU
 // -----------------------------------------------------------------------------
 //
-void CMmCustomMessHandler::UiccMtkGenHandleOMABcastOperationData( 
+void CMmCustomMessHandler::UiccMtkGenHandleOMABcastOperationData(
          RMmCustomAPI::TSimAuthenticationMgvMtkGeneration& aMtkGen,
          TDesC8& aMbmsData )
     {
@@ -7466,8 +7419,8 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMTKGENHANDLEOMABCASTOPERATIOND
             }
         if( FindTlvObject( KParentalControlTag, omaBcastData, parentalControlData ) )
             {
-            // first parameter of parental control data is "key reference for second 
-            // application PIN defined for parental contol" but it's not supported 
+            // first parameter of parental control data is "key reference for second
+            // application PIN defined for parental contol" but it's not supported
             // at the moment
             aMtkGen.iParentalControl.Append( parentalControlData[1] ); // rating type
             aMtkGen.iParentalControl.Append( parentalControlData[2] ); // rating value
@@ -7487,15 +7440,15 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMTKGENHANDLEOMABCASTOPERATIOND
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccCreateMbmsMskDeletionApdu(
-    TUiccSendApdu& params, 
+    TUiccSendApdu& params,
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateMbmsMskDeletionApdu.\n" );
 OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKDELETIONAPDU, "CMmCustomMessHandler::UiccCreateMbmsMskDeletionApdu" );
-    
+
     // Note. MBMS functionality is not tested in real hardware and in real environment
-    // because of at the moment there is no users for this authentication type. 
-    // So this is implemented with the best knowledge at the moment and it can contain 
+    // because of at the moment there is no users for this authentication type.
+    // So this is implemented with the best knowledge at the moment and it can contain
     // some bugs which can be found when this is tested in real environment.
 
     RMmCustomAPI::TSimAuthenticationMgvMskDeletion mskDel;
@@ -7503,19 +7456,19 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKDELETIONAPDU, "CM
 
     // len of data is MBMS Data Object tag (1 byte) +
     // MBMS Data Object length (1 byte) +
-    // MBMS Security Context Mode (1 byte) + 
+    // MBMS Security Context Mode (1 byte) +
     // size of Key Domain Id + size of Key Group Id Part
-    TUint8 lc( 1 + 
-               1 + 
-               1 + 
-               mskDel.iKeyDomainId.Size() + 
+    TUint8 lc( 1 +
+               1 +
+               1 +
+               mskDel.iKeyDomainId.Size() +
                mskDel.iKeyGroupIdPart.Size() );
 
     // data size in MBMS Data Object Tag is:
-    // MBMS Security Context Mode (1 byte) + 
+    // MBMS Security Context Mode (1 byte) +
     // size of Key Domain Id + size of Key Group Id Part
-    TUint8 dataSize( 1 + 
-                     mskDel.iKeyDomainId.Size() + 
+    TUint8 dataSize( 1 +
+                     mskDel.iKeyDomainId.Size() +
                      mskDel.iKeyGroupIdPart.Size() );
 
     params.trId = ETrIdEMbmsMskDeletion;
@@ -7523,7 +7476,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKDELETIONAPDU, "CM
     params.apdu.Append( KOddInstructionCode );  // INS
     params.apdu.Append( KFirstBlockOfAuthenticationData ); // P1
     params.apdu.Append( KMBMSAuthenticationContext ); // P2
-    params.apdu.Append( lc );                         // Lc 
+    params.apdu.Append( lc );                         // Lc
     params.apdu.Append( KMBMSDataObjectTag );       // MBMS Data object tag
     params.apdu.Append( dataSize );                 // MBMS data obj len
     params.apdu.Append( KMskDeletionMode );         // MBMS Security Context Mode
@@ -7534,7 +7487,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKDELETIONAPDU, "CM
 
 // -----------------------------------------------------------------------------
 // CMmCustomMessHandler::UiccMbmsMskDeletionApduResp
-// Handles response APDU for MBMS security context AUTHENTICATE APDU 
+// Handles response APDU for MBMS security context AUTHENTICATE APDU
 // (MSK Deletion Mode)
 // -----------------------------------------------------------------------------
 //
@@ -7546,8 +7499,8 @@ TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMbmsMskDeletionApduResp.\n" );
 OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMSKDELETIONAPDURESP, "CMmCustomMessHandler::UiccMbmsMskDeletionApduResp" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environment
-    // because of at the moment there is no users for this authentication type. 
-    // So this is implemented with the best knowledge at the moment and it can contain 
+    // because of at the moment there is no users for this authentication type.
+    // So this is implemented with the best knowledge at the moment and it can contain
     // some bugs which can be found when this is tested in real environment.
 
     TInt ret( KErrGeneral );
@@ -7612,7 +7565,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMSKDELETIONAPDURESP, 
             iMessageRouter->Complete(
                 ECustomGetSimAuthenticationDataIPC,
                 &dataPackage,
-                ret );	
+                ret );
             }
         else
             {
@@ -7650,15 +7603,15 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEFIRSTBLOCKOFAUTHRESPAPDU
     params.apdu.Append( KOddInstructionCode );  // INS
     params.apdu.Append( KFirstBlockOfAuthenticationResponseData ); // P1
     params.apdu.Append( 0x00 ); // P2
-    params.apdu.Append( 0x00 ); // Le 
+    params.apdu.Append( 0x00 ); // Le
 
-    iMmUiccMessHandler->CreateUiccApplCmdReq( params ); 
+    iMmUiccMessHandler->CreateUiccApplCmdReq( params );
     }
 
 
 // -----------------------------------------------------------------------------
 // CMmCustomMessHandler::MapSw1Sw2ToAuthenticateResult
-// Maps sw1 and sw2 from response authenticate apdu to result 
+// Maps sw1 and sw2 from response authenticate apdu to result
 // -----------------------------------------------------------------------------
 //
 TUint8 CMmCustomMessHandler::MapSw1Sw2ToAuthenticateResult( TUint8 sw1, TUint8 sw2 )
@@ -7684,7 +7637,7 @@ OstTraceExt2( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_MAPSW1SW2TOAUTHENTICATERESULT, 
                 {
                 ret = KNormalCommandEnding;
                 }
-            else if( 0xF1 == sw2 || 
+            else if( 0xF1 == sw2 ||
                      0xF2 == sw2 )
                 {
                 ret = KWarningMoreDataAvailable;
@@ -7755,8 +7708,8 @@ OstTraceExt2( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_MAPSW1SW2TOAUTHENTICATERESULT, 
 // Validates received apdu
 // -----------------------------------------------------------------------------
 //
-TUint8 CMmCustomMessHandler::ValidateReceivedAuthenticateApdu( 
-    TInt aTraId, 
+TUint8 CMmCustomMessHandler::ValidateReceivedAuthenticateApdu(
+    TInt aTraId,
     const TDesC8& aApdu )
     {
     TUint8 ret( KApduOk );
@@ -7813,7 +7766,7 @@ TFLOGSTRING("TSY: CMmCustomMessHandler::ValidateGsmSecurityContextApduResp.\n" )
 OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGSMSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::ValidateGsmSecurityContextApduResp" );
     TUint8 ret( KApduNok );
 
-    // apdu len is len of aApdu - 2 (because of 
+    // apdu len is len of aApdu - 2 (because of
     // aApdu contains sw1 and sw2)
     TUint apduLen( aApdu.Length() - 2 );
     TUint32 index( 0 );
@@ -7841,7 +7794,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP,
 
     TUint8 ret( KApduOk );
 
-    // Let's calculate total APDU data len in aApdu. Length is 
+    // Let's calculate total APDU data len in aApdu. Length is
     // decremented by 2 because of aApdu contains also sw1 and sw2
     // and these are total 2 bytes long.
     TUint8 apduLen( aApdu.Length() - 2 );
@@ -7975,7 +7928,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGBABOOTSTRAPPINGAPDURESP, 
 
     TUint8 ret( KApduNok );
 
-    // Let's calculate total APDU data len in aApdu. Length is 
+    // Let's calculate total APDU data len in aApdu. Length is
     // decremented by 2 because of aApdu contains also sw1 and sw2
     // and these are total 2 bytes long.
     TUint8 apduLen( aApdu.Length() - 2 );
@@ -8009,7 +7962,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGBANAFDERIVATIONAPDURESP, 
 
     TUint8 ret = KApduNok;
 
-    // Let's calculate total APDU data len in aApdu. Length is 
+    // Let's calculate total APDU data len in aApdu. Length is
     // decremented by 2 because of aApdu contains also sw1 and sw2
     // and these are total 2 bytes long.
     TUint8 apduLen( aApdu.Length() - 2 );
@@ -8020,10 +7973,10 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGBANAFDERIVATIONAPDURESP, 
         {
         if( KSuccessfull3GAuthTag == tag )
             {
-            // response apdu contains only parameter Ks Ext NAF 
+            // response apdu contains only parameter Ks Ext NAF
             // so, let's check that apdu len contains parameter
             // correctly. So apduLen should be len of Ks Ext NAF
-            // + 2 ("Successful GBA operation" field + 
+            // + 2 ("Successful GBA operation" field +
             // Length of Ks_ext_NAF field)
             if( apduLen == aApdu[index] + 2 )
                 {
@@ -8058,7 +8011,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATERUNGSMALGORITHMAPDURESP, "
 // CMmCustomMessHandler::FindTlvObject
 // Finds TLV object
 // -----------------------------------------------------------------------------
-//  
+//
 TBool CMmCustomMessHandler::FindTlvObject(
     TUint8 aTlvTag,
     const TDesC8& aBerTlv,
@@ -8078,7 +8031,7 @@ OstTrace1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_FINDTLVOBJECT, "CMmCustomMessHandl
         tlvLength = aBerTlv[index++];
 
         // let's check if len of tlv object is coded
-        // with one or two bytes        
+        // with one or two bytes
         if( 0x81 == tlvLength ||
             0x82 == tlvLength )
             {
@@ -8135,7 +8088,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT, "CMmCustomMess
 // CMmCustomMessHandler::DeriveCkFromKc
 // derives Ck from Kc
 // -----------------------------------------------------------------------------
-//  
+//
 void CMmCustomMessHandler::DeriveCkFromKc(
     TDes8& aCk,
     const TDesC8& aKc )
@@ -8217,7 +8170,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_DERIVEIKFROMKC, "CMmCustomMessHand
 // derives Ck from Kc
 // -----------------------------------------------------------------------------
 //
-TInt CMmCustomMessHandler::UiccHandleImsAuthentication( 
+TInt CMmCustomMessHandler::UiccHandleImsAuthentication(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccHandleImsAuthentication.\n" );
@@ -8251,7 +8204,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCHANDLEIMSAUTHENTICATION, "CMmC
 
     if( UICC_CARD_TYPE_ICC == cardType )
         {
-        // no need to activate ISIM application, 
+        // no need to activate ISIM application,
         // let's just send the authentication APDU
         UiccCreateRunGsmAlgorithmApdu(
             params,
@@ -8272,9 +8225,9 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCHANDLEIMSAUTHENTICATION, "CMmC
             // let's check is ISIM application already tried to activate
             if( iIsimApplActivated )
                 {
-                UiccCreate3GSecurityContextApdu( 
-                    params, 
-                    authenticationData.iRAND, 
+                UiccCreate3GSecurityContextApdu(
+                    params,
+                    authenticationData.iRAND,
                     authenticationData.iAUTN,
                     ETrIdEEapAkaAuthenticateIms );
 
@@ -8337,9 +8290,9 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCHANDLEISIMACTIVATIONRESP, "CMm
     params.filePath.Append( KMasterFileId );
     params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
 
-    UiccCreate3GSecurityContextApdu( 
-        params, 
-        iRandBuf, 
+    UiccCreate3GSecurityContextApdu(
+        params,
+        iRandBuf,
         iAutnBuf,
         ETrIdEEapAkaAuthenticateIms );
 
@@ -8353,7 +8306,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCHANDLEISIMACTIVATIONRESP, "CMm
         }
     else
         {
-        // ISim application activation fails, le'ts send authentication apdu 
+        // ISim application activation fails, le'ts send authentication apdu
         // to the USim application
         iMmUiccMessHandler->CreateUiccApplCmdReq( params );
         }

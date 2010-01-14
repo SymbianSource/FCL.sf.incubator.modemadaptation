@@ -22,9 +22,9 @@
 #include <ctsy/serviceapi/mmtsy_ipcdefs.h>
 #include "cmmmessagerouter.h"
 #include "cmmphonebookoperationinit3G_adn.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmphonebookoperationinittraces.h"
+#include "cmmphonebookoperationinitTraces.h"
 #include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
 #include "cmmphonebookoperationinit3g_adnTraces.h"
@@ -118,7 +118,7 @@ CMmPhoneBookOperationInit3G_adn* CMmPhoneBookOperationInit3G_adn::NewL
 
     phoneBookData->GetPhoneBookName( phonebookTypeName );
     // Store phonebook name
-    mmPhoneBookOperationInit3G_adn->iPhonebookType = phonebookTypeName;
+    mmPhoneBookOperationInit3G_adn->iPhoneBookTypeName = phonebookTypeName;
 
     if( 0 == phonebookTypeName.CompareF( KInternalPhoneBookType ) )
         {
@@ -126,7 +126,6 @@ CMmPhoneBookOperationInit3G_adn* CMmPhoneBookOperationInit3G_adn::NewL
         }
     else // Full construction is not needed in case of internal initilization
         {
-        mmPhoneBookOperationInit3G_adn->iTransactionId = ETrIdPbInit;
         mmPhoneBookOperationInit3G_adn->ConstructL();
         }
     mmPhoneBookOperationInit3G_adn->iMmPhoneBookStoreMessHandler =
@@ -192,7 +191,8 @@ void CMmPhoneBookOperationInit3G_adn::ConstructL
 TInt CMmPhoneBookOperationInit3G_adn::UICCCreateReq
     (
     TInt aIpc,
-    const CMmDataPackage* /*aDataPackage*/
+    const CMmDataPackage* /*aDataPackage*/,
+    TUint8 aTransId
     )
     {
     TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::UICCCreateReq" );
@@ -215,11 +215,10 @@ TInt CMmPhoneBookOperationInit3G_adn::UICCCreateReq
                     }
 
                 iServiceType = UICC_APPL_FILE_INFO;
-                iExtensionPresent = EFalse; // Default Extension is not present
 
                 // Start Initialization for ADN phonebook 3G
                 iIniPhase = EPBInitPhase_3GADN_PBR;
-                ret = UICCInitializeReq3GADN();
+                ret = UICCInitializeReq3GADN( aTransId );
                 }
             else  // else for if internalInit goign on
                 {
@@ -249,7 +248,7 @@ TInt CMmPhoneBookOperationInit3G_adn::UICCCreateReq
 // For USIM Separate different request to correct function
 // -----------------------------------------------------------------------------
 //
-TInt CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN()
+TInt CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN( TUint8 aTransId)
     {
     TInt ret(KErrNone);
 
@@ -260,7 +259,7 @@ TInt CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN()
         TUiccReadLinearFixed cmdParams;
         cmdParams.messHandlerPtr =
             static_cast<MUiccOperationBase*>( iMmPhoneBookStoreMessHandler );
-        cmdParams.trId = ETrIdPbInit;
+        cmdParams.trId = static_cast<TUiccTrId>( aTransId );
 
         cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
         cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
@@ -394,15 +393,16 @@ TInt CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile(
 // -----------------------------------------------------------------------------
 //
 
-TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL
+TBool CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL
         (
-        TBool &aComplete,
         TInt aStatus,
+        TUint8 /*aDetails*/,
         const TDesC8 &aFileData,
-        TInt /*aTransId*/
+        TInt aTransId
         )
     {
     TInt ret( KErrNone );
+    TBool complete( EFalse );
 
     // break immediatelly in case of internal init
     if ( iInternalInit )
@@ -414,7 +414,7 @@ TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL
         iIniPhase = EPBIniPhase_Unknown;
 
         iInternalInit = EFalse;
-        aComplete = ETrue;
+        complete = ETrue;
         return KErrNone;
         }
 
@@ -428,7 +428,7 @@ TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL
             TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. USIM ADN PhoneBook Init" );
             OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. USIM ADN Phonebook init" );
 
-            ret = HandleUICCPbResp3GADN( aFileData, aStatus );
+            ret = HandleUICCPbResp3GADN( aFileData, aStatus, aTransId );
             }
             break;
             case EPBInitPhaseFDN:
@@ -440,7 +440,7 @@ TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL
             OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. Other Phonebook Init" );
 
             // For all other phoenbook handling is same as 2g Phonebook
-            ret = HandlePBRespL( aFileData, aStatus );
+            ret = HandlePBRespL( aFileData, aStatus, aTransId );
             }
             break;
             default:
@@ -453,7 +453,7 @@ TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL
          if ( KErrNone != ret || EPBIniPhase_PBInitialized == iIniPhase )
              {
              CPhoneBookDataPackage phoneBookData;
-             phoneBookData.SetPhoneBookName( iPhonebookType );
+             phoneBookData.SetPhoneBookName( iPhoneBookTypeName );
              phoneBookData.PackData( iPBStoreInfoData );
 
              if ( UICC_STATUS_OK != aStatus )
@@ -466,9 +466,9 @@ TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL
                      &phoneBookData,
                      ret );
 
-             aComplete = ETrue;
+             complete = ETrue;
              }
-    return ret;
+    return complete;
 
     }
 // -----------------------------------------------------------------------------
@@ -479,7 +479,8 @@ TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL
 TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbResp3GADN
     (
     const TDesC8& aFileData,
-    TInt aStatus)
+    TInt aStatus,
+    TUint8 aTransId )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::HandleUICCPbResp3GADN");
     OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESP3GADN, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbResp3GADN" );
@@ -496,17 +497,10 @@ TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbResp3GADN
                     // For File Info , get the no of records in PBR file to get the total no of entries in 3G ADN phonebook
                     if( UICC_APPL_FILE_INFO == iServiceType )
                         {
-                        // Extract Number of records in PBR EF
-                        offSet = aFileData.Find( &KTagFCIFileDescriptor,1 );
-                        if( offSet != KErrNotFound )
-                            {
-                            // Number of entries is 1 byte long
-                            //iNumOfPBRRecords = aFileData[offSet + UICC_FCI_EF_FDESC_OFFSET_NUM_ENTR];
-                            // get the no of records in PBR file
-                            HandleFcpData(aFileData, iNumOfPBRRecords, KNoOfRecords);
+                        TFci fci( aFileData );
+                        iNumOfPBRRecords = fci.GetNumberOfRecords();
 
-                            ret = KErrNone;
-                            }
+                        ret = KErrNone;
                         iServiceType = UICC_APPL_READ_LINEAR_FIXED;
                         }
                     else if( UICC_APPL_READ_LINEAR_FIXED == iServiceType )
@@ -585,12 +579,12 @@ TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbResp3GADN
                 iIniPhase = GetNextAvailablePbUicc( UICC_FDN_SERVICE_NUM );
                 }
             iServiceType = UICC_APPL_FILE_INFO;
-            ret = UICCInitializeReq();
+            ret = UICCInitializeReq( aTransId );
             }
         else
             {
             // Call Create request for next phase
-            ret = UICCInitializeReq3GADN();
+            ret = UICCInitializeReq3GADN( aTransId );
             }
         }
 
@@ -627,7 +621,7 @@ TInt CMmPhoneBookOperationInit3G_adn::FetchType1FileFromPBR( const TDesC8 &aFile
         primTag.tagValue = aFileData[offset + i];
 
         // get the File ID which is 2byte long
-        Get16bit(primTag.tagFID, aFileData, ( offset+i+2 ));
+        primTag.tagFID = CMmStaticUtility::Get16Bit( aFileData, ( offset+i+2 ));
 
         // if file Tag length is 3 the SFI is available and if file tag length is 2 the only File ID is present
         if(KLengthWithSFI == aFileData[offset + i+1])
@@ -681,7 +675,7 @@ TInt CMmPhoneBookOperationInit3G_adn::FetchType2FileFromPBR(const TDesC8 &aFileD
         // Get the Tag name
         primTag.tagValue = aFileData[offset+i];
         // get the File ID which is 2byte long
-        Get16bit(primTag.tagFID, aFileData, ( offset+i+2 ));
+        primTag.tagFID = CMmStaticUtility::Get16Bit( aFileData, ( offset+i+2 ));
 
         // if file Tag length is 3 the SFI is available and if file tag length is 2 the only File ID is present
         if(KLengthWithSFI == aFileData[offset+i+1])
@@ -737,7 +731,8 @@ TInt CMmPhoneBookOperationInit3G_adn::FetchType3FileFromPBR(const TDesC8& aFileD
             primTag.tagValue = aFileData[offset+i];
 
             // get the File ID which is 2byte long
-            Get16bit( primTag.tagFID, aFileData, ( offset+i+2 ));
+            primTag.tagFID = CMmStaticUtility::Get16Bit( aFileData,
+            	                                          ( offset + i + 2 ));
 
             // if file Tag length is 3 the SFI is available and if file tag length is 2 the only File ID is present
             if(KLengthWithSFI == aFileData[offset+i+1])
@@ -785,11 +780,10 @@ void CMmPhoneBookOperationInit3G_adn::HandleType1FileResp( const TDesC8 &aFileDa
     if( UICC_STATUS_OK  == aStatus )
         {
         // Get the Record length for all linear fixed and circular EF's
-        HandleFcpData(aFileData, recordLength, KRecordLength);
-
-        // Get the no of records
-        HandleFcpData(aFileData, noOfRecords, KNoOfRecords);
-
+        TFci fci( aFileData );
+        recordLength = fci.GetRecordLength();
+        noOfRecords = fci.GetNumberOfRecords();
+			
         // Check for No of records in Type 1 file
         if( UICC_EF_ADN_TAG != tagValue )
             {
@@ -963,12 +957,11 @@ void CMmPhoneBookOperationInit3G_adn::HandleType2FileResp(const TDesC8 &aFileDat
     if( UICC_STATUS_OK  == aStatus )
         {
         // Get the Record length for all linear fixed and circular EF's
-        HandleFcpData(aFileData, recordLength, KRecordLength);
-
-        // get no of records
-        HandleFcpData(aFileData, noOfRecords, KNoOfRecords);
-
+        TFci fci( aFileData );
+        recordLength = fci.GetRecordLength();
+        noOfRecords = fci.GetNumberOfRecords();
         }
+
     // Get the tag value for current File
     TUint tagValue = iType2FileArray[iCurrentArrayCounter].tagValue;
 
@@ -1072,10 +1065,9 @@ void CMmPhoneBookOperationInit3G_adn::HandleType3FileResp(const TDesC8 &aFileDat
 
     if( UICC_STATUS_OK  == aStatus )
         {
-        // Get the Record length for all linear fixed and circular EF's
-        HandleFcpData(aFileData, recordLength, KRecordLength);
-
-        HandleFcpData(aFileData, noOfRecords, KNoOfRecords);
+        TFci fci( aFileData );
+        recordLength = fci.GetRecordLength();
+        noOfRecords = fci.GetNumberOfRecords();
         }
 
     // Get the tag value for current File

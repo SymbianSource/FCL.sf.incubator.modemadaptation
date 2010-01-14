@@ -19,10 +19,6 @@
 #include <phonetisi.h>                  // For ISI_HEADER_SIZE
 #include <pn_const.h>                   // For PN_HEADER_SIZE
 #include <pipeisi.h>                    // For PNS_PIPE_DATA_OFFSET_DATA
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-#include <mediaisi.h>                   // For PNS_MEDIA_SPECIFIC_REQ/RESP
-#include <nsisi.h>                      // For PNS_NAME...
-#endif // NCP_COMMON_BRIDGE_FAMILY
 #include <commisi.h>                    // For SIZE_COMMON_MESSAGE_COMM_ISA_ENTITY_NOT_REACHABLE_RESP
 #include "router.h"
 #include "iadtrace.h"                   // For C_TRACE..
@@ -31,6 +27,7 @@
 #include "queue.h"                      // For DQueue
 #include "iadinternaldefinitions.h"     // For EIADAsync...
 #include "iadhelpers.h"                 // For GET_RECEIVER
+#include <nsisi.h>                      // For PN_NAMESERVICE...
 
 #include "pipehandler.h"                // For PipeHandler
 #include "OstTraceDefinitions.h"
@@ -38,97 +35,18 @@
 #include "routerTraces.h"
 #endif
 
+
 //#define MODEM_MCE_DOES_NOT_WORK_AS_IT_SHOULD // TODO: to be removed when Bridge Modem SW is ok
 
 // ISCE
 #include "memapi.h"                     // For MemApi
 #include "trxdefs.h"                    // For ETrx...
 // ISCE
-// ISCE #include "miad2istapi.h" // For MIAD2ISTApi
-
-
 
 // CONSTS
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-
-// TODO : spec this to some document
-/**** IAD<->SOS_MM ****/
-const TUint8 KIADObjId( 0xfe );
-/* CTRL CONF REQ START *
-[0]     media,          PN_MEDIA_SOS;
-[1]     recdev,         PN_MEDIA_ROUTING_REQ
-[2]     senderdev,      PN_DEV_SOS
-[3]     function,       PN_MEDIA_CONTROL
-[4,5]   length,         8
-[6]     recobj,         PN_OBJ_ROUTER
-[7]     senderobj,      KIADObjId
-[8]     transaction     0x00
-[9]     messageid       PNS_MEDIA_SPECIFIC_REQ
-[10]    media2control   PN_MEDIA_SOS
-[11]    ctrl msg id     KIADCtrlConfReq (0x05)
-[12]    filler          0x00
-[13]    filler          0x00
-*  CTRL CONF REQ END */
-const TUint8 KIADCtrlConfReq( 0x5 );
-/* CTRL CONF RESP START *
-[0]     media,          PN_MEDIA_SOS;
-[1]     recdev,         PN_DEV_SOS
-[2]     senderdev,      PN_MEDIA_ROUTING_REQ
-[3]     function,       PN_MEDIA_CONTROL
-[4,5]   length,         10
-[6]     recobj,         KIADObjId
-[7]     senderobj,      PN_OBJ_ROUTER
-[8]     transaction     0x00
-[9]     messageid       PNS_MEDIA_SPECIFIC_REQ
-[10]    media2control   PN_MEDIA_SOS
-[11]    media error     PN_MCTRL_NO_ERROR
-[12]    ctrl msg id     KIADCtrlConfResp (0x06)
-[13]    conf size       8 bytes
-[14]    conf size       8 bytes
-[15]    filler          0x00
-*  CTRL CONF RESP END */
-const TUint8 KIADCtrlConfResp( 0x6 );
-/* CTRL DRM REQ START *
-[0]     media,          PN_MEDIA_SOS;
-[1]     recdev,         PN_MEDIA_ROUTING_REQ
-[2]     senderdev,      PN_DEV_SOS
-[3]     function,       PN_MEDIA_CONTROL
-[4,5]   length,         8 ( + 6 = KIADCtrlDrmReqLength )
-[6]     recobj,         PN_OBJ_ROUTER
-[7]     senderobj,      KIADObjId
-[8]     channel number  IAD client's channel number
-[9]     messageid       PNS_MEDIA_SPECIFIC_REQ
-[10]    mediatocontrol  PN_MEDIA_SOS
-[11]    ctrl msg id     KIADCtrlDrmReq (0x07)
-[12]    ch is 2 be reg  IAD client's channel number
-[13]    filler          0x00
-*  CTRL DRM REQ END */
-const TUint8 KIADCtrlDrmReq( 0x7 );
-const TInt KIADCtrlDrmReqLength( 14 );
-/* CTRL DRM RESP START *
-[0]     media,          PN_MEDIA_SOS;
-[1]     recdev,         PN_DEV_SOS
-[2]     senderdev,      PN_MEDIA_ROUTING_REQ
-[3]     function,       PN_MEDIA_CONTROL
-[4,5]   length,         8
-[6]     recobj,         KIADObjId
-[7]     senderobj,      PN_OBJ_ROUTER
-[8]     channel number  IAD client's channel number
-[9]     messageid       PNS_MEDIA_SPECIFIC_RESP
-[10]    mediatocontrol  PN_MEDIA_SOS
-[11]    media error     PN_MCTRL_NO_ERROR
-[12]    ctrl msg id     KIADCtrlDrmResp (0x08)
-[13]    filler          0x00
-* CTRL DRM REQ END */
-const TUint8 KIADCtrlDrmResp( 0x8 );
-
-#define CTRL_REQ_OFFSET_MESSAGEID ( ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_REQ_OFFSET_DATA )
-#define CTRL_RESP_OFFSET_MESSAGEID ( ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_RESP_OFFSET_DATA )
-#define CTRL_CONF_RESP_OFFSET_SIZE_BYTE1 ( CTRL_RESP_OFFSET_MESSAGEID + 1 )
-#define CTRL_CONF_RESP_OFFSET_SIZE_BYTE2 ( CTRL_CONF_RESP_OFFSET_SIZE_BYTE1 + 1 )
-#define CTR_DRM_REQ_RESP_OFFSET_CHANNEL_ID ( ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_RESP_OFFSET_UTID )
-#define CTRL_DRM_REQ_OFFSET_REQUIRED_CHANNEL_ID ( CTRL_REQ_OFFSET_MESSAGEID + 1 )
-#endif // NCP_COMMON_BRIDGE_FAMILY
+DRouter* DRouter::iThisPtr = NULL;
+const TUint32 KCommunicationManagerUID( 0x2002B3D0 );
+const TUint32 KNameServiceUID( 0x2002A5A1 );
 
 // TODO: change this to use UnuqueID instead and to extension..
 void DRouter::CheckDfc()
@@ -169,7 +87,7 @@ DRouter::DRouter():
     
     C_TRACE( ( _T( "DRouter::DRouter ->" ) ) );
     // owned
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
     iPipeHandler = new DPipeHandler( *this );
 #endif
     iIndicationHandler = new DIndicationHandler( *this );
@@ -201,21 +119,17 @@ DRouter::DRouter():
         C_TRACE( ( _T( "DRouter::DRouter %d" ), i ) );
         }
     // Configuration of ISI links. TODO: devices and link configurations for coming platforms are unknown and to be done later.
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-    iLinksArray[ DRouter::EISIMediaSOS ] = MISIRouterLinkIf::CreateLinkF( this, PN_MEDIA_SOS, ETrxPartnerOS );
-#else
-    // Bridge media = PN_MEDIA_MODEM_HOST_IF
     iLinksArray[ DRouter::EISIMediaHostSSI ] = MISIRouterLinkIf::CreateLinkF( this, PN_MEDIA_MODEM_HOST_IF, ETrxSharedMemory );
-#endif // NCP_COMMON_BRIDGE_FAMILY
-    // ISCE
+    DRouter::iThisPtr = this;
     C_TRACE( ( _T( "DRouter::DRouter 0x%x <-" ), this ) );
     OstTrace1( TRACE_NORMAL, DROUTER_DROUTER_EXIT, "<DRouter::DRouter;this=%x", this );
     }
-    
+
 DRouter::~DRouter(
         // None
        )
     {
+
     OstTrace0( TRACE_NORMAL, DUP1_DROUTER_DROUTER_ENTRY, "<DRouter::~DRouter" );
 //ISCE
     // owning so deleting
@@ -235,7 +149,7 @@ DRouter::~DRouter(
         iChannelTable[ i ].iWaitingChannel = NULL;
         iChannelTable[ i ].iType = ENormalOpen;
         }
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
     if( iPipeHandler )
         {
         delete iPipeHandler;
@@ -301,7 +215,7 @@ EXPORT_C TDes8& DRouter::AllocateDataBlock(
     C_TRACE( ( _T( "DRouter::AllocateDataBlock %d <->" ), aSize ) );
     TUint32 neededLength( aSize + ISI_HEADER_SIZE + PNS_PIPE_DATA_OFFSET_DATA );
     TDes8& tmp = this->AllocateBlock( neededLength );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
     tmp.SetLength( neededLength );
     TUint8* msgPtr = const_cast<TUint8*>( tmp.Ptr() );
     SET_RECEIVER_DEV( msgPtr, PN_DEV_DONT_CARE );    
@@ -324,7 +238,7 @@ EXPORT_C void DRouter::Close(
     OstTraceExt1( TRACE_NORMAL, DROUTER_CLOSE_ENTRY, ">DRouter::Close;aChannelId=%hx", aChannelId );
     C_TRACE( ( _T( "DRouter::Close 0x%x ->" ), aChannelId ) );
     // Channel must be from appropiate length and although it is sixteenbit value it must contain only 8-bit values. If over 8-bit changes needed.
-    ASSERT_RESET_ALWAYS( aChannelId < EIADSizeOfChannels || aChannelId < 0xff, EIADWrongParameter | EIADFaultIdentifier10 << KFaultIdentifierShift );
+    ASSERT_RESET_ALWAYS( aChannelId < EIADSizeOfChannels || aChannelId < 0xff, EIADWrongParameter | EIADFaultIdentifier10 << KFaultIdentifierShift | aChannelId << KChannelNumberShift );
     ASSERT_DFCTHREAD_INEXT();
     // If channel open (!NULL) set as closed (NULL) or if channel open is pending.
     ASSERT_RESET_ALWAYS( aChannelId < EIADSizeOfChannels, EIADWrongParameter | (TUint8)aChannelId << KChannelNumberShift | EIADFaultIdentifier21 << KFaultIdentifierShift );
@@ -454,26 +368,10 @@ EXPORT_C void DRouter::Open(
         // Null so channel is not open, set !null to mark opened channel.
         else
             {
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-            const TBool drmChannel( ( aChannel == EIADNokiaDRM || aChannel == EIADNokiaSecurityDriver ) ? ETrue : EFalse );
-            if( drmChannel )
-                {
-                C_TRACE( ( _T( "DRouter::Open channel 0x%x drm 0x%x" ), aChannel, aCallback ) );
-                OstTraceExt1( TRACE_NORMAL, DROUTER_OPEN, "DRouter::Open DRM;aChannel=%hx", aChannel );
-                iChannelTable[ aChannel ].iWaitingChannel = aCallback;
-                iChannelTable[ aChannel ].iType = EDrmOpen;
-                SendDrmReq( aChannel );
-                }
-            else
-                {
-#endif // NCP_COMMON_BRIDGE_FAMILY
-                C_TRACE( ( _T( "DRouter::Open channel 0x%x normal 0x%x" ), aChannel, aCallback ) );
-                OstTraceExt1( TRACE_NORMAL, DUP1_DROUTER_OPEN, "DRouter::Open normal;aChannel=%hx", aChannel );
-                iChannelTable[ aChannel ].iChannel = aCallback;
-                aCallback->CompleteChannelRequest( aRequest, KErrNone );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-                }
-#endif // NCP_COMMON_BRIDGE_FAMILY
+            C_TRACE( ( _T( "DRouter::Open channel 0x%x normal 0x%x" ), aChannel, aCallback ) );
+            OstTraceExt1( TRACE_NORMAL, DUP1_DROUTER_OPEN, "DRouter::Open normal;aChannel=%hx", aChannel );
+            iChannelTable[ aChannel ].iChannel = aCallback;
+            aCallback->CompleteChannelRequest( aRequest, KErrNone );
             }
         }
     else
@@ -482,17 +380,11 @@ EXPORT_C void DRouter::Open(
         OstTrace0( TRACE_NORMAL, DUP2_DROUTER_OPEN, "DRouter::Open Not ready" );        
         ASSERT_RESET_ALWAYS( !iChannelTable[ aChannel ].iWaitingChannel, EIADWrongRequest | EIADFaultIdentifier15 << KFaultIdentifierShift  );
         iChannelTable[ aChannel ].iWaitingChannel = aCallback;
-        iChannelTable[ aChannel ].iType = ( ( aChannel == EIADNokiaDRM || aChannel == EIADNokiaSecurityDriver ) ?
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-EDrmOpen : ENormalOpen );
-#else
-ENormalOpen : ENormalOpen );
-#endif // NCP_COMMON_BRIDGE_FAMILY
+        iChannelTable[ aChannel ].iType = ( ( aChannel == EIADNokiaDRM || aChannel == EIADNokiaSecurityDriver ) ? ENormalOpen : ENormalOpen );//??? TODO FIX THIS
         }
     C_TRACE( ( _T( "DRouter::Open 0x%x <-" ), aChannel ) );
-
     OstTraceExt1( TRACE_NORMAL, DROUTER_OPEN_EXIT, "<DRouter::Open;aChannel=%hx", aChannel );
-    
+
     }
 
 // With resource and media
@@ -504,52 +396,15 @@ EXPORT_C void DRouter::Open(
         )
     {
     OstTraceExt4( TRACE_NORMAL, DUP1_DROUTER_OPEN_ENTRY, ">DRouter::Open;aChannel=%hx;aRequest=%hu;aOpenInfo=%x;aCallback=%x", aChannel, aRequest, ( TUint )&( aOpenInfo ), ( TUint )( aCallback ) );
-//TODO: open with resource: change not to be permit one and in closing pn_name_remove_req.
     C_TRACE( ( _T( "DRouter::Open 0x%x %d 0x%x 0x%x ->" ), aChannel, aRequest, &aOpenInfo, aCallback ) );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-    ASSERT_RESET_ALWAYS( aCallback, EIADNullParameter | EIADFaultIdentifier20 << KFaultIdentifierShift  );
-    ASSERT_DFCTHREAD_INEXT();
-    ASSERT_RESET_ALWAYS( aChannel < EIADSizeOfChannels, EIADWrongParameter | (TUint8)aChannel << KChannelNumberShift | EIADFaultIdentifier27 << KFaultIdentifierShift );
-    if( iConnectionStatus == EIADConnectionOk )
-        {
-        // If not null channel is allready open.
-        if( iChannelTable[ aChannel ].iChannel ||
-            iChannelTable[ aChannel ].iWaitingChannel )
-            {
-            // If another channel tries to open already open channel.
-            OstTrace0( TRACE_NORMAL, DUP4_DROUTER_OPEN, "DRouter::Open already open channel" );            
-            TRACE_WARNING( iChannelTable[ aChannel ].iChannel == aCallback, (TUint8)aChannel << KChannelNumberShift );
-            aCallback->CompleteChannelRequest( aRequest, ( iChannelTable[ aChannel ].iChannel == aCallback ? KErrInUse : KErrAlreadyExists ) );
-            }
-        // Null so channel is not open, set !null to mark opened channel.
-        else
-            {
-            OstTrace0( TRACE_NORMAL, DUP3_DROUTER_OPEN, "DRouter::Open with resource" );            
-            C_TRACE( ( _T( "DRouter::Open channel with resource 0x%x 0x%x" ), aChannel, aCallback ) );
-            iChannelTable[ aChannel ].iWaitingChannel = aCallback;
-            iChannelTable[ aChannel ].iType = ENameAddOpen;
-            SendPnsNameAddReq( aChannel, aOpenInfo );
-            }
-        }
-    else
-        {
-        C_TRACE( ( _T( "DRouter::Open with resource not ready" ) ) );
-        // Opening with resource Id is not supported before IAD is initialized. 
-        // If needed, client can open channel without resource Id and send PNS_NAME_ADD_REQ after 
-        // channel open is actually completed
-        TRACE_ASSERT_INFO( 0, (TUint8)aChannel<<KChannelNumberShift );
-        ASSERT_RESET_ALWAYS( iBootDone, EIADNotSupported | EIADFaultIdentifier5 << KFaultIdentifierShift | (TUint8)aChannel<<KChannelNumberShift );        
-        }
-#else // NCP_COMMON_BRIDGE_FAMILY
     // Some maniac from modem sw decided to remove name service in the last meters, hip-hip hurray inform which clients use resource from open to help debug!
     TRACE_ASSERT_INFO( 0, (TUint8)aChannel<<KChannelNumberShift );
-    // Treat as normal open to enable the sending NOTE! resource is not functioning!!
+    // Treat as normal open to enable the sending.
+    // NOTE! SUPPORT FOR RESOURCE OPEN DOES NOT EXISTS: CLIENT SHOULD NAME SERVICE BY ISI IF. SUPPORT FOR NAME SERVICE DOES NOT EXIST IN APE SW YET: NCP_COMMON_BRIDGE_FAMILY_NAME_SERVICE_SUPPORT
     Open( aChannel, aRequest, aCallback );
-#endif // NCP_COMMON_BRIDGE_FAMILY
-
     C_TRACE( ( _T( "DRouter::Open 0x%x <-" ), aChannel ) );
-
     OstTraceExt1( TRACE_NORMAL, DUP1_DROUTER_OPEN_EXIT, "<DRouter::Open;aChannel=%hx", aChannel );
+
     }
 
 #if (NCP_COMMON_SOS_VERSION_SUPPORT >= SOS_VERSION_95)
@@ -567,7 +422,7 @@ EXPORT_C TInt DRouter::Loan(
     ASSERT_DFCTHREAD_INEXT();
     ASSERT_RESET_ALWAYS( aChannel < EIADSizeOfChannels, aChannel );
     TInt error( KErrNone );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
     // Is connection lost.
     error = ( iConnectionStatus == EIADConnectionNotOk ) ? KErrNotSupported : error;
     TRACE_ASSERT_INFO( KErrNone == error, error );
@@ -614,7 +469,7 @@ EXPORT_C TInt DRouter::ReturnLoan(
     ASSERT_DFCTHREAD_INEXT();
     ASSERT_RESET_ALWAYS( aChannel < EIADSizeOfChannels, aChannel );
     TInt error( KErrNone );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
     // Is connection lost.
     error = ( iConnectionStatus == EIADConnectionNotOk ) ? KErrNotSupported : error;
     TRACE_ASSERT_INFO( KErrNone == error, error );
@@ -701,9 +556,11 @@ EXPORT_C TInt DRouter::SendMessage(
         ASSERT_RESET_ALWAYS( aMessage.Length() > ISI_HEADER_OFFSET_RESOURCEID, EIADOverTheLimits | EIADFaultIdentifier2 << KFaultIdentifierShift  );
         if( msgBlockPtr[ ISI_HEADER_OFFSET_RESOURCEID ] == PN_PIPE && msgBlockPtr[ ISI_HEADER_OFFSET_SENDERDEVICE ] == THIS_DEVICE )
             {
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
             // This shall send the message and deallocate it too.
             error = iPipeHandler->SendPipeMessage( aMessage, aCh );
+#else
+			error = KErrNotSupported;
 #endif
             if( error != KErrNone )
                 {
@@ -729,10 +586,28 @@ EXPORT_C TInt DRouter::SendMessage(
                 SET_RECEIVER_OBJ( indicationPtr, KIADEventSubscriptionObjId );
                 this->MessageReceived( tmpIndication );
                 }
-            // The IST shall deallocate the block when it's approriate to do.
-            C_TRACE( ( _T( "DRouter::SendMessage sending 0x%x" ), &aMessage ) );
-            OstTrace1( TRACE_NORMAL, DUP3_DROUTER_SENDMESSAGE, "DRouter::SendMessage;aMessage=%x", (TUint)&(aMessage ));
-            error = SendMsg( aMessage );
+            // To communicationmanager
+            if( ( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVEROBJECT ] == PN_OBJ_EVENT_MULTICAST  )
+               && ( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN ) )
+                {
+                C_TRACE( ( _T( "DRouter::SendMessage sending to COMMUNICATIONMANAGER>" ) ) );
+                iCommunicationManager->Receive( aMessage );
+                C_TRACE( ( _T( "DRouter::SendMessage sending to COMMUNICATIONMANAGER<" ) ) );
+                }
+            else if( ( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVEROBJECT ] == PN_OBJ_ROUTING_REQ  )
+               && ( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN ) )
+                {
+                C_TRACE( ( _T( "DRouter::SendMessage sending to NAMESERVICE>" ) ) );
+                iNameService->Receive( aMessage );
+                C_TRACE( ( _T( "DRouter::SendMessage sending to NAMESERVICE<" ) ) );
+                }
+            else // Normal way
+                {
+                // The IST shall deallocate the block when it's approriate to do.
+                C_TRACE( ( _T( "DRouter::SendMessage sending 0x%x" ), &aMessage ) );
+                OstTrace1( TRACE_NORMAL, DUP3_DROUTER_SENDMESSAGE, "DRouter::SendMessage;aMessage=%x", (TUint)&(aMessage ));
+                error = SendMsg( aMessage );
+                }
             }//PIPE
         }
     else
@@ -839,20 +714,48 @@ void DRouter::HandleIsiMessage(
     OstTrace1( TRACE_NORMAL, DROUTER_HANDLEISIMESSAGE_ENTRY, ">DRouter::HandleIsiMessage;aMsg=%x", ( TUint )&( aMsg ) );
 
     C_TRACE( ( _T( "DRouter::HandleIsiMessage 0x%x ->" ), &aMsg ) );
-    const TUint16 rcvObjId( GET_RECEIVER_OBJ( aMsg ) );
-    C_TRACE( ( _T( "DRouter::HandleIsiMessage rcvObjId 0x%x" ), rcvObjId ) );
-    ASSERT_RESET_ALWAYS( rcvObjId < EIADSizeOfChannels, EIADWrongParameter | (TUint8)rcvObjId << KChannelNumberShift | EIADFaultIdentifier22 << KFaultIdentifierShift );
-    if( iChannelTable[ rcvObjId ].iChannel )
+    TUint8* msg = const_cast<TUint8*>( aMsg.Ptr() );
+    // Message from MODEM to APE, or from APE to APE. If Media SOS -> come through link. If dev OWN -> from APE nameservice
+    if( msg[ ISI_HEADER_OFFSET_MEDIA ] == PN_MEDIA_SOS || ( msg[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN ) )
         {
-        iChannelTable[ rcvObjId ].iChannel->ReceiveMsg( aMsg );
-        // DeAllocation done by the channel after writing to client's address space.
+        const TUint16 rcvObjId( GET_RECEIVER_OBJ( aMsg ) );
+        C_TRACE( ( _T( "DRouter::HandleIsiMessage rcvObjId 0x%x" ), rcvObjId ) );
+        ASSERT_RESET_ALWAYS( rcvObjId < EIADSizeOfChannels, EIADWrongParameter | (TUint8)rcvObjId << KChannelNumberShift | EIADFaultIdentifier22 << KFaultIdentifierShift );
+        if( rcvObjId == PN_OBJ_ROUTER ) //TODO to channel table
+            {
+            C_TRACE( ( _T( "DRouter::HandleIsiMessage to NAMESERVICE>" ) ) );
+            iNameService->Receive( aMsg );
+            C_TRACE( ( _T( "DRouter::HandleIsiMessage to NAMESERVICE<" ) ) );
+            }
+        else if( rcvObjId == PN_OBJ_EVENT_MULTICAST )
+            {
+            C_TRACE( ( _T( "DRouter::HandleIsiMessage to COMMUNICATIONMANAGER>" ) ) );
+            iCommunicationManager->Receive( aMsg );
+            C_TRACE( ( _T( "DRouter::HandleIsiMessage to COMMUNICATIONMANAGER<" ) ) );
+            }
+        else
+            {
+            if( iChannelTable[ rcvObjId ].iChannel )
+                {
+                iChannelTable[ rcvObjId ].iChannel->ReceiveMsg( aMsg );
+                // DeAllocation done by the channel after writing to client's address space.
+                }
+            else
+                {
+                SendCommIsaEntityNotReachableResp( aMsg );
+                // Not going to anywhere deallocate.
+                DeAllocateBlock( aMsg );
+                }
+            }
         }
-    else
+    else // PN_MEDIA_ROUTING_REQ, receivedevice != own, from nameservice, send to modem
         {
-        SendCommIsaEntityNotReachableResp( aMsg );
-        // Not going to anywhere deallocate.
-        DeAllocateBlock( aMsg );
-        }
+    	  C_TRACE( ( _T( "DRouter::CheckRouting going to MODEM" ) ) );
+    	  msg[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_SOS; // link should set this
+        TInt sendError = SendMsg( aMsg );
+        C_TRACE( ( _T( "DRouter::CheckRouting sendError %d" ), sendError ) );
+    	  }
+    
     C_TRACE( ( _T( "DRouter::HandleIsiMessage 0x%x <-" ), &aMsg ) );
 
     OstTrace0( TRACE_NORMAL, DROUTER_HANDLEISIMESSAGE_EXIT, "<DRouter::HandleIsiMessage" );    
@@ -866,7 +769,7 @@ void DRouter::HandlePipeMessage(
     OstTrace1( TRACE_NORMAL, DROUTER_HANDLEPIPEMESSAGE_ENTRY, ">DRouter::HandlePipeMessage;aMsg=%x", ( TUint )&( aMsg ) );
 
     C_TRACE( ( _T( "DRouter::HandlePipeMessage 0x%x ->" ), &aMsg ) );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
     const TUint16 rcvObjId( GET_RECEIVER_OBJ( aMsg ) );
     C_TRACE( ( _T( "DRouter::HandlePipeMessage rcvObjId 0x%x" ), rcvObjId ) );
     ASSERT_RESET_ALWAYS( rcvObjId < EIADSizeOfChannels, EIADWrongParameter | (TUint8)rcvObjId << KChannelNumberShift| EIADFaultIdentifier25 << KFaultIdentifierShift );    
@@ -898,47 +801,13 @@ void DRouter::HandleMediaMessage(
         TDes8& aMsg
         )
     {
-    OstTrace1( TRACE_NORMAL, DROUTER_HANDLEMEDIAMESSAGE_ENTRY, ">DRouter::HandleMediaMessage;aMsg=%x", ( TUint )&( aMsg ) );
 
+    OstTrace1( TRACE_NORMAL, DROUTER_HANDLEMEDIAMESSAGE_ENTRY, ">DRouter::HandleMediaMessage;aMsg=%x", ( TUint )&( aMsg ) );
     C_TRACE( ( _T( "DRouter::HandleMediaMessage 0x%x ->" ), &aMsg ) );
     TUint8 rcvObjId( 0x00);
     ASSERT_RESET_ALWAYS( aMsg.Length() > ISI_HEADER_OFFSET_MEDIA, EIADOverTheLimits | EIADFaultIdentifier3 << KFaultIdentifierShift  );
-    switch( aMsg[ ISI_HEADER_OFFSET_MEDIA ] )
-        {
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-        case PN_MEDIA_USB:
-            {
-            C_TRACE( ( _T( "DRouter::HandleMediaMessage USB" ) ) );
-            OstTrace0( TRACE_NORMAL, DROUTER_HANDLEMEDIAMESSAGE_USB, "DRouter::HandleMediaMessage USB" );            
-            rcvObjId = EIADNokiaUsbPhonetLink;
-            break;
-            }
-        case PN_MEDIA_BT:
-            {
-            C_TRACE( ( _T( "DRouter::HandleMediaMessage BT" ) ) );
-            OstTrace0( TRACE_NORMAL, DROUTER_HANDLEMEDIAMESSAGE_BT, "DRouter::HandleMediaMessage BT" );            
-            rcvObjId = EIADNokiaBtPhonetLink;
-            break;
-            }
-        //TBR AFTER CMT ERROR CORRECTION : wk49 cellmo has correction, so remove this later on
-        case PN_MEDIA_ROUTING_REQ:
-            {
-            // TODO: write an error! Someone is sending to APE with wrong media.
-            // USB PDD
-            TRACE_ASSERT_ALWAYS;
-            rcvObjId = GET_RECEIVER_OBJ( aMsg );
-            Kern::Printf("Unknown message 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x", aMsg[ 0 ], aMsg[ 1 ], aMsg[ 2 ], aMsg[ 3 ], aMsg[ 4 ], aMsg[ 5 ], aMsg[ 6 ], aMsg[ 7 ], aMsg[ 8 ], aMsg[ 9 ] );
-            break;
-            }
-#endif
-        //TBR AFTER CMT ERROR CORRECTION
-        default:
-            {
-            rcvObjId = GET_RECEIVER_OBJ( aMsg );
-            ASSERT_RESET_ALWAYS( 0, EIADUnkownMedia | ( rcvObjId << KChannelNumberShift ) );
-            break;
-            }
-        }
+    rcvObjId = GET_RECEIVER_OBJ( aMsg );
+    ASSERT_RESET_ALWAYS( 0, EIADUnkownMedia | ( rcvObjId << KChannelNumberShift ) );
     // TODO: UNIQUE
     ASSERT_RESET_ALWAYS( rcvObjId < EIADSizeOfChannels, EIADWrongParameter | (TUint8)rcvObjId << KChannelNumberShift | EIADFaultIdentifier3 << KFaultIdentifierShift  );
     if( iChannelTable[ rcvObjId ].iChannel )
@@ -953,122 +822,8 @@ void DRouter::HandleMediaMessage(
         DeAllocateBlock( aMsg );
         }
     C_TRACE( ( _T( "DRouter::HandleMediaMessage 0x%x <-" ), &aMsg ) );
-
     OstTrace0( TRACE_NORMAL, DROUTER_HANDLEMEDIAMESSAGE_EXIT, "<DRouter::HandleMediaMessage" );
-    }
 
-void DRouter::HandleControlMessage(
-        TDes8& aMsg
-        )
-    {
-    OstTrace1( TRACE_NORMAL, DROUTER_HANDLECONTROLMESSAGE_ENTRY, ">DRouter::HandleControlMessage;aMsg=%x", ( TUint )&( aMsg ) );
-
-    C_TRACE( ( _T( "DRouter::HandleControlMessage 0x%x ->" ), &aMsg ) );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-    const TUint8* msgPtr( aMsg.Ptr() );
-    // Check legal msgs
-    ASSERT_RESET_ALWAYS( msgPtr[ ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_RESP_OFFSET_SUBFUNCTION ] == PNS_MEDIA_SPECIFIC_RESP, EIADInvalidCtrlMessage | EIADFaultIdentifier1 << KFaultIdentifierShift  );
-    ASSERT_RESET_ALWAYS( msgPtr[ ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_RESP_OFFSET_MEDIATOCTRL ] == PN_MEDIA_SOS, EIADInvalidCtrlMessage | EIADFaultIdentifier2 << KFaultIdentifierShift  );
-    ASSERT_RESET_ALWAYS( msgPtr[ ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_RESP_OFFSET_ERRORCODE ] == PN_MCTRL_NO_ERROR, EIADInvalidCtrlMessage | EIADFaultIdentifier3 << KFaultIdentifierShift  );
-    ASSERT_RESET_ALWAYS( aMsg.Length() > CTRL_RESP_OFFSET_MESSAGEID,  EIADOverTheLimits | EIADFaultIdentifier4 << KFaultIdentifierShift );
-    switch( msgPtr[ CTRL_RESP_OFFSET_MESSAGEID ] )
-        {
-        case KIADCtrlConfResp:
-            {
-            // In MINI_OS case take the maximumdatasize amount from configuration message if bigger than "hat" constant.
-            iMaxFrameSize = KIADMaxIsiMsgSize;
-#ifdef NCP_COMMON_MINIOS
-            TUint16 confMsgSize = ( ( ( ( TUint16 )( msgPtr[ CTRL_CONF_RESP_OFFSET_SIZE_BYTE1 ] ) ) << 8 ) | ( ( TUint16 )( msgPtr[ CTRL_CONF_RESP_OFFSET_SIZE_BYTE2 ] ) ) );
-            // NOTE! This hat constant has relation to cmt side (sos_mm) if the const is changed in either place harmonize!!
-            const TUint16 KSosProxyHatConst( 2140 );
-            iMaxFrameSize = ( confMsgSize > KSosProxyHatConst ? confMsgSize : KIADMaxIsiMsgSize );
-            ASSERT_RESET_ALWAYS( iMaxFrameSize <= confMsgSize, EIADConfigurationInvalid );
-#endif
-            // Datalink layer initialized, router layer is this and knows it, now inform obj layer clients.
-            iConnectionStatus = EIADConnectionOk;
-            iBootDone = ETrue;
-            // Could call straight cause the context is the same thread (extension dfc)
-            NotifyObjLayerConnStat( EIADConnectionOk );
-            // TODO: pns_name_add_req
-            // Initialize channels to NULL when channel is opened !NULL.
-            for( TInt i( 0 ); i < EIADSizeOfChannels; ++i )
-                {
-                ASSERT_RESET_ALWAYS( !iChannelTable[ i ].iChannel, EIADChannelOpenedBeforePhysicalLayerInit );
-                C_TRACE( ( _T( "DRouter::HandleControlMessage loop TBR 0x%x" ), i ) );
-                if( iChannelTable[ i ].iWaitingChannel )
-                    {
-                    switch( iChannelTable[ i ].iType )
-                        {
-                        case ENormalOpen:
-                            {
-                            C_TRACE( ( _T( "DRouter::HandleControlMessage booting ENormalOpen 0x%x" ), i ) );
-                            OstTrace1( TRACE_NORMAL, DROUTER_HANDLECONTROLMESSAGE_NORMAL_OPEN, "DRouter::HandleControlMessage;i=%x", i );
-                            
-                            MIAD2ChannelApi* tmpChannel = iChannelTable[ i ].iWaitingChannel;
-                            iChannelTable[ i ].iChannel = tmpChannel;
-                            iChannelTable[ i ].iWaitingChannel = NULL;
-                            iChannelTable[ i ].iChannel->CompleteChannelRequest( EIADAsyncOpen, KErrNone );
-                            break;
-                            }
-                        case EDrmOpen:
-                            {
-                            C_TRACE( ( _T( "DRouter::HandleControlMessage booting EDrmOpen 0x%x" ), i ) );
-                            OstTrace1( TRACE_NORMAL, DROUTER_HANDLECONTROLMESSAGE_DRM_OPEN, "DRouter::HandleControlMessage EDrmOpen;i=%x", i );
-                            
-                            SendDrmReq( i );
-                            break;
-                            }
-                        case ENameAddOpen:
-                            {
-                            C_TRACE( ( _T( "DRouter::HandleControlMessage booting ENameAddOpen 0x%x" ), i ) );
-                            OstTrace1( TRACE_NORMAL, DROUTER_HANDLECONTROLMESSAGE_NAMEADD_OPEN, "DRouter::HandleControlMessage ENameAddOpen;i=%x", i );
-                            
-                            // TODO: Not done yet, problem info get as param, channel to allocate deallocate after open complete?
-                            ASSERT_RESET_ALWAYS( 0, EIADWrongParameter | EIADFaultIdentifier13 << KFaultIdentifierShift );
-                            break;
-                            }
-                        default:
-                            {
-                            ASSERT_RESET_ALWAYS( 0, EIADWrongParameter | EIADFaultIdentifier14 << KFaultIdentifierShift  );
-                            break;
-                            }
-                        }
-                    }
-                }
-            C_TRACE( ( _T( "DRouter::HandleControlMessage conf %d" ), iMaxFrameSize ) );
-            break;
-            }
-        case KIADCtrlDrmResp:
-            {
-            const TUint16 channelId( msgPtr[ CTR_DRM_REQ_RESP_OFFSET_CHANNEL_ID ] );
-            C_TRACE( ( _T( "DRouter::HandleControlMessage drm resp 0x%x" ), channelId ) );
-            OstTrace0( TRACE_NORMAL, DROUTER_HANDLECONTROLMESSAGE_DRM_RESP, "DRouter::HandleControlMessage drm resp");
-            
-            // Check is this waiting
-            ASSERT_RESET_ALWAYS( channelId < EIADSizeOfChannels, EIADWrongParameter | (TUint8)channelId << KChannelNumberShift | EIADFaultIdentifier28 << KFaultIdentifierShift );
-            TRACE_ASSERT_INFO( iChannelTable[ channelId ].iWaitingChannel, (TUint8)channelId<<KChannelNumberShift );
-            TRACE_ASSERT_INFO( !iChannelTable[ channelId ].iChannel, (TUint8)channelId<<KChannelNumberShift );
-            ASSERT_RESET_ALWAYS( iChannelTable[ channelId ].iType == EDrmOpen, EIADWrongTypeOfOpenPending | EIADFaultIdentifier1 << KFaultIdentifierShift );
-            MIAD2ChannelApi* tmpChannel = iChannelTable[ channelId ].iWaitingChannel;
-            iChannelTable[ channelId ].iChannel = tmpChannel;
-            iChannelTable[ channelId ].iWaitingChannel = NULL;
-            C_TRACE( ( _T( "DRouter::HandleControlMessage drm resp 0x%x 0x%x 0x%x 0x%x" ), channelId, tmpChannel, iChannelTable[ channelId ].iChannel, &aMsg ) );
-            iChannelTable[ channelId ].iChannel->CompleteChannelRequest( EIADAsyncOpen, KErrNone );
-            break;
-            }
-        default:
-            {
-            // If wrong message reset! IF changed take care of completion of requests.
-            ASSERT_RESET_ALWAYS( 0, EIADInvalidCtrlMessage | EIADFaultIdentifier5 << KFaultIdentifierShift  );
-            break;
-            }
-        } // switch
-#endif
-    // De-allocate cause not going anywhere else.
-    DeAllocateBlock( aMsg );
-    C_TRACE( ( _T( "DRouter::HandleControlMessage 0x%x <-" ), &aMsg ) );
-
-    OstTrace0( TRACE_NORMAL, DROUTER_HANDLECONTROLMESSAGE_EXIT, "<DRouter::HandleControlMessage" );
     }
 
 // KErrBadDescriptor, if message length too small
@@ -1131,17 +886,7 @@ void DRouter::CheckRouting(
             {
             switch( msg[ ISI_HEADER_OFFSET_RECEIVEROBJECT ] )
                 {
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-                // Router <-> SOSMM
-                case KIADObjId:
-                    {
-                    // Name add resp, drm or conf
-                    ASSERT_RESET_ALWAYS( msg[  ISI_HEADER_OFFSET_RESOURCEID ] == PN_NAMESERVICE || msg[  ISI_HEADER_OFFSET_RESOURCEID ] == PN_MEDIA_CONTROL, EIADWrongParameter | msg[  ISI_HEADER_OFFSET_RESOURCEID ] );
-                    route = ( msg[ ISI_HEADER_OFFSET_RESOURCEID ] == PN_NAMESERVICE ) ? EPnNameAddRespMsg : EControlMsg;
-                    break;
-                    }
-#endif
-                // Indication
+                // Indication NOTE! INDICATION HANDLING IS STILL LEGACY
                 case KIADEventSubscriptionObjId:
                     {
                     ASSERT_RESET_ALWAYS( msg[  ISI_HEADER_OFFSET_RESOURCEID ] != PN_PIPE, EIADWrongParameter | msg[  ISI_HEADER_OFFSET_RESOURCEID ] );
@@ -1169,6 +914,11 @@ void DRouter::CheckRouting(
             SET_RECEIVER_DEV( ptr, THIS_DEVICE );
             route = EIndicationMsg;
             }
+       else if ( msg[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_PC )// TODO: This (PN_DEV_GLOBAL) should be removed from Bridge when modem SW MCE Server is ok
+            {
+            C_TRACE( ( _T( "DRouter::CheckRouting message to PN_DEV_PC ") ) );
+            route=EUsbPhonetMsg;
+            }
 #ifdef MODEM_MCE_DOES_NOT_WORK_AS_IT_SHOULD
 #include <mceisi.h>
             else
@@ -1195,6 +945,12 @@ void DRouter::CheckRouting(
             TRACE_ASSERT_ALWAYS;
             Kern::Printf("Unknown message 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x", msg[ 0 ], msg[ 1 ], msg[ 2 ], msg[ 3 ], msg[ 4 ], msg[ 5 ], msg[ 6 ], msg[ 7 ], msg[ 8 ], msg[ 9 ] );
             }
+        }
+    // APE to APE routing
+    else if( ( msg[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN ) && ( msg[ ISI_HEADER_OFFSET_SENDERDEVICE ] == PN_DEV_OWN ) )
+        {
+        C_TRACE( ( _T( "DRouter::CheckRouting APE to APE routing" ) ) );
+        route = EIsiMsg;
         }
     // Message to other media than sos in symbian side.
     else
@@ -1228,18 +984,11 @@ void DRouter::CheckRouting(
             aTmp.DeAllocateBlock( aMsg );
             break;
             }
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-        case EControlMsg:
+        case EUsbPhonetMsg:
             {
-            aTmp.HandleControlMessage( aMsg );
+            aTmp.iChannelTable[ EIscNokiaUsbPhonetLink ].iChannel->ReceiveMsg( aMsg );
             break;
             }
-        case EPnNameAddRespMsg:
-            {
-            aTmp.HandlePnsNameAddResp( aMsg );
-            break;
-            }
-#endif // NCP_COMMON_BRIDGE_FAMILY
         case ENotKnownMsg:
             {
             // Not going to anywhere deallocate.
@@ -1266,6 +1015,7 @@ void DRouter::CommonRxDfc(
     C_TRACE( ( _T( "DRouter::CommonRxDfc ->" ) ) );
     DRouter& tmp = *reinterpret_cast<DRouter*>( aPtr );
     ASSERT_DFCTHREAD_INEXT();
+		
     if( tmp.iCommonRxQueue->Count() > KErrNone )
         {
         TDes8& msg( tmp.iCommonRxQueue->Get() );
@@ -1328,9 +1078,15 @@ void DRouter::SendCommIsaEntityNotReachableResp(
     tempPtr.Append( 0x00 );
 
 //    ASSERT_RESET_ALWAYS( iConnectionStatus == EIADConnectionOk, EIADCmtConnectionLost | EIADFaultIdentifier2 << KFaultIdentifierShift );
-    SendMsg( tempPtr );
+    if( msgTmpPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN )
+        {
+        MessageReceived( *reinterpret_cast<TDes8*>( const_cast<TDesC8*>(&aMsg) ) );
+        }
+    else
+        {
+        SendMsg( tempPtr );
+        }
     C_TRACE( ( _T( "DRouter::SendCommIsaEntityNotReachableResp 0x%x <-" ), &aMsg ) );
-
     OstTrace0( TRACE_NORMAL, DROUTER_SENDCOMMISAENTITYNOTREACHABLERESP_EXIT, "<DRouter::SendCommIsaEntityNotReachableResp" );
     }
 
@@ -1344,22 +1100,15 @@ void DRouter::InitCmtDfc(
     DRouter& tmp = *reinterpret_cast<DRouter*>( aPtr );
     if( !tmp.iBootDone )
         {
-#ifdef NCP_COMMON_BRIDGE_FAMILY
 #ifndef MODEM_MCE_DOES_NOT_WORK_AS_IT_SHOULD
         tmp.InitConnectionOk();
 #endif // MODEM_MCE_DOES_NOT_WORK_AS_IT_SHOULD
-#else
-        tmp.InitCmtConnection();
-#endif
         }
-
-// ISCE    tmp.InitCmtConnection();
     C_TRACE( ( _T( "DRouter::InitCmtDfc <-" ) ) );
-
     OstTrace0( TRACE_NORMAL, DROUTER_INITCMTDFC_EXIT, "<DRouter::InitCmtDfc" );
+
     }
 
-#ifdef NCP_COMMON_BRIDGE_FAMILY
 void DRouter::InitConnectionOk()
     {
 
@@ -1395,216 +1144,6 @@ void DRouter::InitConnectionOk()
             }
         }
     C_TRACE( ( _T( "DRouter::InitConnectionOk <-" ) ) );
-    }
-#endif // NCP_COMMON_BRIDGE_FAMILY
-
-void DRouter::InitCmtConnection(
-        // None
-        )
-    {
-    OstTrace0( TRACE_NORMAL, DROUTER_INITCMTCONNECTION_ENTRY, ">DRouter::InitCmtConnection" );
-
-    C_TRACE( ( _T( "DRouter::InitCmtConnection ->" ) ) );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-
-    // send configuration request to proxy
-    const TInt KCtrlConfReqLength( 14 );
-    //ASSERT_RESET_ALWAYS( iIST, EIADNullParameter | EIADFaultIdentifier16 << KFaultIdentifierShift  );
-    TDes8& temp = AllocateBlock( KCtrlConfReqLength );
-    ASSERT_RESET_ALWAYS( ( KCtrlConfReqLength > CTRL_REQ_OFFSET_MESSAGEID + 2 ), EIADOverTheLimits | EIADFaultIdentifier6 << KFaultIdentifierShift  );
-    temp.SetLength( KCtrlConfReqLength );
-    TUint8* tmpPtr( const_cast<TUint8*>( temp.Ptr() ) );
-    tmpPtr[ ISI_HEADER_OFFSET_MEDIA ]                                       = PN_MEDIA_SOS;
-    SET_RECEIVER_DEV( tmpPtr, PN_MEDIA_ROUTING_REQ );
-    SET_SENDER_DEV( tmpPtr, THIS_DEVICE );
-    tmpPtr[ ISI_HEADER_OFFSET_RESOURCEID ]                                  = PN_MEDIA_CONTROL;
-    SET_LENGTH( tmpPtr, ( KCtrlConfReqLength - PN_HEADER_SIZE ) );
-    SET_RECEIVER_OBJ( tmpPtr, PN_OBJ_ROUTER );
-    SET_SENDER_OBJ( tmpPtr, KIADObjId );
-    tmpPtr[ ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_REQ_OFFSET_UTID ]          = 0x00;
-    tmpPtr[ ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_REQ_OFFSET_SUBFUNCTION ]   = PNS_MEDIA_SPECIFIC_REQ;
-    tmpPtr[ ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_REQ_OFFSET_MEDIATOCTRL ]   = PN_MEDIA_SOS;
-    tmpPtr[ CTRL_REQ_OFFSET_MESSAGEID ]                                     = KIADCtrlConfReq;
-    tmpPtr[ CTRL_REQ_OFFSET_MESSAGEID + 1 ]                                 = 0x00; // Filler
-    tmpPtr[ CTRL_REQ_OFFSET_MESSAGEID +2 ]                                  = 0x00; // Filler
-    temp.SetLength( KCtrlConfReqLength );
-    SendMsg( temp );
-#endif // NCP_COMMON_BRIDGE_FAMILY
-
-    C_TRACE( ( _T( "DRouter::InitCmtConnection <-" ) ) );
-
-    OstTrace0( TRACE_NORMAL, DROUTER_INITCMTCONNECTION_EXIT, "<DRouter::InitCmtConnection" );
-    }
-
-void DRouter::SendDrmReq(
-        const TUint16 aChannelId
-        )
-    {
-    OstTraceExt1( TRACE_NORMAL, DROUTER_SENDDRMREQ_ENTRY, ">DRouter::SendDrmReq;aChannelId=%hx", aChannelId );
-
-    C_TRACE( ( _T( "DRouter::SendDrmReq 0x%x ->" ), aChannelId) );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-    // DRM REQ/RESP messages are spec so that only 8-bit values for channelid are possible.
-    ASSERT_RESET_ALWAYS( aChannelId <= 0xff, EIADTooManyBytesToPresent );
-    TDes8& block = AllocateBlock( KIADCtrlDrmReqLength );
-    ASSERT_RESET_ALWAYS( ( KIADCtrlDrmReqLength > CTRL_DRM_REQ_OFFSET_REQUIRED_CHANNEL_ID ), EIADOverTheLimits | EIADFaultIdentifier7 << KFaultIdentifierShift  );;
-    block.SetLength( KIADCtrlDrmReqLength );
-    TUint8* ptr( const_cast<TUint8*>( block.Ptr() ) );
-    ptr[ ISI_HEADER_OFFSET_MEDIA ]                                      = PN_MEDIA_SOS;
-    SET_RECEIVER_DEV( ptr, PN_MEDIA_ROUTING_REQ );
-    SET_SENDER_DEV( ptr, THIS_DEVICE );
-    ptr[ ISI_HEADER_OFFSET_RESOURCEID ]                                 = PN_MEDIA_CONTROL;
-    SET_LENGTH( ptr, ( KIADCtrlDrmReqLength - PN_HEADER_SIZE ) );
-    SET_RECEIVER_OBJ( ptr, PN_OBJ_ROUTER );
-    SET_SENDER_OBJ( ptr, KIADObjId );
-    ptr[ ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_REQ_OFFSET_UTID ]         = aChannelId;
-    ptr[ ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_REQ_OFFSET_SUBFUNCTION ]  = PNS_MEDIA_SPECIFIC_REQ;
-    ptr[ ISI_HEADER_SIZE + PNS_MEDIA_SPECIFIC_REQ_OFFSET_MEDIATOCTRL ]  = PN_MEDIA_SOS;
-    ptr[ CTRL_REQ_OFFSET_MESSAGEID ]                                    = KIADCtrlDrmReq;
-    ptr[ CTRL_DRM_REQ_OFFSET_REQUIRED_CHANNEL_ID ]                      = aChannelId;
-    ASSERT_RESET_ALWAYS( iConnectionStatus == EIADConnectionOk, EIADCmtConnectionLost | EIADFaultIdentifier3 << KFaultIdentifierShift );
-    SendMsg( block );
-#endif // NCP_COMMON_BRIDGE_FAMILY
-    C_TRACE( ( _T( "DRouter::SendDrmReq 0x%x <-" ), aChannelId) );
-
-    OstTrace0( TRACE_NORMAL, DROUTER_SENDDRMREQ_EXIT, "<DRouter::SendDrmReq" );
-    }
-
-void DRouter::SendPnsNameAddReq( 
-        const TUint16 aChannel, 
-        const TDesC8& aOpenInfo
-        )
-    {
-    OstTraceExt2( TRACE_NORMAL, DROUTER_SENDPNSNAMEADDREQ_ENTRY, ">DRouter::SendPnsNameAddReq;aChannel=%hx;aOpenInfo=%x", aChannel, ( TUint )&( aOpenInfo ) );
-
-    C_TRACE( ( _T( "DRouter::SendPnsNameAddReq 0x%x 0x%x ->" ), aChannel, &aOpenInfo ) );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-
-    TUint16 msgLength( ISI_HEADER_SIZE + SIZE_PNS_NAME_ADD_REQ );
-    TDes8& block = AllocateBlock( msgLength );
-    ASSERT_RESET_ALWAYS( ( msgLength > ( ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 7 ) ), EIADOverTheLimits | EIADFaultIdentifier8 << KFaultIdentifierShift );
-    block.SetLength( msgLength );
-    TUint8* ptr = const_cast<TUint8*>( block.Ptr() );
-
-    ptr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_SOS;
-    SET_RECEIVER_DEV( ptr, OTHER_DEVICE_1 );
-    SET_SENDER_DEV( ptr, THIS_DEVICE );
-    ptr[ ISI_HEADER_OFFSET_RESOURCEID ] = PN_NAMESERVICE;
-    SET_LENGTH( ptr, ( msgLength - PN_HEADER_SIZE ) );
-    SET_RECEIVER_OBJ( ptr, PN_OBJ_ROUTER);
-    SET_SENDER_OBJ( ptr, KIADObjId );
-    ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_UTID ] = aChannel; 
-    ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_SUBFUNCTION ] = PNS_NAME_ADD_REQ;
-    ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_RESERVED1 ] = 0x00;
-    ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_RESERVED2 ] = 0x00;
-
-    TUint8* resourcePtr = const_cast<TUint8*>( aOpenInfo.Ptr() );
-    /*
-    //TBR
-    for( TInt i( 0 ); i < aOpenInfo.Length(); i++ )
-        {
-        Kern::Printf( "resource[%d]0x%x", i, resourcePtr[i] );
-        }
-    //TBR
-    */
-    switch( aOpenInfo.Length() )
-        {
-        // Resource bigendian 32-bit, TODO : how about winscw?
-        case 4:
-            {
-            C_TRACE( ( _T( "DRouter::SendPnsNameAddReq 32-bit resourceid used 0x%x 0x%x" ), aChannel, &aOpenInfo ) );
-            OstTraceExt5( TRACE_NORMAL, DROUTER_SENDPNSNAMEADDREQ_32BIT, "DRouter::SendPnsNameAddReq;aChannel=%hx;resourcePtr[0]=%hhx;resourcePtr[1]=%hhx;resourcePtr[2]=%hhx;resourcePtr[3]=%hhx", aChannel, resourcePtr[0], resourcePtr[1], resourcePtr[2], resourcePtr[3] );
-            
-            ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY ] = resourcePtr[ 0 ];
-            ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 1 ] = resourcePtr[ 1 ];
-            ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 2 ] = resourcePtr[ 2 ];
-            ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 3 ] = resourcePtr[ 3 ];
-            break;
-            }
-        case 1:
-            {
-            ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY ] = 0x00;
-            ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 1 ] = 0x00;
-            ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 2 ] = 0x00;
-            ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 3 ] = resourcePtr[ 0 ];
-            OstTraceExt2( TRACE_NORMAL, DROUTER_SENDPNSNAMEADDREQ_8BIT, "DRouter::SendPnsNameAddReq;aChannel=%hx;resourcePtr[0]=%hhx", aChannel, resourcePtr[0] );
-            C_TRACE( ( _T( "DRouter::SendPnsNameAddReq 8-bit resourceid used 0x%x 0x%x" ), aChannel, &aOpenInfo ) );
-            break;
-            }
-        default:
-            {
-            ASSERT_RESET_ALWAYS( 0, EIADWrongParameter | EIADFaultIdentifier17 << KFaultIdentifierShift  );
-            break;
-            }
-        }
-    // Phonet device id associated with name.
-    ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 4 ] = THIS_DEVICE;
-    // Phonet object id associated with name.
-    ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 5 ] = aChannel;
-    // Record flags. This entry cannot be changed.
-    ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 6 ] = PN_NAME_NOCHG;
-    ptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + 7 ] = 0x00;
-    ASSERT_RESET_ALWAYS( iConnectionStatus == EIADConnectionOk, EIADCmtConnectionLost | EIADFaultIdentifier4 << KFaultIdentifierShift );
-    SendMsg( block );
-#endif // NCP_COMMON_BRIDGE_FAMILY
-    C_TRACE( ( _T( "DRouter::SendPnsNameAddReq 0x%x 0x%x <-" ), aChannel, &aOpenInfo ) );
-
-    OstTrace0( TRACE_NORMAL, DROUTER_SENDPNSNAMEADDREQ_EXIT, "<DRouter::SendPnsNameAddReq" );
-    }
-
-void DRouter::HandlePnsNameAddResp(
-        TDes8& aMsg
-        )
-    {
-    OstTrace1( TRACE_NORMAL, DROUTER_HANDLEPNSNAMEADDRESP_ENTRY, ">DRouter::HandlePnsNameAddResp;aMsg=%x", ( TUint )&( aMsg ) );
-
-    C_TRACE( ( _T( "DRouter::HandlePnsNameAddResp 0x%x ->" ), &aMsg ) );
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-
-    // Channel id from Transaction ID.
-    const TUint8* cptr( aMsg.Ptr() );
-    ASSERT_RESET_ALWAYS( ( ISI_HEADER_SIZE + PNS_NAME_ADD_RESP_OFFSET_REASON ) < aMsg.Length(), EIADOverTheLimits | EIADFaultIdentifier9 << KFaultIdentifierShift  );
-    TUint8 channelId( cptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_UTID ] );
-    ASSERT_RESET_ALWAYS( channelId < EIADSizeOfChannels, EIADWrongParameter | (TUint8)channelId << KChannelNumberShift | EIADFaultIdentifier23 << KFaultIdentifierShift );
-    if( iChannelTable[ channelId ].iWaitingChannel )
-        {
-        ASSERT_RESET_ALWAYS( iChannelTable[ channelId ].iType == ENameAddOpen, EIADWrongTypeOfOpenPending | EIADFaultIdentifier2 << KFaultIdentifierShift );
-        if( cptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_RESP_OFFSET_REASON ] == PN_NAME_OK )
-            {
-            MIAD2ChannelApi* tmpChannel = iChannelTable[ channelId ].iWaitingChannel;
-            iChannelTable[ channelId ].iChannel = tmpChannel;
-            iChannelTable[ channelId ].iWaitingChannel = NULL;
-            C_TRACE( ( _T( "DRouter::HandlePnsNameAddResp name add resp ok 0x%x 0x%x 0x%x 0x%x" ), channelId, tmpChannel, iChannelTable[ channelId ].iChannel, &aMsg ) );
-
-            OstTraceExt2( TRACE_NORMAL, DROUTER_HANDLEPNSNAMEADDRESP_OK, "DRouter::HandlePnsNameAddResp OK;channelId=%hhx;tmpChannel=%x", channelId, (TUint) ( tmpChannel ) );
-            
-            iChannelTable[ channelId ].iChannel->CompleteChannelRequest( EIADAsyncOpen, KErrNone );
-            }
-        else
-            {
-            C_TRACE( ( _T( "DRouter::HandlePnsNameAddResp name add resp NOK 0x%x 0x%x" ), channelId, &aMsg ) );
-            OstTraceExt1( TRACE_NORMAL, DROUTER_HANDLEPNSNAMEADDRESP_NOK, "DRouter::HandlePnsNameAddResp;channelId=%hhx", channelId );
-            
-            TRACE_ASSERT( cptr[ ISI_HEADER_SIZE + PNS_NAME_ADD_RESP_OFFSET_REASON ] == PN_NAME_OK );
-            iChannelTable[ channelId ].iWaitingChannel->CompleteChannelRequest( EIADAsyncOpen, KErrNotSupported );
-            // Set channel open waiting to null, open was failed.
-            iChannelTable[ channelId ].iWaitingChannel = NULL;
-            }
-        }
-    else
-        {
-        // Check is this waiting
-        // TODO: Does pns_name_add_resp need to be informed with comm_isa_entity_not_reachable_resp if channel is closed?
-        TRACE_ASSERT_INFO( !iChannelTable[ channelId ].iChannel, channelId<<KChannelNumberShift );
-        TRACE_ASSERT_INFO( iChannelTable[ channelId ].iWaitingChannel, channelId<<KChannelNumberShift ); // TODO: This will come when open cancel called with resource.
-        }
-    // De-allocate cause not going anywhere else.
-    DeAllocateBlock( aMsg );
-#endif // NCP_COMMON_BRIDGE_FAMILY
-
-    C_TRACE( ( _T( "DRouter::HandlePnsNameAddResp 0x%x <-" ), &aMsg ) );
-
-    OstTrace0( TRACE_NORMAL, DROUTER_HANDLEPNSNAMEADDRESP_EXIT, "<DRouter::HandlePnsNameAddResp" );
     }
 
 // router and handler (pipe and indication)
@@ -1665,40 +1204,34 @@ void DRouter::SetSenderInfo(
          )
     {
     OstTraceExt2( TRACE_NORMAL, DROUTER_SETSENDERINFO_ENTRY, ">DRouter::SetSenderInfo;aMessage=%x;aCh=%hx", ( TUint )&( aMessage ), aCh );
-
-    C_TRACE( ( _T( "DRouter::SetSenderInfo 0x%x ->" ), &aMessage ) );    
+    C_TRACE( ( _T( "DRouter::SetSenderInfo 0x%x ->" ), &aMessage ) );
     TUint8* msgBlockPtr = const_cast<TUint8*>( aMessage.Ptr() );
     ASSERT_RESET_ALWAYS( aMessage.Length() > ISI_HEADER_OFFSET_MEDIA, EIADOverTheLimits | EIADFaultIdentifier10 << KFaultIdentifierShift  );
-    switch( aCh )
-        {
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-        case EIADNokiaBtPhonetLink:
+    if ( aCh == EIADNokiaUsbPhonetLink )
+ 	      {
+        msgBlockPtr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_SOS;
+        SET_RECEIVER_DEV( msgBlockPtr, OTHER_DEVICE_1 );
+        }
+    else{
+        SET_SENDER_OBJ( msgBlockPtr, aCh );    
+        C_TRACE( ( _T( "DRouter::SetSenderInfo receiver device %d" ), msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] ) );
+        if( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN )
             {
-            OstTrace0( TRACE_NORMAL, DROUTER_SETSENDERINFO_BT, "DRouter::SetSenderInfo BT" );            
-            msgBlockPtr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_BT;
-            break;
+            C_TRACE( ( _T( "DRouter::SetSenderInfo message to APE from APE" ) ) );
+            SET_SENDER_DEV( msgBlockPtr, PN_DEV_OWN );
             }
-        case EIADNokiaUsbPhonetLink:
+        else
             {
-            OstTrace0( TRACE_NORMAL, DROUTER_SETSENDERINFO_USB, "DRouter::SetSenderInfo USB" );            
-            msgBlockPtr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_USB;
-            break;
-            }
-#endif
-        default:
-            {
+            C_TRACE( ( _T( "DRouter::SetSenderInfo message to MODEM from APE" ) ) );
             msgBlockPtr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_SOS;
-            SET_SENDER_DEV( msgBlockPtr, THIS_DEVICE );
             SET_RECEIVER_DEV( msgBlockPtr, OTHER_DEVICE_1 );
-            SET_SENDER_OBJ( msgBlockPtr, aCh );
-            break;
+            SET_SENDER_DEV( msgBlockPtr, THIS_DEVICE );
             }
         }
-    C_TRACE( ( _T( "DRouter::SetSenderInfo 0x%x <-" ), &aMessage ) );        
-    
+    C_TRACE( ( _T( "DRouter::SetSenderInfo 0x%x <-" ), &aMessage ) );
     OstTrace0( TRACE_NORMAL, DROUTER_SETSENDERINFO_EXIT, "<DRouter::SetSenderInfo" );
     }
-    
+
 void DRouter::CheckSameThreadContext()
     {
     OstTrace0( TRACE_NORMAL, DROUTER_CHECKSAMETHREADCONTEXT_ENTRY, ">DRouter::CheckSameThreadContext" );
@@ -1768,11 +1301,7 @@ TUint8 DRouter::MapMediaToLinkId(
         {
         case PN_MEDIA_SOS:
             {
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-            linkdId = EISIMediaSOS;
-#else
             linkdId = EISIMediaHostSSI;
-#endif
             break;
             }
         // Not supported media
@@ -1784,6 +1313,48 @@ TUint8 DRouter::MapMediaToLinkId(
         }
     return linkdId;
 
+    }
+
+//From objectapi
+EXPORT_C MISIObjectRouterIf* MISIObjectRouterIf::Connect( const TInt32 aUID, TUint8& aObjId, MISIRouterObjectIf* aCallback )
+    {
+    C_TRACE( ( _T( "MISIObjectRouterIf::Connect %d 0x%x 0x%x>" ), aUID, aObjId, aCallback ) );
+    //Connect( aUID, aObjId, aCallback );
+    if( aUID == KNameServiceUID )
+        {
+        C_TRACE( ( _T( "MISIObjectRouterIf was nameservice" ) ) );
+        DRouter::iThisPtr->iNameService = aCallback;
+        aObjId = PN_OBJ_ROUTING_REQ; // 0x00
+        }
+    else if( aUID == KCommunicationManagerUID )
+        {
+        C_TRACE( ( _T( "MISIObjectRouterIf was communicationmanager" ) ) );
+        DRouter::iThisPtr->iCommunicationManager = aCallback;
+        aObjId = PN_OBJ_EVENT_MULTICAST; // 0x20
+        }
+    else
+        {
+        C_TRACE( ( _T( "MISIObjectRouterIf unknown object api client" ) ) );
+        }
+    MISIObjectRouterIf* tmp = DRouter::iThisPtr;
+    C_TRACE( ( _T( "MISIObjectRouterIf::Connect %d 0x%x 0x%x<" ), aUID, aObjId, aCallback ) );
+    return tmp;
+    }
+
+TInt DRouter::Send( TDes8& aMessage, const TUint8 aObjId )
+    {
+  	C_TRACE( ( _T( "DRouter::Send objectapi 0x%x 0x%x>" ), &aMessage, aObjId ) );
+    if( aObjId == PN_OBJ_EVENT_MULTICAST ) //from communicationmanager
+        {
+        // Don't put to mainrxqueue
+        HandleIsiMessage( aMessage );
+        }
+    else
+        {
+        Receive( aMessage );
+        }
+    C_TRACE( ( _T( "DRouter::Send objectapi 0x%x 0x%x<" ), &aMessage, aObjId ) );
+  	return KErrNone;
     }
 
 // End of file.

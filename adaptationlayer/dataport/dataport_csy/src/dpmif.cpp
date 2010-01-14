@@ -29,9 +29,9 @@
 #include "dppif.h"      // pipe interface pif
 #include "dpcommpep.h"  // comm pep interface. interaction with mif
 #include "dplog.h"      // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpmiftraces.h"
+#include "dpmifTraces.h"
 #endif
 
 

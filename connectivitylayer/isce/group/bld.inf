@@ -39,6 +39,9 @@ PRJ_EXPORTS
 ../p2prouter_dll/inc/mp2pif.h                   NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(mp2pif.h)
 ../p2prouter_dll/inc/p2pdefs.h                  NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(p2pdefs.h)
 
+// NAMESERVICE
+../isinameservice_dll/inc/nsisi.h                   NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(nsisi.h)
+
 // ISC & ISI
 ../isaaccessextension_dll/inc/isakernelapi.h        NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(isakernelapi.h)
 ../isaaccessextension_dll/inc/iscnokiadefinitions.h NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(iscnokiadefinitions.h)
@@ -57,6 +60,10 @@ PRJ_MMPFILES
 ../isaaccessextension_dll/group/isaaccessextension.mmp
 ../isaaccessldd_ldd/group/isaaccessesldd.mmp
 ../iscapi_dll/group/isauserapi.mmp
+// NameService
+../isinameservice_dll/group/isinameservice.mmp
+// CommunicationManager
+../isicommunicationmanager_dll/group/isicommunicationmanager.mmp
 
 #else
 // No actions

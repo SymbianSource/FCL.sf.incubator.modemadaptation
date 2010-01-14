@@ -22,9 +22,9 @@
 #include <ctsy/serviceapi/mmtsy_ipcdefs.h>
 #include "tsylogger.h"
 #include "cmmphonebookoperationread3g_adn.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmphonebookoperationreadtraces.h"
+#include "cmmphonebookoperationreadTraces.h"
 #include "OstTraceDefinitions.h"
 #include "cmmphonebookoperationread3g_adnTraces.h"
 #endif
@@ -93,7 +93,9 @@ CMmPhoneBookOperationRead3g_adn::~CMmPhoneBookOperationRead3g_adn
 //
 CMmPhoneBookOperationRead3g_adn* CMmPhoneBookOperationRead3g_adn::NewL
     (
-// NONE
+            CMmPhoneBookStoreMessHandler* /*aMmPhoneBookStoreMessHandler*/,
+            CMmUiccMessHandler* /*aUiccMessHandler*/,
+            const CMmDataPackage* /*aDataPackage*/ // Data
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::NewL");

@@ -30,6 +30,7 @@
 #include "cmmphonemesshandler.h"
 #include "cmmsupplservmesshandler.h"
 #include "cmmphonebookstoremesshandler.h"
+#include "cmmenstoremesshandler.h"
 #include "cmmpacketservicemesshandler.h"
 #include "cmmpacketcontextmesshandler.h"
 #include "cmmpacketqosmesshandler.h"
@@ -50,9 +51,9 @@
 #include <pipe_sharedisi.h>
 #include <ctsy/rmmcustomapi.h>
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmmessageroutertraces.h"
+#include "cmmmessagerouterTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES
@@ -285,6 +286,10 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMMESSAGEROUTER_CONSTRUCTL, "CMmMessageRouter::Co
         this,
         iMmUiccMessHandler);
 
+    iMmENStoreMessHandler = CMmENStoreMessHandler::NewL(
+        this,
+        iMmUiccMessHandler);
+
     iMmPacketServiceMessHandler = CMmPacketServiceMessHandler::NewL(
         iPhoNetSender,
         iPhoNetReceiver,
@@ -390,6 +395,8 @@ OstTrace1( TRACE_NORMAL, CMMMESSAGEROUTER_ROUTEREQUEST, "CMmMessageRouter::Route
             //CSD features
             case EEtelCallLoanDataPort:
             case EEtelCallRecoverDataPort:
+            // for call control purposes
+            case ESatNotifyCallControlRequest:
                 {
                 messHandler = iMmCallMessHandler;
                 break;
@@ -436,8 +443,17 @@ OstTrace1( TRACE_NORMAL, CMMMESSAGEROUTER_ROUTEREQUEST, "CMmMessageRouter::Route
             case EMmTsyPhoneBookStoreInitIPC:
             case EMmTsyPhoneBookStoreCacheCancelIPC:
             case EMobilePhoneGetMailboxNumbers:
+            case EMmTsyONStoreReadIPC:
+            case EMmTsyONStoreReadEntryIPC:
                 {
                 messHandler = iMmPhoneBookStoreMessHandler;
+                break;
+                }
+            case EMmTsyENStoreReadAllPhase1IPC:
+            case EMmTsyENStoreReadIPC:
+            case EMmTsyENStoreGetInfoIPC:
+                {
+                messHandler = iMmENStoreMessHandler;
                 break;
                 }
             case EPacketAttach:
@@ -506,7 +522,7 @@ OstTrace1( TRACE_NORMAL, CMMMESSAGEROUTER_ROUTEREQUEST, "CMmMessageRouter::Route
             case ECustomNotifyIccCallForwardingStatusChangeIPC:
             // Temporary until SAT: ETEL Multimode API
             // usage for SAT has been implemented
-            case ESatNotifyCallControlRequest:
+            case ESatNotifySendSsPCmd:
                 {
                 messHandler = iMmSupplServMessHandler;
                 break;

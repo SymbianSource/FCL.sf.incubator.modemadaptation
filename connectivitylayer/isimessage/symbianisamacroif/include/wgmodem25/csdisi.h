@@ -13,15 +13,16 @@
 * 
 * Description:
 * Name      : PN_CSD [ 0x16 ] Resource Circuit Switched Data Server
-* Version   : 012.000
+* Version   : 013.000
+*
+* Documentation: www.wirelessmodemapi.com
 *
 */
-
 
 #ifndef _SYMBIAN_ISI_CSDISI_H_
 #define _SYMBIAN_ISI_CSDISI_H_
 
-#define CIRCUIT_SWITCHED_DATA_SERVER_ISI_VERSION_Z	 12
+#define CIRCUIT_SWITCHED_DATA_SERVER_ISI_VERSION_Z	 13
 #define CIRCUIT_SWITCHED_DATA_SERVER_ISI_VERSION_Y	 0
 
 

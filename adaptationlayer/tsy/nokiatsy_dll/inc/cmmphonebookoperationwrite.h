@@ -34,6 +34,18 @@
     //none
 
 //  EXTERNAL DATA STRUCTURES
+enum TPBWritePhases
+    {
+    EPBWritePhase_Read_Entry = 0,
+    EPBWritePhase_Read_Ext_Entry,
+    EPBWritePhase_Search_Ext_Entry,
+    EPBWritePhase_Write_Entry,
+    EPBWritePhase_Write_Ext_Entry,
+    EPBWritePhase_Read_MBI_profile,
+    EPBWritePhase_Write_MBI_profile,
+    EPBWritePhase_complete
+    };
+
 
 //  FUNCTION PROTOTYPES
     //none
@@ -90,9 +102,10 @@ class CMmPhoneBookOperationWrite
         * @param aDataPackage Packaged data.
         * @return KErrNone or error value.
         */
-        TInt CreateReq(
+        TInt UICCCreateReq(
             TInt aIpc,
-            const CMmDataPackage* aDataPackage );
+            const CMmDataPackage* aDataPackage,
+            TUint8 aTransId );
 
         /**
         * Handles SimPbResp ISI -message
@@ -102,33 +115,130 @@ class CMmPhoneBookOperationWrite
         *        operationlist or not.
         * @return KErrNone or error value.
         */
-        TInt HandleSimPbRespL(
-            const TIsiReceiveC& aIsiMessage,
-            TBool& aComplete );
+        TBool HandleUICCPbRespL(
+                TInt aStatus,
+                TUint8 aDetails,
+                const TDesC8& aFileData,
+                TInt aTransId );
 
         /**
-        * Handles HandleWriteResp ISI -message
+        * Handles HandleWriteReadEntryResp aFileData
         *
-        * @param aIsiMessage
-        * @param aComplete Indicates if request can remove from
-        *        operationlist or not.
-        * @return KErrNone or error value.
+        * @param aFileData
+        * @param aTransId - Transaction id received
+        * @param aFileId - file id for main PB file
+        * @param aFileIdExt - file Id for EXT fiel related to main PB file
+        * @ param aArrayIndex - Array index for the Array in which configuration data Stored
+        * @param aStatus - Response message status
+        * @return complete 
         */
-        TInt HandleWriteResp(
-            const TIsiReceiveC& aIsiMessage,
-            TBool& aComplete );
+        TInt HandleWriteReadEntryResp(
+            TInt aStatus,
+            const TDesC8& aFileData,
+            TUint8 aTransId,
+            TUint16 aFileId,
+            TUint16 aFileIdExt,
+            TUint8 aArrayIndex );
 
         /**
-        * Handling write response at delete phase
+        * Handles HandleWriteReadExtEntryResp aFileData
         *
-        * @param aIsiMessage
-        * @param aComplete Indicates if request can remove from
-        *        operationlist or not.
-        * @return KErrNone or error value.
+        * @param aFileData
+        * @param aTransId - Transaction id received
+        * @param aFileId - file id for main PB file
+        * @param aFileIdExt - file Id for EXT fiel related to main PB file
+        * @ param aArrayIndex - Array index for the Array in which configuration data Stored
+        * @param aStatus - Response message status
+        * @return complete 
         */
-        TInt HandleWriteDeleteL(
-            const TIsiReceiveC& aIsiMessage,
-            TBool& aComplete );
+        TInt HandleWriteReadExtEntryResp(
+            TInt aStatus,
+            const TDesC8& aFileData,
+            TUint8 aTransId,
+            TUint16 aFileId,
+            TUint16 aFileIdExt);
+
+        /**
+        * Handles HandleWriteSearchExtEntryResp aFileData
+        *
+        * @param aFileData
+        * @param aTransId - Transaction id received
+        * @param aFileId - file id for main PB file
+        * @param aFileIdExt - file Id for EXT fiel related to main PB file
+        * @ param aArrayIndex - Array index for the Array in which configuration data Stored
+        * @param aStatus - Response message status
+        * @return complete 
+        */
+        TInt HandleWriteSearchExtEntryResp(
+            TInt aStatus,
+            const TDesC8& aFileData,
+            TUint8 aTransId,
+            TUint16 aFileId,
+            TUint16 aFileIdExt );
+        
+        /**
+        * Handles HandleWriteEntryResp aFileData
+        *
+        * @param aFileData
+        * @param aTransId - Transaction id received
+        * @param aFileId - file id for main PB file
+        * @param aFileIdExt - file Id for EXT fiel related to main PB file
+        * @ param aArrayIndex - Array index for the Array in which configuration data Stored
+        * @param aStatus - Response message status
+        * @return complete 
+        */
+        TInt HandleWriteEntryResp(
+            TInt aStatus,
+            TUint8 aTransId,
+            TUint16 aFileId,
+            TUint16 aFileIdExt );
+
+        /**
+        * Handles HandleWriteExtEntryResp aFileData
+        *
+        * @param aFileData
+        * @param aTransId - Transaction id received
+        * @param aFileId - file id for main PB file
+        * @param aFileIdExt - file Id for EXT fiel related to main PB file
+        * @ param aArrayIndex - Array index for the Array in which configuration data Stored
+        * @param aStatus - Response message status
+        * @return complete 
+        */
+        TInt HandleWriteExtEntryResp(
+            TInt aStatus,
+            TUint8 aTransId,
+            TUint16 aFileId,
+            TUint16 aFileIdExt);
+        
+        /**
+        * Handles HandleWriteMBIReadResp aFileData
+        *
+        * @param aFileData
+        * @param aTransId - Transaction id received
+        * @param aFileId - file id for main PB file
+        * @param aFileIdExt - file Id for EXT fiel related to main PB file
+        * @ param aArrayIndex - Array index for the Array in which configuration data Stored
+        * @param aStatus - Response message status
+        * @return complete 
+        */
+        TInt HandleWriteMBIReadResp( 
+                TInt aStatus,
+                TUint8 aDetails,
+                TUint8 aTransId,
+                const TDesC8 &aFileData ); 
+        
+        
+        /**
+        * Handles HandleWriteMBIWriteResp aFileData
+        *
+        * @param aStatus
+        * @param aDetails -
+        * @param aTransId - Transaction id received
+        * @return complete 
+        */
+        TInt HandleWriteMBIWriteResp(
+                TInt aStatus,
+                TUint8 aDetails );
 
         /**
         * Creates and sends ISI message in order to wite an entry to SIM
@@ -138,7 +248,7 @@ class CMmPhoneBookOperationWrite
         * @param aDataToWrite Entry to write
         * @return KErrNone or error value
         */
-        TInt SimPbReqWriteL(
+        TInt UiccPbReqWriteL(
             TUint8 aTraId,
             TInt16 aIndex,
             CPhoneBookStoreEntry& aDataToWrite );
@@ -148,148 +258,89 @@ class CMmPhoneBookOperationWrite
         *
         * @param aTraId Transaction id
         * @param aIndex Location index
-        * @return KErrNone or error value
-        */
-        TInt SimPbReqWriteDelete(
-            TUint8 aTraId,
-            const TInt16 aIndex );
-
-        /**
-        * Compose 3G data if available
-        *
-        * @param aDataToWrite Entry
-        * @param aDataPtr Reference to data
-        * @param aErrVal error value
-        * @return KErrNone or error value
-        */
-        TInt Compose3GDataL(
-            CPhoneBookStoreEntry& aDataToWrite,
-            TDes8& aDataPtr
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-            ,TInt& aErrVal
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-             );
-
-        /**
-        * Count sublock length
-        *
         * @param aDataToWrite Entry to write
-        * @param aNumOfSubblocks Number of subblocks
-        * @param aMessageLength MessageLength
-        * @return None
-        */
-        void CountSublocksAndMessLength(
-            CPhoneBookStoreEntry& aDataToWrite,
-            TUint8& aNumOfSubblocks,
-            TInt& aMessageLength );
-
-        /**
-        * Create SIM_DATA_SIZE_READ_REQ message.
-        *
-        * @param aTraId Transaction Id
-        * @param aComplete
-        * @return KErrNone or error value.
-        */
-        TInt BuildSimDataSizeReadReqData(
-            TUint8 aTraId,
-            TBool& aComplete );
-
-        /**
-        * Handling error situation
-        *
-        * @param aIsiMessage ISI message
-        * @param aStatus Status from ISI message
-        * @param aSbStartOffSet Offset to data
-        * @return KErrNone or error value.
-        */
-        TInt ErrorStatusHandling(
-            const TIsiReceiveC& aIsiMessage,
-            TUint8 aStatus,
-            TUint& aSbStartOffSet );
-
-        /**
-        * Add tSIM_SB_NAME_NUMBER
-        *
-        * @param aSubBlockId Subblock Id
-        * @param aLocation Location
-        * @param aName Reference to data name
-        * @param aNumber Reference to data number
-        * @param aDataToAppend Reference to data
-        * @return None
-        */
-        void AddSimSbNameNumberSubBlock(
-            TUint16& aSubBlockId,
-            TInt16& aLocation,
-            TDesC& aName,
-            TDesC& aNumber,
-            TDes8& aDataToAppend );
-
-        /**
-        * Add tSIM_SB_TEXT_NUMBER
-        *
-        * @param aSubBlockId Reference to subblock data
-        * @param aLocation Location
-        * @param aText Reference to text data
-        * @param aDataToAppend Reference to data
-        * @return None
-        */
-        void AddSimSbTextSubBlock(
-            const TUint16& aSubBlockId,
-            TInt16& aLocation,
-            TDesC& aText,
-            TDes8& aDataToAppend );
-
-        /**
-        * Add tSIM_SB_NUMBER_NUMBER
-        *
-        * @param aLocation Location
-        * @param aNumber Reference to number
-        * @param aAasRecordNumber AAS number
-        * @param aDataToAppend Reference to data
-        * @return None
-        */
-        void AddSimSbNumberSubBlock( const TUint16& aSubBlockId,
-            TInt16& aLocation,
-            TDesC& aNumber,
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-            TUint8 aAasRecordNumber,
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-            TDes8& aDataToAppend );
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-
-        /**
-        * Add tSIM_SB_GROUP_NUMBER
-        *
-        * @param aSubBlockId
-        * @param aGrpLocation
-        * @param aGasLocations
-        * @param aDataToAppend:
-        * @return None
-        */
-        void AddSimSbGroupSubBlock( const TUint16& aSubBlockId,
-            TInt16& aGrpLocation,
-            CArrayFixFlat<TInt>* aGasLocations,
-            TDes8& aDataToAppend );
-
-        /**
-        * Creates and sends ISI message in order to write alphastring to SIM.
-        *
-        * @param None
         * @return KErrNone or error value
         */
-        TInt SimWriteAlphaStringReq();
+        TInt UiccPBReqWriteEntry(
+                TUint16 aFileId,
+                TUint8 aIndex,
+                TUint8 aTraId,
+                CPhoneBookStoreEntry& aDataToWrite );
 
         /**
-        * Receives SIM_PB_RESP(SIM_PB_WRITE) ISI messages from phonet receiver
-        *
-        * @param aIsiMessage Reference to the received message.
-        * @return KErrNone or error code
+        * Creates and sends ISI message in order to wite an ext to SIM
+        * @param aFileId File Id
+        * @param aTraId Transaction id
+        * @param aIndex Location index
+        * @param aFileId 
+        * @param aDataToWrite Entry to write
+        * @return KErrNone or error value
         */
-        TInt SimWriteAlphaStringRespL( const TIsiReceiveC& aIsiMessage );
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
+        TInt UiccPbReqWriteExt(
+                TUint8 aTraId,
+                TUint8 aIndex,
+                TUint16 aFileId,
+                TUint16 aFileIdExt,
+                CPhoneBookStoreEntry& aDataToWrite );
 
+        /**
+        * Creates and sends ISI message in order to read an existing entry Ext record from SIM
+        *
+        * @param aTraId Transaction id
+        * @param aIndex Location index
+        * @param aFileId File id
+        * @return KErrNone or error value
+        */
+        TInt UiccPbReqWriteReadExt(
+                TUint16 aFileId,
+                TUint16 aFileIdExt,
+                TUint8 aIndex,
+                TUint8 aTraId );
 
+        /**
+        * Creates and sends ISI message in order to read an existing entry from SIM
+        *
+        * @param aTraId Transaction id
+        * @param aIndex Location index
+        * @param aFileId File id
+        * @return KErrNone or error value
+        */
+        TInt UiccPbReqWriteRead(
+                TUint16 aFileId,
+                TUint8 aIndex,
+                TUint8 aTraId );
+
+        /**
+        * Creates and sends ISI message in order to delete EXT file record releted to PB entry
+        * @param aTraId Transaction id
+        * @param aIndex Location index
+        * @param aDataToWrite Entry to write
+        * @return KErrNone or error value
+        */
+        TInt UiccPbReqWriteExtDelete(
+                TUint16 aFileId,
+                TUint16 aFileIdExt,
+                TUint8 aIndex,
+                TUint8 aTransId );
+        
+        /**
+        * Creates and sends ISI message in order to read MBI Profile form first record
+        * @param aTraId Transaction id
+        * @param aIndex Location index
+        * @param aDataToWrite Entry to write
+        * @return KErrNone or error value
+        */
+        TInt UiccPbReqReadMBI( TUint8 aIndex, TUint8 aTransId );
+
+        
+        /**
+        * Creates and sends ISI message in order to write MBI Profile form first record
+        * @param aTraId Transaction id
+        * @param aIndex Location index
+        * @param aDataToWrite Entry to write
+        * @return KErrNone or error value
+        */
+        TInt UiccPBReqWriteMBIProfile( TUint8 aTransId, TUint8 aIndex, TUint8 aOperationType );
     public:     // Data
         // None
 
@@ -303,6 +354,33 @@ class CMmPhoneBookOperationWrite
 
         // Keep track on current write -phase
         TPBWritePhases iCurrentWritePhase;
+        
+        // Array to Store new EXT records
+        RArray<TInt> iExtRecordArrayToBeWrite;
+        
+        // Array to store EXT record nos to be delete
+       RArray<TInt> iExtRecordArrayToBeDelete; 
+       
+       // EXT record number to be read
+       TInt iExtRecordNo;
+       
+       // Store the no of ext records already written
+       TUint8 iExtRecordWritten;
+       
+       // Attribute Store the information if it is location search
+       TBool iLocationSearch;
+       
+       // Attribute to store the information if delete EXT operation going on 
+       TBool iExtDeleteOperation;
+       
+       // For Free Entry Search
+       TInt iEntryToWrite;
+       
+       // To Store Entry to update List
+       TPBEntry* iEntryToUpdateInList; 
+       
+       // to store the MBI operation
+       TUint8 iMBIOperation;
 };
 
 #endif // CMMPHONEBOOKOPERATIONWRITE_H

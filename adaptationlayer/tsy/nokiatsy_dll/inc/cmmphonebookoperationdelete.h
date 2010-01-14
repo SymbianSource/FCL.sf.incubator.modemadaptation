@@ -8,59 +8,78 @@
 *
 * Initial Contributors:
 * Nokia Corporation - initial contribution.
-* 
+*
 * Contributors:
-* 
+*
 * Description:
 *
 */
 
-#ifndef _CMMPHONEBOOK_OPERATION_DELETE_H
-#define _CMMPHONEBOOK_OPERATION_DELETE_H
+#ifndef CMMPHONEBOOKOPERATIONDELETE_H
+#define CMMPHONEBOOKOPERATIONDELETE_H
 
-// INCLUDES
+//  INCLUDES
 #include <ctsy/pluginapi/cmmdatapackage.h>
 #include <e32base.h>
+
 #include "cmmphonebookstoreoperationbase.h"
 
-// CONSTANTS
-    // None
+//  CONSTANTS
+    //none
 
-// MACROS
-    // None
+//  MACROS
+    //none
 
-// DATA TYPES
-    // None
+//  DATA TYPES
+    //none
 
-// EXTERNAL DATA STRUCTURES
-    // None
+//  EXTERNAL DATA STRUCTURES
+enum TPBDeletePhases
+    {
+    EPBDeletePhaseReadExtensions,
+    EPBDeletePhaseReadEntry,
+    EPBDeletePhaseDeleteExtension,
+    EPBDeletePhase_Read_MBI_profile,
+    EPBDeletePhase_delete_MBI_profile,
+    EPBDeletePhaseDeleteEntry
+    };
 
-// FUNCTION PROTOTYPES
-    // None
 
-// FORWARD DECLARATION
-    // None
+//  FUNCTION PROTOTYPES
+    //none
 
 // CLASS DECLARATION
 /**
-* CMmPhoneBookOperationDelete is used to create and send GSM-specific
-* PBStore ISI messages to PhoNet via PhoNetSender relating to delete.
+* CMmPhoneBookOperationWrite is used to create and send GSM-specific
+* PBStore ISI messages to PhoNet via PhoNetSender relating to write.
 */
-class CMmPhoneBookOperationDelete : public CMmPhoneBookStoreOperationBase
+class CMmPhoneBookOperationDelete
+    : public CMmPhoneBookStoreOperationBase
     {
-    public: // Constructors and destructor
+    public:  // Constructors and destructor
 
         /**
         * Two-phased constructor.
-        * @return CMmPhoneBookOperationDelete*: created object
         */
         static CMmPhoneBookOperationDelete* NewL(
             CMmPhoneBookStoreMessHandler* aMmPhoneBookStoreMessHandler,
+            CMmUiccMessHandler* aUiccMessHandler,
             const CMmDataPackage* aDataPackage );
+
         /**
         * Destructor.
         */
         ~CMmPhoneBookOperationDelete();
+
+        /**
+        * This method creates entry point to correct operation
+        * @param aPhonebookType PhoneBook type
+        * @param aIpc IPC
+        * @return Pointer to operation.
+        */
+        static CMmPhoneBookOperationDelete* Build(
+            TName aPhonebookType,
+            TInt aIpc );
 
   private:
 
@@ -70,74 +89,153 @@ class CMmPhoneBookOperationDelete : public CMmPhoneBookStoreOperationBase
         CMmPhoneBookOperationDelete();
 
         /**
+        * Class attributes are created in ConstructL.
+        */
+        //void ConstructL();
+
+        /**
         * Separates different IPC requests for each other.
-        * @param TInt aIpc: Identify number of request.
-        * @param const CMmDataPackage* aDataPackage: Packaged data.
-        * @return TInt: KErrNone or error value.
+        *
+        * @param aIpc Identify number of request.
+        * @param aDataPackage Packaged data.
+        * @return KErrNone or error value.
         */
-        TInt CreateReq( TInt aIpc, const CMmDataPackage* aDataPackage );
+        TInt UICCCreateReq(
+            TInt aIpc,
+            const CMmDataPackage* aDataPackage,
+            TUint8 aTransId );
 
         /**
-        * Handles SimPbResp ISI -message
-        * @param  TIsiReceiveC& aIsiMessage
-        * @param TBool& aComplete: Indicates if request can remove from
-        *    operationlist or not.
-        * @return TInt: KErrNone or error value.
+        * Handles UICC response ISI -message
+        * @param aStatus Status
+        * @param aFileData File data
+        * @param aTransId Transaction ID
+        * @return Is operation going to be deleted
         */
-        TInt HandleSimPbRespL(
-            const TIsiReceiveC& aIsiMessage,
-            TBool& aComplete );
+        TBool HandleUICCPbRespL(
+            TInt aStatus,
+            TUint8 aDetails,
+            const TDesC8& aFileData,
+            TInt aTransId );
 
         /**
-        * Handling delete response
-        * @param TIsiReceiveC& aIsiMessage
-        * @param TBool& aComplete: Indicates if request can remove from
-        *    operationlist or not.
-        * @return TInt: KErrNone or error value.
+        * Handles request to delete a phonebook entry
+        * @return KErrNone or error value
         */
-        TInt HandleDeleteResp(
-            const TIsiReceiveC& aIsiMessage,
-            TBool& aComplete );
+        TInt UiccPbReqDelete();
 
         /**
-        * Creates and sends ISI message in order to delete an entry from SIM
-        * @param TInt16 aIndex: Location index
-        * @return TInt: KErrNone or error value.
+        * Creates and sends ISI message in order to delete an entry
+        * @return KErrNone or error value
         */
-        TInt SimPbReqDelete( TInt16 aIndex );
+        TInt UiccPbReqDeleteEntry();
 
         /**
-        * Creates and sends ISI message in order to delete all entries from SIM
-        * @return TInt: KErrNone or error value.
+        * Creates and sends ISI message in order to delete an extension
+        * @param aExtRecordNum Extension record number
+        * @return KErrNone or error value
         */
-        TInt SimPbReqDeleteAll();
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-        /**
-        * Creates and sends ISI message in order to delete alphastring from SIM
-        * @return TInt: KErrNone or error value
-        */
-        TInt SimDeleteAlphaStringReq();
+        TInt UiccPbReqDeleteExt( TInt aExtRecordNum );
 
         /**
-        * Receives SIM_PB_RESP(SIM_PB_DELETE) ISI messages from phonet receiver
-        * @param TIsiReceiveC: reference to the received message.
-        * @return TInt: KErrNone or error code
+        * Creates and sends ISI message in order to read an entry
+        * @return KErrNone or error value
         */
-        TInt SimDeleteAlphaStringRespL( const TIsiReceiveC& aIsiMessage );
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
+        TInt UiccPbReqReadEntry();
 
-    public: // Data
+        /**
+        * Handles phonebook entry data
+        * @param aFileData File data
+        * @return KErrNone or error value
+        */
+        TInt HandleReadEntryResp( const TDesC8& aFileData );
+
+        /**
+        * Creates and sends ISI message in order to read an extension
+        * @return KErrNone or error value
+        */
+        TInt UiccPbReqReadExt( TUint8 aExtRecordNum );
+
+        /**
+        * Handles phonebook extension data
+        * @param aFileData File data
+        * @return KErrNone or error value
+        */
+        TInt HandleReadExtResp( const TDesC8& aFileData );
+        
+        /**
+        * Creates request to read MBI record
+        * @return KErrNone or error value
+        */
+        TInt UiccPbReqReadMBI();
+        
+        /**
+        * Handles phonebook extension data
+        * @param aStatus
+        * @param aDetails
+        * @param aFileData File data
+        * @return KErrNone or error value
+        */
+        TInt HandleWriteMBIReadResp(TInt aStatus, TUint8 aDetails, const TDesC8& aFileData );
+        
+        /**
+        * Creates request to Delete MBI profile
+        * @return KErrNone or error value
+        */
+        TInt UiccPBReqDeleteMBIProfile();
+
+        
+    public:     // Data
         // None
 
-    protected: // Data
-        // None
+    protected:  // Data
+        // none
 
-    private: // Data
-        // None
+    private:    // Data
 
+       // Keep track on current delete phase
+       TPBDeletePhases iCurrentDeletePhase;
+
+       // Phone book entry to be deleted
+       CPhoneBookStoreEntry* iPhoneBookEntry;
+
+       // IPC number of operation
+       TInt iIpc;
+
+       // Number of entries
+       TInt iNumOfEntries;
+
+       // Number of extension records in entry
+       TInt iNumOfExtensions;
+
+       // Elementary file ID
+       TUint16 iFileId;
+
+       // Extension file ID
+       TUint16 iFileIdExt;
+
+       // Record number in phonebook to be deleted
+       TInt iIndex;
+
+       // Phonebook entry
+       TPBEntry iEntry;
+
+       // Transaction ID used in delete operations
+       TUint8 iTransId;
+
+       // Location index of phonebook type
+       TUint8 iArrayIndex;
+
+       // Information of location already read
+       TBool iLocationFoundInPbList;
+       
+       // Array to store ext rexords to be deletet
+       RArray<TInt> iExtRecordArrayToBeDelete;
+       
+       // Attribute to store MBI Profiletype
+       TUint8 iMBIProfileType;
 };
 
-#endif // _CMMPHONEBOOK_OPERATION_DELETE_H
+#endif // CMMPHONEBOOKOPERATIONDELETE_H
 
-// End of File
+// End of file

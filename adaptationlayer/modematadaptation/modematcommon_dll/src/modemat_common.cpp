@@ -121,7 +121,7 @@ TInt CModemAtCommon::GetMode( TUint aMask, TUint& aMode )
         }
     if ( aMask & KModeVerbose )
         {
-        aMode |= iQuietMode * KVerboseModeBase;
+        aMode |= iVerboseMode * KVerboseModeBase;
         C_TRACE((_L("verbosemode %d"), aMode));
         }
     if ( aMask & KModeCarriage )
@@ -426,20 +426,17 @@ void CModemAtCommon::HandleUnsolicitedResultReceived(TInt /*aErr*/)
 void CModemAtCommon::HandleCommandModeChanged( TInt aErr, TCommandMode aMode )
     {
     C_TRACE((_L("CModemAtCommon::HandleCommandModeChanged( aErr: %d, aMode: %d) "), aErr, aMode));
-    ASSERT_PANIC_ALWAYS( aErr == KErrNone );
-    ASSERT_PANIC_ALWAYS( aMode != EIgnore );
-
-   iCommandMode = aMode;
-   TUint mode( 0 );
-   mode |= KCommandModeChanged;
-   if( aMode != EDataMode)
-       {
-       C_TRACE((_L("Not EDataMode")));
-       mode |= KModeCommand;
-       }
-   C_TRACE((_L("COMMON PLUGIN SendModeStatusChange: 0x%x"), mode));
-   SendModeStatusChange( mode );
-   }
+    iCommandMode = aMode;
+    TUint mode( 0 );
+    mode |= KCommandModeChanged;
+    if( aMode != EDataMode)
+        {
+        C_TRACE((_L("Not EDataMode")));
+        mode |= KModeCommand;
+        }
+    C_TRACE((_L("COMMON PLUGIN SendModeStatusChange: 0x%x"), mode));
+    SendModeStatusChange( mode );
+    }
 
 
 //  End of File

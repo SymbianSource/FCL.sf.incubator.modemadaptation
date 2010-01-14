@@ -31,9 +31,9 @@
 #include "cmmstaticutility.h"
 #include "cmmussdmesshandler.h"
 #include "tsylogger.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmussdmesshandlertraces.h"
+#include "cmmussdmesshandlerTraces.h"
 #endif
 
 //  External Data Structures

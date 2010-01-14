@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -26,6 +26,8 @@
 #include <ctsy/rmmcustomapi.h>
 
 #include "cmmnetmesshandler.h"
+#include "muiccoperationbase.h"
+#include "cmmuiccmesshandler.h"
 
 // CONSTANTS
 // Max length of Operator Name String (ONS name).
@@ -65,6 +67,7 @@ enum TDataCodingSchemeType
 // FORWARD DECLARATIONS
 class TIsiReceiveC;
 class TIsiSubBlock;
+class CMmUiccMessHandler;
 
 // CLASS DECLARATION
 
@@ -73,17 +76,19 @@ class TIsiSubBlock;
 * ISI messages to PhoNet via PhoNetSender. It also receives
 * Operator name handling specific ISI messages from PhoNetReceiver.
 */
-class CMmNetOperatorNameHandler : public CBase
+class CMmNetOperatorNameHandler : public CBase, public MUiccOperationBase
     {
     public: // Constructors and destructor
 
         /**
         * Two-phased constructor.
         * @param aNetMessHandler: Pointer to the NetMessHandler.
+        * @param aUiccMessHandler: Pointer to the UiccMessHandler.
         * @return created message handler object.
         */
         static CMmNetOperatorNameHandler* NewL(
-            CMmNetMessHandler* aNetMessHandler );
+            CMmNetMessHandler* aNetMessHandler,
+            CMmUiccMessHandler* aUiccMessHandler );
 
         /**
         * Destructor.
@@ -139,21 +144,6 @@ class CMmNetOperatorNameHandler : public CBase
         void InfoPpReadResp( const TIsiReceiveC& aIsiMessage );
 
         /**
-        * Creates a SIM_OPERATOR_REQ ISI message with service type
-        * SIM_ST_READ_PNN and sends it to phonet.
-        * Used to read the PLMN Network Name from EFpnn on (U)SIM.
-        * @param aPnnIdentifier is identifier of the record to be read.
-        */
-        void SimOperatorReqReadPnn( TUint8 aPnnIdentifier );
-
-        /**
-        * Breaks a SIM_OPERATOR_RESP ISI message with service type
-        * SIM_ST_READ_PNN.
-        * @param const TIsiReceiveC& aIsiMessage: The received ISI message.
-        */
-        void SimOperatorRespReadPnnL( const TIsiReceiveC& aIsiMessage );
-
-        /**
         * Creates a PERM_PM_RECORD_WRITE_REQ ISI message and sends
         * it to phonet.
         * Used to Write record for PMM.
@@ -184,6 +174,41 @@ class CMmNetOperatorNameHandler : public CBase
         * @return PNN record identifier value.
         */
         TInt GetPnnRecordIdentifierValue();
+
+        /**
+        * Creates a UICC_APPL_CMD_REQ ISI message with service type
+        * UICC_APPL_FILE_INFO and sends it to phonet.
+        * Used to read the record count of EFopl on (U)SIM.
+        */
+        void UiccReadOplRecordCount();
+
+        /**
+        * Handle UICC response messages
+        * @param aTraId Transaction ID
+        * @param aStatus Status
+        * @param aFileData File data from (U)SIM
+        * @return KErrNone or error code
+        */
+        TInt ProcessUiccMsg(
+            TInt aTraId,
+            TInt aStatus,
+            TUint8 aDetails,
+            const TDesC8& aFileData );
+
+        /**
+        * Read operator name from (U)SIM
+        * @return None
+        */
+        void UiccOperatorReq();
+        
+        /**
+        * Creates a UICC_APPL_CMD_REQ ISI message and sends it to phonet.
+        * Used to read the PLMN Network Name from EFpnn on (U)SIM.
+        * @param aPnnIdentifier is identifier of the record to be read.
+        * @return None.
+        */
+        void UiccOperatorReqReadPnn( TUint8 aPnnIdentifier );
+        
 
     private: // Constructors and destructor
 
@@ -321,6 +346,63 @@ class CMmNetOperatorNameHandler : public CBase
         */
         void CompleteMobilePhoneGetDetectedNetworksV2Phase1L();
 
+        /**
+        * Response handling for EFopl record count
+        * @param aStatus Status
+        * @param aFileData FCI data containig recored count
+        * @return void
+        */
+        void UiccOplRecordCountResponse(
+            TInt aStatus,
+            const TDesC8& aFileData );
+
+        /**
+        * Request to read a record from EFopl
+        * @return void
+        */
+        void UiccReadOplReq();
+
+        /**
+        * Response handling for received EFopl record
+        * @param aFileData File data
+        * @return void
+        */
+        void UiccReadOplResp( const TDesC8& aFileData );
+
+        /**
+        * Response handling for operator name
+        * @param aStatus Status
+        * @param aFileData File data
+        * @return void
+        */
+        void UiccOperatorResp( TInt aStatus, const TDesC8& aFileData );
+
+        /**
+        * Request to read EFpnn from (U)SIM
+        * @param aMCC is current Mobile Country Code.
+        * @param aMNC is current Mobile Network Code.
+        * @param aPnnIdentifier is PNN record identifier.
+        * @param aLocationAreaData is current LAC data.
+        * @param aNetworkData is Network data.
+        * @return None.
+        */
+        void SendReadPnnReq(
+            TUint aMCC,
+            TUint aMNC,
+            TUint8 aPnnIdentifier,
+            const RMobilePhone::TMobilePhoneLocationAreaV1& aLocationAreaData,
+            const RMobilePhone::TMobilePhoneNetworkInfoV5& aNetworkData );
+
+
+        /**
+        * Response handling for PLMN Network Name (EFpnn)
+        * @param aStatus Status
+        * @param aFileData File data
+        * @return None.
+        */
+        void UiccOperatorRespReadPnnL( TInt aStatus, const TDesC8& aFileData );
+
+
     protected: // Constructors and destructor
 
         /**
@@ -382,6 +464,9 @@ class CMmNetOperatorNameHandler : public CBase
         // Pointer to the NetMessHandler.
         CMmNetMessHandler* iNetMessHandler;
 
+        // Pointer to UICC message handler
+        CMmUiccMessHandler* iMmUiccMessHandler;
+
         // Storing Location Area data for later use.
         RMobilePhone::TMobilePhoneLocationAreaV1 iLocationAreaData;
         // Storing Network data for later use.
@@ -433,6 +518,12 @@ class CMmNetOperatorNameHandler : public CBase
 
         // Manual search data list array.
         RArray<TManualSearchDataList> iManualSearchDataList;
+
+        // Number of records in EFopl
+        TInt iOplRecordCount;
+
+        // Record number of EFopl
+        TUint8 iOplRecordNumber;
 
     protected: // Data
 

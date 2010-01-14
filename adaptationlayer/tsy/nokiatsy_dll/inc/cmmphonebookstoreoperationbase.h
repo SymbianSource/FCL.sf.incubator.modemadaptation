@@ -8,9 +8,9 @@
 *
 * Initial Contributors:
 * Nokia Corporation - initial contribution.
-* 
+*
 * Contributors:
-* 
+*
 * Description:
 *
 */
@@ -106,12 +106,11 @@ const TUint8 KSimMbdn = 0x00;
 //File ID
 const TUint16 KMasterFile            = 0x3F00;  // Master File
 const TUint16 KDedicatedFileGSM      = 0x7F20;  // Dedicated File (Gsm)
-const TUint16 KDedicatedFileMBI      = 0x6FC9;  // Dedicated File (MBI)
 
 
 const TUint8 KTagFCIFileDescriptor = 0x82;     // for file descriptor tag in FCI data received from UICC Server
-const TUint8 KTagFCIFileIdentifier = 0x83;       // for File identifier in FCI data
-const TUint8 KTagFCIFileSize       = 0x85;      // for File size data
+const TUint8 KTagFCIFileIdentifier = 0x83;     // for File identifier in FCI data
+const TUint8 KTagFCIFileSize       = 0x80;     // for File size data
 const TUint8 KTagConstructedTagA8  = 0xA8;     // Type 1 files tag in PBR file
 const TUint8 KTagConstructedTagA9  = 0xA9;     // Type 2 files tag in PBR file
 const TUint8 KTagConstructedTagAA  = 0xAA;     // Type 3 files tag in PBR file
@@ -119,19 +118,14 @@ const TUint8 KTagUnusedbyte        = 0xFF;     // constant to find unused bytes
 
 const TUint8 KRecordLength   = 0;
 const TUint8 KNoOfRecords    = 1;
-const TUint8 KFileSize       = 2;
-const TUint8 KFileIdentifier = 3;
-const TUint8 KFileStatus     = 4;
-
-
-
-
-
+const TUint8 KFileSize1       = 2;
+const TUint8 KFileIdentifier1 = 3;
+const TUint8 KFileStatus1     = 4;
 
 // UICC constants
 #define MF_FILE                             0x3F00 //Master file
 #define DF_CURRENT_APP                      0x7FFF //
-#define DF_PHONEBOOK                        0x5F3A  
+#define DF_PHONEBOOK                        0x5F3A
 #define APPL_FILE_ID                        0x7F10  // Address for DFphonebook
 #define UICC_SESSION_ID_NOT_USED            0x00
 #define PB_UICC_SB_APPL_PATH_SB_LENGTH      0x0010
@@ -141,14 +135,16 @@ const TUint8 KFileStatus     = 4;
 #define PB_SDN_FID                          0x6F49
 #define PB_BDN_FID                          0x6F4D
 #define PB_MBDN_FID                         0x6FC7
+#define PB_MBI_FID                          0x6FC9
 #define PB_MSISDN_FID                       0x6F40
 #define PB_VMBX_FID                         0x6F17
 #define PB_EXT1_FID                         0x6F4A
 #define PB_EXT2_FID                         0x6F4B
 #define PB_EXT3_FID                         0x6F4C
-#define PB_EXT4_FID                         0x6F55
-#define PB_EXT5_FID                         0x6F4E
+#define PB_EXT4_FID                         0x6F4E
+#define PB_EXT5_FID                         0x6F55
 #define PB_EXT6_FID                         0x6FC8
+#define PB_EXT7_FID                         0x6FCC
 #define PB_PBR_FID                          0x4F30
 #define DF_PB_FILE_PATH                     0x3F007FFF5F3A
 #define UICC_SFI_NOT_PRESENT                0x00
@@ -157,6 +153,7 @@ const TUint8 KFileStatus     = 4;
 #define DF_PATH_PHONEBOOK                   0x5F3A
 #define UICC_SB_LINEAR_FIXED_SB_LENGTH      0x0008
 #define UICC_APPL_CMD_RESP_OFFSET           0x07
+#define UICC_ILLEGAL_FILE_ID                0xFFFF
 
 #define UICC_SB_FCI_FCP_EF_NO_REC_OFFSET    0x12
 #define UICC_SB_FCI_FCP_EF_REC_L_OFFSET     0x10
@@ -165,8 +162,8 @@ const TUint8 KFileStatus     = 4;
 #define UICC_EF_ANR_EXT_REC_OFFSET          0x15
 #define UICC_EF_FILE_EXT_FILE_NOT_EXIST     0xFF
 #define UICC_EF_FDN_NO_EXT_NUM_LEN          20
+#define UICC_EF_EXT_REC_NUM_LEN             11
 #define UICC_EF_MAX_NUM_LEN_WITH_EXT        2814
-#define UICC_EF_MAX_NAME_LEN                241
 #define UICC_EF_ANR_EXT_OFFSET              14
 #define UICC_EF_MAX_REC_LEN                 255
 
@@ -214,7 +211,7 @@ const TUint8 KFileStatus     = 4;
 #define UICC_EF_EMAIL_TAG                   0xCA
 #define UICC_EF_CCP1_TAG                    0xCB
 
-// UICC Server Service type 
+// UICC Server Service type
 #define UICC_APPL_READ_TRANSPARENT          0x21
 #define UICC_APPL_UPDATE_TRANSPARENT        0x22
 #define UICC_APPL_READ_LINEAR_FIXED         0x23
@@ -260,6 +257,9 @@ const TUint8 KFileStatus     = 4;
 
 
 #define UICC_NO_EXT_MAX_NUM_LEN             0x14
+#define UICC_EXT_REC_NO_OFFSET              12
+#define UICC_EMPTY_ENTRY_PATTERN_1          0xFF
+#define UICC_EMPTY_ENTRY_PATTERN_2          0x00
 
 
 // File types
@@ -279,26 +279,6 @@ const TUint8 KFileStatus     = 4;
     //none
 
 //  EXTERNAL DATA STRUCTURES
-enum TPBIniPhases
-    {
-    EPBInitPhaseADN = 0,
-    EPBInitPhaseFDN,
-    EPBInitPhaseSDN,
-    EPBInitPhaseMBDN,
-    EPBInitPhaseMSISDN,
-    EPBInitPhaseVMBX,
-    EPBInitPhase_File_Info,
-    EPBInitPhase_FIle_Data,
-    EPBInitPhase_Complete,
-    EPBInitPhase_3GADN_PBR,
-    EPBInitPhase_3GADN_Type1,
-    EPBInitPhase_3GADN_Type2,
-    EPBInitPhase_3GADN_Type3,
-    EPBIniPhase_3GADNDone,
-    EPBIniPhase_PBInitialized,
-    EPBIniPhase_Unknown,
-    EPBIniPhase_Internal
-    };
 
 
 enum TPhonebookType
@@ -308,16 +288,17 @@ enum TPhonebookType
     EPhonebookTypeSdn,
     EPhonebookTypeBdn,
     EPhonebookTypeVMBX,
-    EPhonebookTypeMBDN
+    EPhonebookTypeMBDN,
+    EPhonebookTypeMSISDN,
+    EPhonebookTypeUnknown
     };
 
-enum TPBWritePhases
+enum TTypeOfFileToBeRead
     {
-    EPBWritePhase_delete = 0,
-    EPBWritePhase_rewrite,
-    EPBWritePhase_complete
+    EBasicEfRead,
+    EExtensionRead,
+    EMailboxIdRead
     };
-
 
 // Struct data
 
@@ -378,7 +359,7 @@ class CMmPhoneBookStoreOperationBase
         /**
         * Cancels the operation.
         */
-        virtual void CancelReq();
+        virtual void CancelReq( TName& aPhoneBook );
 
         /**
         * Prepares the operation (makes it ready to be launched).
@@ -434,10 +415,10 @@ class CMmPhoneBookStoreOperationBase
         * @param aFileData KErrNotSupported
         * @return KErrNotSupported.
         */
-        
-        virtual TInt HandleUICCPbRespL( TBool & /*complete*/, TInt /*aStatus*/, const TDesC8& /*aFileData*/, TInt /*aTransId*/)
+
+        virtual TBool HandleUICCPbRespL( TInt /*aStatus*/, TUint8 /*aDetails*/, const TDesC8& /*aFileData*/, TInt /*aTransId*/)
             {TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::HandleUICCPbRespL - Return KErrNotSupported");
-            return KErrNotSupported; 
+            return ETrue;
             };
 
         /**
@@ -449,13 +430,14 @@ class CMmPhoneBookStoreOperationBase
         */
         virtual TInt UICCCreateReq(
             TInt /*aIpc*/,
-            const CMmDataPackage* /*aDataPackage*/)
+            const CMmDataPackage* /*aDataPackage*/,
+            TUint8 /*aTransId*/ )
             {
             TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::CreateReq - Return KErrNotSupported");
-            return KErrNotSupported; 
+            return KErrNotSupported;
             };
 
-            
+
         /**
         * Converts client phonebook to phonebook mask.
         *
@@ -464,7 +446,33 @@ class CMmPhoneBookStoreOperationBase
         */
         static TUint8 ConvertToPBtype( const TName& aPBType );
 
-        
+
+        /**
+        * Converts client phonebook to phonebook mask.
+        *
+        * @param aPBType
+        * @return TUint8
+        */
+        static TUint16 ConvertToPBfileId( const TName& aPBType, TUint16& aFileIdExt );
+
+
+        /**
+        * Converts File ID to Index
+        *
+        * @param aFileId
+        * @return TUint8
+        */
+        static TUint8 ConvertToConfArrayIndex( const TUint16 aFileId );
+        /**
+        * Give return value for the transactio id According to operation and Phoenbook type
+        *
+        * @param aPBType
+        * @param aOperation
+        * @return TUint8
+        */
+        static TUint8 GetTransId( const TName& aPBType, const TUint8 aOperation );
+
+
         /**
         * Converts client phonebook to phonebook mask.
         *
@@ -472,8 +480,8 @@ class CMmPhoneBookStoreOperationBase
         * @return TUint8
         */
         static TUint8 ConvertToPBtypeUICC( const TName& aPBType );
-        
-        
+
+
         /**
         * Converts client phonebooktype to client phonebook name.
         *
@@ -491,37 +499,12 @@ class CMmPhoneBookStoreOperationBase
         void ConvertToPBname( const TUint8 aTrans, TName& aName );
 
         /**
-        * Separate Phonebook Entry from UICC -message
-        *
-        * @param aFileData Received UICC message
-        * @param aEntry Entry to be separated
-        * @return KErrNone or error value.
-        */
-        TInt SeparatePhoneBookEntryFromUiccMsgL(
-            const TDesC8& aFileData,
-            TDes8& aNameBuf,
-            TUint16 aSimPhonebookType);
-
-
-        /**
-        * Store Phonebook Entry from UICC -message
-        *
-        * @param aFileData Received UICC message
-        * @param aEntry Entry to be separated
-        * @return KErrNone or error value.
-        */
-        void StorePhonebookEntry(
-                TDes8& aName,
-                TDes8& aNumber,
-                CPhoneBookStoreEntry& aEntry);
-
-        /**
-        * Gets transactionId.
+        * Gets PhoneBookName.
         *
         * @param None
-        * @return TransactionId.
+        * @return phonebookname.
         */
-        TUint8 TransId();
+        const TName& GetPhoneBookName()const;
 
         /**
         * Convert number of phonebook type to server's phonebook type
@@ -532,29 +515,19 @@ class CMmPhoneBookStoreOperationBase
         TUint16 ConvertToSimPhoneBookType(
             const TUint8 aPbMask );
 
+        /**
+        * Handle number to convert in Ascii Format
+        * @param const TDesC8& aSource: Message to be converted in Ascii
+        * @param TDes16 aTarget : After conversion data to be staored in
+        */
+        //void ConvertToUcs2FromBCD(const TDesC8 &aSource, TDes16 &aTarget );
 
         /**
-        * Gets the required parameter from FCI Data
-        *
-        * @param TDesC8 aFileData FCI Data
-        * @param TInt aValue actual value of parameter to be read
-        * @param TUint8 aParam parameter to be read
-        * @return Error
+        * Handle to Find the Empty Entry
+        * @param const TDesC8& aFileData: Entry data to checked entry is empty or not
+        * @return TInt: KErrNone or KErrNotFound
         */
-        TInt HandleFcpData( 
-                const TDesC8 &aFileData,
-                TInt& aValue,
-                TUint8 aParam);
-
-
-        /**
-        * Handle FileData of Type1File Response
-        * @param const TDes8& aFileData: UICC Message
-        * @return TInt: KErrNone or error value.
-        */
-        void Get16bit(TInt& aTarget, const TDesC8& aSource, TInt aIndex);
-
-
+        TInt EmptyEntryCheck( const TDesC8 &aFileData );
 
     protected:
 
@@ -632,12 +605,12 @@ class CMmPhoneBookStoreOperationBase
 
         // Pointer to CMmPhoneBookStoreMessHandler.
         CMmPhoneBookStoreMessHandler* iMmPhoneBookStoreMessHandler;
-        
+
         // Pointer to UICC message handler
         CMmUiccMessHandler* iMmUiccMessHandler;
 
-        // TransactionId that consist with phonebook type and transactionId.
-        TUint8 iTransactionId;
+        // To store Phone Book type
+        TName iPhoneBookTypeName;
 
         // Pointer to array for Caching PB Store <ADN/FDN>.
         // CTSY take care of deleting entries.
@@ -654,21 +627,28 @@ class CMmPhoneBookStoreOperationBase
 
         // Attribute to hold the information what index to be read
         TInt iIndexToRead;
+
+        // Is there any mailbox id
+        TBool iMailboxIdExist;
+
         // Attribute to store record length
         TInt iRecordLength;
 
         // Keeps track of error value if write completed only partially.
         TInt iRet;
 
-        // Phonebooktype, ADN, FDN, SDN...
-        TName iPhonebookType;
-
-        // modifiable Store number if there is extension number also there 
+        // modifiable Store number if there is extension number also there
         TBuf8<UICC_EF_MAX_NUM_LEN_WITH_EXT> iNumberBuf;
-        
+
         // Store entry name
         TBuf8<UICC_EF_MAX_NAME_LEN> iNameBuf;
 
+
+       // Store for Empty Space
+        TUint8 iEmptyIndex;
+
+        // Attribute to check what kind of read is ongoing
+        TTypeOfFileToBeRead iTypeOfReading ;
 
 #ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
         // Holds information for AAS and GAS

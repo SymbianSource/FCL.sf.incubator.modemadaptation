@@ -23,9 +23,9 @@
 #include "cmmphonetreceiver.h"
 #include <ctsy/serviceapi/mmtsy_defaults.h>
 #include "tsylogger.h" // for logging purposes
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmphonetsendertraces.h"
+#include "cmmphonetsenderTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

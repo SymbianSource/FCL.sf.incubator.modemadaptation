@@ -25,7 +25,7 @@
 #include "dmc_logical_device.h"
 #include "dmc_trace.h"
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
 #include "dmc_logical_channelTraces.h"
 #endif

@@ -95,7 +95,7 @@ public:
     /**
      * Queries AT MODEM object id. 
      */
-    void SendTaskIdQuery();
+    void QueryModemAtFromNameService();
 #endif
 private:
     /**
@@ -208,8 +208,6 @@ private:
     TInt  iPipeHandle;              //handle of created pipe 
     TUint iDataportDevId;           //Dataport device-id
     TUint iDataportObjId;           //Dataport obj-id
-    TUint iCellmoDevId;             //AT Modem device-id
-    TUint iCellmoObjId;             //AT Modem obj-id
     TPipeInfo iPipeTable[KMaxDteIdCount];   //created pipes
     CModemAtHandler& iAtHandler;    //forwards AT-commands to the AT MODEM
     CActiveSchedulerWait* iSchedulerWait;

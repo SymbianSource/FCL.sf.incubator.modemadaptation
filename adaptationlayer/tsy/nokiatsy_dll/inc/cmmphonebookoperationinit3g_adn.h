@@ -92,28 +92,138 @@ class CMmPhoneBookOperationInit3G_adn : public CMmPhoneBookOperationInit
         */
         void ConstructL();
 
-        TInt UICCCreateReq(TInt aIpc, const CMmDataPackage* aDataPackage);
-        TInt UICCInitializeReq3GADN();
+        /**
+        * Create request to Start initialization for Phonebook
+        * @param aIpc
+        * @param aDataPackage
+        * @param aTransId
+        * @return TInt: KErrNone or error value.
+        */
+        TInt UICCCreateReq(TInt aIpc, const CMmDataPackage* aDataPackage, TUint8 aTransId);
 
+        /**
+        * Create request to Start initialization for 3G ADN Phonebook
+        * @param aTransId
+        * @return TInt: KErrNone or error value.
+        */
+
+        TInt UICCInitializeReq3GADN( TUint8 aTransId);
+
+        /**
+        * Create request to Start initialization for Type1 , Type2 and Type3 Files in PBR
+        * @param aparams
+        * @param aFiletype
+        * @return TInt: KErrNone or error value.
+        */
         TInt CreateReqFetchTypeFile(
                 TUiccReadLinearFixed &aparams,
                 const TUint8 aFileType);
         
-        TInt HandleUICCPbRespL(TBool &aComplete,TInt aStatus,const TDesC8 &aFileData,TInt aTransId);
-        TInt HandleUICCPbResp3GADN(const TDesC8 &aFileData, TInt aStatus);
+
+        /**
+        * Handles response for PhoneBook Init 
+        * @param aFileData
+        * @param TInt aTraId
+        * @param TInt aStatus
+        * @param TDesC8& aFileData
+        * @return TInt: KErrNone or error value.
+        */
+
+        TBool HandleUICCPbRespL( TInt aStatus,
+                TUint8 aDetails,
+                const TDesC8 &aFileData,
+                TInt aTransId );
+
+        /**
+        * Handles response for 3GADN PhoneBook Init 
+        * @param aFileData
+        * @param TInt aTraId
+        * @param TInt aStatus
+        * @param TDesC8& aFileData
+        * @return TInt: KErrNone or error value.
+        */
+
+        TInt HandleUICCPbResp3GADN(const TDesC8 &aFileData, TInt aStatus, TUint8 aTransId );
+
+        /**
+        * Send Request to read Type 1 file info for ADN 3G initialization
+        * @param TDesC8& aFileData
+        * @return TInt: KErrNone or error value.
+        */
 
         TInt FetchType1FileFromPBR(const TDesC8 &aFileData);
+
+        /**
+        * Send Request to read Type 2 file info for ADN 3G initialization
+        * @param TDesC8& aFileData
+        * @return TInt: KErrNone or error value.
+        */
+
         TInt FetchType2FileFromPBR(const TDesC8 &aFileData);
+
+        /**
+        * Send Request to read Type 3 file info for ADN 3G initialization
+        * @param TDesC8& aFileData
+        * @return TInt: KErrNone or error value.
+        */
+
         TInt FetchType3FileFromPBR(const TDesC8 &aFileData);
 
         
+        /**
+        * Handles FileData of Type 1 file info for ADN 3G initialization
+        * @param TDesC8& aFileData
+        * @param TInt aStatus
+        * @return TInt: KErrNone or error value.
+        */
+
         void HandleType1FileResp(const TDesC8& aFileData, TInt aStatus);
+
+        /**
+        * Handles FileData of Type 2 file info for ADN 3G initialization
+        * @param TDesC8& aFileData
+        * @param TInt aStatus
+        * @return TInt: KErrNone or error value.
+        */
+
         void HandleType2FileResp(const TDesC8& aFileData, TInt aStatus);
+        
+        /**
+        * Handles FileData of Type 3 file info for ADN 3G initialization
+        * @param TDesC8& aFileData
+        * @param TInt aStatus
+        * @return TInt: KErrNone or error value.
+        */
+
         void HandleType3FileResp(const TDesC8& aFileData, TInt aStatus);
         
+        /**
+        * Check for 2 Files have same File id in PBR TLV Data
+        * @return TInt: KErrNone or error value.
+        */
         TInt CheckForFileId();
+
+        /**
+        * Check for no of recors for Type 1 File SHould be same as EF_ADN file
+        * @param aNoOfRecords
+        * @return TInt: KErrNone or error value.
+        */
+
         TInt CheckForNoOfRecords(TInt aNoOfRecords);
+
+        /**
+        * Check same File id fot Type and Type 2 Files
+        * @return TInt: KErrNone or error value.
+        */
+
         TInt CheckForSameType1AndType2Files();
+
+        /**
+        * Check for fixed recordlegth EF have correct Recordlength
+        * @param aNoOfRecords
+        * @return TInt: KErrNone or error value.
+        */
+
         TInt CheckRecordSizeForFixedLength(TInt aFileType, TInt aFileId, TInt aRecordLength);
 
         

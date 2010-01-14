@@ -49,7 +49,7 @@ RESOURCE REGISTRY_INFO theInfo
           implementation_uid = 0x20022E86;
           version_no = 1;
           display_name = "Modem AT EXT";
-          default_data = "PAT&S|PAT&S0|PAT&S1|PAT&K|PAT&K0|PAT&K3|PAT&K4|PATZ|PATZ0|PATZ1|PAT&F|PAT&F0|PATI|PAT+GMI|PAT+GMM|PAT+GMR|PAT+GSN|PAT+GCAP|PAT&V|PAT&V0|PAT&V1|PAT&V2|PAT&W|PAT&W0|PAT&W1|PAT&Y|PAT&Y0|PAT&Y1|PAT+CGMI|PAT+CGMM|PAT+CGMR|PAT+CGSN|PAT+CSCS|PAT+CIMI";
+          default_data = "PAT&S|PAT&S0|PAT&S1|PAT&K|PAT&K0|PAT&K3|PAT&K4|PATZ|PATZ0|PATZ1|PAT&F|PAT&F0|PAT+GMI|PAT+GMM|PAT+GMR|PAT+GSN|PAT+GCAP|PAT&V|PAT&V0|PAT&V1|PAT&V2|PAT&W|PAT&W0|PAT&W1|PAT&Y|PAT&Y0|PAT&Y1|PAT+CGMI|PAT+CGMM|PAT+CGMR|PAT+CGSN|PAT+CSCS|PAT+CIMI";
           opaque_data = "";
           rom_only = 0;
           },
@@ -76,16 +76,7 @@ RESOURCE REGISTRY_INFO theInfo
           implementation_uid = 0x20022E89;
           version_no = 1;
           display_name = "Modem AT EXT";
-          default_data = "PAT+CGTFT|PAT+CGCMOD|PAT+CBCIE|PAT*NAUTODISC|PAT*NRLP|PAT*NSYNCSEQ|PAT*NVTMODE|PAT*NTRACE|PAT*NNET|PAT*NOKIAFBUS|PAT*NPTTLOGIN|PAT*NPTTLOGOFF|PAT*NPTTATTACH|PAT*NPTTDETACH|PAT*NPTT|PAT*NTESTSYSTEM|PAT*NLOGGING|PAT*NBALOCK|PAT*NCHLOCK|PAT*NCELLBARR";
-          opaque_data = "";
-          rom_only = 0;
-          },
-        IMPLEMENTATION_INFO
-          {
-          implementation_uid = 0x20022E8A;
-          version_no = 1;
-          display_name = "Modem AT EXT";
-          default_data = "PAT*NEOTD|PAT*NTESTAUDIO|PAT*NSECLOCK|PAT*NSYSLOCK|PAT*NUMAMODE|PAT*NSMSROUTE|PAT|PATD*";
+          default_data = "PAT+CGTFT|PAT+CGCMOD|PAT|PATD*|PATI|PATI0|PATI1|PATI2|PATI3|PATI4|PATI9|PATI10|PATI11";
           opaque_data = "";
           rom_only = 0;
           }

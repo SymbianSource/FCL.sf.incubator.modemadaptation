@@ -96,7 +96,7 @@ class CMmNetMessHandler
         * @param aFileData Descriptor for file data
         * @return KErrNone or error code
         */
-        TInt ProcessUiccMsg( TInt aTraId, TInt aStatus, const TDesC8& aFileData );
+        TInt ProcessUiccMsg( TInt aTraId, TInt aStatus, TUint8 aDetails, const TDesC8& aFileData );
 
         /**
         * Entry point for request from the message manager

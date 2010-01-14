@@ -47,8 +47,6 @@ class CUsbPnScheduler : public CActiveScheduler
 
         /**
         * Starts USB Phonet Link server thread and the server itself.
-        * @since Series ?XX ?SeriesXX_version
-        * @param
         * @return Starting status
         */
         IMPORT_C static TInt ThreadStart();

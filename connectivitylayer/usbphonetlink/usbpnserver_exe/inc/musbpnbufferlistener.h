@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -34,9 +34,7 @@ class MUsbPnBufferListener
 
         /**
         * Continue receive if buffer queue has room again.
-        * @since Series ?XX ?SeriesXX_version
         * @param TBool aDiscard
-        * @return ?description
         */
         virtual void Receive( TBool aDiscard ) = 0;
 

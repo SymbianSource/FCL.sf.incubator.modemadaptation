@@ -27,9 +27,9 @@
 #include <nsisi.h>
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 #include "tsylogger.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmpipecontroltraces.h"
+#include "cmmpipecontrolTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES
@@ -683,7 +683,6 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPEENABLERESP, "CMmPipeControl:
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
 
     // pipe control handles only messages for NIF pipes
-    // TODO: See TelAd-110
     TInt ret = iContextList->PipeCreateTransIdOkByTransId( transId );
 
     if ( KErrNone == ret )
@@ -771,7 +770,6 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPIPECONTROL_PNSPIPERESETRESP, "CMmPipeControl::
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
 
     // pipe control handles only messages for NIF pipes
-    // TODO: See TelAd-110
     TInt ret = iContextList->PipeCreateTransIdOkByTransId( transId );
 
     if ( KErrNone == ret )
@@ -887,7 +885,6 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPEREMOVERESP, "CMmPipeControl:
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
 
     // pipe control handles only messages for NIF pipes
-    // TODO: See TelAd-110
     TInt ret = iContextList->PipeCreateTransIdOkByTransId( transId );
 
     if ( KErrNone == ret )

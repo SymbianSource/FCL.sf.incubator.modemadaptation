@@ -76,14 +76,14 @@ public:
      * @return Number of sessions open
      */ 
     TInt SessionCount();
-    
+
     /**
      * Connect session to the modem  
      * @param CModemAtSession* aSession Pointer to the session
      * @return Connection status: KErrNone, KErrAlreadyExists
      */    
-    void ConnectToModem( CModemAtSession* aSession);
-    
+    TInt ConnectToModem( CModemAtSession* aSession);
+
     /**
      * HandleSignalInd  
      * @param aDteId Device Terminal ID
@@ -189,3 +189,4 @@ private:  // data
     };
 
 #endif  // CMODEMATSRV_H
+

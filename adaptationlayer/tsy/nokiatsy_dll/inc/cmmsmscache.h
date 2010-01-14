@@ -161,7 +161,16 @@ class CMmSmsCache : public CBase
         */
         void DeleteAll();
 
-    // ATTRIBUTES
+        /**
+        * Changes the storage status of a cached entry
+        * @param aLocation location to change entry at
+        * @param aStorageStatus storage status (TS 31.102, clause 4.2.25)
+        */
+        void SetStorageStatus(
+            TInt aLocation,
+            RMobileSmsStore::TMobileSmsStoreStatus aMsgStatus );
+
+        // ATTRIBUTES
     private:
         // cache error code
         TInt iError;

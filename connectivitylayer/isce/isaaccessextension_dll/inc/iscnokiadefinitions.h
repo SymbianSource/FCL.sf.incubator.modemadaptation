@@ -139,15 +139,18 @@ enum TIscCancelAsyncCustomOperations
     EIscNokiaCancelAsyncEventSubscribe32bit
     };
 
+#ifndef PN_DEV_PC
+#define PN_DEV_PC 0x10 // Not in pn_const.h at the moment TODO: Remove when possible
+#endif
+#ifndef PN_APE_COMMGR
+#define PN_APE_COMMGR 0x11 //TODO remove when defined in pn_const.h
+#endif
 #ifndef THIS_DEVICE
     #if !defined (__WINS__) && !defined(NCP_COMMON_PLATFORM_SIMULATOR)
-        #if !defined (NCP_COMMON_BRIDGE_FAMILY)
-            #define THIS_DEVICE PN_DEV_SOS
-            #define OTHER_DEVICE_1 PN_DEV_HOST
-        #else
             // Device IDs
             #define THIS_DEVICE PN_DEV_HOST
             #define OTHER_DEVICE_1 PN_DEV_MODEM
+            #define PN_DEV_OWN                                                  0x6c
             #define PN_DEV_DONT_CARE OTHER_DEVICE_1
             // Media IDs
             #define PN_MEDIA_SOS                                                PN_MEDIA_MODEM_HOST_IF
@@ -158,7 +161,6 @@ enum TIscCancelAsyncCustomOperations
             // To be removed when pipe changes are done.
             #define PNS_PIPE_DATA_OFFSET_DATA                                   3
             // <- Internals CLIENT OF ISC API OR ISA KERNEL API - DO NOT USE!
-        #endif
     #else
         #define THIS_DEVICE PN_DEV_PC
     #endif

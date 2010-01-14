@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -41,9 +41,9 @@
 //#include <permisi.h> To be done in CPS
 #include <uiccisi.h>
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmnetmesshandlertraces.h"
+#include "cmmnetmesshandlerTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES
@@ -333,7 +333,9 @@ void CMmNetMessHandler::ConstructL()
 TFLOGSTRING("TSY: CMmNetMessHandler::ConstructL()");
 OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_CONSTRUCTL, "CMmNetMessHandler::ConstructL" );
 
-    iNetOperatorNameHandler = CMmNetOperatorNameHandler::NewL( this );
+    iNetOperatorNameHandler = CMmNetOperatorNameHandler::NewL(
+        this,
+        iMmUiccMessHandler );
 
     // Delay timer for completion of Packet transfer state
     iDelayTimer = CDelayTimer::NewL( this );
@@ -395,6 +397,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_CMMNETMESSHANDLER, "CMmNetMessHa
 TInt CMmNetMessHandler::ProcessUiccMsg(
     TInt aTraId,
     TInt aStatus,
+    TUint8 /*aDetails*/,
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY: CMmNetMessHandler::ProcessUiccMsg, transaction ID: %d, status: %d", aTraId, aStatus );
@@ -701,7 +704,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessHand
                             aIsiMessage );
                         }
                     break;
-                    }  
+                    }
                 default:
                     {
                     // No appropriate handler methods for ISI-message found.
@@ -3077,6 +3080,11 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_INITIALIZEONSANDOPLREADING, "CMmNetMe
     // Set iNetMessageHandlingOngoing flag to ETrue.
     iNetMessageHandlingOngoing = ETrue;
 
+    // Start Operator Name String (ONS Name) reading.
+    iNetOperatorNameHandler->UiccOperatorReq();
+
+    // Start Operator PLMN List (OPL) rules reading by reading the record count
+    iNetOperatorNameHandler->UiccReadOplRecordCount();
     }
 
 // ---------------------------------------------------------------------------

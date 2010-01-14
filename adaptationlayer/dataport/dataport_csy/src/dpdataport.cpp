@@ -44,9 +44,9 @@
 #include "dptermdetect.h"        // terminal bytes detection
 #include "pep_comm_types.h"      // structures for isi-message interface
 #include "dplog.h"               // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpdataporttraces.h"
+#include "dpdataportTraces.h"
 #endif
 
 // LOCAL FUNCTION PROTOTYPES

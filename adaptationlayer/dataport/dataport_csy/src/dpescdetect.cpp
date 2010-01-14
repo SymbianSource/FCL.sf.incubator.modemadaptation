@@ -37,9 +37,9 @@
 extern RFile DpLogFile;
 #endif // USE_FILE_DEBUG
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpescdetecttraces.h"
+#include "dpescdetectTraces.h"
 #endif
 
 

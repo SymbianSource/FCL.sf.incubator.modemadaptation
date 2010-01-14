@@ -27,9 +27,9 @@
 #include <commdb.h>
 #include <etelmmerr.h>
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "cmmdataporthandlertraces.h"
+#include "cmmdataporthandlerTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

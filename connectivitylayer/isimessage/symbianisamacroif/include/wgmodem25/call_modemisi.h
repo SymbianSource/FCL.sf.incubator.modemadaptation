@@ -14,7 +14,9 @@
 * 
 * Description:
 * Name      : PN_MODEM_CALL [ 0xC9 ] Resource Modem Call Server
-* Version   : 001.004
+* Version   : 002.002
+*
+* Documentation: www.wirelessmodemapi.com
 *
 */
 
@@ -22,8 +24,8 @@
 #ifndef _SYMBIAN_ISI_CALL_MODEMISI_H_
 #define _SYMBIAN_ISI_CALL_MODEMISI_H_
 
-#define MODEM_CALL_SERVER_ISI_VERSION_Z	 1
-#define MODEM_CALL_SERVER_ISI_VERSION_Y	 4
+#define MODEM_CALL_SERVER_ISI_VERSION_Z	 2
+#define MODEM_CALL_SERVER_ISI_VERSION_Y	 2
 
 
 //CONSTANTS
@@ -186,7 +188,6 @@
 #define CALL_MODEM_STATUS_HOLD                            	0x0C                                                 	
 #define CALL_MODEM_STATUS_RETRIEVE_INITIATED              	0x0D                                                 	
 #define CALL_MODEM_STATUS_RECONNECT_PENDING               	0x0E                                                 	
-#define CALL_MODEM_STATUS_TERMINATED                      	0x0F                                                 	
 #define CALL_MODEM_STATUS_SWAP_INITIATED                  	0x10                                              	
 
 //BitmaskTables for CALL_MODEM_PRESENT_INFO
@@ -200,12 +201,12 @@
 #define CALL_MODEM_RI_IN_BAND_INFO                        	0x01                                                 	
 
 //ConstantTable for CALL_MODEM_OPERATION
+#define CALL_MODEM_OP_UNKNOWN                             	0x00                                                 	
 #define CALL_MODEM_OP_HOLD                                	0x01                                                 	
 #define CALL_MODEM_OP_RETRIEVE                            	0x02                                                 	
 #define CALL_MODEM_OP_SWAP                                	0x03                                                 	
 #define CALL_MODEM_OP_CONFERENCE_BUILD                    	0x04                                                 	
 #define CALL_MODEM_OP_CONFERENCE_SPLIT                    	0x05                                                 	
-#define CALL_MODEM_OP_CUG                                 	0xA0                                              	
 #define CALL_MODEM_OP_TRANSFER                            	0xA1                                              	
 
 //ConstantTable for CALL_MODEM_DTMF_STATUS
@@ -217,6 +218,7 @@
 #define CALL_MODEM_RECONNECTED                            	0x02                                                 	
 
 //ConstantTable for CALL_MODEM_PROPERTY
+#define CALL_MODEM_PROP_UNKNOWN                           	0x00                                                 	
 #define CALL_MODEM_PROP_ALL                               	0x01                                                 	
 #define CALL_MODEM_PROP_IMMEDIATE_CONNECT                 	0xA0                                              	
 #define CALL_MODEM_PROP_CUG_INFO                          	0xA1                                              	
@@ -250,6 +252,7 @@
 //ConstantTable for CALL_MODEM_EMERG_NUMBER_OPERATION
 #define CALL_MODEM_EMERG_NUMBER_REMOVE                    	0x00                                                 	
 #define CALL_MODEM_EMERG_NUMBER_ADD                       	0x01                                                 	
+#define CALL_MODEM_EMERG_NUMBER_UNKNOWN                   	0xFF                                              	
 
 //ConstantTable for CALL_MODEM_EMERG_NUMBER_CHECK_STATUS
 #define CALL_MODEM_EMERG_NBR_CHECK_FAIL                   	0x00                                                 	
@@ -478,6 +481,7 @@
 #define CALL_MODEM_RES_CONF_RECONFIGURED                  	0x02                                                 	
 
 //ConstantTable for CALL_MODEM_RES_CONF_OPERATION
+#define CALL_MODEM_RES_CONF_UNKNOWN                       	0x00                                                 	
 #define CALL_MODEM_RES_CONF_GET                           	0x01                                                 	
 #define CALL_MODEM_RES_CONF_SET                           	0x02                                                 	
 

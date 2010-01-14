@@ -21,9 +21,9 @@
 #include "sattimer.h"           // sat timer class
 #include "satmessaging.h"       // sat messaging class
 #include "satmesshandler.h"     // sat message handler class
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "sattimertraces.h"
+#include "sattimerTraces.h"
 #endif
 
 

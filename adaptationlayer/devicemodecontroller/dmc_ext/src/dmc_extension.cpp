@@ -28,7 +28,7 @@
 #include "dmc_trace.h"
 #include "dmc_event_handler_ape_cent.h"
 
-#include "osttracedefinitions.h"    // For Open System Trace
+#include "OstTraceDefinitions.h"    // For Open System Trace
 #ifdef OST_TRACE_COMPILER_IN_USE
 #include "dmc_extensionTraces.h"
 #endif

@@ -61,6 +61,7 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
         */
         static CMmPhoneBookOperationCache* NewL(
             CMmPhoneBookStoreMessHandler* aMmPhoneBookStoreMessHandler,
+            CMmUiccMessHandler* aUiccMessHandler,
             TInt aIpc,
             const CMmDataPackage* aDataPackage );
 
@@ -68,19 +69,6 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
         * Destructor.
         */
         ~CMmPhoneBookOperationCache();
-
-        /**
-        * Calculates transaction id from data package
-        * @param aIpc IPC number
-        * @param aDataPackage data package
-        * @param aTransactionId resulting transaction id
-        * @return TInt KErrNotSupported or KErrNone
-        */
-        static TInt CalculateTransactionId(
-            TInt aIpc,
-            const CMmDataPackage* aDataPackage,
-            TUint8& aTransactionId
-            );
 
     private:
 
@@ -100,92 +88,30 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
         * @param const CMmDataPackage* aDataPackage: Packaged data.
         * @return TInt: KErrNone or error value.
         */
-        TInt CreateReq( TInt aIpc, const CMmDataPackage* aDataPackage );
+        TInt UICCCreateReq( TInt aIpc, const CMmDataPackage* aDataPackage, TUint8 aTransId );
 
         /**
-        * Handles SimPbResp ISI -message
-        * @param TIsiReceiveC& aIsiMessage: Received ISI message
-        * @param TBool& aComplete: Indicates if request can remove from
-        *        operationlist or not.
-        * @return TInt: KErrNone or error value
+        * Handles Recieved data
+        * @param TBool& aComplete : flag to check operation needs to be removed form the list or not.
+        * @param TInt aStatus : To get the UICC Server response status
+        * @param const TDeC9 &aFileData : Data received in ISI Message
+        * @param TInt aTransId : transaction Id sent in request message
+        * @return TInt: KErrNone or error value.
         */
-        TInt HandleSimPbRespL(
-            const TIsiReceiveC& aIsiMessage,
-            TBool& aComplete );
-
+        TBool HandleUICCPbRespL ( TInt aStatus, TUint8 aDetails, const TDesC8 &aFileData, TInt aTraId);
+        
+        
         /**
-        * Handles SimPbResp ISI -message, Cache.
-        * @param TIsiReceiveC& aIsiMessage: Received ISI message
-        * @param TBool& aComplete: Indicates if request can remove from
-        *        operationlist or not.
-        * @return TInt: KErrNone or error value
-        */
-        TInt HandleSimPbRespLCacheL(
-            const TIsiReceiveC& aIsiMessage,
-            TBool& aComplete );
-
-        /**
-        * Handles SimPbResp ISI -message, Get info
-        * @param TIsiReceiveC& aIsiMessage: Received ISI message
-        * @param TBool& aComplete: Indicates if request can remove from
-        *        operationlist or not.
-        * @return TInt: KErrNone or error value
-        */
-        TInt HandleSimPbRespGetInfo(
-            const TIsiReceiveC& aIsiMessage,
-            TBool& aComplete );
-
-        /**
-        * Prepares operation to start caching.
-        * @param const CMmDataPackage* aDataPackage: data
-        * @return TInt: KErrNone or error value
-        */
-        TInt PrepareCacheReq( const CMmDataPackage* aDataPackage );
-
-        /**
-        * Creates and sends ISI message in order to read entry from SIM
-        * @param TUint8 aTransactionId : Transaction id
-        * @param TInt aLocation : Location index
+        * Creates message in order to read entry from SIM
+        * @param aRecordNo entry to be read
         * @return TInt : KErrNone or error value
         */
-        TInt SimPbReqRead( TUint8 aTransactionId, const TInt aLocation );
-
-        /**
-        * Checks if this cacheing operation is prepared to be launched
-        * @return TBool ETrue - operation is ready to be launched
-        */
-        TBool IsPrepared() const;
+        TInt USimPbReqRead( TInt aRecordNo, TUint8 aTransId );
 
         /**
         * Cancels cacheing request
         */
-        void CancelReq();
-
-        /**
-        * Prepares the operation (makes it ready to be launched).
-        * @param aIpc IPC request
-        * @param aDataPackage parameters to prepare request with
-        * @return TInt KErrNotReady on attempt to prepare prepared operation
-        * @return TInt KErrArgument on attempt to create malformed request
-        */
-        TInt PrepareReq(
-            TInt aIpc,
-            const CMmDataPackage* aDataPackage
-            );
-
-        /**
-        * Launches activated operation.
-        * @return TInt KErrNotReady on attempt to launch not prepared operation;
-        * or system-wide error code
-        */
-        TInt LaunchReq();
-
-        /**
-        * Completes the request.
-        * @param aErrorCode error code to be completed with
-        * @return TInt KErrNone or KErrNotSupported if operation is not prepared
-        */
-        TInt CompleteReq( TInt aErrorCode );
+        void CancelReq( TName& aPhoneBook );
 
     public: // Data
         // None
@@ -200,6 +126,19 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
 
         // Number of used VMBX entries
         TInt iNumOfUsedVMBXEntries;
+        
+        // Flag to store EXT needs to be read or not
+        TBool iExtensionToRead;
+        
+        // To Store the information about no of entries filled in commontsy araay
+        TInt iNumOfEntriesFilled;
+        
+        // Store information about operation has been canceled or not
+        TBool iCancelOperation;
+
+        // Attribute to Store Entry
+        TPBEntry* iStoreEntry;
+
 
 #ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
 

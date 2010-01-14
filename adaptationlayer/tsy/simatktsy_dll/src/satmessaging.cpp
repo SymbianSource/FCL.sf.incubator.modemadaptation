@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -40,9 +40,9 @@
 #include <infoisi.h>            // isa cellmo info server
 #include <uiccisi.h>            // UICC server
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "satmessagingtraces.h"
+#include "satmessagingTraces.h"
 #endif
 
 #if (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
@@ -232,6 +232,10 @@ void CTsySatMessaging::ConstructL()
     // Request IMEI code. Needed in provide local info proactive command.
     iSatMessHandler->InfoSerialNumberReadReq(
         GetTransactionId(), INFO_SB_SN_IMEI_PLAIN );
+
+    // Request IMEI-SV code. Needed in provide local info proactive command.
+    iSatMessHandler->InfoSerialNumberReadReq(
+        GetTransactionId(), INFO_SN_IMEI_SV_TO_NET );
 
     // Request Network status
     iSatMessHandler->NetCellInfoGetReq(

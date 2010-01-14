@@ -38,12 +38,6 @@
 // "4.2.25   EFSMS (Short messages)"
 const TUint8 KSmsElemetaryFileRecordLength = 176;
 
-// for file descriptor tag in FCI data received from UICC Server
-const TUint8 KTagFCIFileDescriptor = 0x82;
-
-#define UICC_FCI_EF_FDESC_OFFSET_NUM_ENTR   6
-
-
 // MACROS
 //none
 
@@ -98,8 +92,8 @@ class CMmSmsMessHandler :
             EPhoneStoreWrite,
             EInternalNack,
             ESms2Cache,
-            ESms2WriteReceived
-
+            ESms2WriteReceived,
+            ESmsMessagingNackSmsStoredCapacityExceeded
             };
 
     //METHODS
@@ -162,6 +156,7 @@ class CMmSmsMessHandler :
         TInt ProcessUiccMsg(
             TInt aTraId,
             TInt aStatus,
+            TUint8 aDetails,
             const TDesC8& aFileData );
 
     private:
@@ -226,21 +221,6 @@ class CMmSmsMessHandler :
             TInt  aIpc );
 
         /**
-        * Handle internally SIM server response to SimStSmsRead
-        * (ReadAllSms) request
-        * @param TBool aSupportedPduType: Is read PDU's type supported
-        * @param TSmsMsg* aSmsMsg: A pointer to the sms message
-        * @param Int aSmsLocIndex: index of the SIM SMS slot
-        * @param TUint8 aSmsNumOfLoc: number of SIM SMS slots
-        * @return void: None
-        */
-        void InternalRetrieveSmsListReadSmsL(
-            TBool aSupportedPduType,
-            TSmsMsg* aSmsMsg,
-            TInt aSmsLocIndex,
-            TUint8 aSmsNumOfLoc );
-
-        /**
         * Sms gsm received pp report request (Ack or Nack)
         * @param TUint8 aTransactionId: Transaction identifier
         * @param const TDesC8* aMsgData: A pointer to the Message data
@@ -258,12 +238,6 @@ class CMmSmsMessHandler :
         * @return TUint8 - SMS Cause value
         */
         TUint8 SmsMapCause( TInt aRpCause );
-
-        /* Complete reading of one SMSP set
-        * @param TSmsParameters* aParameters: A pointer to sms parameter
-        * @return: void: None
-        */
-        void InternalRetrieveSmspListL( TSmsParameters* aParameters );
 
         /**
         * Activate, deactivate or query status of SMS receiving
@@ -571,9 +545,11 @@ class CMmSmsMessHandler :
             const TDesC8& aFileData );
 
         /**
-        * Write Class 2 SMS from SIM/USIM
-        * @param aInfo Flags 2 data
-        * @return void
+        * Write Class 2 SMS to SIM/USIM
+        * @param const RMobileSmsStore::TMobileGsmSmsEntryV1& aEntry:
+        *     SIM-stored SMS
+        * @aRecordId SMS entry record id
+        * @return Error code
         */
         TInt UiccWriteSMSReq(
             const RMobileSmsStore::TMobileGsmSmsEntryV1& aEntry,
@@ -581,7 +557,7 @@ class CMmSmsMessHandler :
 
         /**
         * Write Class 2 SMS from SIM/USIM response
-        * @param aInfo Flags 2 data
+        * @param aStatus Status
         * @return void
         */
         void UiccWriteSMSResp( TInt aStatus );
@@ -602,7 +578,78 @@ class CMmSmsMessHandler :
             TInt aStatus,
             const TDesC8& aFileData );
 
-    //ATTRIBUTES
+        /**
+        * Delete one SMS from SIM/USIM response
+        * @param aStatus Status
+        * @return void
+        */
+        void UiccDeleteSMSResp( TInt aStatus );
+
+        /**
+        * Delete all Class 2 SMSs from SIM/USIM response
+        * @param aStatus Status
+        * @return void
+        */
+        void UiccDeleteAllSMSResp( TInt aStatus );
+
+        /**
+        * Compares the SC timestamp of messages aReadSmsIsiMsg to aScTime.
+        * @param const RMobileSmsStore::TMobileGsmSmsEntryV1& aEntry:
+        *     SIM-stored SMS
+        * @param TTime aScTime: Client-side SMSC timestamp
+        * @return TBool: Result of the comparison
+        */
+
+        TBool CMmSmsMessHandler::CheckSCTimestamp(
+            const RMobileSmsStore::TMobileGsmSmsEntryV1& aEntry,
+            const TTime& aScTime );
+
+        /**
+        * Update Class 2 SMS status as read to SIM/USIM
+        * @param const RMobileSmsStore::TMobileGsmSmsEntryV1& aEntry:
+        *     SIM-stored SMS
+        * @aRecordId SMS entry record id
+        * @return Error code
+        */
+        TInt UiccUpdateSMSStatus( const TUint8 aRecordId );
+
+        /**
+        * Read SMS from SIM for SMS status update
+        * @param aStatus Status
+        * @param aFileData File data to be modified and written back
+        * @return void
+        */
+        void UiccUpdateSMSStatusReadSMSResp(
+            TInt aStatus,
+            const TDesC8& aFileData );
+
+        /**
+        * Written updated SMS to SIM
+        * @param aStatus Status
+        * @return void
+        */
+        void UiccUpdateSMSStatusWriteSMSResp( TInt aStatus );
+
+        /**
+        * Get SMSP entry from (U)SIM
+        * @return Symbian error code
+        */
+        TInt UiccGetSmspEntryReq();
+
+        /**
+        * Store SMSP entry to internal array
+        * @param aFileData Data containig SMSP entry
+        * @return Symbian error code
+        */
+        TInt UiccStoreSmspEntry( const TDesC8& aFileData );
+
+        /**
+        * Write SMSP entry to (U)SIM
+        * @param aDataPackage Data containig SMSP entry
+        * @return Symbian error code
+        */
+        TInt UiccSmsUpdateParameterReq( const CMmDataPackage* aDataPackage );
+        //ATTRIBUTES
     public:
         //none
 
@@ -651,7 +698,7 @@ class CMmSmsMessHandler :
         // Is SMS Sending ongoing
         TBool iSMSSendingOngoing;
 
-        // Record ID saved during query
+        // Record ID saved during query or deletion.
         TUint8 iRecordId;
 
         // Pointer to UICC message handler
@@ -659,6 +706,12 @@ class CMmSmsMessHandler :
 
         // Flag to check is the case class 2 SMS write or EMobileStoreWrite
         TBool iSMSClass2Write;
+
+        // Client has no storage to receive anymore SM's
+        TBool iMemoryCapacityExceeded;
+
+        // Record number of EF smsp
+        TUint8 iSmspRecordNumber;
     };
 
 #endif // _CMMSMSMESSHANDLER_H_

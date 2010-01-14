@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -20,6 +20,7 @@
 #include <non_foundation_paths.hrh>
 #include <platform_paths.hrh>
 
+SMPSAFE
 TARGET        nokiatsy.dll
 TARGETTYPE    dll
 UID           0x1000008D 0x1000A84A
@@ -60,9 +61,14 @@ SOURCE        cmmphonebookstoremesshandler.cpp
 SOURCE        cmmphonebookstoreoperationbase.cpp
 SOURCE        cmmphonebookstoreoperationlist.cpp
 SOURCE        cmmphonebookoperationinit.cpp
-SOURCE		  cmmphonebookoperationinit3g_adn.cpp
+SOURCE        cmmphonebookoperationinit3g_adn.cpp
 SOURCE        cmmphonebookoperationread.cpp
 SOURCE        cmmphonebookoperationread3g_adn.cpp
+SOURCE        cmmphonebookoperationcache.cpp
+SOURCE        cmmphonebookoperationwrite.cpp
+SOURCE        cmmenstoremesshandler.cpp
+SOURCE        cmmphonebookoperationdelete.cpp
+
 // SMS & other messaging
 SOURCE        cmmsmsmesshandler.cpp
 SOURCE        cmmsmscache.cpp

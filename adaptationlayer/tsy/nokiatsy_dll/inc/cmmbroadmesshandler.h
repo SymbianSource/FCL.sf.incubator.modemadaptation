@@ -157,6 +157,9 @@ class CMmBroadMessHandler : public CBase, public MMmMessHandlerBase, public MMmM
         //Pointer to the message router object
         CMmMessageRouter* iMessageRouter;
 
+        //CB Subscription number.
+        TUint8 iCbSubscriptionNumber;
+
     private: // types
 
         // The broadcast request types are grouped into

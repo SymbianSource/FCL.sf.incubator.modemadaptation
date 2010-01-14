@@ -15,6 +15,12 @@
 *
 */
 
+// NOTE! MISSING SUPPORT >
+//
+// Missing support for NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT, NCP_COMMON_BRIDGE_FAMILY_NAME_SERVICE_SUPPORT
+// Using legacy indicationhandler
+//
+// NOTE! MISSING SUPPORT <
 
 #include <non_foundation_paths.hrh>
 #include <platform_paths.hrh>
@@ -31,6 +37,8 @@ FEATUREVARIANT
 
 EPOCALLOWDLLDATA
 
+SMPSAFE
+
 SOURCEPATH      ../src
 SOURCE          isakernelapi.cpp
 SOURCE          iadtrace.cpp
@@ -40,7 +48,7 @@ SOURCE          isakernelchannel.cpp
 SOURCE          queue.cpp
 SOURCE          router.cpp
 
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
 SOURCE            pep.cpp
 SOURCE            peptransceiver.cpp
 SOURCE            pipehandler.cpp

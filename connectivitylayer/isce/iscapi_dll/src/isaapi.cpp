@@ -201,20 +201,25 @@ EXPORT_C void RIscApi::Open(
         C_TRACE( ( _T( "RIscApi::Open iChannelNumber %d aChannelNumber %d " ), iChannelNumber, aChannelNumber ) );
         OstTraceExt2( TRACE_NORMAL, DUP1_RISCAPI_OPEN, "RIscApi::Open;iChannelNumber=%hx;aChannelNumber=%hx", iChannelNumber, aChannelNumber );        
         aStatus = KRequestPending;
+        TRequestStatus status = KRequestPending;
         TAny* params[ KThreeParams ];
-        params[ KFirstParam ] = reinterpret_cast< TAny* >( &aStatus );
+        params[ KFirstParam ] = reinterpret_cast< TAny* >( &status );
         params[ KSecondParam ] = reinterpret_cast< TAny* >( &iChannelNumber );
         // If opened with resource (aOpenParams).
         params[ KThirdParam ] = reinterpret_cast< TAny* >( const_cast<TDesC8*>( aOpenParams ) );
         error = DoControl( EIADAsyncOpen, params );
         TRACE_ASSERT_ALWAYS_COND( KErrNone == error );
+        User::WaitForRequest(status);
         // In case of KErrAlreadyExists as a result to open we must close the handle after open.
-        if( KErrAlreadyExists == aStatus.Int() )
+        if( status.Int() == KErrAlreadyExists )
             {
             C_TRACE(  (  _T(  "RIscApi::Open close handle KErrAlreadyExists" ) ) );
             OstTraceExt1( TRACE_NORMAL, RISCAPI_OPEN_ALREADY_EXIST, "RIscApi::Open;aChannelNumber=%hx", aChannelNumber );
             RHandleBase::Close();
             }
+        TRequestStatus* statusPtr=&aStatus;
+
+        User::RequestComplete(statusPtr, status.Int());
         }
     C_TRACE(  (  _T(  "RIscApi::Open <-" ) ) );
 

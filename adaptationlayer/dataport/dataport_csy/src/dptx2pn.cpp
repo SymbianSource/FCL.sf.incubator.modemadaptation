@@ -29,9 +29,9 @@
 #include "dpparityhandler.h" // parity bit handling in 7-bit data mode
 #include "pep_comm_types.h"  // pep_comm_types
 #include "dplog.h"           // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dptx2pntraces.h"
+#include "dptx2pnTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

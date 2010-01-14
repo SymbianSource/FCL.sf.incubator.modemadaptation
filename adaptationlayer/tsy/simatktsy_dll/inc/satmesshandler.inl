@@ -42,7 +42,17 @@ inline TUint8 CSatMessHandler::TimeZone() const
 //
 inline TBool CSatMessHandler::ImeiAvailable() const
     {
-    return iSerialNumberReadReceived ? ETrue : EFalse;
+    return iImeiAvailable;
+    }
+
+// -----------------------------------------------------------------------------
+// CSatMessHandler::ImeiSvAvailable
+// Return ETrue if ImeiSv has been successfullly read, EFalse if not.
+// -----------------------------------------------------------------------------
+//
+inline TBool CSatMessHandler::ImeiSvAvailable() const
+    {
+    return iImeiSvAvailable;
     }
 
 // -----------------------------------------------------------------------------

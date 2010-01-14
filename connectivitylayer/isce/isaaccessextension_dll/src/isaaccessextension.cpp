@@ -106,7 +106,7 @@ EXPORT_C TDfcQue* DIsaAccessExtension::GetDFCThread
     C_TRACE( ( _T( "DIsaAccessExtension::GetDFCThread <->" ) ) );
     ASSERT_RESET_ALWAYS( ( EIADLddDfcQueue == aDfcThread || EIADExtensionDfcQueue == aDfcThread ), EIADDFCThreadGetFailed | EIADFaultIdentifier2 << KFaultIdentifierShift );
     // Ownership not given to caller.
-    return iDfcQueueList[ aDfcThread ];
+    return iDfcQueueList[ EIADExtensionDfcQueue ];//SMPSAFE
 
     }
 

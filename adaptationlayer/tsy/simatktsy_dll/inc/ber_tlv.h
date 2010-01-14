@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -24,7 +24,7 @@
 #include <e32base.h>        // base class cbase
 
 
-//  CONSTANTS 
+//  CONSTANTS
 const TUint8 KTlvLengthStartPosition                            = 0x01;
 const TUint8 KTlvDataAreaStartPosition                          = 0x02;
 const TUint8 KTlvHeaderLength                                   = 0x02;
@@ -165,6 +165,7 @@ const TUint8 KTlvAccessTechnologyTag                            = 0x3F;
 const TUint8 KTlvESNTag                                         = 0x46;
 const TUint8 KTlvNetworkAccessNameTag                           = 0x47;
 const TUint8 KTlvPdpContextActivationParametersTag              = 0x52;
+const TUint8 KTlvImeisvTag                                      = 0x62;
 
 const TUint8 KTlvTimerIdentifierTagCRBitOn                      = 0xA4;
 
@@ -288,7 +289,7 @@ const TUint8 KNoResponseFromUser                                        = 0x12;
 const TUint8 KHelpInformationRequiredByTheUser                          = 0x13;
 const TUint8 KUssdOrSsTransactionTerminatedByTheUser                    = 0x14;
 
-//Results '2X' Indicate To The SIM That It May Be Worth Re-Trying The Command 
+//Results '2X' Indicate To The SIM That It May Be Worth Re-Trying The Command
 //At A Later Opportunity.
 const TUint8 KMeCurrentlyUnableToProcessCommand                         = 0x20;
 const TUint8 KNetworkCurrentlyUnableToProcessCommand                    = 0x21;
@@ -298,8 +299,8 @@ const TUint8 KActionInContradictionWithTheCurrentTimerState             = 0x24;
 const TUint8 KInteractionWithCallControlBySimTemporaryProblem           = 0x25;
 const TUint8 KLaunchBrowserGenericErrorCode                             = 0x26;
 
-//Results '3X' Indicate That It Is Not Worth The SIM Re-Trying With An 
-//Identical Command, As It Will Only Get The Same Response. However, The 
+//Results '3X' Indicate That It Is Not Worth The SIM Re-Trying With An
+//Identical Command, As It Will Only Get The Same Response. However, The
 //Decision To Retry Lies With The SIM Application.
 const TUint8 KCommandBeyondMeCapabilities                               = 0x30;
 const TUint8 KCommandTypeNotUnderstoodByMe                              = 0x31;
@@ -314,15 +315,15 @@ const TUint8 KSimPermanentProblem                                       = 0x39;
 const TUint8 KBearerIndependentProtocolError                            = 0x3a;
 
 //Additional information
-//Contents: For the general result "Command performed successfully", some 
-// proactive commands require additional information in the command result. 
-// This is defined in the subclauses below. For the general results '20', '21', 
-// '26', '34', '35', '37', '38' and '39' and '3A', it is mandatory for the ME 
-// to provide a specific cause value as additional information, as defined in 
-// the subclauses below. For the other general results, the ME may optionally 
-// supply additional information. If additional information is not supplied, 
-// then the length of the value part of the data object need only contain the 
-// general result. See 3GPP TS 11.14 V8.8.0, chapters 12.12.1 - 12.12.11 for 
+//Contents: For the general result "Command performed successfully", some
+// proactive commands require additional information in the command result.
+// This is defined in the subclauses below. For the general results '20', '21',
+// '26', '34', '35', '37', '38' and '39' and '3A', it is mandatory for the ME
+// to provide a specific cause value as additional information, as defined in
+// the subclauses below. For the other general results, the ME may optionally
+// supply additional information. If additional information is not supplied,
+// then the length of the value part of the data object need only contain the
+// general result. See 3GPP TS 11.14 V8.8.0, chapters 12.12.1 - 12.12.11 for
 // more details.
 
 //Additional information for ME problem
@@ -391,7 +392,7 @@ const TUint8 KMe                                                = 0x82;
 const TUint8 KNetwork                                           = 0x83;
 
 
-//  DATA TYPES  
+//  DATA TYPES
 
 // Tlv Specific Data Types
 enum TTlvSpesificDataType
@@ -497,7 +498,7 @@ class CTlv;
 *  TTlvBase
 *  TLV type: Tag Length Value(s)
 *  Generic BER-TLV constructor class, can be used to create TLVs
-*  You do not need to worry about lenghts; Example usage: 
+*  You do not need to worry about lenghts; Example usage:
 *                  TTlv tlv;
 *                  tlv.Begin( KxxBerTag);  <--- top level tag
 *                  tlv.AddTag( KxxxTag )   <--- simple tags
@@ -566,7 +567,7 @@ class TTlvBase
         /**
         * Return data, calculated without
         * top level tag.
-        * @since Series 60 Series60_2.6 
+        * @since Series 60 Series60_2.6
         * @param None
         * @return TDesC8& descriptor containing BER-TLV
         */
@@ -574,7 +575,7 @@ class TTlvBase
 
 
     protected: // Data
-    
+
         TInt        iLenIndex;
         TDes8&      iData;
     };
@@ -616,16 +617,16 @@ private: // Data
 class TTlv : public TTlvBase
     {
     public: // Constructor
-    
+
         /**
         * Constructor
         * @since Series 60 Series60_2.6
         * @param iBuffer
-        */    
+        */
         TTlv() : TTlvBase( iBuffer ) {}
-        
+
         private:    // Data
-    
+
         // TLV must fit in APDU limits (255 bytes)
         // therefore the maximum possible TLV size is 255
         TBuf8<255>   iBuffer;
@@ -727,7 +728,7 @@ class CTlvBase : public CBase
             }
 
     protected: // Data
-        
+
         // Pointer to Tlv data
         TPtrC8 iData;
     };
@@ -753,16 +754,16 @@ class CBerTlv : public CTlvBase
 
         /**
         * Find tlv by tag value
-        * @param aTlv 
+        * @param aTlv
         * @param aTlvTagValue TlvTag
         * @param aItemNbr number of requested Tlv, default is 0
         * @return TInt: KErrNone or KErrNotFound
         */
         TInt TlvByTagValue(
             CTlv* aTlv,
-            TUint8 aTlvTagValue, 
+            TUint8 aTlvTagValue,
             TInt aItemNbr = 0 );
-            
+
         /**
         * Find several tlvs by tag value
         * @since Series 60 Series60_2.6
@@ -771,7 +772,7 @@ class CBerTlv : public CTlvBase
         * @return TInt: KErrNone or KErrNotFound
         */
         TInt TlvByTagValueMulti( CTlv* aTlv, TUint8 aTlvTag );
-        
+
         /**
         * Set ber-tlv from atk_generic_req isi-message.
         * @since NCP 5.0
@@ -808,7 +809,7 @@ class CTlv : public CTlvBase
          TUint8 GetShortInfo( TTlvSpesificDataType aType );
 
         /**
-        * Returns the Data defined by aType. Index and length of the 
+        * Returns the Data defined by aType. Index and length of the
         * data depends on data type.
         * @since Series 60 Series60_2.6
         * @param TAtkSpesificDataType aType: data type.

@@ -13,7 +13,9 @@
 * 
 * Description:
 * Name      : PN_GPDS [ 0x31 ] Resource GPDS Shared Subblock Descriptions
-* Version   : 018.006
+* Version   : 019.001
+*
+* Documentation: www.wirelessmodemapi.com
 *
 */
 
@@ -21,8 +23,8 @@
 #ifndef _SYMBIAN_ISI_GPDS_SHAREDISI_H_
 #define _SYMBIAN_ISI_GPDS_SHAREDISI_H_
 
-#define GPDS_SHARED_SUBBLOCK_DESCRIPTIONS_ISI_VERSION_Z	 18
-#define GPDS_SHARED_SUBBLOCK_DESCRIPTIONS_ISI_VERSION_Y	 6
+#define GPDS_SHARED_SUBBLOCK_DESCRIPTIONS_ISI_VERSION_Z	 19
+#define GPDS_SHARED_SUBBLOCK_DESCRIPTIONS_ISI_VERSION_Y	 1
 
 
 //CONSTANTS

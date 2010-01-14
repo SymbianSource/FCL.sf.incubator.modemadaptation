@@ -10,8 +10,8 @@
 * Nokia Corporation - initial contribution.
 *
 * Contributors:
-* 
-* Description: 
+*
+* Description:
 *
 */
 
@@ -34,9 +34,9 @@ class MISILinkRouterIf
         * Receive message from link.
         * Called without FM held.
         * @param aMsg, message to be received
+		* @return Error value
         */
-        virtual void RouteISIMessage( TDes8& aMsg ) = 0;
-
+        virtual TInt RouteISIMessage( TDes8& aMsg ) = 0;
     };
 
 

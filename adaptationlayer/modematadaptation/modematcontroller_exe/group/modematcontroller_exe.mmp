@@ -21,6 +21,7 @@
 #include <platform_paths.hrh>
 
 
+SMPSAFE
 TARGET                  modematcontroller.exe
 TARGETTYPE              exe
 UID                     0x1000008d 0x2001FCB1

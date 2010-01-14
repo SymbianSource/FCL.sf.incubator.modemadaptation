@@ -13,7 +13,9 @@
 * 
 * Description:
 * Name      : PN_GSS [ 0x32 ] Resource GSM Stack Server
-* Version   : 008.001
+* Version   : 008.002
+*
+* Documentation: www.wirelessmodemapi.com
 *
 */
 
@@ -22,7 +24,7 @@
 #define _SYMBIAN_ISI_GSSISI_H_
 
 #define GSM_STACK_SERVER_ISI_VERSION_Z	 8
-#define GSM_STACK_SERVER_ISI_VERSION_Y	 1
+#define GSM_STACK_SERVER_ISI_VERSION_Y	 2
 
 
 //CONSTANTS
@@ -384,11 +386,6 @@
 #define GSS_CS_LOCAL_INFO_GET                             	0x03                                                 	
 #define GSS_POWER_CLASS_CHANGE                            	0x04                                                 	
 #define GSS_BAND_INFO_GET                                 	0x05                                                 	
-#define GSS_ADJ_CHA_MEAS_START                            	0x09                                                 	
-#define GSS_ADJ_CHA_MEAS_STOP                             	0x0A                                                 	
-#define GSS_ADJ_CHA_MEAS                                  	0x0B                                                 	
-#define GSS_FORCED_HANDOVER                               	0x0C                                                 	
-#define GSS_CELL_BARRING                                  	0x0D                                                 	
 #define GSS_SELECTED_RAT_WRITE                            	0x0E                                                 	
 #define GSS_ATK_TIMING_ADVANCE_GET                        	0x96                                              	
 #define GSS_UMA_PREF_MODE_READ                            	0x97                                              	
@@ -445,20 +442,11 @@
 #define GSS_CS_STATUS_TCH                                 	0x15                                              	
 #define GSS_CS_STATUS_INIT                                	0x16                                              	
 
-//ConstantTable for GSS_OPERATION_STATUS
-#define GSS_OPERATION_FAILED                              	0x00                                                 	
-#define GSS_OPERATION_OK                                  	0x01                                                 	
-#define GSS_OPERATION_FAILED_CS_INACTIVE                  	0x02                                                 	
-
-//ConstantTable for GSS_CELL_BARRING_FUNCTIONS
-#define CELL_BARRING_NORMAL                               	0x00                                                 	
-#define CELL_BARRING_REVERSE                              	0x01                                                 	
-#define CELL_BARRING_IGNORED                              	0x02                                                 	
-
-//ConstantTable for GSS_RAT_INFO_FUNCTIONS
-#define GSS_DUAL_RAT                                      	0x00                                                 	
+//BitmaskTables for GSS_RAT_INFO_FUNCTIONS
 #define GSS_GSM_RAT                                       	0x01                                                 	
 #define GSS_UMTS_RAT                                      	0x02                                                 	
+#define GSS_EUTRAN_RAT                                    	0x04                                                 	
+#define GSS_DUAL_RAT                                      	0x03                                                 	
 
 //BitmaskTables for GSS_GSM_BAND_VALUES
 #define GSS_GSM_NO_BANDS                                  	0x00                                                 	
@@ -467,6 +455,7 @@
 #define GSS_GSM_1900_BAND_MASK                            	0x04                                                 	
 #define GSS_GSM_850_BAND_MASK                             	0x08                                                 	
 #define GSS_ALL_GSM_BANDS                                 	0xFF                                              	
+
 
 //BitmaskTables for GSS_UMTS_BAND_VALUES
 #define GSS_UMTS_NO_BANDS                                 	0x00                                                 	
@@ -589,35 +578,6 @@
 #define GSS_BAND_INFO_OFFSET_GSMUPPERBANDSPOWERCLASS      	4 //size 1 byte(s)
 #define GSS_BAND_INFO_OFFSET_FILLERBYTE1                  	5 //size 3 byte(s)
 #define SIZE_GSS_BAND_INFO                                	8
-
-
-//Definition for GSS_ADJ_CHA_MEAS_INFO
-#define GSS_ADJ_CHA_MEAS_INFO                             	0x08                                                 	
-#define GSS_ADJ_CHA_MEAS_INFO_OFFSET_SUBBLOCKID           	0 //size 1 byte(s)
-#define GSS_ADJ_CHA_MEAS_INFO_OFFSET_SUBBLOCKLENGTH       	1 //size 1 byte(s)
-#define GSS_ADJ_CHA_MEAS_INFO_OFFSET_RXLEVNFULL           	2 //size 1 byte(s)
-#define GSS_ADJ_CHA_MEAS_INFO_OFFSET_RXLEVNSUB            	3 //size 1 byte(s)
-#define GSS_ADJ_CHA_MEAS_INFO_OFFSET_RXLEVNUPPER          	4 //size 1 byte(s)
-#define GSS_ADJ_CHA_MEAS_INFO_OFFSET_RXLEVNLOWER          	5 //size 1 byte(s)
-#define GSS_ADJ_CHA_MEAS_INFO_OFFSET_FILLERBYTE1          	6 //size 2 byte(s)
-#define SIZE_GSS_ADJ_CHA_MEAS_INFO                        	8
-
-
-//Definition for GSS_HANDOVER_INFO
-#define GSS_HANDOVER_INFO                                 	0x09                                                 	
-#define GSS_HANDOVER_INFO_OFFSET_SUBBLOCKID               	0 //size 1 byte(s)
-#define GSS_HANDOVER_INFO_OFFSET_SUBBLOCKLENGTH           	1 //size 1 byte(s)
-#define GSS_HANDOVER_INFO_OFFSET_CARRIER                  	2 //size 2 byte(s)
-#define SIZE_GSS_HANDOVER_INFO                            	4
-
-
-//Definition for GSS_BARRING_INFO
-#define GSS_BARRING_INFO                                  	0x0A                                                 	
-#define GSS_BARRING_INFO_OFFSET_SUBBLOCKID                	0 //size 1 byte(s)
-#define GSS_BARRING_INFO_OFFSET_SUBBLOCKLENGTH            	1 //size 1 byte(s)
-#define GSS_BARRING_INFO_OFFSET_FUNCTION                  	2 //size 1 byte(s)
-#define GSS_BARRING_INFO_OFFSET_FILLERBYTE1               	3 //size 1 byte(s)
-#define SIZE_GSS_BARRING_INFO                             	4
 
 
 //Definition for GSS_RAT_INFO
@@ -757,35 +717,6 @@
 #define SIZE_GSS_CS_SERVICE_FAIL_RESP                     	4
 
 
-//Definition for GSS_NEMO_REQ
-#define GSS_NEMO_REQ                                      	0x07                                                 	
-#define GSS_NEMO_REQ_OFFSET_TRANSID                       	0 //size 1 byte(s)
-#define GSS_NEMO_REQ_OFFSET_MESSAGEID                     	1 //size 1 byte(s)
-#define GSS_NEMO_REQ_OFFSET_OPERATION                     	2 //size 1 byte(s)
-#define GSS_NEMO_REQ_OFFSET_NBROFSUBBLOCKS                	3 //size 1 byte(s)
-#define SIZE_GSS_NEMO_REQ                                 	4
-
-
-//Definition for GSS_NEMO_RESP
-#define GSS_NEMO_RESP                                     	0x08                                                 	
-#define GSS_NEMO_RESP_OFFSET_TRANSID                      	0 //size 1 byte(s)
-#define GSS_NEMO_RESP_OFFSET_MESSAGEID                    	1 //size 1 byte(s)
-#define GSS_NEMO_RESP_OFFSET_OPERATION                    	2 //size 1 byte(s)
-#define GSS_NEMO_RESP_OFFSET_STATUS                       	3 //size 1 byte(s)
-#define GSS_NEMO_RESP_OFFSET_FILLERBYTE1                  	4 //size 3 byte(s)
-#define GSS_NEMO_RESP_OFFSET_NBROFSUBBLOCKS               	7 //size 1 byte(s)
-#define SIZE_GSS_NEMO_RESP                                	8
-
-
-//Definition for GSS_NEMO_NTF
-#define GSS_NEMO_NTF                                      	0x09                                                 	
-#define GSS_NEMO_NTF_OFFSET_TRANSID                       	0 //size 1 byte(s)
-#define GSS_NEMO_NTF_OFFSET_MESSAGEID                     	1 //size 1 byte(s)
-#define GSS_NEMO_NTF_OFFSET_OPERATION                     	2 //size 1 byte(s)
-#define GSS_NEMO_NTF_OFFSET_NBROFSUBBLOCKS                	3 //size 1 byte(s)
-#define SIZE_GSS_NEMO_NTF                                 	4
-
-
 //Definition for GSS_CS_IND
 #define GSS_CS_IND                                        	0x03                                                 	
 #define GSS_CS_IND_OFFSET_TRANSID                         	0 //size 1 byte(s)
@@ -813,15 +744,6 @@
 #define SIZE_GSS_SELECTED_RAT_IND                         	4
 
 
-//Definition for GSS_SELECTED_BANDS_IND
-#define GSS_SELECTED_BANDS_IND                            	0x16                                              	
-#define GSS_SELECTED_BANDS_IND_OFFSET_TRANSID             	0 //size 1 byte(s)
-#define GSS_SELECTED_BANDS_IND_OFFSET_MESSAGEID           	1 //size 1 byte(s)
-#define GSS_SELECTED_BANDS_IND_OFFSET_NBROFSUBBLOCKS      	2 //size 1 byte(s)
-#define GSS_SELECTED_BANDS_IND_OFFSET_FILLERBYTE1         	3 //size 1 byte(s)
-#define SIZE_GSS_SELECTED_BANDS_IND                       	4
-
-
 //Definition for GSS_UMA_PREF_MODE_IND
 #define GSS_UMA_PREF_MODE_IND                             	0x15                                              	
 #define GSS_UMA_PREF_MODE_IND_OFFSET_TRANSID              	0 //size 1 byte(s)
@@ -829,27 +751,6 @@
 #define GSS_UMA_PREF_MODE_IND_OFFSET_UMAPREFMODE          	2 //size 1 byte(s)
 #define GSS_UMA_PREF_MODE_IND_OFFSET_FILLERBYTE1          	3 //size 1 byte(s)
 #define SIZE_GSS_UMA_PREF_MODE_IND                        	4
-
-
-//Definition for GSS_MS_INTERROGATE_REQ
-#define GSS_MS_INTERROGATE_REQ                            	0x0B                                                 	
-#define GSS_MS_INTERROGATE_REQ_OFFSET_TRANSID             	0 //size 1 byte(s)
-#define GSS_MS_INTERROGATE_REQ_OFFSET_MESSAGEID           	1 //size 1 byte(s)
-#define GSS_MS_INTERROGATE_REQ_OFFSET_FILLERBYTE1         	2 //size 2 byte(s)
-#define SIZE_GSS_MS_INTERROGATE_REQ                       	4
-
-
-//Definition for GSS_MS_INTERROGATE_RESP
-#define GSS_MS_INTERROGATE_RESP                           	0x0C                                                 	
-#define GSS_MS_INTERROGATE_RESP_OFFSET_TRANSID            	0 //size 1 byte(s)
-#define GSS_MS_INTERROGATE_RESP_OFFSET_MESSAGEID          	1 //size 1 byte(s)
-#define GSS_MS_INTERROGATE_RESP_OFFSET_NBROFENTRIES       	2 //size 2 byte(s)
-#define GSS_MS_INTERROGATE_RESP_OFFSET_DATA               	4 //size 2 byte(s)
-#define GSS_MS_INTERROGATE_RESP_OFFSET_FILLERBYTE1        	6 //size 1 byte(s)
-#define GSS_MS_INTERROGATE_RESP_OFFSET_FILLERBYTE2        	7 //size 1 byte(s)
-#define SIZE_GSS_MS_INTERROGATE_RESP                      	8
-//NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
-//NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
 
 
 //Definition for GSS_HSXPA_USER_SETTING_WRITE_REQ

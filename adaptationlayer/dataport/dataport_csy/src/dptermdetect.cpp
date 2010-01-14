@@ -24,9 +24,9 @@
 #include    "dpstd.h"                   // fault codes etc.
 #include    "dpdataconfig.h"            // configuration store
 #include    "dplog.h"                   // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dptermdetecttraces.h"
+#include "dptermdetectTraces.h"
 #endif
 
 // EXTERNAL DATA STRUCTURES

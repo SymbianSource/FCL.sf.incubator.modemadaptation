@@ -36,6 +36,19 @@ const TUint8 KFilePathLength( 16 );
 const TUint8 KFileDataLength( 200 );
 const TUint16 KApduDataLength( 270 );
 
+// Constants for descriptors in 3G SIM
+const TUint8 KFileDescriptor( 0x82 );
+const TUint8 KFileIdentifier( 0x83 );
+const TUint8 KFileSize( 0x80 );
+const TUint8 KPINStatusTemplateDO( 0xC6 );
+
+// Constants for descriptors in 2G SIM
+const TUint8 KFileStatus( 11 );
+const TUint8 KRecordLength2( 14 );
+const TUint8 KFileSize2( 2 );
+const TUint8 KFileId( 4 );
+
+
 // UICC master file
 const TUint16 KMasterFileId( 0x3F00 );
 
@@ -74,10 +87,18 @@ const TUint16 KElemSimServiceTable                ( 0x6F38 );
 const TUint16 KElemGba                            ( 0x6FD6 );
 const TUint16 KElemEst                            ( 0x6F56 );
 const TUint16 KElemCphsInformation                ( 0x6F16 );
+const TUint16 KElemFileSmsParams                  ( 0x6F42 );
+const TUint16 KElemFileAcl                        ( 0x6F57 );
+const TUint16 KElemFileOpl                        ( 0x6FC6 );
+const TUint16 KElemFilePlmnNetworkName            ( 0x6FC5 );
+const TUint16 KElemFileFixedDiallingNumbers       ( 0x6F3B );
+const TUint16 KElemEmergencyCallCodes             ( 0x6FB7 );
 
 const TUint8 KEfSstSize (0xFF);
 const TUint8 KEfUstSize (0xFF);
 const TUint8 KEfCphsInfoSize (0xFF);
+
+const TUint8 KMaxPbTrIdCount (20);
 
 // Unique transaction IDs for all UICC operations
 enum TUiccTrId
@@ -149,9 +170,9 @@ enum TUiccTrId
     ETrIdReadSMSRecordCount,
     ETrIdReadSMSForComplete,     // 65
     ETrIdPbInit,
-    ETrIdPbInitFDN,
-    ETrIdPbRead,
-    ETrIdPbReadADN,
+    ETrIdPbReadAdn,
+    ETrIdPbReadFdn,
+    ETrIdPbReadSdn,
     ETrIdPbUpdate,              // 70
     ETrIdPbDelete,
     ETrIdSetFdnStateReadEst,
@@ -161,6 +182,27 @@ enum TUiccTrId
     ETrIdGetFdnStateReadEst,
     ETrIdGetFdnStateReadFileInfo,
     ETrIdCphsCache,
+    ETrIdDeleteSMS,
+    ETrIdDeleteAllSMSs,
+    ETrIdUpdateSMSStatusReadSMS,
+    ETrIdUpdateSMSStatusWriteSMS,
+    ETrIdGetSmspEntries,
+    ETrIdWriteSmspEntry,
+    ETrIdPbReadMbdn,             //85
+    ETrIdPbReadVmbx,
+    ETrIdPbReadBdn,
+    ETrIdPbOperationStart,       // 88
+    ETrIdPbOperationEnd = ETrIdPbOperationStart+KMaxPbTrIdCount,  // Transaction Id inbetween used by Phonebook operations
+    ETrIdReadOplRecordCount,
+    ETrIdReadOplRecord, // 110
+    ETrIdAclStatusReadEfEst,
+    ETrIdAclStatusWriteEfEst,
+    ETrIdAclReadEfAcl,
+    ETrIdAclWriteEfAcl,
+    ETrIdReadOperatorName, // 115
+    ETrIdReadPnn,
+    ETrIdEnStoreRead,
+    ETrIdEnStoreGetInfo,
     ENumOfUiccTrIds
     };
 
@@ -180,8 +222,7 @@ class TUiccParamsBase
         TUint16 fileId; // ID of elementary file
         TUint8 fileIdSfi; // Filled only in case SFI is present
         TUint8 serviceType; // UICC service type
-        TBuf8<KFilePathLength> filePath; // Elementary file path, (DF ) + EF
-                                        // If same as fileId, no need to fill
+        TBuf8<KFilePathLength> filePath; // Elementary file path + DF
     } ;
 
 // Parameters needed in UICC_APPL_FILE_INFO
@@ -258,6 +299,77 @@ class TUiccParamsApduReq: public TUiccParamsBase
         // Data
         TBuf8<KApduDataLength> apduData; // APDU data
     } ;
+
+/**
+*  Class used to handle FCI data.
+*/
+class TFci
+{
+private:
+    const TDesC8& iData; // == aFileData
+
+    /**
+    * Returns length of the FCI sub block
+    * @return TInt
+    */
+    TInt GetLength();
+
+public:
+
+    /**
+    * Returns type of the card
+    * @return TUint8
+    */
+    TUint8 GetTypeOfCard();
+
+    /**
+    * Returns type offset of the TLV in FCI sub block
+    * @param TUint8 aDescription
+    * @return TUint8
+    */
+    TInt GetOffsetOfTLV( TUint8 aDescription );
+
+    /**
+    * Returns number of the records on SIM
+    * @return TInt
+    */
+    TInt GetNumberOfRecords();
+
+    /**
+    * Returns length of the record on SIM
+    * @return TInt
+    */
+    TInt GetRecordLength();
+
+    /**
+    * Returns file size on SIM
+    * @return TInt
+    */
+    TInt GetSizeOfFile();
+
+    /**
+    * Returns file identifier on SIM
+    * @return TInt
+    */
+    TInt GetFileIdentifier();
+
+    /**
+    * Returns file status on SIM (ICC)
+    * @return TInt
+    */
+    TUint8 GetFileStatus();
+
+    // Constructor (the whole FCI sub block is given as the parameter).
+    TFci( const TDesC8& aFCI_sb )
+    :iData( aFCI_sb )
+    {
+    }
+    // Destructor
+    ~TFci()
+    {
+    }
+
+} ;
 
 // FORWARD DECLARATIONS
     class CMmPhoNetSender;
@@ -374,9 +486,10 @@ class CMmUiccMessHandler :
         /**
         * Caches SIM service table (EFust or EFsst depending
         * on card type in use)
+        * @param aComplete Information if complete is needed
         * @return none
         */
-        void InitializeSimServiceTableCache();
+        void InitializeSimServiceTableCache( TBool aComplete = ETrue );
 
         /**
         * Gets service status from service table
@@ -402,6 +515,7 @@ class CMmUiccMessHandler :
         TInt ProcessUiccMsg(
             TInt aTraId,
             TInt aStatus,
+            TUint8 aDetails,
             const TDesC8& aFileData );
 
         /**
@@ -448,6 +562,63 @@ class CMmUiccMessHandler :
         * @return ETrue if service supported, otherwise EFalse
         */
         TBool GetCphsInformationStatus( TUint8 aServiceNo );
+
+        /**
+        * Length of FCI (File Control Info)
+        * @param aFileData Descriptor for file data
+        * @return length
+        */
+        TInt GetUICCFCILength( const TDesC8& aFileData );
+
+        /**
+        * UICC card type
+        * @param aFileData Descriptor for file data
+        * @return UICC card type
+        */
+        TUint8 GetUICCCardType( const TDesC8& aFileData );
+
+        /**
+        * Index of data if searched by the description of file.
+        * @param description Description
+        * @param aFileData Descriptor for file data
+        * @return index, zero is returned if description is not found.
+        */
+        TInt ReturnIndexOfData( const TUint8 aDescription,
+                                const TDesC8& aFileData );
+
+        /**
+        * UICC Get number of records
+        * @param aFileData Descriptor for file data
+        * @return UICC card type
+        */
+        TInt GetUICCNumberOfRecords( const TDesC8& aFileData );
+
+        /**
+        * UICC Get record length
+        * @param aFileData Descriptor for file data
+        * @return UICC card type
+        */
+        TInt GetUICCRecordLength( const TDesC8& aFileData );
+
+        /**
+        * UICC Get size of the file
+        * @param aFileData Descriptor for file data
+        * @return UICC card type
+        */
+        TInt GetUICCFileSize( const TDesC8& aFileData );
+
+        /**
+        * UICC Get file identifier
+        * @param aFileData Descriptor for file data
+        * @return UICC card type
+        */
+        TInt GetUICCFileIdentifier( const TDesC8& aFileData );
+
+        /**
+        * Get UICC client ID
+        * @return UICC client ID
+        */
+        TUint8 GetUiccClientId();
 
     public: // Functions from base classes
 
@@ -665,6 +836,9 @@ class CMmUiccMessHandler :
         RMobilePhone::TAID iAid;
         // Store active PIN
         RMobilePhone::TMobilePhoneSecurityCode iActivePin;
+        // Flag to indicate should EMmTsyBootNotifySimStatusReadyIPC be
+        // completed when service table has been cached
+        TBool iCompleteSimStatusReady;
 
     };
 

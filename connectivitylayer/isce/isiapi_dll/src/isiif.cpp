@@ -26,7 +26,7 @@ const TInt KSendArraySize( 1 );
 const TInt KReceiveArraySize( 3 );
 const TInt KFirstParam( 0 );
 const TInt KSecondParam( 1 );
-const TInt KThirdParam( 1 );
+const TInt KThirdParam( 2 );
 
 // We need binary type suffix because LDD FW loads .ldd suffix as assumption.
 _LIT( KISIDriverLddBinaryName, "isirouter.dll" );

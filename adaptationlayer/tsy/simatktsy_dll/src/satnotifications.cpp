@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -32,9 +32,9 @@
 #include <atkisi.h>             // atk server
 #include <uiccisi.h>            // uicc server
 #include <satcs.h>
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "satnotificationstraces.h"
+#include "satnotificationsTraces.h"
 #endif
 
 
@@ -3086,10 +3086,10 @@ TInt CSatNotifySendSm::CheckTpdu
     TInt ret( KErrNone );
     TUint8 tpUdlPos( 0 ); // UDL position
     TUint8 tpUdl( 0 ); // User data length
-    TUint8 bufferLength( aTpdu.Length() ); // TPDU buffer length
+    TUint8 lengthOfTPDU( aTpdu.Length() ); // TPDU buffer length
 
     // At first check that TPDU length isn't under minimum
-    if ( KMinSmsTpduLength > bufferLength )
+    if ( KMinSmsTpduLength > lengthOfTPDU )
         {
         TFLOGSTRING("CSatNotifySendSm::CheckTpdu, error: invalid TPDU length");
         OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDSM_CHECKTPDU, "CSatNotifySendSm::CheckTpdu, error: invalid TPDU length" );
@@ -3100,7 +3100,7 @@ TInt CSatNotifySendSm::CheckTpdu
         // Get index of UDL field
         tpUdlPos = GetTpUdlIndex( aTpdu );
         // Check that UDL index is valid
-        if ( tpUdlPos < bufferLength )
+        if ( tpUdlPos < lengthOfTPDU )
             {
             // Get user data length in 8-bit characters (without packing)
             tpUdl = aTpdu[tpUdlPos];
@@ -3119,7 +3119,7 @@ TInt CSatNotifySendSm::CheckTpdu
         if ( KSATSmsMTISubmitOrSubmitReport == ( aTpdu[0] & KMask3 ) )
             {
             // Only user data bytes are remained
-            bufferLength -= ( tpUdlPos + 1 );
+            TUint8 tpUdByteCount( lengthOfTPDU - ( tpUdlPos + 1 ) );
             // Get index of TP-DCS field
             TUint8 tpDcsPos( GetTpDcsIndex( aTpdu ) );
             // Get data coding scheme
@@ -3127,15 +3127,18 @@ TInt CSatNotifySendSm::CheckTpdu
 
             // Bits 2 and 3 are for coding scheme ( spec. 3GPP TS23.038 )
             dcs = ( dcs >> 2 ) & 0x03;
+
+            // Check if packing is required
+            TBool isPackingRequired( KSmsPackingRequiredMask &
+                iCommandDetails[KCommandQualifier] );
+            TUint8 maxSmsSize( isPackingRequired ?
+                KSmsMaxSize : KSmsMaxSizeWithoutPacking );
+
             // GSM 7 bit default alphabet
             if ( KSmsDcsDefaultAlphabet == dcs )
                 {
-                // When 7 bit packing is used, number of characters is calculated
-                // as follows (spec. 3GPP TS 23.038 V7.0.0 ):
-                // number of characters = length of user data in bytes * 8 / 7
-                bufferLength = ( bufferLength * 8 ) / 7;
                 // Check the validity of user data length
-                if ( KSmsMaxSize < tpUdl || bufferLength < tpUdl )
+                if ( KSmsMaxSize < tpUdl || maxSmsSize < tpUdByteCount )
                     {
                     // Message is over 160 bytes or invalid user data length
                     TFLOGSTRING("CSatNotifySendSm::CheckTpdu, error: invalid user data length");
@@ -3145,13 +3148,8 @@ TInt CSatNotifySendSm::CheckTpdu
                 }
             else // 8-bit or 16-bit data
                 {
-                // Check if packing is required
-                TBool isPackingRequired( KSmsPackingRequiredMask &
-                    iCommandDetails[KCommandQualifier] );
-                TUint8 maxSmsSize( isPackingRequired ?
-                    KSmsMaxSize : KSmsMaxSizeWithoutPacking );
                 // Check the validity of user data length
-                if ( maxSmsSize < tpUdl || bufferLength < tpUdl )
+                if ( maxSmsSize < tpUdl || tpUdByteCount < tpUdl )
                     {
                     // Message size is over the limit or invalid user data length
                     TFLOGSTRING("CSatNotifySendSm::CheckTpdu, error: invalid user data length");
@@ -3783,7 +3781,7 @@ void CSatNotifySendSs::MessageReceived
             TFLOGSTRING("TSY: Inform NokiaTSY SS request being SAT originated");
             OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDSS_MESSAGERECEIVED, "Inform NokiaTSY SS request being SAT originated" );
             iSatMessaging->GetMessageRouter()->ExtFuncL(
-                ESatNotifyCallControlRequest,
+                ESatNotifySendSsPCmd,
                 NULL );
             }
 #endif
@@ -6927,6 +6925,26 @@ void CSatNotifyLocalInfo::MessageReceived
             else
                 {
                 // No IMEI available at the moment
+                iLocalInfoRspV3.iGeneralResult =
+                    RSat::KMeUnableToProcessCmd;
+                iLocalInfoRspV3.iAdditionalInfo.Append(
+                    KNoSpecificCauseCanBeGiven );
+                }
+            break;
+            }
+        case RSat::KProvideLocalInfoIMEISV:
+            {
+            TFLOGSTRING("TSY: CSatNotifyLocalInfo::MessageReceived Request: IMEISV");
+            OstTrace0( TRACE_NORMAL, DUP14_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived Request: IMEISV" );
+            // Check if IMEISV is received
+            if ( iSatMessHandler->ImeiSvAvailable() )
+                {
+                // IMEISV is received from info server
+                iLocalInfoRspV3.iGeneralResult = RSat::KSuccess;
+                }
+            else
+                {
+                // No IMEISV available at the moment
                 iLocalInfoRspV3.iGeneralResult =
                     RSat::KMeUnableToProcessCmd;
                 iLocalInfoRspV3.iAdditionalInfo.Append(

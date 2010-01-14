@@ -21,9 +21,9 @@
 #include    "dpdef.h"                   // dataport definitions
 #include    "dpparityhandler.h"         // parity bit handling (7-bit data mode)
 #include    "dplog.h"                   // dataport logging
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
-#include "dpparityhandlertraces.h"
+#include "dpparityhandlerTraces.h"
 #endif
 
 

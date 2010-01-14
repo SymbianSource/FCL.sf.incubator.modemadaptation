@@ -22,7 +22,7 @@
 #include "usbpndefinitions.h"       // For constants
 #include "usbpntrace.h"             // For tracing
 
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
 #include "cusbpnusbreceiverTraces.h"
 #endif

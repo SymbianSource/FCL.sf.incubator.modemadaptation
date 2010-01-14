@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -983,6 +983,13 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         inline TBool ImeiAvailable() const;
 
         /**
+        * Method to check if IMEISV is successfully received
+        * @return ETrue if IMEISV is known, otherwise EFalse
+        * @param None
+        */
+        inline TBool ImeiSvAvailable() const;
+
+        /**
         * Method to check Location information status
         * @since NCP 5.0
         * @return ETrue or EFalse
@@ -1187,6 +1194,9 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         // For storing IMEI code.
         TBuf8<16>           iIMEI;
 
+        // For storing IMEI-SV BCD string
+        TBuf8<9>           iIMEIsv;
+
         // For storing NMR
         TBuf8<16>           iNMR;
 
@@ -1194,7 +1204,10 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         TBuf<32>            iBCCHChannelList;
 
         // For checking if IMEI code has been received
-        TBool               iSerialNumberReadReceived;
+        TBool               iImeiAvailable;
+
+        // For checking if IMEISV code has been received
+        TBool               iImeiSvAvailable;
 
         // Stores the state of SMS CB routing request
         TBool               iSmsCbRoutingComplete;
