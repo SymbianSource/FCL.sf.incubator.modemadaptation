@@ -176,7 +176,7 @@ class CMmPhoneBookOperationDelete
         * @param aFileData File data
         * @return KErrNone or error value
         */
-        TInt HandleWriteMBIReadResp(TInt aStatus, TUint8 aDetails, const TDesC8& aFileData );
+        TInt HandleWriteMBIReadResp(TInt aStatus, TUint8 aDetails, TBool &aComplete, const TDesC8& aFileData );
         
         /**
         * Creates request to Delete MBI profile

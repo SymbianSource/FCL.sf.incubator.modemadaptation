@@ -561,17 +561,38 @@ EXPORT_C TDes8& TIsiKernelSend::Complete
     COMPONENT_TRACE( ( _T ( "TIsiKernelSend::Complete, length: 0x%x, calcfinallength: 0x%x" ), length, calcFinalLength ) );
     OstTraceExt2( TRACE_NORMAL, DUP1_TISIKERNELSEND_COMPLETE, "TIsiKernelSend::Complete;length=%hu;calcFinalLength=%hu", length, calcFinalLength );
     
-    if( iFinalLength == 0 )    // TIsiKernelSend alternative constructor used
-        {               
-        iBuffer[ ISI_HEADER_OFFSET_LENGTH ] = static_cast<TUint8>( (length & 0xff00) >> 8);   //BE             
-        iBuffer[ ISI_HEADER_OFFSET_LENGTH + 1 ] = static_cast<TUint8>(length & 0x00ff);    //BE
-        }
-    else
+    #if defined( __WINS__ ) || defined( __WINSCW__ )
         {
-        iBuffer[ ISI_HEADER_OFFSET_LENGTH ] = static_cast<TUint8>( (calcFinalLength & 0xff00 ) >> 8);   //BE             
-        iBuffer[ ISI_HEADER_OFFSET_LENGTH + 1 ] = static_cast<TUint8>(calcFinalLength & 0x00ff);    //BE
-        iBuffer.SetLength( iFinalLength );                
+        if( iFinalLength == 0 )    // TIsiKernelSend alternative constructor used
+            {               
+            iBuffer[ ISI_HEADER_OFFSET_LENGTH ] = static_cast<TUint8>( (length & 0xff00) >> 8);   //BE             
+            iBuffer[ ISI_HEADER_OFFSET_LENGTH + 1 ] = static_cast<TUint8>(length & 0x00ff);    //BE
+            }
+        else
+            {
+            iBuffer[ ISI_HEADER_OFFSET_LENGTH ] = static_cast<TUint8>( (calcFinalLength & 0xff00 ) >> 8);   //BE             
+            iBuffer[ ISI_HEADER_OFFSET_LENGTH + 1 ] = static_cast<TUint8>(calcFinalLength & 0x00ff);    //BE
+            iBuffer.SetLength( iFinalLength );                
+            }
+        }        
+        
+    #else
+        {
+        if( iFinalLength == 0 )    // TIsiKernelSend alternative constructor used
+            {
+            iBuffer[ ISI_HEADER_OFFSET_LENGTH +1 ] = static_cast<TUint8>( (length & 0xff00) >> 8);   //LE             
+            iBuffer[ ISI_HEADER_OFFSET_LENGTH ] = static_cast<TUint8>(length & 0x00ff);    //LE               
+           }
+        else
+            {              
+            iBuffer[ ISI_HEADER_OFFSET_LENGTH +1 ] = static_cast<TUint8>( (calcFinalLength & 0xff00) >> 8);   //LE             
+            iBuffer[ ISI_HEADER_OFFSET_LENGTH ] = static_cast<TUint8>(calcFinalLength & 0x00ff);    //LE
+            iBuffer.SetLength( iFinalLength );                                
+             }
+        OstTraceExt2( TRACE_NORMAL, DUP2_TISIKERNELSEND_COMPLETE, "TIsiKernelSend::Complete;byte2=%hhu;byte1=%hhu", iBuffer[5], iBuffer[4] );
+        COMPONENT_TRACE( ( _T ( "TIsiKernelSend::Complete, byte2: 0x%x, byte1: 0x%x" ), iBuffer[5], iBuffer[4] ) );
         }
+    #endif    
 
     COMPONENT_TRACE( ( _T ( "TIsiKernelSend::Complete - return, buffer length = 0x%x, iFinalLength = 0x%x" ), length, iFinalLength ) );
     OstTraceExt2( TRACE_NORMAL, DUP3_TISIKERNELSEND_COMPLETE, "TIsiKernelSend::Complete - return;buffer length=%hu;iFinalLength=%u", length, iFinalLength );

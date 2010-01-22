@@ -156,9 +156,11 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMmPhoneBookOperationDelete_UICCCREATEREQ, "CMm
 
             if( PB_MBDN_FID == iFileId )
                 {
+                // Store MBI Profile
+                iMBIProfileType = iIndex;
                 // For MBDN PhoneBook first read MBI file 
                 // Check if the mailbox inidcation type is correct
-                if( iIndex <= iMmPhoneBookStoreMessHandler->
+                if( iIndex < iMmPhoneBookStoreMessHandler->
                         iPBStoreConf[iArrayIndex].iMbiRecLen )
                     {
                     iCurrentDeletePhase = EPBDeletePhase_Read_MBI_profile;
@@ -178,15 +180,38 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMmPhoneBookOperationDelete_UICCCREATEREQ, "CMm
             }
         case EMmTsyPhoneBookStoreDeleteAllIPC:
             {
-            iNumOfEntries = iMmPhoneBookStoreMessHandler->
-                iPBStoreConf[iArrayIndex].iNoOfRecords;
-            if ( iNumOfEntries )
+            if( PB_MBDN_FID != iFileId)
                 {
-                // Start to delete entries from the last one
-                iIndex = iNumOfEntries;
-                ret = UiccPbReqDelete();
-                iNumOfEntries--;
+                iNumOfEntries = iMmPhoneBookStoreMessHandler->
+                    iPBStoreConf[iArrayIndex].iNoOfRecords;
+                if ( iNumOfEntries )
+                    {
+                    // Start to delete entries from the last one
+                    iIndex = iNumOfEntries;
+                    ret = UiccPbReqDelete();
+                    iNumOfEntries--;
+                    }
                 }
+            else
+                {
+                // For first Profile Type Read
+                iMBIProfileType = 0;
+                iIndex = iMBIProfileType;
+                // For MBDN PhoneBook first read MBI file 
+                // Check if the mailbox inidcation type is correct
+                if( iMBIProfileType < iMmPhoneBookStoreMessHandler->
+                        iPBStoreConf[iArrayIndex].iMbiRecLen )
+                    {
+                    iCurrentDeletePhase = EPBDeletePhase_Read_MBI_profile;
+                    // read MBDN record number from MBI first record Profile number
+                    ret = UiccPbReqReadMBI();
+                    }
+                else
+                    {
+                    ret = KErrArgument;
+                    }
+                }
+                
             break;
             }
 #ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
@@ -216,7 +241,7 @@ TInt CMmPhoneBookOperationDelete::UiccPbReqDelete()
 TFLOGSTRING3("TSY: CMmPhoneBookOperationDelete::UiccPbReqDelete, iTransId:%d,index:%d", iTransId, iIndex);
 OstTraceExt2( TRACE_NORMAL, CMmPhoneBookOperationDelete_UICCPBREQWRITEL, "CMmPhoneBookOperationDelete::UiccPbReqDelete;iTransId=%hhu;iIndex=%hd", iTransId, iIndex );
 
-    TInt ret( KErrNotSupported );
+    TInt ret( KErrArgument );
 
     switch ( iFileId )
         {
@@ -420,7 +445,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONDELETE_UICCPBREQREADMBI, "CMmPhone
         cmdParams.fileId = PB_MBI_FID;
         cmdParams.serviceType =  UICC_APPL_READ_LINEAR_FIXED ;
         cmdParams.dataAmount = 1;
-        cmdParams.dataOffset = iIndex;
+        cmdParams.dataOffset = iMBIProfileType;
         cmdParams.record = 1;   // only first profile number is supported
         
         
@@ -461,7 +486,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONDELETE_UICCPBREQDELETEMBIPROFILE, 
     cmdParams.fileId = PB_MBI_FID;
     cmdParams.serviceType =  UICC_APPL_READ_LINEAR_FIXED ;
     cmdParams.dataAmount = 1;
-    cmdParams.dataOffset = iIndex;
+    cmdParams.dataOffset = iMBIProfileType;
     cmdParams.record = 1;   // only first profile number is supported
 
     // Append FileData needs to be write
@@ -601,18 +626,42 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONDELETE_HANDLEREADEXTRESP, "CMmPhon
 TInt CMmPhoneBookOperationDelete::HandleWriteMBIReadResp(
         TInt aStatus,
         TUint8 aDetails,
+        TBool &aComplete,
         const TDesC8 &aFileData ) 
     {
     TInt ret ( KErrNone );
 TFLOGSTRING("TSY: CMmPhoneBookOperationDelete::HandleWriteMBIReadResp");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONDELETE_HANDLEWRITEMBIREADRESP, "CMmPhoneBookOperationDelete::HandleWriteMBIReadResp" );
 
-    // Store MBI Profile
-    iMBIProfileType = iIndex;
     if( UICC_STATUS_OK  == aStatus )
         {
         iIndex = aFileData[0];
-        ret = UiccPbReqDelete();
+        if( ( 0 != iIndex ) && ( iIndex <= iMmPhoneBookStoreMessHandler->
+                iPBStoreConf[iArrayIndex].iNoOfRecords ) )
+            {
+            ret = UiccPbReqDelete();
+            }
+        else
+            {
+            // Again read next MBI Profile type
+            iMBIProfileType++;
+            if ( EMmTsyPhoneBookStoreDeleteAllIPC == iIpc &&
+                    ( iMBIProfileType < iMmPhoneBookStoreMessHandler->
+                            iPBStoreConf[iArrayIndex].iMbiRecLen ) )
+                {
+                iCurrentDeletePhase = EPBDeletePhase_Read_MBI_profile;
+                // read MBDN record number from MBI first record Profile number
+                ret = UiccPbReqReadMBI();
+                }
+            else
+                {
+                if( EMmTsyPhoneBookStoreDeleteIPC == iIpc )
+                    {
+                    ret = KErrArgument;
+                    }
+                aComplete = ETrue;
+                }
+            }
         }
     else
         {
@@ -647,7 +696,6 @@ OstTrace0( TRACE_NORMAL, CMmPhoneBookOperationDelete_HANDLEUICCPBRESPL, "CMmPhon
     TInt ret( KErrNone );
     TBool complete( EFalse );
 
-    TInt maxNumLength( 0 );
     TInt location( 0 );
 
     if ( UICC_STATUS_OK == aStatus )
@@ -735,8 +783,6 @@ OstTrace0( TRACE_NORMAL, CMmPhoneBookOperationDelete_HANDLEUICCPBRESPL, "CMmPhon
                     {
                         // Ready for complete
                         complete = ETrue;
-                        maxNumLength = iMmPhoneBookStoreMessHandler->
-                            iPBStoreConf[iArrayIndex].iNumlength;
                     if ( EMmTsyPhoneBookStoreDeleteAllIPC == iIpc &&
                         iNumOfEntries )
                         {
@@ -749,8 +795,6 @@ OstTrace0( TRACE_NORMAL, CMmPhoneBookOperationDelete_HANDLEUICCPBRESPL, "CMmPhon
                         {
                         // Ready for complete
                         complete = ETrue;
-                        maxNumLength = iMmPhoneBookStoreMessHandler->
-                            iPBStoreConf[iArrayIndex].iNumlength;
                         // In case of delete all location is 0
                         if ( EMmTsyPhoneBookStoreDeleteIPC == iIpc )
                             {
@@ -762,7 +806,7 @@ OstTrace0( TRACE_NORMAL, CMmPhoneBookOperationDelete_HANDLEUICCPBRESPL, "CMmPhon
                 }
             case EPBDeletePhase_Read_MBI_profile:
                 {
-                ret = HandleWriteMBIReadResp( aStatus, aDetails, aFileData );
+                ret = HandleWriteMBIReadResp( aStatus, aDetails, complete, aFileData );
                 break;
                 }
             case EPBDeletePhase_delete_MBI_profile:
@@ -780,11 +824,28 @@ OstTrace0( TRACE_NORMAL, CMmPhoneBookOperationDelete_HANDLEUICCPBRESPL, "CMmPhon
                     }
                 else
                     {
-                    // Ready for complete
-                    complete = ETrue;
-                    maxNumLength = iMmPhoneBookStoreMessHandler->
-                        iPBStoreConf[iArrayIndex].iNumlength;
-                    location = iMBIProfileType;
+                    // Continue deleting entries
+                    // increment iMBIProfileType to read next profile
+                    iMBIProfileType++;
+                    
+                    if ( EMmTsyPhoneBookStoreDeleteAllIPC == iIpc &&
+                        ( iMBIProfileType < iMmPhoneBookStoreMessHandler->
+                                iPBStoreConf[iArrayIndex].iMbiRecLen ) )
+                        {
+                        iCurrentDeletePhase = EPBDeletePhase_Read_MBI_profile;
+                        // read MBDN record number from MBI first record Profile number
+                        ret = UiccPbReqReadMBI();
+                        }
+                    else
+                        {
+                        // Ready for complete
+                        complete = ETrue;
+                        // In case of delete all location is 0
+                        if ( EMmTsyPhoneBookStoreDeleteIPC == iIpc )
+                            {
+                            location = iMBIProfileType - 1 ;
+                            }
+                        }
                     }
                 break;
                 }
@@ -813,7 +874,8 @@ OstTrace1( TRACE_NORMAL, CMMPHONEBOOKOPERATIONDELETE_HANDLEUICCPBRESPL, "CMmPhon
     if ( complete )
         {
         TPBEntryInfo pbEntryInfo;
-        pbEntryInfo.iMaxNumLength = maxNumLength;
+        pbEntryInfo.iMaxNumLength = iMmPhoneBookStoreMessHandler->
+        iPBStoreConf[iArrayIndex].iNumlength;
         pbEntryInfo.iLocation = location;
 
         CPhoneBookDataPackage phoneBookData;
