@@ -26,6 +26,7 @@
 #include "cmmmessagerouter.h"
 #include "cmmpacketmesshandlercontextlist.h"
 #include "cmmpacketservicemesshandler.h"
+#include "cmmcustommesshandler.h"
 #include "tsylogger.h" // Logging
 #include "cmmuiccmesshandler.h"
 
@@ -932,6 +933,22 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNet
             }
         else
             {
+            if ( KCustomTransId == aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) )
+                {
+                // Initialize default return values to ECustomGetOperatorNameIPC
+                // complete.
+                RMmCustomAPI::TOperatorNameInfo operNameInfo;
+                operNameInfo.iType = RMmCustomAPI::EOperatorNameFlexiblePlmn;
+                operNameInfo.iName.Zero();
+
+                // Packed parameter: a RMmCustomAPI::TOperatorNameInfo.
+                dataPackage.PackData( &operNameInfo );
+
+                iMessageRouter->Complete(
+                    ECustomGetOperatorNameIPC,
+                    &dataPackage,
+                    KErrNotReady );
+                }
             // Phone is not registered to any network.
             // Complete EMobilePhoneNotifyCurrentNetworkChange without
             // operator names.

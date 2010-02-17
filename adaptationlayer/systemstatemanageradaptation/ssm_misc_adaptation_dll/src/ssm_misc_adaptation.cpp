@@ -4,8 +4,8 @@
 *  Part of:        SSMA MiscAdaptation
 *  Interface:      N/A
 *  Description:    Implementation of CMiscAdaptation class
-*  %version:       1 %
-*  %date_modified: Tue Dec 29 15:31:50 2009 %
+*  %version:       2 %
+*  %date_modified: Fri Feb 12 10:56:14 2010 %
 *
 * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -294,7 +294,7 @@ void CMiscAdaptation::GetSimLanguagesL( CBufBase* aBuf,
         languageList.Append(StartupAdaptation::EPrefLangEnglish);
         }
 
-    OstTrace0( TRACE_NORMAL, CMISCADAPTATION_GETSIMLANGUAGES_1,
+    OstTrace0( TRACE_NORMAL, CMISCADAPTATION_GETSIMLANGUAGES_2,
                "SSMA # CMiscAdaptation::GetSimLanguages - write languages to stream." );
     INTERNAL_TRACE( _L( "SSMA # CMiscAdaptation::GetSimLanguages - write languages to stream." ) );
 
@@ -309,7 +309,7 @@ void CMiscAdaptation::GetSimLanguagesL( CBufBase* aBuf,
     CleanupStack::PopAndDestroy();
     languageList.Close();
 
-    OstTrace0( TRACE_NORMAL, CMISCADAPTATION_GETSIMLANGUAGES_2,
+    OstTrace0( TRACE_NORMAL, CMISCADAPTATION_GETSIMLANGUAGES_3,
                "SSMA # CMiscAdaptation::GetSimLanguages - return void" );
     INTERNAL_TRACE( _L( "SSMA # CMiscAdaptation::GetSimLanguages - return void" ) );
     }

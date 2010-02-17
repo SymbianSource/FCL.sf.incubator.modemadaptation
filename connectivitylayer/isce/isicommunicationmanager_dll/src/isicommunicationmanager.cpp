@@ -17,19 +17,27 @@
 
 
 #include <kernel.h>                       // For Kern
-#include "isicommunicationmanager.h"      // For DISINameService
+#include "isicommunicationmanager.h"      // For DISICommunicationManager
 #include "misiobjectrouterif.h"           // For MISIObjectRouterIf
 #include "isicommunicationmanagertrace.h" // For C_TRACE, ASSERT_RESET.. and fault codes
 #include "memapi.h"                       // For MemApi
 #include <phonetisi.h>                    // For ISI_HEADER_SIZE
 #include <pn_const.h>                     // For PN_OBJ_ROUTING_REQ...
 #include "nsisi.h"                        // For PN_NAMESERVICE
-#include "misiobjectrouterif.h"           // For MISIObjectRouterIf
-#include "iadhelpers.h"                   // For SET_RECEIVER_OBJ...
-#include <iscnokiadefinitions.h>          // For THIS_DEVICE
+#ifdef INTERNAL_FLAG_ISI_ROUTER_IN_USE
+#include "isihelpers.h"                   // For SET_RECEIVER_OBJ...
+#include "isirouter.h"                    // For GetDFCThread
+#else
+//#include "misiobjectrouterif.h"           // For MISIObjectRouterIf
 #include "isaaccessextension.h"           // For DIsaAccessExtension
+
+#include "iadhelpers.h"                   // For SET_RECEIVER_OBJ...
+#endif
+#include <iscnokiadefinitions.h>          // For THIS_DEVICE
 #include "isiindicationhandler.h"         // For DISIIndicationHandler
 #include "ape_commgrisi.h"                // For APE_COMMGR..
+#include "misicommunicationmanagerif.h"   // For MISICommunicationManagerIf
+#include <commisi.h>                      // For Common messages
 
 
 // Faults
@@ -41,6 +49,7 @@ enum TISICommunicationManagerFaults
     EISICommunicationManagerUnknownMessage,
     EISICommunicationManagerMutexCreateFailed,
     EISICommunicationManagerMutexWaitFailed,
+    EISICommunicationManagerWrongMessageOrder,
     };
 
 
@@ -103,12 +112,13 @@ _LIT8( KCommunicationManagerMutex, "KCommunicationManagerMutex" );
 const TUint32 KCommunicationManagerUID( 0x2002B3D0 );
 const TUint8 KFiller( 0 );
 const TInt KInitDfcPriority( 7 );
-
+const TUint8 KDone( 0 );
 
 DISICommunicationManager::DISICommunicationManager(
         // None
         )
-    : iObjId( 0x00 )
+    : iObjId( 0x00 ),
+      iBootMsgCount( 0x04 ) // 2xRESP, 2xIND
     {
     C_TRACE( ( _T( "DISICommunicationManager::DISICommunicationManager 0x%x 0x%x>" ), iObjId, iRouter ) );
     iRouter = MISIObjectRouterIf::Connect( KCommunicationManagerUID, iObjId, this );
@@ -116,7 +126,11 @@ DISICommunicationManager::DISICommunicationManager(
     // Must be > KMutexOrdGeneral1 for nesting purposes because trx shared memory uses KMutexOrdGeneral1
     TInt err( Kern::MutexCreate( iCommunicationManagerMutex, KCommunicationManagerMutex, KMutexOrdGeneral2 ) );
     ASSERT_RESET_ALWAYS( ( KErrNone == err ), ( EISICommunicationManagerMutexCreateFailed | EDISICommunicationManagerTraceId << KClassIdentifierShift ) );
+#ifdef INTERNAL_FLAG_ISI_ROUTER_IN_USE    
+    iInitDfc = new TDfc( InitDfc, this, iRouter->GetDfcThread( MISIObjectRouterIf::EISIKernelMainThread ), KInitDfcPriority );
+#else
     iInitDfc = new TDfc( InitDfc, this, DIsaAccessExtension::GetDFCThread( EIADExtensionDfcQueue ), KInitDfcPriority );
+#endif    
     ASSERT_RESET_ALWAYS( iInitDfc, ( EISICommunicationManagerMemAllocFailure | EDISICommunicationManagerTraceId << KClassIdentifierShift ) );
     iISIIndicationHandler = new DISIIndicationHandler( iRouter );
     ASSERT_RESET_ALWAYS( iISIIndicationHandler, ( EISICommunicationManagerMemAllocFailure1 | EDISICommunicationManagerTraceId << KClassIdentifierShift ) );
@@ -164,6 +178,7 @@ void DISICommunicationManager::SendNameAddReqs()
     addMsg2.Copy( addMsg );
     TUint8* addPtr2 = const_cast<TUint8*>( addMsg2.Ptr() );
     PUTB32( &addPtr2[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + PN_NAME_SRV_ITEM_STR_OFFSET_NAME ], PN_APE_COMMGR );
+    //Register PN_APE_COMMGR and PN_COMMGR
     iRouter->Send( addMsg, PN_OBJ_EVENT_MULTICAST );
     iRouter->Send( addMsg2, PN_OBJ_EVENT_MULTICAST );
     C_TRACE( ( _T( "DISICommunicationManager::SendNameAddReqs<" ) ) );    
@@ -183,6 +198,10 @@ DISICommunicationManager::~DISICommunicationManager(
     iInitDfc->Cancel();
     delete iInitDfc;
     iInitDfc = NULL;
+    if( iCommunicationManagerMutex )
+        {
+        ((DObject*)iCommunicationManagerMutex)->Close( NULL );
+        }
     iCommunicationManagerMutex = NULL;
     C_TRACE( ( _T( "DISICommunicationManager::~DISICommunicationManager<" ) ) );
     }
@@ -193,64 +212,94 @@ void DISICommunicationManager::Receive( const TDesC8& aMessage )
     C_TRACE( ( _T( "DISICommunicationManager::Receive 0x%x>" ), &aMessage ) );
     TInt err( Kern::MutexWait( *iCommunicationManagerMutex ) );
     ASSERT_RESET_ALWAYS( ( KErrNone == err ), ( EISICommunicationManagerMutexWaitFailed | EDISICommunicationManagerTraceId << KClassIdentifierShift ) );
-    //TODO check nameadd resps for own nameadd success
-    for( TInt i( 0 ); i < aMessage.Length(); i++ )
-        {
-        C_TRACE( ( _T( "index[ %d ] data 0x%x"), i, aMessage.Ptr()[i] ) );
-        }
-    
     const TUint8* msgPtr( aMessage.Ptr() );
     TDes8* blockPtr = reinterpret_cast<TDes8*>( const_cast<TDesC8*>(&aMessage) );
-    
-    switch( msgPtr[ ISI_HEADER_OFFSET_RESOURCEID ] )
+    if( iBootMsgCount == KDone )
         {
-        case PN_COMMGR:
+        if( msgPtr[ ISI_HEADER_OFFSET_MESSAGEID ] == COMMON_MESSAGE )
             {
-            C_TRACE( ( _T( "DISICommunicationManager message to PN_COMMGR" ) ) );
-            break;
-            }
-        case PN_APE_COMMGR: //PN_APE_COMMGR
-            {
-            if( msgPtr[ ISI_HEADER_OFFSET_MESSAGEID ] == APE_COMMGR_SUBSCRIBE_REQ )
+            switch( msgPtr[ ISI_HEADER_OFFSET_SUBMESSAGEID ] )
                 {
-                SendPNSSubscribeResp( *blockPtr );
-                if( msgPtr[ ISI_HEADER_OFFSET_SENDERDEVICE ] == PN_DEV_OWN )
+                case COMM_ISA_ENTITY_NOT_REACHABLE_RESP:
                     {
-           	        C_TRACE( ( _T( "DISICommunicationManager PNS_SUBSCRIBE_REQ from APE" ) ) );
-                    iISIIndicationHandler->Subscribe( *blockPtr );
+                    C_TRACE( ( _T( "DISICommunicationManager::Received not reachable resp" ) ) );
+                    break;
                     }
+                case COMM_ISI_VERSION_GET_REQ:
+                    {
+                    C_TRACE( ( _T( "DISICommunicationManager::Received version get req" ) ) );
+                    SendCommIsiVersionGetResp( *blockPtr );
+                    break;
+                    }
+                default:
+                    {
+                    C_TRACE( ( _T( "DISICommunicationManager::Received unknown common message" ) ) );
+                    SendCommServiceNotIdentifiedResp( *blockPtr );
+                    break;
+                    }
+                }
+            }
+        else if( ( msgPtr[ ISI_HEADER_OFFSET_RESOURCEID ] == PN_APE_COMMGR )
+            || ( msgPtr[ ISI_HEADER_OFFSET_RESOURCEID ] == PN_COMMGR ) )
+            {
+            C_TRACE( ( _T( "DISICommunicationManager::Receive subscription" ) ) );
+            SendPnsSubscribeResp( *blockPtr );
+            if( msgPtr[ ISI_HEADER_OFFSET_SENDERDEVICE ] == PN_DEV_OWN )
+                {
+       	        C_TRACE( ( _T( "DISICommunicationManager PNS_SUBSCRIBE_REQ from APE" ) ) );
+                iISIIndicationHandler->Subscribe( *blockPtr );
+                }
+            }
+        else
+            {
+            if( ( msgPtr[ ISI_HEADER_OFFSET_SENDERDEVICE ] != PN_DEV_OWN )
+                || ( MISICommunicationManagerIf::IsValidResource( *blockPtr ) ) )
+                {
+                C_TRACE( ( _T( "DISICommunicationManager::Receive indication" ) ) );
+                iISIIndicationHandler->Multicast( *blockPtr );
                 }
             else
                 {
-          	    C_TRACE( ( _T( "DISICommunicationManager unknown PN_APE_COMMGR message" ) ) );
+                C_TRACE( ( _T( "DISICommunicationManager not allowed resource from APE" ) ) );
                 }
-            break;
             }
-       default:
-           {
-           C_TRACE( ( _T( "DISICommunicationManager unknown message to communication manager" ) ) );
-           break;	
-           }
+        }
+    else
+        {
+        C_TRACE( ( _T( "DISICommunicationManager not indication %d" ), iBootMsgCount ) );
+        // From PN_NAMESERVICE && ( IND || successfull RESP )
+        if( ( msgPtr[ ISI_HEADER_OFFSET_RESOURCEID ] == PN_NAMESERVICE )
+            && ( msgPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_IND_OFFSET_SUBFUNCTION ]== PNS_NAME_ADD_IND
+            || ( msgPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_RESP_OFFSET_SUBFUNCTION ]== PNS_NAME_ADD_RESP 
+            && msgPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_RESP_OFFSET_REASON ] == PN_NAME_OK ) ) )
+            {
+            C_TRACE( ( _T( "DISICommunicationManager::Receive from NAMESERVICE message id 0x%x" ), msgPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_IND_OFFSET_SUBFUNCTION ]  ) );
+            iBootMsgCount--;
+            }
+        else
+            {
+            ASSERT_RESET_ALWAYS( 0, ( EISICommunicationManagerWrongMessageOrder | EDISICommunicationManagerTraceId << KClassIdentifierShift ) );
+            }
         }
     MemApi::DeallocBlock( *blockPtr );
     Kern::MutexSignal( *iCommunicationManagerMutex );
     C_TRACE( ( _T( "DISICommunicationManager::Receive<" ) ) );
     }
 
-void DISICommunicationManager::SendPNSSubscribeResp( const TDesC8& aMessage )
+void DISICommunicationManager::SendPnsSubscribeResp( const TDesC8& aMessage )
     {
-    C_TRACE( ( _T( "DISICommunicationManager::SendPNSSubscribeResp 0x%x>" ), &aMessage ) );
+    C_TRACE( ( _T( "DISICommunicationManager::SendPnsSubscribeResp 0x%x>" ), &aMessage ) );
     TUint16 msgLength( ISI_HEADER_SIZE + SIZE_APE_COMMGR_SUBSCRIBE_RESP );
     TDes8& respMsg = MemApi::AllocBlock( msgLength );
     respMsg.SetLength( msgLength );
     TUint8* msgPtr = const_cast<TUint8*>( aMessage.Ptr() );
     TUint8* respPtr = const_cast<TUint8*>( respMsg.Ptr() );
     respPtr[ ISI_HEADER_OFFSET_MEDIA ] = msgPtr[ ISI_HEADER_OFFSET_MEDIA ];
-    SET_RECEIVER_DEV( respPtr, msgPtr[ ISI_HEADER_OFFSET_SENDERDEVICE ] );
+    SET_RECEIVER_DEV( respPtr, GET_SENDER_DEV( aMessage ) );
     SET_SENDER_DEV( respPtr, PN_DEV_OWN );
     respPtr[ ISI_HEADER_OFFSET_RESOURCEID ] = PN_APE_COMMGR;
     SET_LENGTH( respPtr, ( msgLength - PN_HEADER_SIZE ) );
-    SET_RECEIVER_OBJ( respPtr, msgPtr[ ISI_HEADER_OFFSET_SENDEROBJECT ] );
+    SET_RECEIVER_OBJ( respPtr, GET_SENDER_OBJ( aMessage ) );
     SET_SENDER_OBJ( respPtr, PN_OBJ_ROUTER );
     respPtr[ ISI_HEADER_SIZE + APE_COMMGR_SUBSCRIBE_RESP_OFFSET_TRANSID ] = msgPtr[ ISI_HEADER_OFFSET_TRANSID ];
     respPtr[ ISI_HEADER_SIZE + APE_COMMGR_SUBSCRIBE_RESP_OFFSET_MESSAGEID ] = APE_COMMGR_SUBSCRIBE_RESP;
@@ -261,16 +310,59 @@ void DISICommunicationManager::SendPNSSubscribeResp( const TDesC8& aMessage )
     else
         {
         respPtr[ ISI_HEADER_SIZE + APE_COMMGR_SUBSCRIBE_RESP_OFFSET_RESULT ] = APE_COMMGR_NOT_ALLOWED;	
-        }
-      
-    
-    for( TInt i( 0 ); i < respMsg.Length(); i++ )
-        {
-        C_TRACE( ( _T( "indeksi[ %d ] data 0x%x"), i, respMsg.Ptr()[i] ) );
-        }
-    
+        }    
     iRouter->Send( respMsg, PN_OBJ_EVENT_MULTICAST );
-	  C_TRACE( ( _T( "DISICommunicationManager::SendPNSSubscribeResp<" ) ) );
+	  C_TRACE( ( _T( "DISICommunicationManager::SendPnsSubscribeResp<" ) ) );
+    }
+
+
+void DISICommunicationManager::SendCommServiceNotIdentifiedResp( const TDesC8& aMessage )
+    {
+    C_TRACE( ( _T( "DISICommunicationManager::SendCommServiceNotIdentifiedResp 0x%x>" ), &aMessage ) );
+    TDes8& respMsg = MemApi::AllocBlock( ISI_HEADER_SIZE + SIZE_COMMON_MESSAGE_COMM_SERVICE_NOT_IDENTIFIED_RESP );
+    TUint8* ptr( const_cast<TUint8*>( respMsg.Ptr() ) );
+    const TUint8* msgPtr( aMessage.Ptr() );
+    ptr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_ROUTING_REQ;
+    SET_RECEIVER_DEV( ptr, GET_SENDER_DEV( aMessage ) );
+    SET_SENDER_DEV( ptr, PN_DEV_OWN );
+    ptr[ ISI_HEADER_OFFSET_RESOURCEID ] = PN_APE_COMMGR;
+    SET_RECEIVER_OBJ( ptr, GET_SENDER_OBJ( aMessage ) );
+    SET_SENDER_OBJ( ptr, PN_OBJ_EVENT_MULTICAST );
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_SERVICE_NOT_IDENTIFIED_RESP_OFFSET_TRANSACTIONID ] = 0x00;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_SERVICE_NOT_IDENTIFIED_RESP_OFFSET_MESSAGEID ] = COMMON_MESSAGE;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_SERVICE_NOT_IDENTIFIED_RESP_OFFSET_SUBMESSAGEID ] = COMM_SERVICE_NOT_IDENTIFIED_RESP;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_SERVICE_NOT_IDENTIFIED_RESP_OFFSET_NOTSERVEDMESSAGEID ] = msgPtr[ ISI_HEADER_OFFSET_MESSAGEID ];
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_SERVICE_NOT_IDENTIFIED_RESP_OFFSET_FILLERBYTE1 ] = KFiller;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_SERVICE_NOT_IDENTIFIED_RESP_OFFSET_NOTSERVEDSUBMESSAGEID ] = msgPtr[ ISI_HEADER_OFFSET_SUBMESSAGEID ];
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_SERVICE_NOT_IDENTIFIED_RESP_OFFSET_FILLERBYTE2 ] = KFiller;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_SERVICE_NOT_IDENTIFIED_RESP_OFFSET_FILLERBYTE3 ] = KFiller;
+    iRouter->Send( respMsg, PN_OBJ_EVENT_MULTICAST );
+    C_TRACE( ( _T( "DISICommunicationManager::SendCommServiceNotIdentifiedResp<" ) ) );
+    }
+
+
+void DISICommunicationManager::SendCommIsiVersionGetResp( const TDesC8& aMessage )
+    {
+    C_TRACE( ( _T( "DISICommunicationManager::SendCommIsiVersionGetResp 0x%x>" ), &aMessage ) );
+    TDes8& respMsg = MemApi::AllocBlock( ISI_HEADER_SIZE + SIZE_COMMON_MESSAGE_COMM_ISI_VERSION_GET_RESP );
+    TUint8* ptr( const_cast<TUint8*>( respMsg.Ptr() ) );
+    const TUint8* msgPtr( aMessage.Ptr() );
+    ptr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_ROUTING_REQ;
+    SET_RECEIVER_DEV( ptr, GET_SENDER_DEV( aMessage ) );
+    SET_SENDER_DEV( ptr, PN_DEV_OWN );
+    ptr[ ISI_HEADER_OFFSET_RESOURCEID ] = PN_APE_COMMGR;
+    SET_RECEIVER_OBJ( ptr, GET_SENDER_OBJ( aMessage ) );
+    SET_SENDER_OBJ( ptr, PN_OBJ_EVENT_MULTICAST );
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_ISI_VERSION_GET_RESP_OFFSET_TRANSACTIONID ] = 0x00;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_ISI_VERSION_GET_RESP_OFFSET_MESSAGEID ] = COMMON_MESSAGE;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_ISI_VERSION_GET_RESP_OFFSET_SUBMESSAGEID ] = COMM_ISI_VERSION_GET_RESP;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_ISI_VERSION_GET_RESP_OFFSET_ISIVERSIONZZZ ] = APE_COMMUNICATION_MANAGER_SERVER_ISI_VERSION_Z;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_ISI_VERSION_GET_RESP_OFFSET_ISIVERSIONYYY ] = APE_COMMUNICATION_MANAGER_SERVER_ISI_VERSION_Y;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_ISI_VERSION_GET_RESP_OFFSET_FILLERBYTE1 ] = KFiller;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_ISI_VERSION_GET_RESP_OFFSET_FILLERBYTE2 ] = KFiller;
+    ptr[ ISI_HEADER_SIZE + COMMON_MESSAGE_COMM_ISI_VERSION_GET_RESP_OFFSET_FILLERBYTE3 ] = KFiller;
+    iRouter->Send( respMsg, PN_OBJ_EVENT_MULTICAST );
+    C_TRACE( ( _T( "DISICommunicationManager::SendCommIsiVersionGetResp<" ) ) );
     }
 
 

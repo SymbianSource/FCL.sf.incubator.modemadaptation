@@ -59,7 +59,6 @@
 
 // CONSTANTS
 // hard-coded transaction id for ISI messages
-const TUint8 KCustomTransId = 6;
 // const TUint8 KCustomWimTransId = 7;
 
 // Max length for HSXPA message request

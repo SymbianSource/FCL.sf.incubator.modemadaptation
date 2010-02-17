@@ -15,7 +15,6 @@
 *
 */
 
-#include <iscnokiadefinitions.h>
 #include <pn_eventmodem_extisi.h>         // PNS_SUBSCRIBED_RESOURCES_EXTEND_IND_...
 #include <phonetisi.h>                    // For ISI_HEADER_SIZE
 #include <pn_const.h>                     // For PN_HEADER_SIZE
@@ -23,10 +22,14 @@
 #include "isicommunicationmanagertrace.h" // For C_TRACE..
 #include "misiobjectrouterif.h"           // For DISICommunicationManager
 #include "memapi.h"                       // For MemApi
+#ifdef INTERNAL_FLAG_ISI_ROUTER_IN_USE
+#include "isihelpers.h"                   // For SET_RECEIVER_OBJ...
+#else
 #include "iadhelpers.h"                   // For SET_RECEIVER_OBJ...
+#endif
 #include "nsisi.h"                        // For PN_MEDIA_ROUTING_REQ
 #include "ape_commgrisi.h"                // For APE_COMMGR..
-
+#include <iscnokiadefinitions.h>
 
 /* PUTB8 macro writes byte value to given address.
  * This macro is used mainly by other PUTBXX macros.
@@ -73,6 +76,10 @@
 #define GETB32(p) \
     (((TUint32) GETB16(p)<<16) | (TUint32) GETB16((TUint8 *)(p)+2))
 
+const TUint8 KMaxAmountOfResources( 255 );
+const TUint8 KPnsSubscribedResourcesExtendLength( 12 );
+const TUint8 KResourceArraySize( 4 );
+
 // Faults
 enum TISIIndincationHandlerFaults
     {
@@ -81,6 +88,32 @@ enum TISIIndincationHandlerFaults
     EISIIndicationHandlerMemAllocFailure1,
     EISIIndicationHandlerMemAllocFailure2,
     EISIIndicationHandlerMemAllocFailure3,
+    EISIIndicationHandlerMemAllocFailure4,
+    EISIIndicationHandlerMemAllocFailure5,
+    EISIIndicationHandlerQueNULLPointer,
+    EISIIndicationHandlerQueNULLPointer1,
+    EISIIndicationHandlerQueNULLPointer2,
+    EISIIndicationHandlerQueNULLPointer3,
+    EISIIndicationHandlerQueNULLPointer4,
+    EISIIndicationHandlerQueNULLPointer5,
+    EISIIndicationHandlerQueNULLPointer6,
+    EISIIndicationHandlerQueNULLPointer7,
+    EISIIndicationHandlerQueNULLPointer8,
+    EISIIndicationHandlerQueNULLPointer9,
+    EISIIndicationHandlerQueNULLPointer10,
+    EISIIndicationHandlerQueNULLPointer11,
+    EISIIndicationHandlerQueNULLPointer12,
+    EISIIndicationHandlerQueNULLPointer13,
+    EISIIndicationHandlerQueNULLPointer14,
+    EISIIndicationHandlerQueNULLPointer15,
+    EISIIndicationHandlerQueNULLPointer16,
+    EISIIndicationHandlerQueNULLPointer17,
+    EISIIndicationHandlerQueNULLPointer18,
+    EISIIndicationHandlerQueNULLPointer19,
+    EISIIndicationHandlerQueNULLPointer20,
+    EISIIndicationHandlerQueNULLPointer21,
+    EISIIndicationHandlerQueNULLPointer22,
+    EISIIndicationHandlerQueNULLPointer23
     };
 
 
@@ -127,17 +160,20 @@ DISIIndicationHandler::~DISIIndicationHandler(
     while( deviceAnchor != next )
         {
         deviceLink = _LOFF( next, TDeviceIdLink, iDeviceLink );
+        ASSERT_RESET_ALWAYS( deviceLink, ( EISIIndicationHandlerQueNULLPointer1 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
         C_TRACE( ( _T("DISIIndicationHandler::~DISIIndicationHandler device: 0x%x"), deviceLink->iDeviceId ) );
         serverAnchor = &deviceLink->iServerQ.iA;
         serverNext = serverAnchor->iNext;
         while( serverAnchor != serverNext )
             {
             serverLink = _LOFF( serverNext, TServerIdLink, iServerLink );
+            ASSERT_RESET_ALWAYS( serverLink, ( EISIIndicationHandlerQueNULLPointer2 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
             indicationAnchor = &serverLink->iIndicationQ.iA;
             indicationNext = indicationAnchor->iNext;
             while( indicationAnchor != indicationNext )
                 {
                 indicationLink = _LOFF( indicationNext, TIndicationLink, iIndicationLink );
+                ASSERT_RESET_ALWAYS( indicationLink, ( EISIIndicationHandlerQueNULLPointer3 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
                 C_TRACE( ( _T("DISIIndicationHandler::~DISIIndicationHandler indication: 0x%x"), indicationLink->iIndication ));
                 // get next link already in case if particular link is to be deleted
                 indicationNext = indicationNext->iNext;
@@ -146,6 +182,7 @@ DISIIndicationHandler::~DISIIndicationHandler(
                 while( subscriberAnchor != subscriberNext )
                     {
                     subscriberLink = _LOFF( subscriberNext, TSubscriberLink, iSubscriberLink );
+                    ASSERT_RESET_ALWAYS( subscriberLink, ( EISIIndicationHandlerQueNULLPointer4 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
                     C_TRACE( ( _T("DISIIndicationHandler::~DISIIndicationHandler subscriber: 0x%x"), subscriberLink->iObjId ));
                     TBool onlySubscriber( subscriberLink->iSubscriberLink.Alone() );
                     subscriberLink->iSubscriberLink.Deque();
@@ -195,62 +232,106 @@ DISIIndicationHandler::~DISIIndicationHandler(
 //
 // -----------------------------------------------------------------------------
 //
-TInt DISIIndicationHandler::Subscribe(
+void DISIIndicationHandler::Subscribe(
         TDes8& aSubscriptionReq
         )
     {
     C_TRACE( ( _T( "DISIIndicationHandler::Subscribe 0x%x>" ), &aSubscriptionReq ) );
     
     TUint8* msgPtr( const_cast<TUint8*>( aSubscriptionReq.Ptr() ) );
-    
-    TInt msgLength( aSubscriptionReq.Length() ); 
+    TInt msgLength( aSubscriptionReq.Length() );
     TUint32 resourceId( 0 );
     TUint8 deviceId( 0 );
-    TUint8 indication( 0 );
     TUint16 objId( 0 );
-      
-    objId = msgPtr[ ISI_HEADER_OFFSET_SENDEROBJECT ];
+          
+    objId = GET_SENDER_OBJ( aSubscriptionReq );
     RemoveSubscription( objId );
-    for( TInt subBlockOffset( ISI_HEADER_SIZE + SIZE_APE_COMMGR_SUBSCRIBE_REQ ); subBlockOffset < msgLength; subBlockOffset += ( SIZE_APE_COMMGR_SUBSCRIBE_SB ) )
-        {
-        deviceId = msgPtr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_DEVICEID ];
-        resourceId = GETB32( &msgPtr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_FILLERBYTE1 ] ); //resource offset
-        indication = msgPtr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_RESOURCEID ];
-        C_TRACE( ( _T("DISIIndicationHandler indication 0x%x objId 0x%x resource 0x%x device 0x%x"), indication, objId, resourceId, deviceId ) );
-        TDeviceIdLink* deviceLink = GetDeviceLink( deviceId );
-        if( !deviceLink )
+
+    if( msgPtr[ ISI_HEADER_OFFSET_SENDERDEVICE ] == PN_DEV_OWN )
+        {            
+        //If any subblocks
+        if( msgPtr[ ISI_HEADER_SIZE + APE_COMMGR_SUBSCRIBE_REQ_OFFSET_FILLERBYTE1 ] != 0 )
             {
-            C_TRACE( ( _T("DISIIndicationHandler::Subscribe device not found yet -> create: 0x%x"), deviceId ) );
-            deviceLink = new TDeviceIdLink();
-            ASSERT_RESET_ALWAYS( deviceLink, ( EISIIndicationHandlerMemAllocFailure | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
-            deviceLink->iDeviceId = deviceId;
-            iDeviceQ.Add( &( deviceLink->iDeviceLink ) );
+            TUint8 indication( 0 );
+            for( TInt subBlockOffset( ISI_HEADER_SIZE + SIZE_APE_COMMGR_SUBSCRIBE_REQ ); subBlockOffset < msgLength; subBlockOffset += ( SIZE_APE_COMMGR_SUBSCRIBE_SB ) )
+                {
+                deviceId = msgPtr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_DEVICEID ];
+                resourceId = GETB32( &msgPtr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_FILLERBYTE1 ] ); //resource offset
+                indication = msgPtr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_RESOURCEID ];
+                C_TRACE( ( _T("DISIIndicationHandler indication 0x%x objId 0x%x resource 0x%x device 0x%x"), indication, objId, resourceId, deviceId ) );
+                TDeviceIdLink* deviceLink = GetDeviceLink( deviceId );
+                if( !deviceLink )
+                    {
+                    C_TRACE( ( _T("DISIIndicationHandler::Subscribe device not found yet -> create: 0x%x"), deviceId ) );
+                    deviceLink = new TDeviceIdLink();
+                    ASSERT_RESET_ALWAYS( deviceLink, ( EISIIndicationHandlerMemAllocFailure | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
+                    deviceLink->iDeviceId = deviceId;
+                    iDeviceQ.Add( &( deviceLink->iDeviceLink ) );
+                    }
+                AddServer( *deviceLink, resourceId, indication, objId );
+                }
             }
-        AddServer( *deviceLink, resourceId, indication, objId );
-        }
-        
 #ifdef _DEBUG
 #ifdef COMPONENT_TRACE_FLAG
-    PrintSubscriptions();
+        PrintSubscriptions();
 #endif // COMPONENT_TRACE_FLAG
 #endif // _DEBUG
     
-    TDeviceIdLink* deviceLink = NULL;
-    SDblQueLink* anchor = &iDeviceQ.iA;
-    SDblQueLink* next = anchor->iNext;
-    while( anchor != next )
-        {
-        deviceLink = _LOFF( next, TDeviceIdLink, iDeviceLink );
-        C_TRACE( ( _T("DISIIndicationHandler::Subscribe device: 0x%x"), deviceLink->iDeviceId ) );
-        if( deviceLink->iDeviceId != PN_DEV_OWN )
+        TDeviceIdLink* deviceLink = NULL;
+        SDblQueLink* anchor = &iDeviceQ.iA;
+        SDblQueLink* next = anchor->iNext;
+        while( anchor != next )
             {
-            C_TRACE( ( _T("DISIIndicationHandler::Subscribe send subscription to device: 0x%x"), deviceLink->iDeviceId ) );
-            SendSubscription( *deviceLink );
+            deviceLink = _LOFF( next, TDeviceIdLink, iDeviceLink );
+            ASSERT_RESET_ALWAYS( deviceLink, ( EISIIndicationHandlerQueNULLPointer5 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
+            C_TRACE( ( _T("DISIIndicationHandler::Subscribe device: 0x%x"), deviceLink->iDeviceId ) );
+            if( deviceLink->iDeviceId != PN_DEV_OWN )
+                {
+                C_TRACE( ( _T("DISIIndicationHandler::Subscribe send subscription to device: 0x%x"), deviceLink->iDeviceId ) );
+                SendSubscription( *deviceLink );
+                }
+            next = next->iNext;
             }
-        next = next->iNext;
+        }
+    else
+        {
+        deviceId = GET_SENDER_DEV( aSubscriptionReq );
+        TDeviceIdLink* deviceLink = GetExternalDeviceLink( deviceId );
+        if( !deviceLink )
+            {
+            C_TRACE( ( _T("DISIIndicationHandler::Subscribe external device not found yet -> create: 0x%x"), deviceId ) );
+            deviceLink = new TDeviceIdLink();
+            ASSERT_RESET_ALWAYS( deviceLink, ( EISIIndicationHandlerMemAllocFailure4 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
+            deviceLink->iDeviceId = deviceId;
+            iDeviceQ.Add( &( deviceLink->iDeviceLink ) );
+            }
+        else
+            {
+            SDblQueLink* serverAnchor = NULL;
+            SDblQueLink* serverNext = NULL;
+            TServerIdLink* serverLink = NULL;
+            serverAnchor = &deviceLink->iServerQ.iA;
+            serverNext = serverAnchor->iNext;
+            while( serverAnchor != serverNext )
+                {
+                serverLink = _LOFF( serverNext, TServerIdLink, iServerLink );
+                ASSERT_RESET_ALWAYS( serverLink, ( EISIIndicationHandlerQueNULLPointer6 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
+                C_TRACE( ( _T("DISIIndicationHandler::~DISIIndicationHandler remove server: 0x%x"), serverLink->iResourceId ));
+                serverLink->iServerLink.Deque();
+                delete serverLink;
+                serverLink = NULL;
+                serverNext = serverNext->iNext;           
+                }
+            }
+        for( TInt subBlockOffset( ISI_HEADER_SIZE + PNS_SUBSCRIBED_RESOURCES_EXTEND_IND_OFFSET_RESOURCELIST );
+            subBlockOffset < msgLength; subBlockOffset += KResourceArraySize )
+            {
+            resourceId = GETB32( &msgPtr[ subBlockOffset ] );
+            C_TRACE( ( _T("DISIIndicationHandler resource 0x%x device 0x%x"), resourceId, deviceId ) );
+            AddServer( *deviceLink, resourceId );
+            }
         }
     C_TRACE( ( _T( "DISIIndicationHandler::Subscribe<" ) ) );
-    return KErrNone;
     }
 
 
@@ -280,6 +361,31 @@ void DISIIndicationHandler::AddServer(
     AddIndication( *serverLink, aIndication, aObjId );
     C_TRACE( ( _T( "DISIIndicationHandler::AddServer 0x%x 0x%x 0x%x 0x%x<" ), &aDeviceLink, aResourceId, aIndication, aObjId ) );
     }
+    
+
+// -----------------------------------------------------------------------------
+// DISIIndicationHandler::AddServer
+//
+// -----------------------------------------------------------------------------
+//
+void DISIIndicationHandler::AddServer(
+        TDeviceIdLink& aDeviceLink,
+        const TUint32 aResourceId
+        )
+    {
+    C_TRACE( ( _T( "DISIIndicationHandler::AddServer external 0x%x 0x%x>" ), &aDeviceLink, aResourceId ) );
+    TServerIdLink* serverLink = GetServerLink( aDeviceLink, aResourceId );
+    if( !serverLink )
+        {
+        C_TRACE( ( _T("DISIIndicationHandler::AddServer external resource: 0x%x not found, create"), aResourceId ));
+        serverLink = new TServerIdLink();
+        ASSERT_RESET_ALWAYS( serverLink, ( EISIIndicationHandlerMemAllocFailure5 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
+        serverLink->iResourceId = aResourceId;
+        aDeviceLink.iServerQ.Add( &( serverLink->iServerLink ) );
+        }
+    C_TRACE( ( _T( "DISIIndicationHandler::AddServer 0x%x 0x%x<" ), &aDeviceLink, aResourceId ) );
+    }
+
 
 // -----------------------------------------------------------------------------
 // DISIIndicationHandler::AddIndication
@@ -351,6 +457,7 @@ DISIIndicationHandler::TDeviceIdLink* DISIIndicationHandler::GetDeviceLink(
     while( anchor != next )
         {
         tmpDeviceLink = _LOFF( next, TDeviceIdLink, iDeviceLink );
+        ASSERT_RESET_ALWAYS( tmpDeviceLink, ( EISIIndicationHandlerQueNULLPointer7 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
         C_TRACE( ( _T( "DISIIndicationHandler::GetDeviceLink device: 0x%x"), tmpDeviceLink->iDeviceId ) );
         if( tmpDeviceLink->iDeviceId == aDeviceId )
             {
@@ -363,6 +470,35 @@ DISIIndicationHandler::TDeviceIdLink* DISIIndicationHandler::GetDeviceLink(
     return deviceLink;
     }
 
+// -----------------------------------------------------------------------------
+// DISIIndicationHandler::GetExternalDeviceLink
+//
+// -----------------------------------------------------------------------------
+//
+DISIIndicationHandler::TDeviceIdLink* DISIIndicationHandler::GetExternalDeviceLink(
+        const TUint8 aDeviceId
+        )
+    {
+    C_TRACE( ( _T( "DISIIndicationHandler::GetExternalDeviceLink 0x%x ->" ), aDeviceId ) );
+    TDeviceIdLink* deviceLink = NULL;
+    TDeviceIdLink* tmpDeviceLink = NULL;
+    SDblQueLink* anchor = &iExternalDeviceQ.iA;
+    SDblQueLink* next = anchor->iNext;
+    while( anchor != next )
+        {
+        tmpDeviceLink = _LOFF( next, TDeviceIdLink, iDeviceLink );
+        ASSERT_RESET_ALWAYS( tmpDeviceLink, ( EISIIndicationHandlerQueNULLPointer8 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
+        C_TRACE( ( _T( "DISIIndicationHandler::GetExternalDeviceLink device: 0x%x"), tmpDeviceLink->iDeviceId ) );
+        if( tmpDeviceLink->iDeviceId == aDeviceId )
+            {
+            deviceLink = tmpDeviceLink;
+            break;
+            }
+        next = next->iNext;
+        }
+    C_TRACE( ( _T( "DISIIndicationHandler::GetExternalDeviceLink 0x%x <-" ), deviceLink ) );
+    return deviceLink;
+    }
 
 // -----------------------------------------------------------------------------
 // DISIIndicationHandler::GetServerLink
@@ -383,6 +519,7 @@ DISIIndicationHandler::TServerIdLink* DISIIndicationHandler::GetServerLink(
     while( anchor != next ) // servers
         {
         tmpServerLink = _LOFF( next, TServerIdLink, iServerLink );
+        ASSERT_RESET_ALWAYS( tmpServerLink, ( EISIIndicationHandlerQueNULLPointer9 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
         C_TRACE( ( _T( "DISIIndicationHandler::GetServerLink server: 0x%x"), tmpServerLink->iResourceId ) );
         if( tmpServerLink->iResourceId == aResourceId )
             {
@@ -414,6 +551,7 @@ DISIIndicationHandler::TIndicationLink* DISIIndicationHandler::GetIndicationLink
     while( anchor != next )
         {
         tmpIndicationLink = _LOFF( next, TIndicationLink, iIndicationLink );
+        ASSERT_RESET_ALWAYS( tmpIndicationLink, ( EISIIndicationHandlerQueNULLPointer10 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
         if( tmpIndicationLink->iIndication == aIndication )
             {
             indicationLink = tmpIndicationLink;
@@ -442,7 +580,8 @@ DISIIndicationHandler::TSubscriberLink* DISIIndicationHandler::GetSubscriberLink
     SDblQueLink* next = anchor->iNext;
     while( anchor != next )
         {
-        tmpSubscriberLink= _LOFF( next, TSubscriberLink, iSubscriberLink );
+        tmpSubscriberLink = _LOFF( next, TSubscriberLink, iSubscriberLink );
+        ASSERT_RESET_ALWAYS( tmpSubscriberLink, ( EISIIndicationHandlerQueNULLPointer11 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
         if ( tmpSubscriberLink->iObjId == aObjId )
             {
             subscriberLink = tmpSubscriberLink;
@@ -479,25 +618,28 @@ void DISIIndicationHandler::PrintSubscriptions(
     while( anchor != next )
         {
         deviceLink = _LOFF( next, TDeviceIdLink, iDeviceLink );
+        ASSERT_RESET_ALWAYS( deviceLink, ( EISIIndicationHandlerQueNULLPointer12 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
         C_TRACE( ( _T("DISIIndicationHandler::PrintSubscriptions device: 0x%x"), deviceLink->iDeviceId ) );
         serverAnchor = &deviceLink->iServerQ.iA;
         serverNext = serverAnchor->iNext;
         while( serverAnchor != serverNext )
             {
             serverLink = _LOFF( serverNext, TServerIdLink, iServerLink );
+            ASSERT_RESET_ALWAYS( serverLink, ( EISIIndicationHandlerQueNULLPointer13 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
             C_TRACE( ( _T("DISIIndicationHandler::PrintSubscriptions server: 0x%x"), serverLink->iResourceId ) );
             indicationAnchor = &serverLink->iIndicationQ.iA;
             indicationNext = indicationAnchor->iNext;
             while( indicationAnchor != indicationNext )
                 {
                 indicationLink = _LOFF( indicationNext, TIndicationLink, iIndicationLink );
+                ASSERT_RESET_ALWAYS( indicationLink, ( EISIIndicationHandlerQueNULLPointer14 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
                 C_TRACE( ( _T("DISIIndicationHandler::PrintSubscriptions indication: 0x%x"), indicationLink->iIndication ) );
                 subscriberAnchor = &indicationLink->iSubscriberQ.iA;
                 subscriberNext = subscriberAnchor->iNext;
-                while( subscriberAnchor != subscriberNext)
+                while( subscriberAnchor != subscriberNext )
                     {
                     subscriberLink = _LOFF( subscriberNext, TSubscriberLink, iSubscriberLink );
-                    subscriberLink = subscriberLink;
+                    ASSERT_RESET_ALWAYS( subscriberLink, ( EISIIndicationHandlerQueNULLPointer15 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
                     C_TRACE( ( _T("DISIIndicationHandler::PrintSubscriptions objid: 0x%x"), subscriberLink->iObjId ) );
                     subscriberNext = subscriberNext->iNext;
                     }
@@ -540,17 +682,20 @@ void DISIIndicationHandler::RemoveSubscription(
     while( deviceAnchor != next )
         {
         deviceLink = _LOFF( next, TDeviceIdLink, iDeviceLink );
+        ASSERT_RESET_ALWAYS( deviceLink, ( EISIIndicationHandlerQueNULLPointer16 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
         C_TRACE( ( _T("DISIIndicationHandler::RemoveSubscription device: 0x%x"), deviceLink->iDeviceId ) );
         serverAnchor = &deviceLink->iServerQ.iA;
         serverNext = serverAnchor->iNext;
         while( serverAnchor != serverNext )
             {
             serverLink = _LOFF( serverNext, TServerIdLink, iServerLink );
+            ASSERT_RESET_ALWAYS( serverLink, ( EISIIndicationHandlerQueNULLPointer17 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
             indicationAnchor = &serverLink->iIndicationQ.iA;
             indicationNext = indicationAnchor->iNext;
             while( indicationAnchor != indicationNext )
                 {
                 indicationLink = _LOFF( indicationNext, TIndicationLink, iIndicationLink );
+                ASSERT_RESET_ALWAYS( indicationLink, ( EISIIndicationHandlerQueNULLPointer18 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
                 C_TRACE( ( _T("DISIIndicationHandler::RemoveSubscription indication: 0x%x"), indicationLink->iIndication ));
                 // get next link already in case if particular link is to be deleted
                 indicationNext = indicationNext->iNext;
@@ -559,6 +704,7 @@ void DISIIndicationHandler::RemoveSubscription(
                 while( subscriberAnchor != subscriberNext )
                     {
                     subscriberLink = _LOFF( subscriberNext, TSubscriberLink, iSubscriberLink );
+                    ASSERT_RESET_ALWAYS( subscriberLink, ( EISIIndicationHandlerQueNULLPointer19 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
                     C_TRACE( ( _T("DISIIndicationHandler::RemoveSubscription objid: 0x%x"), subscriberLink->iObjId ));
                     if( subscriberLink->iObjId == aObjId )
                         {
@@ -611,23 +757,104 @@ void DISIIndicationHandler::RemoveSubscription(
     }
 
 // -----------------------------------------------------------------------------
+// DIndicationHandler::
+//
+// -----------------------------------------------------------------------------
+//
+void DISIIndicationHandler::Multicast(
+        TDes8& aIndication
+        )
+    {
+    C_TRACE( ( _T( "DISIIndicationHandler::Multicast 0x%x ->" ), &aIndication ) );
+
+    TUint8* ptr = const_cast<TUint8*>( aIndication.Ptr() );
+
+    TDeviceIdLink* deviceLink = NULL;
+    SDblQueLink* anchor = &iDeviceQ.iA;
+    SDblQueLink* next = anchor->iNext;
+    while( anchor != next )
+        {
+        deviceLink = _LOFF( next, TDeviceIdLink, iDeviceLink );
+        ASSERT_RESET_ALWAYS( deviceLink, ( EISIIndicationHandlerQueNULLPointer20 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
+        C_TRACE( ( _T("DISIIndicationHandler::Multicast device: 0x%x"), deviceLink->iDeviceId ) );
+        TServerIdLink* serverLink = GetServerLink( *deviceLink, ptr[ ISI_HEADER_OFFSET_RESOURCEID ] );
+        TIndicationLink* indicationLink = NULL;
+        TSubscriberLink* subscriberLink = NULL;
+        if( serverLink )
+            {
+            indicationLink = GetIndicationLink( *serverLink, ptr[ ISI_HEADER_OFFSET_MESSAGEID ] );
+            }
+        if( indicationLink )
+            {
+            SDblQueLink* subscriberAnchor = NULL;
+            SDblQueLink* subscriberNext = NULL;
+            subscriberAnchor = &indicationLink->iSubscriberQ.iA;
+            subscriberNext = subscriberAnchor->iNext;
+            while( subscriberAnchor != subscriberNext )
+                {
+                subscriberLink = _LOFF( subscriberNext, TSubscriberLink, iSubscriberLink );
+                ASSERT_RESET_ALWAYS( subscriberLink, ( EISIIndicationHandlerQueNULLPointer21 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
+                C_TRACE( ( _T("DISIIndicationHandler::Multicast Subscriber objid: 0x%x"), subscriberLink->iObjId ));
+                // Make a copy to every subscriber
+                TDes8& tempPtr = MemApi::AllocBlock( aIndication.Length() );
+                tempPtr.Copy( ptr, aIndication.Length() );
+                TUint8* ptr = const_cast<TUint8*>( tempPtr.Ptr() );
+                SET_RECEIVER_OBJ( ptr, subscriberLink->iObjId );
+                iRouter->Send( tempPtr, PN_OBJ_EVENT_MULTICAST );
+                subscriberNext = subscriberNext->iNext;
+                }
+            }
+        next = next->iNext;
+        }
+    deviceLink = NULL;
+    anchor = &iExternalDeviceQ.iA;
+    next = anchor->iNext;
+    while( anchor != next )
+        {
+        deviceLink = _LOFF( next, TDeviceIdLink, iDeviceLink );
+        ASSERT_RESET_ALWAYS( deviceLink, ( EISIIndicationHandlerQueNULLPointer22 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
+        C_TRACE( ( _T("DISIIndicationHandler::Multicast external device: 0x%x"), deviceLink->iDeviceId ) );
+        TServerIdLink* serverLink = GetServerLink( *deviceLink, ptr[ ISI_HEADER_OFFSET_RESOURCEID ] );
+        if( serverLink )
+            {
+            C_TRACE( ( _T("DISIIndicationHandler::Multicast resource: 0x%x"), serverLink->iResourceId ));
+            // Make a copy to every external subscriber
+            TDes8& tempPtr = MemApi::AllocBlock( aIndication.Length() );
+            tempPtr.Copy( ptr, aIndication.Length() );
+            TUint8* ptr = const_cast<TUint8*>( tempPtr.Ptr() );
+            SET_RECEIVER_DEV( tempPtr, deviceLink->iDeviceId );
+            tempPtr[ ISI_HEADER_OFFSET_RESOURCEID ] = ptr[ ISI_HEADER_OFFSET_RESOURCEID ];
+            SET_RECEIVER_OBJ( tempPtr, PN_OBJ_EVENT_MULTICAST );
+            SET_SENDER_OBJ( tempPtr, ptr[ ISI_HEADER_OFFSET_SENDEROBJECT ] );
+            iRouter->Send( tempPtr, PN_OBJ_EVENT_MULTICAST );
+            }
+        next = next->iNext;
+        }    
+    C_TRACE( ( _T( "DISIIndicationHandler::Multicast 0x%x <-" ), &aIndication ) );
+    }
+
+
+
+// -----------------------------------------------------------------------------
 // DISIIndicationHandler::SendSubscription
 //
 // -----------------------------------------------------------------------------
 //
-TInt DISIIndicationHandler::SendSubscription( TDeviceIdLink& aDevice )
+void DISIIndicationHandler::SendSubscription( TDeviceIdLink& aDevice )
     {
-    C_TRACE( ( _T( "DISIIndicationHandler::SendSubscription>" ) ) );
-    const TUint8 KMaxAmountOfResources( 255 );
-    const TUint8 KPnsSubscribedResourcesExtendLength( 12 );
-    const TUint8 KResourceArraySize( 4 );
-    
+    C_TRACE( ( _T( "DISIIndicationHandler::SendSubscription>" ) ) );    
     TDes8& desPtr = MemApi::AllocBlock( ISI_HEADER_SIZE + SIZE_PNS_SUBSCRIBED_RESOURCES_EXTEND_IND + ( KMaxAmountOfResources * KResourceArraySize ) );
 
     TUint8* ptr( const_cast<TUint8*>( desPtr.Ptr() ) );
     ptr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_ROUTING_REQ;
-    SET_RECEIVER_DEV( ptr, aDevice.iDeviceId );
-    SET_SENDER_DEV( ptr, PN_DEV_OWN );
+    // TODO a bug? SET_RECEIVER_DEV( ptr, aDevice.iDeviceId );
+#ifdef NCP_COMMON_BRIDGE_FAMILY
+    SET_SENDER_DEV( ptr, PN_DEV_HOST );
+		SET_RECEIVER_DEV( ptr, PN_DEV_MODEM );    
+#else
+    SET_SENDER_DEV( ptr, PN_DEV_SOS );
+		SET_RECEIVER_DEV( ptr, PN_DEV_HOST );
+#endif    
     ptr[ ISI_HEADER_OFFSET_RESOURCEID ] = PN_COMMGR;
     SET_RECEIVER_OBJ( ptr, PN_OBJ_ROUTER );
     SET_SENDER_OBJ( ptr, PN_OBJ_EVENT_MULTICAST );
@@ -643,29 +870,19 @@ TInt DISIIndicationHandler::SendSubscription( TDeviceIdLink& aDevice )
     while( anchor != next )
         {
         serverLink = _LOFF( next, TServerIdLink, iServerLink );
+        ASSERT_RESET_ALWAYS( serverLink, ( EISIIndicationHandlerQueNULLPointer23 | EDISIIndicationHandlerTraceId << KClassIdentifierShift ) );
         TUint32 resourceId = serverLink->iResourceId;
         C_TRACE( ( _T("DISIIndicationHandler::SendSubscription Server: 0x%08x"), resourceId ) );
-        PUTB32( &ptr[ ISI_HEADER_SIZE + PNS_SUBSCRIBED_RESOURCES_EXTEND_IND_OFFSET_RESOURCELIST ], resourceId );
+        PUTB32( &ptr[ ISI_HEADER_SIZE + PNS_SUBSCRIBED_RESOURCES_EXTEND_IND_OFFSET_RESOURCELIST + ( resourceCount * KResourceArraySize ) ], resourceId );
         resourceCount++;
         next = next->iNext;
         }
     ptr[ ISI_HEADER_SIZE + PNS_SUBSCRIBED_RESOURCES_EXTEND_IND_OFFSET_RESOURCECOUNT ] = resourceCount;
     TInt messageLength( ( resourceCount * KResourceArraySize ) + KPnsSubscribedResourcesExtendLength );
-    while( messageLength % 4 != 0 )
-        {
-        TRACE_ASSERT_INFO(0, messageLength);
-        messageLength++;
-        }
     desPtr.SetLength( messageLength );
     SET_LENGTH( ptr, messageLength - PN_HEADER_SIZE );
-      
-    for( TInt i( 0 ); i < desPtr.Length(); i++ )
-        {
-        C_TRACE( ( _T( "index[ %d ] data 0x%x"), i, desPtr.Ptr()[i] ) );
-        }
-    TInt error = iRouter->Send( desPtr, PN_OBJ_EVENT_MULTICAST );
+    iRouter->Send( desPtr, PN_OBJ_EVENT_MULTICAST );
     C_TRACE( ( _T( "DISIIndicationHandler::SendSubscription<" ) ) );  
-    return error;
     }
 
 // End of file.

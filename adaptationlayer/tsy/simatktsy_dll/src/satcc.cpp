@@ -65,6 +65,7 @@ const TInt KMaximumCcBufferSize =
     4;      //CALL_MODEM_SB_CAUSE
 
 const TUint8 KMSBMask = 0x80;
+const TUint8 KSw1Sw2Unknown = 0;
 
 
 // ==================== MEMBER FUNCTIONS ====================================
@@ -417,7 +418,12 @@ TInt CSatCC::SendUSSDEnvelope
             // impossible. Remove the created CcStruct from the CC array and
             // send CC event response.
             TPtrC8 atkData;
-            SendSsResourceControlReq( aCcstruct, KError, atkData );
+            SendSsResourceControlReq( 
+                aCcstruct, 
+                KSw1Sw2Unknown, 
+                KSw1Sw2Unknown, 
+                KError, 
+                atkData );
 
             TInt index( GetArrayIndexById( aCcstruct.iTransId ) );
             if ( index != KErrNotFound )
@@ -588,6 +594,8 @@ void CSatCC::UiccCatRespEnvelopeReceived( const TIsiReceiveC& aIsiMessage )
                         {
                         SendSsResourceControlReq(
                             ( *iCallControlArray )[ccIndex],
+                            sw1,
+                            sw2,
                             result,
                             apduData );
                         break;
@@ -1452,6 +1460,8 @@ void CSatCC::SsResourceControlInd( const TIsiReceiveC& aIsiMessage )
 //
 void CSatCC::SendSsResourceControlReq(
         const TCallControl& aTcc,
+        const TUint8 aSw1,
+        const TUint8 aSw2,
         const TUint8 aResult,
         TPtrC8 aApduData )
     {
@@ -1653,6 +1663,18 @@ void CSatCC::SendSsResourceControlReq(
                 }
             }
         }
+
+    // SS_SB_RESOURCE_CONTROL_INFO [O] with sw1, sw2 and result 
+    TIsiSubBlock resourceCtrlInfo(
+        isiMessage,
+        SS_SB_RESOURCE_CONTROL_INFO,
+        EIsiSubBlockTypeId8Len8 );
+    isiMessage.Append( 3 ); // data size is 3 (sw1 + sw2 + result)
+    isiMessage.Append( aSw1 );
+    isiMessage.Append( aSw2 );
+    isiMessage.Append( ccresult );
+    sbcount++;
+    resourceCtrlInfo.CompleteSubBlock();
 
     TBuf8<1> numOfSubblocks;
     numOfSubblocks.Append( sbcount);

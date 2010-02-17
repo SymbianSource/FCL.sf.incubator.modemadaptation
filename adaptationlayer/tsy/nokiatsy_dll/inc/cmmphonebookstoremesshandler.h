@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -35,7 +35,7 @@
 #include "cmmuiccmesshandler.h"
 
 //  CONSTANTS
-    //none
+const TInt KUnusedLocation( 0xFF );
 
 //  MACROS
 
@@ -72,11 +72,23 @@ enum TPBConfData
     MSISDNConfData,
     };
 
+struct TIapInfo
+    {
+    TUint16 fileId;
+    TUint8 fileSfi;
+    TUint8 fileTag;
+    TUint8 recordNo;
+    };
+
 struct TPBEntry
     {
     RArray<TInt> PBEntryExtRecord;
     TBool iEntryPresent;
-    TUint8 iEntryIndex;
+    TInt iEntryIndex;
+    TUint8 fileId;
+    TUint8 fileSFI;
+    RArray<TInt> groupNameIdentifiers;
+    RArray<TIapInfo> iapInfo;
     };
 
 struct TPBEntryList
@@ -89,26 +101,35 @@ class TPrimitiveInitInfo
     {
 public:
     TPrimitiveInitInfo();
-    
+
     void GetPBEntryFromUICCData( const TDesC8 &aFileData, TDes8& aNumber, TDes8& aName);
-    
-    
+
+
     TUint16 iNoOfRecords;          // 2 byte long
     TUint16 iAlphaStringlength;    // 2 byte long
     TUint16 iNumlength;          // 2 byte long
     TUint16 iExtNoOfRec;
-    TUint8 iMbiRecLen;          
+    TUint8 iMbiRecLen;
     TBool iExtension;
+
+    // Store ADN 3G realted Data also
+    TInt iPBRNoOfRecords;
+    TInt iIAPRecordLength;
+    TInt iANRNoOfRecords;
+    TInt iSNENoOfRecords;
+    TInt iSNEStringLength;
+    TInt iEmailNoOfRecords;
+    TInt iEmailStringLength;
     };
 
 
-// Struct 
+// Struct
 
 
 // look up table for BCD digits
 
-const TUint8 LookupArray[16]= 
-      {    
+const TUint8 LookupArray[16]=
+      {
               '0','1','2','3','4','5','6','7','8','9',    /* 0-9 */
               '*',                                        /* 0xA */
               '#',                                        /* 0xB */
@@ -117,8 +138,8 @@ const TUint8 LookupArray[16]=
               UICC_EXPANSION_CHAR,                     /* 0xE, Expansion digit */
       };
 
-const TUint8 LookupArrayAdn[16]= 
-      {    
+const TUint8 LookupArrayAdn[16]=
+      {
               '0','1','2','3','4','5','6','7','8','9',    /* 0-9 */
               '*',                                        /* 0xA */
               '#',                                        /* 0xB */
@@ -152,8 +173,8 @@ class CMmPhonebookAlphaString;
 * GSM-specific PBStore ISI messages.
 */
 class CMmPhoneBookStoreMessHandler
-    : public CBase, 
-      public MMmMessHandlerBase, 
+    : public CBase,
+      public MMmMessHandlerBase,
       public MMmMessageReceiver,
       public MUiccOperationBase
     {
@@ -183,7 +204,7 @@ class CMmPhoneBookStoreMessHandler
             TInt aIpc,
             const CMmDataPackage* aDataPackage );
 
-        
+
         /**
         * Handles a received message by calling the specific
         * message handling method.
@@ -193,8 +214,12 @@ class CMmPhoneBookStoreMessHandler
         * @param aFileData reference to Data received in message
         * @return KErrNone or error code
         */
-        TInt ProcessUiccMsg( TInt aTransactionId, TInt aStatus, TUint8 aDetails, const TDesC8 &aFileData );
-        
+        TInt ProcessUiccMsg(
+            TInt aTransactionId,
+            TInt aStatus,
+            TUint8 aDetails,
+            const TDesC8 &aFileData );
+
         /**
         * Creates entry point to correct operation.
         *
@@ -205,7 +230,7 @@ class CMmPhoneBookStoreMessHandler
         CMmPhoneBookStoreOperationBase* CreateNewOperationL(
             const CMmDataPackage* aDataPackage,
             TInt aIpc );
-        
+
         /**
         * Store Phonebook Entry from UICC -message
         *
@@ -225,34 +250,70 @@ class CMmPhoneBookStoreMessHandler
                                           const TBool aMailboxIdExist );
 
         /**
+        * Store ANR to phonebook entry
+        *
+        * @param aAnr Additional number
+        * @param aEntry Phonebook entry where ANR is added
+        * @param aFileId File ID
+        * @return none
+        */
+        static void StoreAnrToPhonebookEntryL(
+            TDes8& aAnr,
+            CPhoneBookStoreEntry& aEntry,
+            const TUint16 aFileId );
+
+
+        /**
+        * Store SNE or EMAIL to phonebook entry
+        * @param aString Second name/email address string
+        * @param aEntry Phonebook entry where SNE/EMAIL is added
+        * @param aFileTypeTag Tag indicating file type
+        * @return none
+        */
+        static void StoreSneEmailToPbEntryL(
+            TDes8& aString,
+            CPhoneBookStoreEntry& aEntry,
+            TUint8 aFileTypeTag );
+
+        /**
         * Handle number to convert in Ascii Format
         * @param const TDesC8& aSource: Message to be converted in Ascii
         * @param TDes16 aTarget : After conversion data to be staored in
         */
-        static void ConvertToUcs2FromBCD( const TDesC8 &aSource,TDes16 &aTarget, const TUint16 aFileData );
-        
+        static void ConvertToUcs2FromBCD(
+            const TDesC8 &aSource,
+            TDes16 &aTarget,
+            const TUint16 aFileData );
+
         /**
         * Handle number to convert in BCD format from UCS2 Format
         * @param const TDesC16& aSource: Message to be converted in BCD
         * @param TDes8 aTarget : After conversion data to be stored in target buffer
         */
-        static TInt ConvertToBCDFromUCS2( TDes16 &aSource, TDes8 &aTarget, TUint16 aFileId );
-        
+        static TInt ConvertToBCDFromUCS2(
+            TDesC16 &aSource,
+            TDes8 &aTarget,
+            TUint16 aFileId );
+
         /**
         * Handle number to convert in BCD format from UCS2 Format
         * @param TInt16 aUCSCharacter: Character to be converted
         * @param const TUint16 aFileId :File id
         * @return The BCD number
         */
-        static TInt GetBCDCodeforUCS( TUint16 aUCSCharacter, TUint16 aFileId );
-        
+        static TInt GetBCDCodeforUCS(
+            TUint16 aUCSCharacter,
+            TUint16 aFileId );
+
         /**
         * Sets PhoneBook Entry to PhoneBook Entry List.
         *
         * @param aStoreEntry.
         * @return None
         */
-        void StoreEntryToPhoneBookList( TPBEntry* aStoreEntry, TUint8 aPBIndex );
+        void StoreEntryToPhoneBookList(
+            TPBEntry* aStoreEntry,
+            TUint8 aPBIndex );
 
         /**
         * Reset phonebook entry in phoneBook entry list.
@@ -269,7 +330,10 @@ class CMmPhoneBookStoreMessHandler
         * @param aStoreEntry.
         * @return None
         */
-        TBool IndexCheckInPBList( TUint8 aIndex, TUint8 aPBIndex, TPBEntry& aEntry );
+        TBool IndexCheckInPBList(
+            TUint8 aIndex,
+            TUint8 aPBIndex,
+            TPBEntry& aEntry );
 
         /**
         * Find Index for Present Entry
@@ -313,21 +377,48 @@ class CMmPhoneBookStoreMessHandler
         void SetNumberOfFdnInfoResps( TUint8 aNumber );
 
         /**
-        * Remove the main Entry Information from Stored list 
+        * Remove the main Entry Information from Stored list
         *
         * @param aIndex - Index to be removed.
         * @return None
         */
-        void UpdateEntryFromList( TPBEntry* aEntry, TUint8 aIndex , TUint8 aPBIndex);
+        void UpdateEntryFromList(
+            TPBEntry* aEntry,
+            TUint8 aIndex,
+            TUint8 aPBIndex);
 
         /**
-        * Remove the EXT records Information from Stored list 
+        * Remove the EXT records Information from Stored list
         *
         * @param aIndex - Index of Ext record to be removed.
         * @return None
         */
         void RemoveExtEntryFromList( TUint8 aIndex, TUint8 aPBIndex);
-        
+
+
+        /**
+        * Finds entry from iPBEntryList
+        *
+        * @param TUint8 aIndex:
+        * @param TUint8 aRecordNo: record to be found
+        * @return TPBEntry*: pointer to found entry or NULL
+        */
+        TPBEntry* FindEntryFromPbList( TUint8 aIndex, TUint8 aRecordNo );
+
+
+        /**
+        * Finds corresponding ADN entry for type 2 file
+        *
+        * @param aCurrentType2EfIndex Index of current elementary file
+        * @param aCurrentRecordNum Current record number
+        * @param aArray ADN entry IDs are stored here
+        * @return None
+        */
+        void GetEntriesForType2FileId(
+            const TInt aCurrentType2EfIndex,
+            const TInt aCurrentRecordNum,
+            RArray<TInt>& aArray );
+
         /**
         * Gets pointer to CMmMessageRouter class.
         *
@@ -336,7 +427,7 @@ class CMmPhoneBookStoreMessHandler
         */
         CMmMessageRouter* MessageRouter();
 
-        
+
         /**
         * Gets pointer to CMmUiccMessHandler class
         *
@@ -352,7 +443,7 @@ class CMmPhoneBookStoreMessHandler
         * @return Pointer to CMmPhoNetSender object.
         */
         CMmPhoNetSender* PhoNetSender();
-        
+
     protected:
         // None
 
@@ -395,16 +486,16 @@ class CMmPhoneBookStoreMessHandler
 
         // Pointer to the UICC Messhandler
         CMmUiccMessHandler* iMmUiccMessHandler;
-        
+
         // Array for storing objects of operations.
         CMmPhoneBookStoreOperationList* iOperationlist;
 
         // Number of FDN info responses
         TUint8 iNumberOfFdnInfoResps;
-        
-        // to store CardType 
+
+        // to store CardType
         TUint8 iCardType;
-        
+
         // Array to Store PhoneBook Entry Status and EXT record no list
         TFixedArray< TPBEntryList,UICC_MAX_PB_NUM > iPBEntryList;
 };

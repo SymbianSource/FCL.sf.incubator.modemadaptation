@@ -47,9 +47,15 @@ NONSHARABLE_CLASS( DISICommunicationManager ) : public DBase, public MISIRouterO
         */
         void Receive( const TDesC8& aMessage );
 
+    private:
+
         void SendNameAddReqs();
         
-        void SendPNSSubscribeResp( const TDesC8& aMessage );
+        void SendPnsSubscribeResp( const TDesC8& aMessage );
+        
+        void SendCommServiceNotIdentifiedResp( const TDesC8& aMessage );
+        
+        void SendCommIsiVersionGetResp( const TDesC8& aMessage );
         
     private:
 
@@ -62,6 +68,7 @@ NONSHARABLE_CLASS( DISICommunicationManager ) : public DBase, public MISIRouterO
         TUint8                 iObjId;
         // Not owned
         MISIObjectRouterIf*    iRouter;
+        TUint8                 iBootMsgCount;
         
     };
 

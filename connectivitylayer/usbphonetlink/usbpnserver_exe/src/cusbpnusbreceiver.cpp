@@ -36,16 +36,6 @@
 #include <iscnokiadefinitions.h>    // For APE Test Server channel ID
 #endif /* NCP_COMMON_BRIDGE_FAMILY */
 
-// EXTERNAL DATA STRUCTURES
-// EXTERNAL FUNCTION PROTOTYPES
-// CONSTANTS
-// MACROS
-// LOCAL CONSTANTS AND MACROS
-// MODULE DATA STRUCTURES
-// LOCAL FUNCTION PROTOTYPES
-// FORWARD DECLARATIONS
-
-// ============================= LOCAL FUNCTIONS ===============================
 // ============================ MEMBER FUNCTIONS ===============================
 
 // -----------------------------------------------------------------------------
@@ -57,8 +47,8 @@
 CUsbPnUsbReceiver::CUsbPnUsbReceiver( RDevUsbcClient& aLdd )
     :CActive( CActive::EPriorityStandard )
     , iLdd( aLdd )
-    , iRecvPtr(0,0)
-    , iStorage(0)
+    , iRecvPtr( NULL, NULL )
+    , iStorage( NULL )
     {
     OstTrace1( TRACE_NORMAL, CUSBPNUSBRECEIVER_CUSBPNUSBRECEIVER_ENTRY, "CUsbPnUsbReceiver::CUsbPnUsbReceiver;aLdd=%x", ( TUint )&( aLdd ) );
     C_TRACE( ( _T( "CUsbPnUsbReceiver::CUsbPnUsbReceiver( aLdd:0x%x )" ), &aLdd ) );
@@ -118,8 +108,8 @@ CUsbPnUsbReceiver::~CUsbPnUsbReceiver()
         {
         delete iIsaSender;
         }
-
-    iPacket = 0;
+    iIsaSender = NULL;
+    iPacket = NULL;
 
     if( iStorage )
         {
@@ -134,8 +124,6 @@ CUsbPnUsbReceiver::~CUsbPnUsbReceiver()
 
 // -----------------------------------------------------------------------------
 // CUsbPnUsbReceiver::DoCancel
-// ?implementation_description
-// (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
 void CUsbPnUsbReceiver::DoCancel( )
@@ -155,8 +143,6 @@ void CUsbPnUsbReceiver::DoCancel( )
 
 // -----------------------------------------------------------------------------
 // CUsbPnUsbReceiver::RunL
-// ?implementation_description
-// (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
 void CUsbPnUsbReceiver::RunL( )
@@ -168,12 +154,10 @@ void CUsbPnUsbReceiver::RunL( )
     ConstructMessageL();
     if( iMessageComplete )
         {
-        iIsaSender->Send( *iPacket );
-        iMessageComplete = EFalse;
-        iByteCount = 0;
-        iMessageLength = 0;
-
-        // Start fresh receive
+        iIsaSender->AddPacketToSendingQueue( *iPacket );
+        SetMessageComplete( EFalse );
+        SetByteCount( NULL );
+        SetMessageLength( NULL );
         Receive( ETrue );
         }
 
@@ -182,9 +166,44 @@ void CUsbPnUsbReceiver::RunL( )
     }
 
 // -----------------------------------------------------------------------------
+// CUsbPnUsbReceiver::SetMessageComplete
+// -----------------------------------------------------------------------------
+void CUsbPnUsbReceiver::SetMessageComplete( const TBool aMsgComplete )
+    {
+    OstTrace1( TRACE_API, CUSBPNUSBRECEIVER_SETMESSAGECOMPLETE_ENTRY, "CUsbPnUsbReceiver::SetMessageComplete;aMsgComplete:%d", aMsgComplete );
+    A_TRACE( ( _T( "CUsbPnUsbReceiver::SetMessageComplete() aMsgComplete:%d" ), aMsgComplete ) );
+    iMessageComplete = aMsgComplete;
+    OstTrace0( TRACE_API, CUSBPNUSBRECEIVER_SETMESSAGECOMPLETE_EXIT, "CUsbPnUsbReceiver::SetMessageComplete - return void" );
+    A_TRACE( ( _T( "CUsbPnUsbReceiver::SetMessageComplete() - return void" ) ) );
+    }
+
+// -----------------------------------------------------------------------------
+// CUsbPnUsbReceiver::SetByteCount
+// -----------------------------------------------------------------------------
+void CUsbPnUsbReceiver::SetByteCount( const TUint aByteCount )
+    {
+    OstTrace1( TRACE_API, CUSBPNUSBRECEIVER_SETBYTECOUNT_ENTRY, "CUsbPnUsbReceiver::SetByteCount;aByteCount:%d", aByteCount );
+    A_TRACE( ( _T( "CUsbPnUsbReceiver::SetByteCount() aByteCount:%d" ), aByteCount ) );
+    iByteCount = aByteCount;
+    OstTrace0( TRACE_API, CUSBPNUSBRECEIVER_SETBYTECOUNT_EXIT, "CUsbPnUsbReceiver::SetByteCount - return void" );
+    A_TRACE( ( _T( "CUsbPnUsbReceiver::SetByteCount() - return void" ) ) );
+    }
+
+
+// -----------------------------------------------------------------------------
+// CUsbPnUsbReceiver::SetMessageLength
+// -----------------------------------------------------------------------------
+void CUsbPnUsbReceiver::SetMessageLength( const TUint aMessageLength )
+    {
+    OstTrace1( TRACE_API, CUSBPNUSBRECEIVER_SetMessageLength_ENTRY, "CUsbPnUsbReceiver::SetMessageLength;aMessageLength:%d", aMessageLength );
+    A_TRACE( ( _T( "CUsbPnUsbReceiver::SetMessageLength() aMessageLength:%d" ), aMessageLength ) );
+    iMessageLength = aMessageLength;
+    OstTrace0( TRACE_API, CUSBPNUSBRECEIVER_SetMessageLength_EXIT, "CUsbPnUsbReceiver::SetMessageLength - return void" );
+    A_TRACE( ( _T( "CUsbPnUsbReceiver::SetMessageLength() - return void" ) ) );
+    }
+
+// -----------------------------------------------------------------------------
 // CUsbPnUsbReceiver::RunError
-// ?implementation_description
-// (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
 TInt CUsbPnUsbReceiver::RunError( TInt aError )
@@ -209,29 +228,26 @@ TInt CUsbPnUsbReceiver::RunError( TInt aError )
             {
             OstTrace0( TRACE_NORMAL, CUSBPNUSBRECEIVER_RUNERROR, "CUsbPnUsbReceiver::RunError - Cable detached!" );
             C_TRACE( ( _T( "CUsbPnUsbReceiver::RunError - Cable detached!" )));
-            aError = KErrNone;
             break;
             }
         default:
             {
-            TRACE_ASSERT_ALWAYS;  // Log the errorcase.
-            aError = KErrNone; // Ignore error..
+            TRACE_ASSERT_ALWAYS;
+            User::Panic( KUsbPnPanicCat, aError );
             break;
             }
         }
 
     OstTrace0( TRACE_NORMAL, CUSBPNUSBRECEIVER_RUNERROR_EXIT, "CUsbPnUsbReceiver::RunError - return" );
     C_TRACE( ( _T( "CUsbPnUsbReceiver::RunL() - return" ) ) );
-    return aError;
+    return KErrNone;
     }
 
 // -----------------------------------------------------------------------------
 // CUsbPnUsbReceiver::Receive
-// ?implementation_description
-// (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void CUsbPnUsbReceiver::Receive( TBool /*aForward*/ )
+void CUsbPnUsbReceiver::Receive( TBool )
     {
     OstTrace0( TRACE_NORMAL, CUSBPNUSBRECEIVER_RECEIVE_ENTRY, "CUsbPnUsbReceiver::Receive" );
     C_TRACE( ( _T( "CUsbPnUsbReceiver::Receive()" )) );
@@ -241,7 +257,7 @@ void CUsbPnUsbReceiver::Receive( TBool /*aForward*/ )
         {
         if(!IsActive())
             {
-            TRAPD( err, iPacket = &iIsaSender->PacketL() );
+            TRAPD( err, iPacket = &iIsaSender->GetNextPacketL() );
             if(!err)
                 {
                 iRecvPtr.Set( iPacket->Buffer().Des() );
@@ -252,7 +268,6 @@ void CUsbPnUsbReceiver::Receive( TBool /*aForward*/ )
                 }
             else
                 {
-                // No free packets so receiving not activated until sender
                 OstTrace0( TRACE_NORMAL, CUSBPNUSBRECEIVER_RECEIVE_DUP1, "CUsbPnUsbReceiver::Receive - Sender tells when to continue" );
                 C_TRACE( ( _T( "CUsbPnUsbReceiver::Receive - Sender tells when to continue" )) );
                 }
@@ -265,8 +280,6 @@ void CUsbPnUsbReceiver::Receive( TBool /*aForward*/ )
 
 // -----------------------------------------------------------------------------
 // CUsbPnUsbReceiver::IsaSender
-// ?implementation_description
-// (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
 MUsbPnControlObserver* CUsbPnUsbReceiver::IsaSender()
@@ -280,8 +293,6 @@ MUsbPnControlObserver* CUsbPnUsbReceiver::IsaSender()
     }
 // -----------------------------------------------------------------------------
 // CUsbPnUsbReceiver::SetEnumerated
-// ?implementation_description
-// (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
 void CUsbPnUsbReceiver::SetEnumerated( TBool aState )
@@ -316,7 +327,7 @@ void CUsbPnUsbReceiver::ConstructMessageL()
         TUint16 lsb(iRecvPtr[ISI_HEADER_OFFSET_LENGTH +1]);
         TUint16 msb(iRecvPtr[ISI_HEADER_OFFSET_LENGTH]);
 
-        iMessageLength = (lsb | (msb<<8));
+        iMessageLength = ( lsb | ( msb<<8 ) );
 
         OstTrace1( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP1, "CUsbPnUsbReceiver::ConstructMessageL;iMessageLength=%d", iMessageLength );
         E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - iMessageLength:%d" ), iMessageLength ) );
@@ -329,11 +340,9 @@ void CUsbPnUsbReceiver::ConstructMessageL()
 
             if( ( PN_HEADER_SIZE + iMessageLength ) > packetLength )
                 {
-                // realloc
                 OstTrace0( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP3, "CUsbPnUsbReceiver::ConstructMessageL - partial message. Receive more" );
                 E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - partial message. Receive more")));
 
-                // Alloc temporary buffer to store data
                 iStorage = HBufC8::NewL( iMessageLength + PN_HEADER_SIZE );
                 TPtr8 tmp( iStorage->Des() );
                 tmp.Append( iPacket->Buffer() );
@@ -351,15 +360,14 @@ void CUsbPnUsbReceiver::ConstructMessageL()
         tmp.Append( iPacket->Buffer() );
         }
 
-    // Ready to be sent?
-    if( iByteCount == iMessageLength + PN_HEADER_SIZE )
+    // message ready to be sent
+    if( iByteCount == ( iMessageLength + PN_HEADER_SIZE ) )
         {
         OstTrace0( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP5, "CUsbPnUsbReceiver::ConstructMessageL - message complete" );
         E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - message complete")));
 
         if( iByteCount > KPnPacketSize )
             {
-            // Realloc iPacket's buffer with needed length
             OstTrace0( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP6, "CUsbPnUsbReceiver::ConstructMessageL - realloc for whole message" );
             E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - realloc for whole message")));
             iPacket->ReallocBufferL( iMessageLength + PN_HEADER_SIZE );
@@ -376,31 +384,17 @@ void CUsbPnUsbReceiver::ConstructMessageL()
         iRecvPtr[ISI_HEADER_OFFSET_LENGTH +1] = tmp4;
 
 #ifndef NCP_COMMON_BRIDGE_FAMILY
-        // Message directly to APE Test Server. Rare labeling case for optimized performance
+        // Message directly to APE Test Server.
         if( (iRecvPtr[ISI_HEADER_OFFSET_RESOURCEID] == PN_EPOC_TEST) &&
             (iRecvPtr[ISI_HEADER_OFFSET_MESSAGEID] == TS_SOS_FILE_WRITE_REQ ) )
             {
             OstTrace0( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP7, "CUsbPnUsbReceiver::ConstructMessageL - Message to APE Test Server" );
             E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - Message to APE Test Server")));
 
-            // Set Receiver device
-            //TUint8 recvDev = iRecvPtr[ISI_HEADER_OFFSET_RECEIVERDEVICE] & 0x03;
-            //iRecvPtr[ISI_HEADER_OFFSET_RECEIVERDEVICE] = (recvDev | (PN_DEV_SOS & 0xFC));
-
             iRecvPtr[ISI_HEADER_OFFSET_RECEIVERDEVICE] = PN_DEV_SOS;
-
-            // Set Receiver Object ID
-            TUint8 objIdHighBits = (EIscNokiaTest >> 8) & 0x03;
-            TUint8 objIdLowBits = (EIscNokiaTest & 0x00ff);
-
-            TUint8 receiverDevice( (iRecvPtr[ISI_HEADER_OFFSET_RECEIVERDEVICE] ) & 0xFC );
-
-            receiverDevice = (receiverDevice | objIdHighBits);
-            iRecvPtr[ISI_HEADER_OFFSET_RECEIVERDEVICE] = receiverDevice;
-
-            iRecvPtr[ISI_HEADER_OFFSET_RECEIVEROBJECT] = objIdLowBits;
+            iRecvPtr[ISI_HEADER_OFFSET_RECEIVEROBJECT] = EIscNokiaTest;
             }
-#endif /* NCP_COMMON_BRIDGE_FAMILY */
+#endif // NCP_COMMON_BRIDGE_FAMILY 
 
         iMessageComplete = ETrue;
         }
@@ -417,7 +411,7 @@ void CUsbPnUsbReceiver::ConstructMessageL()
 
     OstTrace0( TRACE_NORMAL, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_EXIT, "CUsbPnUsbReceiver::ConstructMessageL - return void" );
     C_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage() - return void" ) ) );
-    }
+}    
 
 // ========================== OTHER EXPORTED FUNCTIONS =========================
 

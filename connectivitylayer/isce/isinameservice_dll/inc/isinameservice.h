@@ -28,7 +28,7 @@ class DNameRecords;
 /*
 * ISI router.
 */
-NONSHARABLE_CLASS( DISINameService ) : public DBase, public MISIRouterObjectIf, MISICommunicationManagerIf
+NONSHARABLE_CLASS( DISINameService ) : public DBase, public MISIRouterObjectIf, public MISICommunicationManagerIf
     {
 
     public:
@@ -63,12 +63,17 @@ NONSHARABLE_CLASS( DISINameService ) : public DBase, public MISIRouterObjectIf, 
         */
         void BuildAndSendCommIsaEntityNotReachableResp( const TDesC8& aMsg );
 
+        static DISINameService* iThisptr;
+
+        static DMutex*      iNameServiceMutex;
+
+        DNameRecords*       iNameRecords;
+
     private:
 
         MISIObjectRouterIf* iRouter;
         TUint8              iObjId;
-        DNameRecords*       iNameRecords;
-        static DMutex*      iNameServiceMutex;
+        
 
     };
 

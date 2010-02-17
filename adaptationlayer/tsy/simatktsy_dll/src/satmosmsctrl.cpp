@@ -45,6 +45,7 @@ const TUint8 KMaxLengthOfResourceReq    = 255;
 const TUint8 KSmControlAllowed          = 0;
 const TUint8 KSmControlNotAllowed       = 1;
 const TUint8 KSmControlAllowedWithModif = 2;
+const TUint8 KSmsSubmitAddrDataIndex    = 3;
 
 // ==================== MEMBER FUNCTIONS ====================================
 
@@ -565,9 +566,14 @@ TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceived, Send envelope");
 OstTrace0( TRACE_NORMAL, DUP3_CSATMOSMSCTRL_SMSRESOURCEINDRECEIVED, "CSatMoSmsCtrl::SmsResourceIndReceived, Send envelope" );
 
             // The envelope is sent if MO SMS is activated
+            // iAddressSubblock is not sent as it's received
+            // from SMS server because of iAddressSubblock's first
+            // byte is length of the address data and MO SMS Control envelope
+            // is NOT allowed to contain that in address data. So length
+            // field is skipped
             SendMoSmsCtrlEnvelope(
                 iMoSmsCtrlEnvelopeTransactionId,
-                iAddressSubblock,
+                iAddressSubblock.Mid( 1, iAddressSubblock.Length() - 1 ),
                 addressData2
                 );
             }
@@ -886,12 +892,12 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
         const TDes8& address2
         )
     {
+    TFLOGSTRING("TSY: CSatMoSmsCtrl::FormSmsResourceReqSb");
     // First three mandatory subblocks
     TIsiSubBlock resource( data, SMS_SB_RESOURCE ,
         EIsiSubBlockTypeId16Len16 );    // Message ID and Subblock length
     data.Append( iResourceId >> 8 );      // SMS resource IDs MSB same as received in indication
     data.Append( iResourceId );           // SMS resource IDs LSB
-    data.AppendFill( KPadding, 2 );       // Filler Bytes
     resource.CompleteSubBlock();
 
     // Add Sequence ID subblock
@@ -899,7 +905,6 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
     TIsiSubBlock resourceSeqId( data, SMS_SB_RESOURCE_SEQ_ID ,
         EIsiSubBlockTypeId16Len16 );
     data.Append( iSequenceId );           // Sequence ID same as received in indication message
-    data.AppendFill( KPadding, 3 );
     resourceSeqId.CompleteSubBlock();
 
     // Add Resource Status subblock
@@ -907,7 +912,6 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
     TIsiSubBlock resourceStatus( data, SMS_SB_RESOURCE_STATUS ,
         EIsiSubBlockTypeId16Len16 );
     data.Append( status );                // Resource status
-    data.AppendFill( KPadding, 3 );
     resourceStatus.CompleteSubBlock();
 
     if(iIsMoSmsCtrlActivated)
@@ -919,65 +923,50 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
               data[1]++;
               // Copy address subblocks from Indication message
               // Add Address Subblock
-              TIsiSubBlock address( data, SMS_SB_ADDRESS ,
-              EIsiSubBlockTypeId16Len16 );
+              TIsiSubBlock address( 
+                  data, 
+                  SMS_SB_ADDRESS ,
+                  EIsiSubBlockTypeId16Len16 );
               data.Append( SMS_SMSC_ADDRESS );            // Address type
               data.Append( iAddressSubblock.Length() );     // Address data length
               data.Append( iAddressSubblock );
               // Filler Bytes calculation
-              TUint8 fillbytes = 0;
-              if((6 + iAddressSubblock.Length())%4)
-                  fillbytes = 4 - (( 6 + iAddressSubblock.Length())%4 );
-
-              data.AppendFill( KPadding,fillbytes );
               address.CompleteSubBlock();
 
               // increment subblock
               data[1]++;
               // Add User Data Subblock
-              TIsiSubBlock userData( data, SMS_SB_TPDU ,
+              TIsiSubBlock userData( 
+                  data, 
+                  SMS_SB_TPDU ,
                   EIsiSubBlockTypeId16Len16 );
               data.Append( iUserDataSubblock.Length() );        // data Length
               data.Append( KPadding );        // Filler Byte
               data.Append( iUserDataSubblock ); // Data Bytes
-
-              // Filler Bytes calculation
-              fillbytes = 0;
-              if((6 + iUserDataSubblock.Length())%4)
-                  fillbytes = 4-(( 6 + iUserDataSubblock.Length())%4 );
-
-              data.AppendFill( KPadding,fillbytes );
               userData.CompleteSubBlock();
-
               }
         else
               {
               // when resource is allowed with modification
               // then copy SIM data in address subblock
-              TUint8 fillBytes = 0;
               if ( address1.Length() )
                   {
                   // Add Address subblock
                   data[1]++;          // increase no of subblocks
 
-                  TIsiSubBlock address( data, SMS_SB_ADDRESS ,
+                  TIsiSubBlock address( 
+                      data, 
+                      SMS_SB_ADDRESS ,
                       EIsiSubBlockTypeId16Len16 );
                   data.Append(SMS_SMSC_ADDRESS);            // Address Type
 
-                  // Calculate needed number of filler bytes
-                  while ( ( fillBytes + 6 + address1.Length() ) % 4 )
-                      {
-                      fillBytes++;
-                      }
                   // Data in bytes
                   // First byte is the address length in 3GPP, GSM_0411 format
-                  // "data length in bytes, including TON & NPI"
-                  data.Append( address1.Length() );
-                  // Actual address data
-                  data.Append( address1 );
-                  // Filler bytes
-                  data.AppendFill( KPadding, fillBytes );
-
+                  // "data length in bytes, including TON & NPI".
+                  data.Append( address1.Length() + 1 );
+                  // Actual address data. 
+                  data.Append( address1.Length());
+                  data.Append( address1 ); 
                   address.CompleteSubBlock();
                   }       // end of Service centre Address Subblock
 
@@ -988,18 +977,10 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
                       data[1]++;
 
                       // For User Data Subblock
-                      TIsiSubBlock userDataSb( data, SMS_SB_TPDU,
+                      TIsiSubBlock userDataSb( 
+                          data, 
+                          SMS_SB_TPDU,
                           EIsiSubBlockTypeId16Len16 );
-
-                      // Calculate needed number of filler bytes
-                      fillBytes = 0;
-                      while ( ( fillBytes + 6 + address2.Length() ) % 4 )
-                          {
-                          fillBytes++;
-                          }
-
-                      data.Append( fillBytes + 6 + address2.Length() );        // Data length
-                      data.Append( KPadding );                  // Filler Byte
 
                       // Check what type of TPDU to be sent
                       switch( iMessageType )
@@ -1037,47 +1018,54 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
                                   {
                                   iUserDataSubblock[i+6] = address2[i];
                                   }
-                           break;
-                              }
+                               break;
+                               }
                           case KSmsSubmitType:
                               {
-                               // Data in bytes
-                               // First byte is the address length in 3GPP, GSM_0340 format
-                               // "number of useful semioctets ( = digits ), excluding TON & NPI "
-                               if ( 1 == address2.Length() ||
-                                  ( 1 < address2.Length() &&
-                                  ( KReservedTonNpi1 == address2[0]
-                                  || KReservedTonNpi2 == address2[0] ) )
-                                  )
-                                   {
-                                   // Only Ton&Npi is present
-                                   // or TON6NPI has a reserved value
-                                   iUserDataSubblock[3] = 0x00;
-                                   }
-                               else if ( 0xF0 == ( address2[address2.Length() - 1] & 0xF0 ) )
-                                       {
-                                       // Odd length destination address
-                                       // Destination address lenght ( in semioctets )
-                                       iUserDataSubblock[2] = ( ( address2.Length() * 2 ) - 1 );
-                                       }
-                                    else
-                                       {
-                                       // Even length destination address
-                                       iUserDataSubblock[2] = ( address2.Length() * 2 );
-                                       }
-                               for(TUint8 i = 0; i<address2.Length(); i++)
-                               {
-                                    iUserDataSubblock[i+3] = address2[i];
-                               }
-                               break;
+                              TUint8 oldAddrLen( ( iUserDataSubblock[ 2 ] + 1 ) / 2 );
+                              // Data in bytes
+                              // First byte is the address length in 3GPP, GSM_0340 format
+                              // "number of useful semioctets ( = digits ), excluding TON & NPI "
+                              if ( 1 == address2.Length() ||
+                                 ( 1 < address2.Length() &&
+                                 ( KReservedTonNpi1 == address2[0]
+                                 || KReservedTonNpi2 == address2[0] ) )
+                                 )
+                                  {
+                                  // Only Ton&Npi is present
+                                  // or TON6NPI has a reserved value
+                                  iUserDataSubblock[3] = 0x00;
+                                  }
+                              else if ( 0xF0 == ( address2[address2.Length() - 1] & 0xF0 ) )
+                                  {
+                                  // Odd length destination address
+                                  // Destination address lenght ( in semioctets )
+                                  iUserDataSubblock[2] = ( ( ( address2.Length() - 1 ) * 2 ) - 1 );
+                                  }
+                              else
+                                  {
+                                  // Even length destination address
+                                  iUserDataSubblock[2]  = ( ( address2.Length() - 1 ) * 2 );
+                                  }
+
+                              // old addresss needs to be deleted before new one can be inserted
+                              // to the tpdu
+                              iUserDataSubblock.Delete( 
+                                  KSmsSubmitAddrDataIndex, 
+                                  oldAddrLen + 1 );
+                              iUserDataSubblock.Insert( 
+                                  KSmsSubmitAddrDataIndex,
+                                  address2 );
+                              break;
                               }
                           default:
                               {
                               break;
                               }
                           }
-                      data.Append(iUserDataSubblock);
-
+                      data.Append( iUserDataSubblock.Length() );
+                      data.Append( KPadding );           // Filler Byte
+                      data.Append( iUserDataSubblock );
                       userDataSb.CompleteSubBlock();
                       }
               }
@@ -1085,11 +1073,12 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
             {
             // Add SMS_SB_CAUSE subblock
             data[1]++;           //Increment no of subblocks
-            TIsiSubBlock cause( data, SMS_SB_CAUSE ,
-            EIsiSubBlockTypeId16Len16 );
+            TIsiSubBlock cause( 
+                data, 
+                SMS_SB_CAUSE ,
+                EIsiSubBlockTypeId16Len16 );
             data.Append( SMS_CAUSE_TYPE_COMMON );            // Cause type
             data.Append( SMS_ERR_ROUTE_NOT_ALLOWED );    // Cause
-            data.AppendFill( KPadding, 2 );
             cause.CompleteSubBlock();
             }
         }

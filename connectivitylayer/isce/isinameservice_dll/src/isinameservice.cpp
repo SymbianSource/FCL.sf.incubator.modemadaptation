@@ -24,8 +24,12 @@
 #include <phonetisi.h>            // For ISI_HEADER_SIZE
 #include <pn_const.h>             // For PN_NAMESERVICE
 #include <nsisi.h>                // For PN
-#include "misiobjectrouterif.h"   // For MISIObjectRouterIf
+
+#ifdef INTERNAL_FLAG_ISI_ROUTER_IN_USE
+#include "isihelpers.h"           // For SET_RECEIVER_OBJ...
+#else
 #include "iadhelpers.h"           // For SET_RECEIVER_OBJ...
+#endif
 #include "namerecords.h"          // For DNameRecords
 #include <iscnokiadefinitions.h>  // For THIS_DEVICE
 #include <commisi.h>              // For SIZE_COMMON_MESSAGE_COMM_ISA_ENTITY_NOT_REACHABLE_RESP
@@ -96,6 +100,7 @@ enum TISINameServiceFaults
 const TUint32 KNameServiceUID( 0x2002A5A1 );
 const TUint8 KFiller( 0 );
 
+DISINameService* DISINameService::iThisptr = NULL;
 DMutex* DISINameService::iNameServiceMutex = NULL;
 _LIT8( KNameServiceMutex, "KNameServiceMutex" );
 
@@ -177,16 +182,13 @@ void DISINameService::Receive( const TDesC8& aMessage )
     Kern::MutexSignal( *iNameServiceMutex );
     C_TRACE( ( _T( "DISINameService::DISINameService<" ) ) );
     }
-
 void DISINameService::HandleNameQueryResp( const TDesC8& aMessage, const TUint8* msgPtr )
     {
     C_TRACE( ( _T( "DISINameService::HandleNameQueryResp>" ) ) );
     TUint32 name = GETB32( &msgPtr[ ISI_HEADER_SIZE + PNS_NAME_QUERY_REQ_OFFSET_NAME ] );
     TUint32 mask = GETB32( &msgPtr[ ISI_HEADER_SIZE + PNS_NAME_QUERY_REQ_OFFSET_BITMASK ] );
-
     RArray <TNameTable*> nameTable;
     TInt32 count = iNameRecords->NameQuery( name, mask, &nameTable );
-
     TUint16 msgLength = ( SIZE_PNS_NAME_QUERY_RESP + ( count * SIZE_PN_NAME_SRV_ITEM_STR ) );
     TDes8& respMsg = MemApi::AllocBlock( msgLength );
     respMsg.SetLength( msgLength );
@@ -312,15 +314,7 @@ void DISINameService::HandlePNSNameMessage( const TDesC8& aMessage )
         case PNS_NAME_QUERY_REQ:
             {
             C_TRACE( ( _T( "DISINameService PNS_NAME_QUERY_REQ>" ) ) );
-//            if( msgPtr[ ISI_HEADER_OFFSET_SENDERDEVICE ] == THIS_DEVICE )
-//                {
-                C_TRACE( ( _T( "DISINameService PNS_NAME_QUERY_RESP>" ) ) );
-                HandleNameQueryResp( aMessage, msgPtr );
-//                }
-//            else
-//                {
-//                C_TRACE( ( _T( "DISINameService::HandlePNSNameMessage PNS_NAME_QUERY_REQ from other device, ignore" ) ) );
-//                }
+            HandleNameQueryResp( aMessage, msgPtr );
             C_TRACE( ( _T( "DISINameService PNS_NAME_QUERY_REQ<" ) ) );
             break;
             }
@@ -351,18 +345,12 @@ void DISINameService::HandlePNSNameMessage( const TDesC8& aMessage )
                 TUint8 flags = msgPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_REQ_OFFSET_NAMEENTRY + PN_NAME_SRV_ITEM_STR_OFFSET_FLAGS ];
                 err = iNameRecords->AddName( name, phonetAddr, flags );
                 respPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_RESP_OFFSET_REASON ] = err;
-                for( TInt i( 0 ); i < respMsg.Length(); i++ )
-                    {
-                    C_TRACE( ( _T( "PNS_NAME_ADD_RESP index[ %d ] data 0x%x"), i, respMsg.Ptr()[i] ) );
-                    }
                 iRouter->Send( respMsg, iObjId );
                 C_TRACE( ( _T( "DISINameService PNS_NAME_ADD_RESP from this device<" ) ) );
                 if( err == PN_NAME_OK )
                     {
                     C_TRACE( ( _T( "DISINameService PNS_NAME_ADD_IND>" ) ) );
-                    RArray <TNameTable*>* nameTable = NULL;
-                    nameTable = iNameRecords->GetNameTable();
-                    msgLength = ( SIZE_PNS_NAME_ADD_IND + ( SIZE_PN_NAME_SRV_ITEM_STR * nameTable->Count() ) );
+                    msgLength = ( SIZE_PNS_NAME_ADD_IND + ( SIZE_PN_NAME_SRV_ITEM_STR ) );
                     TDes8& indMsg = MemApi::AllocBlock( msgLength );
                     indMsg.SetLength( msgLength );
                     TUint8* indPtr = const_cast<TUint8*>( indMsg.Ptr() );
@@ -385,10 +373,6 @@ void DISINameService::HandlePNSNameMessage( const TDesC8& aMessage )
                     PUTB16( &indPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL + PN_NAME_SRV_ITEM_STR_OFFSET_DEV ], phonetAddr );
                     indPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL + PN_NAME_SRV_ITEM_STR_OFFSET_FLAGS ] = flags;
                     indPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL + PN_NAME_SRV_ITEM_STR_OFFSET_RESERVED ] = KFiller;
-                    for( TInt i( 0 ); i < indMsg.Length(); i++ )
-                        {
-                        C_TRACE( ( _T( "PNS_NAME_ADD_IND index[ %d ] data 0x%x"), i, indMsg.Ptr()[i] ) );
-                        }
                     iRouter->Send( indMsg, iObjId );
                     C_TRACE( ( _T( "DISINameService PNS_NAME_ADD_IND<" ) ) );
                     }
@@ -397,10 +381,6 @@ void DISINameService::HandlePNSNameMessage( const TDesC8& aMessage )
                 {
                 C_TRACE( ( _T( "DISINameService PNS_NAME_ADD_REQ from other device>" ) ) );
                 respPtr[ ISI_HEADER_SIZE + PNS_NAME_ADD_RESP_OFFSET_REASON ] = PN_NAME_NOT_ALLOWED;
-                for( TInt i( 0 ); i < respMsg.Length(); i++ )
-                    {
-                    C_TRACE( ( _T( "PNS_NAME_ADD_RESP index[ %d ] data 0x%x"), i, respMsg.Ptr()[i] ) );
-                    }
                 iRouter->Send( respMsg, iObjId );
                 C_TRACE( ( _T( "DISINameService PNS_NAME_ADD_RESP from other device<" ) ) );
                 }
@@ -426,16 +406,27 @@ void DISINameService::HandlePNSNameMessage( const TDesC8& aMessage )
     }
 
 
-EXPORT_C TBool DISINameService::IsValidResource(
+EXPORT_C TBool MISICommunicationManagerIf::IsValidResource(
         const TDesC8& aMessage
         )
     {
-    TInt err( Kern::MutexWait( *iNameServiceMutex ) );
-    ASSERT_RESET_ALWAYS( ( KErrNone == err ), ( EISINameServiceMutexWaitFailed | EDISINameServiceTraceId << KClassIdentifierShift ) );
     C_TRACE( ( _T( "DISINameService::IsValidResource 0x%x>" ), &aMessage ) );
-    C_TRACE( ( _T( "DISINameService::IsValidResource 0x%x<" ), &aMessage ) );
-    Kern::MutexSignal( *iNameServiceMutex );
-    return ETrue;
+    TInt err( Kern::MutexWait( *DISINameService::iThisptr->iNameServiceMutex ) );
+    ASSERT_RESET_ALWAYS( ( KErrNone == err ), ( EISINameServiceMutexWaitFailed | EDISINameServiceTraceId << KClassIdentifierShift ) );
+    TUint8* msgPtr = const_cast<TUint8*>( aMessage.Ptr() );
+    TUint16 phonetAddress( 0 );
+    DISINameService::iThisptr->iNameRecords->LookupPhonetAddress( msgPtr[ ISI_HEADER_OFFSET_RESOURCEID ], &phonetAddress );
+    Kern::MutexSignal( *DISINameService::iThisptr->iNameServiceMutex );
+    if( phonetAddress == GET_SENDER_OBJ( aMessage ) )
+        {
+        C_TRACE( ( _T( "DISINameService::IsValidResource phonetAddress found 0x%x" ), phonetAddress ) );
+        return ETrue;
+        }
+    else
+        {
+        C_TRACE( ( _T( "DISINameService::IsValidResource phonetAddress not found 0x%x" ), phonetAddress ) );
+        return EFalse;
+        }
     }
 
 
@@ -445,6 +436,7 @@ DECLARE_STANDARD_EXTENSION()
     // Create a container extension
     DISINameService* extension = new DISINameService();
     TRACE_ASSERT( extension );
+    DISINameService::iThisptr = static_cast< DISINameService* >( extension );
     Kern::Printf( "ISI Name Service extension<" );
     return extension ? KErrNone : KErrNoMemory;
     }
@@ -494,7 +486,6 @@ void DISINameService::BuildAndSendCommIsaEntityNotReachableResp(
 
     TDes8* block = reinterpret_cast<TDes8*>( const_cast<TDesC8*>(&aMsg) );
     MemApi::DeallocBlock( *block );
-
     C_TRACE( ( _T( "DISINameService::SendCommIsaEntityNotReachableResp 0x%x <-" ), &aMsg ) );
     }
 

@@ -114,6 +114,23 @@ class CUsbPnUsbReceiver : public CActive, public MUsbPnBufferListener
         */
         void ConstructMessageL();
 
+        /**
+        * Set message complete flag
+        * @param aMsgComplete ETrue says message constructed
+        */
+        void SetMessageComplete( const TBool aMsgComplete );
+
+        /**
+        * Set message byte count
+        * @param aByteCount counts packet bytes. Append to previous if next msg
+        */
+        void SetByteCount( const TUint aByteCount );
+
+        /**
+        * Set message length
+        * @param aMessageLength ISI msg length  
+        */
+        void SetMessageLength( const TUint aMessageLength );
 
     private:    // Data
 

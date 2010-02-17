@@ -28,7 +28,7 @@ class MISIObjectRouterIf;
 NONSHARABLE_CLASS( DISIIndicationHandler ) : public DBase
     {
 
-    public:
+    private:
 
         class TDeviceIdLink
             {
@@ -60,7 +60,9 @@ NONSHARABLE_CLASS( DISIIndicationHandler ) : public DBase
                 TUint8      iObjId;
                 SDblQueLink iSubscriberLink;
             };
-
+    
+    public:
+    
         /*
         * Constructor
         */
@@ -75,13 +77,15 @@ NONSHARABLE_CLASS( DISIIndicationHandler ) : public DBase
         * Multicast and Subscribe must be called in same DFC thread.
         * If not then take a deep look at synchronization.
         */
-        //void Multicast( TDes8& aIndication );
+        void Multicast( TDes8& aIndication );
 
         /*
         * Multicast and Subscribe must be called in same DFC thread.
         * If not then take a deep look at synchronization.
         */
-        TInt Subscribe( TDes8& aSubscriptionReq );
+        void Subscribe( TDes8& aSubscriptionReq );
+
+
 
     private:
 
@@ -91,7 +95,11 @@ NONSHARABLE_CLASS( DISIIndicationHandler ) : public DBase
 
         void AddServer( TDeviceIdLink& aDeviceLink, const TUint32 aResourceId, const TUint8 aIndication, const TUint16 aObjId );
 
+        void AddServer( TDeviceIdLink& aDeviceLink, const TUint32 aResourceId );
+
         TDeviceIdLink* GetDeviceLink( const TUint8 aDeviceId );
+
+        TDeviceIdLink* GetExternalDeviceLink( const TUint8 aDeviceId );
 
         TServerIdLink* GetServerLink( TDeviceIdLink& aDeviceLink, const TUint32 aResourceId );
 
@@ -103,12 +111,13 @@ NONSHARABLE_CLASS( DISIIndicationHandler ) : public DBase
 
         void RemoveSubscription( const TUint16 aObjId );
 
-        TInt SendSubscription( TDeviceIdLink& aDevice );
+        void SendSubscription( TDeviceIdLink& aDevice );
 
     private:
 
         // Owned
         SDblQue         iDeviceQ;
+        SDblQue         iExternalDeviceQ;
         // Not owned
         MISIObjectRouterIf* iRouter;
 

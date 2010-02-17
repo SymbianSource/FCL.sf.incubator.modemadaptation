@@ -92,7 +92,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONCACHE_CMMPHONEBOOKOPERATIONCA
 CMmPhoneBookOperationCache* CMmPhoneBookOperationCache::NewL
     (
     CMmPhoneBookStoreMessHandler* aMmPhoneBookStoreMessHandler,
-    CMmUiccMessHandler* /*aUiccMessHandler*/,
+    CMmUiccMessHandler* aUiccMessHandler,
     TInt /*aIpc*/,
     const CMmDataPackage* aDataPackage // Data
     )
@@ -115,6 +115,8 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_NEWL, "CMmPhoneBookOperation
     mmPhoneBookOperationCache->iMmPhoneBookStoreMessHandler =
         aMmPhoneBookStoreMessHandler;
 
+    mmPhoneBookOperationCache->iMmUiccMessHandler = aUiccMessHandler;
+    
     return mmPhoneBookOperationCache;
     }
 
@@ -211,7 +213,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMm
         {
         // Convert Phone Book name to file id
         TUint16 fileIdExt ( UICC_ILLEGAL_FILE_ID );
-        TUint16 pbFileId = ConvertToPBfileId( iPhoneBookTypeName, fileIdExt );
+        TUint16 pbFileId = ConvertToPBfileId( iPhoneBookTypeName, fileIdExt,  iMmUiccMessHandler->GetCardType());
         TUint8 pbArrayIndex = ConvertToConfArrayIndex( pbFileId );
         
         switch(pbFileId)
@@ -241,7 +243,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMm
                             // Seperate Entry data form UICC Server response message
                             // Case: <Data available to be filled into array>
                             iMmPhoneBookStoreMessHandler->
-                            iPBStoreConf[EPhonebookTypeAdn].
+                            iPBStoreConf[pbArrayIndex].
                             GetPBEntryFromUICCData( 
                                 aFileData,
                                 iNumberBuf,
@@ -253,7 +255,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMm
                             // Length + 14 , minus 1 is for Array index Calculation 
                             //(it starts from 0)
                             if ( 0xFF == aFileData[iMmPhoneBookStoreMessHandler->
-                                         iPBStoreConf[EPhonebookTypeAdn].
+                                         iPBStoreConf[pbArrayIndex].
                                          iAlphaStringlength + 13]  )
                                 {
                                 // Append Entry to list
@@ -287,7 +289,7 @@ OstTraceExt1( TRACE_NORMAL, DUP6_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "
                                 iExtensionToRead = ETrue;
                                 // Record no to be read from EXT File
                                 TInt recordNo = aFileData[iMmPhoneBookStoreMessHandler->
-                                               iPBStoreConf[EPhonebookTypeAdn].
+                                               iPBStoreConf[pbArrayIndex].
                                                iAlphaStringlength + 13];
                                 
                                 // Append EXT record no.
@@ -457,8 +459,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBook
 
     TInt ret( KErrNone );
     TInt appFileID ( APPL_FILE_ID );   // Application File id for DFphonebook
-    // get the index to be read from phonebook
-    TInt index( iIndexToRead );
 
     TUiccReadLinearFixed cmdParams;
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*> 
@@ -468,45 +468,68 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBook
     cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
     cmdParams.filePath.Append( appFileID>>8);
     cmdParams.filePath.Append( appFileID);
-    cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
+    
+    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
+        {
+        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
+        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
+        }
     
     // Convert Phone Book name to file id
     TUint16 fileIdExt ( 0x0000 );
-    TUint16 pbFileId = ConvertToPBfileId( iPhoneBookTypeName, fileIdExt );
-    
-    // get the corect Location to be read from phone book
-    if( PB_MBDN_FID == pbFileId)
-        {
-        // Index to be read contains two types of information.
-        // The least significant byte contains the profile number
-        // and the most significant byte contains the type.
-        index = index || 0x0100; // Only subscriber profile number 1 is supported
-        }
+    TUint16 pbFileId = ConvertToPBfileId( iPhoneBookTypeName, fileIdExt, iMmUiccMessHandler->GetCardType() );
+    TUint8 pbArrayIndex = ConvertToConfArrayIndex( pbFileId );
 
-        switch( pbFileId )
+    switch( pbFileId )
+        {
+        case PB_ADN_FID:
+        case PB_FDN_FID:
+        case PB_SDN_FID:
             {
-            case PB_ADN_FID:
-                {
-                // For 2G ADN Phonebook EXT1 will be the extension number store
-                cmdParams.trId = static_cast<TUiccTrId> ( aTransId );
-                cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;
-                cmdParams.record = aRecordNo;
+            // For 2G ADN Phonebook EXT1 will be the extension number store
+            cmdParams.trId = static_cast<TUiccTrId> ( aTransId );
+            cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;
+            cmdParams.record = aRecordNo;
                 
-                // Check for Extension Data is Present or not
-                if(!iExtensionToRead)
+            // Check for Extension Data is Present or not
+            if(!iExtensionToRead)
+                {
+                // Check for the record Number to be 
+                //read is valid record number
+                if( iIndexToRead <= iMmPhoneBookStoreMessHandler->
+                        iPBStoreConf[pbArrayIndex].iNoOfRecords)
                     {
-                    // Check for the record Number to be 
-                    //read is valid record number
-                    if( iIndexToRead <= iMmPhoneBookStoreMessHandler->
-                                   iPBStoreConf[EPhonebookTypeAdn].iNoOfRecords)
+                    // Start from first location and Search for First Valid 
+                    //Entry in the Stored List And if some Entry is invalid
+                    // then Read From Sim and Check the Staus its Free 
+                    // or not till end of the records
+                    
+                    cmdParams.fileId = pbFileId;
+                    cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;
+                    cmdParams.record = aRecordNo;
+                    // till End of Record
+                    cmdParams.dataAmount = 0;
+                    // Start from begining of record
+                    cmdParams.dataOffset = 0;
+                    }
+                else
+                    {
+                    ret = KErrNotFound;
+                    }
+                } // end of if case for checking extension data
+            else
+                {
+                // Send Request to Read Extension Data
+                // Check for UST Table supports for EXT File
+                if( iMmPhoneBookStoreMessHandler->
+                        iPBStoreConf[pbArrayIndex].iExtension )
+                    {
+                    // Check for Extension data record in valid
+                    if(iMmPhoneBookStoreMessHandler->
+                            iPBStoreConf[pbArrayIndex].iExtNoOfRec >= aRecordNo)
                         {
-                        // Start from first location and Search for First Valid 
-                        //Entry in the Stored List And if some Entry is invalid
-                        // then Read From Sim and Check the Staus its Free 
-                        // or not till end of the records
-                        
-                        cmdParams.fileId = PB_ADN_FID;
+                        // Read Request to read that index
+                        cmdParams.fileId = fileIdExt;
                         cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;
                         cmdParams.record = aRecordNo;
                         // till End of Record
@@ -516,67 +539,32 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBook
                         }
                     else
                         {
-                        ret = KErrNotFound;
-                        }
-                    } // end of if case for checking extension data
-                else
-                    {
-                    // Send Request to Read Extension Data
-                    // Check for UST Table supports for EXT File
-                    if( iMmPhoneBookStoreMessHandler->
-                        iPBStoreConf[EPhonebookTypeAdn].iExtension )
-                        {
-                        // Check for Extension data record in valid
-                        if(iMmPhoneBookStoreMessHandler->
-                           iPBStoreConf[EPhonebookTypeAdn].iExtNoOfRec > aRecordNo)
-                            {
-                            // Read Request to read that index
-                            cmdParams.fileId = PB_EXT1_FID;
-                            cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;
-                            cmdParams.record = aRecordNo;
-                            // till End of Record
-                            cmdParams.dataAmount = 0;
-                            // Start from begining of record
-                            cmdParams.dataOffset = 0;
-                            }
-                        else
-                            {
-                            ret = KErrGeneral;
-                            }
-                        }
-                    else
-                        {
                         ret = KErrGeneral;
                         }
                     }
-                break;
+                else
+                    {
+                    ret = KErrGeneral;
+                    }
                 }
-            case PB_FDN_FID:
-                {
-                // For FDN Phonebook EXT2 will be the extension number store
-                cmdParams.trId = ETrIdPbReadFdn;
-                cmdParams.fileId = PB_EXT2_FID;
-
-                cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;
-                cmdParams.record = aRecordNo;
                 break;
-                }
-            default:
-                {
+            }
+        default:
+            {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::USimPbReqRead - PhoenBook Not supported");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBookOperationCache::USimPbReqRead - PhoneBook not supported" );
                 break;
-                }
             }
+        }
         
 
-        if( KErrNone == ret )
-            {
-            ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->
-                CreateUiccApplCmdReq( cmdParams );
+    if( KErrNone == ret )
+        {
+        ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->
+        CreateUiccApplCmdReq( cmdParams );
 TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
 OstTraceExt1( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBookOperationCache::USimPbReqRead;ret=%hd", ret );
-            }
+        }
     return ret;
     }
 

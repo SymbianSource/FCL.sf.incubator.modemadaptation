@@ -19,7 +19,6 @@
 #include        <platform_paths.hrh>
 #include        "kernel/kern_ext.mmh"
 
-
 TARGET          isinameservice.dll
 TARGETTYPE      kext
 linkas          isinameservice.dll
@@ -39,6 +38,7 @@ SOURCE          namerecords.cpp
 
 
 USERINCLUDE     ../inc
+USERINCLUDE     ../../isirouter_dll/inc
 USERINCLUDE     ../../isaaccessextension_dll/inc
 USERINCLUDE     ../../memmanager_dll/inc
 

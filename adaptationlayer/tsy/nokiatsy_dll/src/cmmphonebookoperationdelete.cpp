@@ -141,7 +141,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMmPhoneBookOperationDelete_UICCCREATEREQ, "CMm
     iIpc = aIpc;
     iTransId = aTransId;
     // Convert phone book name to file id
-    iFileId = ConvertToPBfileId( iPhoneBookTypeName, iFileIdExt );
+    iFileId = ConvertToPBfileId( iPhoneBookTypeName, iFileIdExt, iMmUiccMessHandler->GetCardType() );
     // Find location from internal array
     iArrayIndex = ConvertToConfArrayIndex( iFileId );
 

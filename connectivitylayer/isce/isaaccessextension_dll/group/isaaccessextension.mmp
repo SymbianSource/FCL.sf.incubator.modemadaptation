@@ -42,7 +42,6 @@ SMPSAFE
 SOURCEPATH      ../src
 SOURCE          isakernelapi.cpp
 SOURCE          iadtrace.cpp
-SOURCE          indicationhandler.cpp
 SOURCE          isaaccessextension.cpp
 SOURCE          isakernelchannel.cpp
 SOURCE          queue.cpp
@@ -61,8 +60,11 @@ USERINCLUDE     ../inc
 USERINCLUDE     ../../ismpmultiplexer_dll/inc
 // ISCE
 USERINCLUDE     ../../memmanager_dll/inc
+USERINCLUDE     ../../isicommunicationmanager_dll/inc
 // ISCE
-
+// ISI
+USERINCLUDE    ../../isirouter_dll/inc
+//ISI
 USERINCLUDE     ../traces
 
 OS_LAYER_SYSTEMINCLUDE

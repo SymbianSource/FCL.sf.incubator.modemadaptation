@@ -65,9 +65,11 @@ SOURCE        cmmphonebookoperationinit3g_adn.cpp
 SOURCE        cmmphonebookoperationread.cpp
 SOURCE        cmmphonebookoperationread3g_adn.cpp
 SOURCE        cmmphonebookoperationcache.cpp
+SOURCE        cmmphonebookoperationcache3g_adn.cpp
 SOURCE        cmmphonebookoperationwrite.cpp
 SOURCE        cmmenstoremesshandler.cpp
 SOURCE        cmmphonebookoperationdelete.cpp
+SOURCE        cmmphonebookoperationwrite3g_adn.cpp
 
 // SMS & other messaging
 SOURCE        cmmsmsmesshandler.cpp

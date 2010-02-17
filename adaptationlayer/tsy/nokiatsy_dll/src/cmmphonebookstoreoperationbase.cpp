@@ -41,7 +41,8 @@
     // None
 
 // CONSTANTS
-//const TUint8 KMinLength = 1;
+const TUint8 KPbrTlvLengthWithSfi( 5 );
+const TUint8 KPbrTlvLengthWithoutSfi( 4 );
 
 
 // MACROS
@@ -160,7 +161,7 @@ const TName& CMmPhoneBookStoreOperationBase::GetPhoneBookName()const
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetPhoneBookName - PhoenbookName");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_GETPHONEBOOKNAME, "CMmPhoneBookStoreOperationBase::GetPhoneBookName - PhoneBookName" );
-    
+
     return iPhoneBookTypeName;
     }
 
@@ -247,7 +248,7 @@ void CMmPhoneBookStoreOperationBase::ConvertPBTypeToPbName(const TUint aPhoneBoo
         case EPhonebookTypeVMBX:
             apbName.Copy(KETelIccVoiceMailBox);
             break;
-            
+
         default:
             break;
         }
@@ -309,7 +310,7 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBTYPE,
 // ---------------------------------------------------------------------------
 //
 TUint16 CMmPhoneBookStoreOperationBase::ConvertToPBfileId(
-    const TName& aPBType, TUint16 &aFileIdExt )
+    const TName& aPBType, TUint16 &aFileIdExt, TUint8 aCardType )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBfileId");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID, "CMmPhoneBookStoreOperationBase::ConvertToPBfileId" );
@@ -348,8 +349,15 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID, "CMmP
         }
     else if ( 0 == aPBType.CompareF( KETelIccMsisdnPhoneBook ) )
         {
+        if( UICC_CARD_TYPE_UICC == aCardType )
+            {
+            aFileIdExt = PB_EXT5_FID;
+            }
+        else
+            {
+            aFileIdExt = PB_EXT1_FID;
+            }
         fileId = PB_MSISDN_FID;
-        aFileIdExt = PB_EXT1_FID;
         }
     else
         {
@@ -358,7 +366,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID, "CMmP
         }
 TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBfileId phonebookfileid: %d", fileId);
 OstTraceExt1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID, "CMmPhoneBookStoreOperationBase::ConvertToPBfileId;fileId=%hu", fileId );
-    
+
 
     return fileId;
     }
@@ -412,7 +420,7 @@ TUint8 CMmPhoneBookStoreOperationBase::GetTransId(
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetTransId");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId" );
-    
+
 
     TUint8 transId( 0 );
 
@@ -527,7 +535,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPho
                 {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetTransId - NO operation supported for FDN PhoneBook ");
 OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId - NO operation supported for FDN PhoneBook" );
-                
+
                 break;
                 }
             }
@@ -609,7 +617,7 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPho
 
 TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::GetTransId : Get transaction id: %d", transId);
 OstTraceExt1( TRACE_NORMAL, DUP4_CMMPHONEBOOKSTOREOPERATIONBASE_GETTRANSID, "CMmPhoneBookStoreOperationBase::GetTransId;transId=%hhu", transId );
-    
+
     return transId;
     }
 
@@ -749,15 +757,80 @@ TInt CMmPhoneBookStoreOperationBase::EmptyEntryCheck( const TDesC8 &aFileData)
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::EmptyEntryCheck");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_EMPTYENTRYCHECK, "CMmPhoneBookStoreOperationBase::EmptyEntryCheck" );
-    
+
 
     TInt ret( KErrNone);
-    
-    if(( 0xFF == aFileData[0]) 
+
+    if(( 0xFF == aFileData[0])
        || (0xFF == aFileData[1]))
         {
         ret = KErrNotFound;
         }
+    return ret;
+    }
+
+// -----------------------------------------------------------------------------
+// CMmPhoneBookStoreOperationBase::FetchFileListFromPBR
+// Search wanted file list from EFpbr
+// -----------------------------------------------------------------------------
+//
+TInt CMmPhoneBookStoreOperationBase::FetchFileListFromPBR(
+    const TDesC8 &aFileData,
+    const TUint8 aTag,
+    RArray <TPrimitiveTag>& aFileList )
+    {
+TFLOGSTRING( "TSY: CMmPhoneBookStoreOperationBase::FetchFileListFromPBR" );
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_FETCHFILELISTFROMPBR, "CMmPhoneBookStoreOperationBase::FetchFileListFromPBR" );
+
+    TInt ret( KErrNone );
+    TPrimitiveTag primTag;
+
+    TInt offset( aFileData.Find( &aTag, 1 ) );
+    TInt nextOffset( 0 );
+
+    if( offset != KErrNotFound )
+        {
+        // Get the File Tag Length
+        offset++;
+        TUint8 tagLength = aFileData[offset++];
+
+        for( TInt i = 0; i < tagLength; i += nextOffset )
+            {
+            // Get the Tag name
+            primTag.tagValue = aFileData[offset++];
+            TUint8 len( aFileData[offset++] );
+
+            // Get the File ID which is 2byte long
+            primTag.tagFID = CMmStaticUtility::Get16Bit( aFileData, offset );
+            offset += 2;
+
+            // If file Tag length is 3 the SFI is available and if file tag
+            // length is 2 the only File ID is present
+            if( KLengthWithSFI == len )
+                {
+                primTag.tagSFI = aFileData[offset++];
+                // get the offset for next file tag
+                nextOffset = KPbrTlvLengthWithSfi;
+                }
+            else if( KLengthWithOutSFI == len )
+                {
+                primTag.tagSFI = 0;
+                // get the offset for next file tag
+                nextOffset = KPbrTlvLengthWithoutSfi;
+                }
+            else
+                {
+                ret = KErrGeneral;
+                break;
+                }
+            aFileList.Append( primTag );
+            }
+        }
+    else
+        {
+        ret = KErrNotFound;
+        }
+
     return ret;
     }
 

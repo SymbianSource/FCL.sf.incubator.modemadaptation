@@ -21,38 +21,22 @@
 #define __ISICHANNELROUTERIF_H__
 
 #include <e32def.h>     // For TInt, TAny
+#include "misiobjectrouterif.h"
 
 class MISIRouterChannelIf;
 
 /*
 * Abstract interface for channel to use router services.
 */
-class MISIChannelRouterIf
+class MISIChannelRouterIf : public MISIObjectRouterIf
     {
 
     public:
-
-        enum TISIDfcQThreadType
-            {
-    	      EISIKernelMainThread = 0,
-            EISIKernelRequestCompletionThread,
-            EISIUserMainThread,
-            EISIUserRequestCompletionThread
-            };
 
         /*
         * Informs router that channel is closed.
         */
         virtual void Disconnect( const TUint8 aObjId ) = 0;
-
-        /*
-        * Returns thread according to TISIDfcThread enums.
-        * @param aThreadIndex, threads index in table
-        * @return pointer to thread
-        */
-        virtual TDfcQue* GetDfcThread( const TISIDfcQThreadType aType ) = 0;
-
-        virtual void FreeDfcThread( TDfcQue* aThread ) = 0;
 
         /*
         * Returns the interface.

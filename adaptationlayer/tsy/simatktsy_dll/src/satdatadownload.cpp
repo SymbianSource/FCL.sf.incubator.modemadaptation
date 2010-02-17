@@ -211,7 +211,7 @@ void CSatDataDownload::BuildSimMsgReport
     TUint8 causeType( ENone == aTpFailure ?
         SMS_CAUSE_TYPE_COMMON : SMS_CAUSE_TYPE_EXT );
     TUint8 smsCause( ENone == aTpFailure ?
-        SMS_OK : SMS_ERR_PP_RESERVED );
+        SMS_OK : SMS_EXT_ERR_PROTOCOL_ERROR );
 
     TUint16 dataLen( aUserData.Length() );
 
@@ -237,7 +237,8 @@ void CSatDataDownload::BuildSimMsgReport
     msgBuffer.Append( 0 );           // no of sublocks
 
     // Add SMS_SB_DELIVER_REPORT subblock if any failure is there
-    if( ENone != aTpFailure )
+    if( ENone != aTpFailure || 
+        0 < dataLen )
         {
         TFLOGSTRING("TSY:CSatDataDownload::BuildSimMsgReport \
                  Adding SMS_SB_DELIVER_REPORT" );
@@ -253,7 +254,6 @@ void CSatDataDownload::BuildSimMsgReport
         msgBuffer.Append( 0x00 ); // SMS_MTI_DELIVER_REPORT
 
         msgBuffer.Append( aTpFailure ); // GSM-TP Failure cause
-        msgBuffer.AppendFill( KPadding, 2);
         // Increment number of subblock
         msgBuffer[5]++;
         deliverReport.CompleteSubBlock();

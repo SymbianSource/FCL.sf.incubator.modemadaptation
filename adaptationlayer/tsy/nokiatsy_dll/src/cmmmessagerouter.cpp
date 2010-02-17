@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -212,7 +212,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMMESSAGEROUTER_CONSTRUCTL, "CMmMessageRouter::Co
 
     iMmUiccMessHandler = CMmUiccMessHandler::NewL(
         iPhoNetSender,
-        iPhoNetReceiver, 
+        iPhoNetReceiver,
         this );
 
     iMmDtmfMessHandler = CMmDtmfMessHandler::NewL(
@@ -281,7 +281,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMMESSAGEROUTER_CONSTRUCTL, "CMmMessageRouter::Co
         iMmSecurityMessHandler,
         this,
         iMmUiccMessHandler );
-    
+
     iMmPhoneBookStoreMessHandler = CMmPhoneBookStoreMessHandler::NewL(
         this,
         iMmUiccMessHandler);
@@ -397,6 +397,7 @@ OstTrace1( TRACE_NORMAL, CMMMESSAGEROUTER_ROUTEREQUEST, "CMmMessageRouter::Route
             case EEtelCallRecoverDataPort:
             // for call control purposes
             case ESatNotifyCallControlRequest:
+            case ESatNotifySetUpCallPCmd:
                 {
                 messHandler = iMmCallMessHandler;
                 break;

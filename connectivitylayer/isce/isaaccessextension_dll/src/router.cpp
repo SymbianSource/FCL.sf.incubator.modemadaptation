@@ -23,7 +23,6 @@
 #include "router.h"
 #include "iadtrace.h"                   // For C_TRACE..
 #include "isaaccessextension.h"         // For DIsaAccessExtension
-#include "indicationhandler.h"          // For DIndicationHandler
 #include "queue.h"                      // For DQueue
 #include "iadinternaldefinitions.h"     // For EIADAsync...
 #include "iadhelpers.h"                 // For GET_RECEIVER
@@ -41,6 +40,7 @@
 // ISCE
 #include "memapi.h"                     // For MemApi
 #include "trxdefs.h"                    // For ETrx...
+#include "ape_commgrisi.h"              // For APE_COMMGR...
 // ISCE
 
 // CONSTS
@@ -48,6 +48,17 @@ DRouter* DRouter::iThisPtr = NULL;
 const TUint32 KCommunicationManagerUID( 0x2002B3D0 );
 const TUint32 KNameServiceUID( 0x2002A5A1 );
 
+const TUint8 K8BitResourceId( 2 );
+const TUint8 K32BitResourceId( 5 );
+const TUint8 K32BitResourceOffsetByte1( 0 );
+const TUint8 K32BitResourceOffsetByte2( 1 );
+const TUint8 K32BitResourceOffsetByte3( 2 );
+const TUint8 K32BitResourceOffsetByte4( 3 );
+const TUint8 K8BitResourceOffset( 0 );
+const TUint8 KEventOffset32Bit( 4 );
+const TUint8 KEventOffset8Bit( 1 );
+const TUint8 KFiller( 0 );
+const TUint8 KNoResource( 0 );
 // TODO: change this to use UnuqueID instead and to extension..
 void DRouter::CheckDfc()
 {
@@ -90,9 +101,7 @@ DRouter::DRouter():
 #ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
     iPipeHandler = new DPipeHandler( *this );
 #endif
-    iIndicationHandler = new DIndicationHandler( *this );
     iCommonRxQueue = new DQueue( KIADExtensionRxQueueSize );
-    ASSERT_RESET_ALWAYS( /*iPipeHandler &&*/ iIndicationHandler && iCommonRxQueue, EIADMemoryAllocationFailure | EIADFaultIdentifier17 << KFaultIdentifierShift );
     // Initialize channels to NULL when channel is opened !NULL.
     for( TInt i( 0 ); i < EIADSizeOfChannels; ++i )
         {
@@ -156,11 +165,6 @@ DRouter::~DRouter(
         iPipeHandler = NULL;
         }
 #endif
-    if( iIndicationHandler )
-        {
-        delete iIndicationHandler;
-        iIndicationHandler = NULL;
-        }
     if( iCommonRxQueue )
         {
         delete iCommonRxQueue;
@@ -523,12 +527,72 @@ EXPORT_C TInt DRouter::OrderIndication(
     TRACE_ASSERT_INFO( msgOk == KErrNone, (TUint8)aCh<<KChannelNumberShift );
     if( KErrNone == msgOk )
         {
-        msgOk = iIndicationHandler->Subscribe( anOrder, aCh, a32Bit );
-        TRACE_ASSERT_INFO( msgOk == KErrNone, (TUint8)aCh<<KChannelNumberShift );
+        TInt numOfOrders( 0 );
+        if( a32Bit == EFalse )
+            {
+            if( anOrder.Ptr()[ K8BitResourceOffset ] == KNoResource ) //Subscription remove
+                {
+                numOfOrders = 0x00;
+                }
+            else{
+                numOfOrders = ( anOrder.Length() / K8BitResourceId );
+                }
+            }
+        else
+            {
+            if( anOrder.Ptr()[ K32BitResourceOffsetByte4 ] == KNoResource ) //Subscription remove
+                {
+                numOfOrders = 0x00;
+                }
+            else{
+                numOfOrders = ( anOrder.Length() / K32BitResourceId );
+                }
+            }
+        TUint16 msgLength = ( ISI_HEADER_SIZE + SIZE_APE_COMMGR_SUBSCRIBE_REQ + ( SIZE_APE_COMMGR_SUBSCRIBE_SB * numOfOrders ) );
+        TDes8& desPtr = MemApi::AllocBlock( msgLength );
+        desPtr.SetLength( msgLength );
+        TUint8* ptr( const_cast<TUint8*>( desPtr.Ptr() ) );
+        ptr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_ROUTING_REQ;
+        SET_RECEIVER_DEV( ptr, PN_DEV_OWN );
+        SET_SENDER_DEV( ptr, PN_DEV_OWN );
+        ptr[ ISI_HEADER_OFFSET_RESOURCEID ] = PN_APE_COMMGR;
+        SET_LENGTH( ptr, ( desPtr.Length() - PN_HEADER_SIZE ) );
+        SET_RECEIVER_OBJ( ptr, PN_OBJ_ROUTER );
+        SET_SENDER_OBJ( ptr, aCh );
+        ptr[ ISI_HEADER_SIZE + APE_COMMGR_SUBSCRIBE_REQ_OFFSET_TRANSID ] = 0x00;
+        ptr[ ISI_HEADER_SIZE + APE_COMMGR_SUBSCRIBE_REQ_OFFSET_MESSAGEID ] = APE_COMMGR_SUBSCRIBE_REQ;
+        ptr[ ISI_HEADER_SIZE + APE_COMMGR_SUBSCRIBE_REQ_OFFSET_FILLERBYTE1 ] = numOfOrders;
+        ptr[ ISI_HEADER_SIZE + APE_COMMGR_SUBSCRIBE_REQ_OFFSET_SUBBLOCKCOUNT ] = 0x00;
+        TInt orderIndex( 0 );
+        //TODO automatically generated ape_commgrisi.h is totally wrong and not according to the specification
+        for( TInt subBlockOffset( ISI_HEADER_SIZE + SIZE_APE_COMMGR_SUBSCRIBE_REQ + APE_COMMGR_SUBSCRIBE_SB_OFFSET_SUBBLOCKID ); subBlockOffset < msgLength; subBlockOffset += SIZE_APE_COMMGR_SUBSCRIBE_SB )
+            {
+            ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_SUBBLOCKID ] = APE_COMMGR_SUBSCRIBE_SB;
+            ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_SUBBLOCKLENGTH ] = SIZE_APE_COMMGR_SUBSCRIBE_SB;
+            ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_DEVICEID ] = PN_DEV_HOST;
+            if( a32Bit == EFalse )
+                {
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_RESOURCEID ]  = ( anOrder.Ptr()[ orderIndex + KEventOffset8Bit ] );
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_FILLERBYTE1 ] = KFiller;
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_FILLERBYTE2 ] = KFiller;
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_FILLERBYTE3 ] = KFiller;
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_MESSAGEID ]   = ( anOrder.Ptr()[ orderIndex + K8BitResourceOffset ] );
+                }
+            else
+                {
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_RESOURCEID ]  = ( anOrder.Ptr()[ orderIndex + KEventOffset32Bit ] );
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_FILLERBYTE1 ] = ( anOrder.Ptr()[ orderIndex + K32BitResourceOffsetByte1 ] );
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_FILLERBYTE2 ] = ( anOrder.Ptr()[ orderIndex + K32BitResourceOffsetByte2 ] );
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_FILLERBYTE3 ] = ( anOrder.Ptr()[ orderIndex + K32BitResourceOffsetByte3 ]) ;
+                ptr[ subBlockOffset + APE_COMMGR_SUBSCRIBE_SB_OFFSET_MESSAGEID ]   = ( anOrder.Ptr()[ orderIndex + K32BitResourceOffsetByte4 ] );
+                }
+            orderIndex = ( a32Bit == EFalse ) ? orderIndex + K8BitResourceId : orderIndex + K32BitResourceId;
+            }
+        iCommunicationManager->Receive( desPtr );
         }
-    C_TRACE( ( _T( "DRouter::OrderIndication 0x%x 0x%x %d %d <-" ), &anOrder, aCh, a32Bit, msgOk ) );
-    
-    OstTrace1( TRACE_NORMAL, DROUTER_ORDERINDICATION, "<DRouter::OrderIndication;msgOk=%x", msgOk );    
+    TRACE_ASSERT_INFO( msgOk == KErrNone, (TUint8)aCh<<KChannelNumberShift );    
+    C_TRACE( ( _T( "DRouter::OrderIndication order:0x%x channel:0x%x  32bit:%d msgok:%d <-" ), &anOrder, aCh, a32Bit, msgOk ) );
+    OstTrace1( TRACE_NORMAL, DROUTER_ORDERINDICATION, "<DRouter::OrderIndication;msgOk=%x", msgOk );
     return msgOk;
     }
 
@@ -570,22 +634,6 @@ EXPORT_C TInt DRouter::SendMessage(
             }
         else
             {
-            // Route indication to possible subscribers in this device
-            if( GET_RECEIVER_OBJ( msgBlockPtr ) == PN_OBJ_EVENT_MULTICAST &&
-                IS_DEV_HOST( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] ) )
-                {
-                DATA_DUMP_TRACE( aMessage, ETrue );
-                OstTraceData( TRACE_ISIMSG, DROUTER_SENDMESSAGE_DATA, "DRouter::SendMsg indication TX: %hx", aMessage.Ptr(), aMessage.Length() );
-                C_TRACE( ( _T( "DRouter::SendMessage routing indication to device PN_DEV_SOS 0x%x" ), &aMessage ) );
-                OstTrace0( TRACE_NORMAL, DUP2_DROUTER_SENDMESSAGE, "DRouter::SendMessage indication to PN_DEV_SOS" );
-                TDes8& tmpIndication = AllocateBlock( aMessage.Length() );
-                tmpIndication.SetLength( aMessage.Length() );
-                tmpIndication.Copy( aMessage );
-                TUint8* indicationPtr = const_cast<TUint8*>( tmpIndication.Ptr() );
-                SET_RECEIVER_DEV( indicationPtr, THIS_DEVICE );
-                SET_RECEIVER_OBJ( indicationPtr, KIADEventSubscriptionObjId );
-                this->MessageReceived( tmpIndication );
-                }
             // To communicationmanager
             if( ( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVEROBJECT ] == PN_OBJ_EVENT_MULTICAST  )
                && ( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN ) )
@@ -634,8 +682,20 @@ EXPORT_C TInt DRouter::SendIndication(
     OstTraceExt2( TRACE_NORMAL, DROUTER_SENDINDICATION_ENTRY, ">DRouter::SendIndication;aMessage=%x;aCh=%hx", ( TUint )&( aMessage ), aCh );
     C_TRACE( ( _T( "DRouter::SendIndication 0x%x 0x%x ->" ), &aMessage, aCh ) );
     TUint8* msgPtr = const_cast<TUint8*>( aMessage.Ptr() );
-    SET_RECEIVER_DEV( msgPtr,OTHER_DEVICE_1 );
     SET_RECEIVER_OBJ( msgPtr,PN_OBJ_EVENT_MULTICAST );
+    if( GET_RECEIVER_DEV( aMessage ) != PN_DEV_OWN )
+        {
+        SET_RECEIVER_DEV( msgPtr, OTHER_DEVICE_1 );
+        // Copy for receivers in this device -> fake event from modem
+        TDes8& tmpIndication = MemApi::AllocBlock( aMessage.Length() );
+        tmpIndication.SetLength( aMessage.Length() );
+        tmpIndication.Copy( aMessage );
+        TUint8* indicationPtr = const_cast<TUint8*>( tmpIndication.Ptr() );
+        SET_SENDER_DEV( indicationPtr, PN_DEV_HOST );
+        SET_RECEIVER_DEV( indicationPtr, PN_DEV_OWN );
+        indicationPtr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_SOS;
+        this->MessageReceived( tmpIndication );
+        }
     TInt error( SendMessage( aMessage, aCh ) );
     C_TRACE( ( _T( "DRouter::SendIndication 0x%x 0x%x %d <-" ), &aMessage, aCh, error ) );
     OstTrace1( TRACE_NORMAL, DROUTER_SENDINDICATION_EXIT, "<DRouter::SendIndication;error=%d", error );
@@ -716,7 +776,7 @@ void DRouter::HandleIsiMessage(
     C_TRACE( ( _T( "DRouter::HandleIsiMessage 0x%x ->" ), &aMsg ) );
     TUint8* msg = const_cast<TUint8*>( aMsg.Ptr() );
     // Message from MODEM to APE, or from APE to APE. If Media SOS -> come through link. If dev OWN -> from APE nameservice
-    if( msg[ ISI_HEADER_OFFSET_MEDIA ] == PN_MEDIA_SOS || ( msg[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN ) )
+    if( ( msg[ ISI_HEADER_OFFSET_MEDIA ] == PN_MEDIA_SOS ) || ( msg[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN ) )
         {
         const TUint16 rcvObjId( GET_RECEIVER_OBJ( aMsg ) );
         C_TRACE( ( _T( "DRouter::HandleIsiMessage rcvObjId 0x%x" ), rcvObjId ) );
@@ -737,8 +797,16 @@ void DRouter::HandleIsiMessage(
             {
             if( iChannelTable[ rcvObjId ].iChannel )
                 {
-                iChannelTable[ rcvObjId ].iChannel->ReceiveMsg( aMsg );
-                // DeAllocation done by the channel after writing to client's address space.
+                if( msg[ ISI_HEADER_OFFSET_RESOURCEID ] == PN_APE_COMMGR )
+                    {
+                    C_TRACE( ( _T( "DRouter::HandleIsiMessage to channel from COMMUNICATIONMANAGER deallocate" ) ) );
+                    DeAllocateBlock( aMsg );
+                    }
+                else
+                    {
+                    iChannelTable[ rcvObjId ].iChannel->ReceiveMsg( aMsg );
+                    // DeAllocation done by the channel after writing to client's address space.
+                    }
                 }
             else
                 {
@@ -882,7 +950,7 @@ void DRouter::CheckRouting(
     // Message to symbian side (media sos).
     if( msg[ ISI_HEADER_OFFSET_MEDIA ] == PN_MEDIA_SOS )
         {
-        if( msg[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == THIS_DEVICE )
+        if( ( msg[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == THIS_DEVICE ) || ( msg[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN ) )
             {
             switch( msg[ ISI_HEADER_OFFSET_RECEIVEROBJECT ] )
                 {
@@ -978,7 +1046,6 @@ void DRouter::CheckRouting(
             }
         case EIndicationMsg:
             {
-            aTmp.iIndicationHandler->Multicast( aMsg );
             // De-allocate, message is multicasted to subsribers as new
             // message and the original is ready to be deallocated.
             aTmp.DeAllocateBlock( aMsg );
@@ -1077,10 +1144,9 @@ void DRouter::SendCommIsaEntityNotReachableResp(
     // Filler
     tempPtr.Append( 0x00 );
 
-//    ASSERT_RESET_ALWAYS( iConnectionStatus == EIADConnectionOk, EIADCmtConnectionLost | EIADFaultIdentifier2 << KFaultIdentifierShift );
     if( msgTmpPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN )
         {
-        MessageReceived( *reinterpret_cast<TDes8*>( const_cast<TDesC8*>(&aMsg) ) );
+        MessageReceived( tempPtr );
         }
     else
         {
@@ -1318,7 +1384,8 @@ TUint8 DRouter::MapMediaToLinkId(
 //From objectapi
 EXPORT_C MISIObjectRouterIf* MISIObjectRouterIf::Connect( const TInt32 aUID, TUint8& aObjId, MISIRouterObjectIf* aCallback )
     {
-    C_TRACE( ( _T( "MISIObjectRouterIf::Connect %d 0x%x 0x%x>" ), aUID, aObjId, aCallback ) );
+    C_TRACE( ( _T( "MISIObjectRouterIf::Connect  %d 0x%x 0x%x>" ), aUID, aObjId, aCallback ) );
+    Kern::Printf( "IADRouter::Connect" );
     //Connect( aUID, aObjId, aCallback );
     if( aUID == KNameServiceUID )
         {
@@ -1344,6 +1411,7 @@ EXPORT_C MISIObjectRouterIf* MISIObjectRouterIf::Connect( const TInt32 aUID, TUi
 TInt DRouter::Send( TDes8& aMessage, const TUint8 aObjId )
     {
   	C_TRACE( ( _T( "DRouter::Send objectapi 0x%x 0x%x>" ), &aMessage, aObjId ) );
+    Kern::Printf( "IADRouter::Send" );
     if( aObjId == PN_OBJ_EVENT_MULTICAST ) //from communicationmanager
         {
         // Don't put to mainrxqueue
@@ -1357,5 +1425,22 @@ TInt DRouter::Send( TDes8& aMessage, const TUint8 aObjId )
   	return KErrNone;
     }
 
+TDfcQue* DRouter::GetDfcThread(
+        const TISIDfcQThreadType // aType
+        )
+    {
+    C_TRACE( ( _T( "DRouter::GetDfcThread<>" ) ) );  
+    Kern::Printf( "IADRouter::GetDfcThread" );
+    return DIsaAccessExtension::GetDFCThread( EIADExtensionDfcQueue );
+    //ASSERT_RESET_ALWAYS( 0, -1003 );
+    //return NULL;
+    }
+
+void DRouter::FreeDfcThread( TDfcQue* aThread )
+    {
+    C_TRACE( ( _T( "DRouter::FreeDfcThread 0x%x>" ), aThread ) );
+    Kern::Printf( "IADRouter::FreeDfcThread" );
+    ASSERT_RESET_ALWAYS( 0, -1002 );
+    }
 // End of file.
 

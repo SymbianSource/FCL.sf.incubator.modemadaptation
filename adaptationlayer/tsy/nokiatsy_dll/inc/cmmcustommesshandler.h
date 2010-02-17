@@ -98,6 +98,8 @@ const TUint8 KCityZoneActiveBit = 0x02;
 const TUint8 KSimNumberOfCbMsgIds = 15;
 const TUint KUnusedCbMsgId = 0xffff;
 
+const TUint8 KCustomTransId = 6;
+
 // MACROS
     //None
 

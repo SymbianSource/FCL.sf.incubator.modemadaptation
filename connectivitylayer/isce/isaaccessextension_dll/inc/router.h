@@ -34,7 +34,6 @@ class DPipeHandler;
 #endif
 //ISCE class MIAD2ISTApi;
 class DRouter;
-class DIndicationHandler;
 class MIAD2ChannelApi;
 class DQueue;
 
@@ -168,7 +167,14 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
         static DRouter* iThisPtr;
         MISIRouterObjectIf* iNameService;
         MISIRouterObjectIf* iCommunicationManager;
+        /*
+        * See comments from MISIChannelRouterIf
+        */
+        TDfcQue* GetDfcThread( const TISIDfcQThreadType aType );
 
+        void FreeDfcThread( TDfcQue* aThread );
+
+   
     private:
         static void CommonRxDfc( TAny* aPtr );
 
@@ -220,7 +226,6 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
 #ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
         DPipeHandler*                                   iPipeHandler;
 #endif
-        DIndicationHandler*                             iIndicationHandler;
         DQueue*                                         iCommonRxQueue;
         TIADChannel                                     iChannelTable[ EIADSizeOfChannels ];
         //static TDfc*                                    iConnStatusBcDfc;

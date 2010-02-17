@@ -165,19 +165,20 @@ EXPORT_C void RUsbPnClient::ConnectL()
 
         User::LeaveIfError( CreateSession( KUsbPnServerName, TVersion(1,0,0) ) );
 
-        OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP7, "RUsbPnClient::ConnectL() - session created" );
-        E_TRACE( ( _L( "RUsbPnClient::ConnectL() - session created" ) ) );
+        OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP7, "RUsbPnClient::ConnectL() - session created1" );
+        E_TRACE( ( _L( "RUsbPnClient::ConnectL() - session created1" ) ) );
         }
     else if ( err )
         {
-        // Session not created, reason unknown
+        OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP8, "RUsbPnClient::ConnectL() - session not created, reason uknown" );
+        E_TRACE( ( _L( "RUsbPnClient::ConnectL() - session not created, reason uknown" ) ) );            
         TRACE_ASSERT_ALWAYS;
         User::Leave( err );
         }
     else
         {
-        OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP8, "RUsbPnClient::ConnectL() - session created" );
-        E_TRACE( ( _T( "RUsbPnClient::ConnectL() - session created" ) ) );
+        OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP9, "RUsbPnClient::ConnectL() - session created2" );
+        E_TRACE( ( _T( "RUsbPnClient::ConnectL() - session created2" ) ) );
         }
     OstTrace0( TRACE_API, RUSBPNCLIENT_CONNECTL_EXIT, "RUsbPnClient::ConnectL() - return void" );
     A_TRACE( ( _T( "RUsbPnClient::ConnectL() - return void" ) ) );

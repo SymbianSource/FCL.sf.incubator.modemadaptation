@@ -35,12 +35,12 @@ class MUsbPnControlObserver
         /**
         * Get packet for sending.
         */
-        virtual CUsbPnPacket& PacketL() = 0;
+        virtual CUsbPnPacket& GetNextPacketL() = 0;
 
         /**
         * Send packet.
         */
-        virtual void Send( CUsbPnPacket& aPacket ) = 0;
+        virtual void AddPacketToSendingQueue( CUsbPnPacket& aPacket ) = 0;
 
     };
 

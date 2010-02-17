@@ -144,31 +144,6 @@ class CMmPhoneBookOperationInit3G_adn : public CMmPhoneBookOperationInit
         */
 
         TInt HandleUICCPbResp3GADN(const TDesC8 &aFileData, TInt aStatus, TUint8 aTransId );
-
-        /**
-        * Send Request to read Type 1 file info for ADN 3G initialization
-        * @param TDesC8& aFileData
-        * @return TInt: KErrNone or error value.
-        */
-
-        TInt FetchType1FileFromPBR(const TDesC8 &aFileData);
-
-        /**
-        * Send Request to read Type 2 file info for ADN 3G initialization
-        * @param TDesC8& aFileData
-        * @return TInt: KErrNone or error value.
-        */
-
-        TInt FetchType2FileFromPBR(const TDesC8 &aFileData);
-
-        /**
-        * Send Request to read Type 3 file info for ADN 3G initialization
-        * @param TDesC8& aFileData
-        * @return TInt: KErrNone or error value.
-        */
-
-        TInt FetchType3FileFromPBR(const TDesC8 &aFileData);
-
         
         /**
         * Handles FileData of Type 1 file info for ADN 3G initialization

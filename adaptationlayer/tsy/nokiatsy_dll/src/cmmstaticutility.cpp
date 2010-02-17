@@ -52,7 +52,8 @@
     // None
 
 // CONSTANTS
-    // None
+const TUint8 KNotAllowed = 0x01;
+const TUint8 KAllowedWithModifications = 0x02;
 
 // MACROS
     // None
@@ -259,6 +260,12 @@ OstTraceExt3( TRACE_NORMAL, CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtili
                         {
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrGsmCallRejected );
+                        break;
+                        }
+                    case CALL_MODEM_CAUSE_INCOMPATIBLE_DEST:
+                        {
+                        epocError = EpocErrorCode( KErrGeneral,
+                            KErrGsmCCBearerCapabilityNotAuthorised );
                         break;
                         }
                     // Not used by GSM ISA Call server: checking of
@@ -2490,6 +2497,93 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMSTATICUTILITY_ISOPERINFOAPAC, "CMmStaticUtility
     return ret;
 
 #endif // __WINSCW__
+    }
+
+// ----------------------------------------------------------------------------
+// CMmStaticUtility::ProcessIfIdentityServices
+// Checks if this is related to identity services
+// -----------------------------------------------------------------------------
+//
+TInt CMmStaticUtility::MapSw1Sw2ToEpocError( 
+    const TUint8 aSw1, 
+    const TUint8 aSw2, 
+    const TUint8 aResult )
+    {
+TFLOGSTRING4("TSY:CMmSupplServMessHandler::MapSw1Sw2ToEpocError: sw1: 0x%x sw2: 0x%x result: 0x%x", aSw1, aSw2, aResult );
+
+    TInt ret( KErrGeneral );
+
+    //These are the ok responses ( for envelope )
+    //-90 00 normal ending of the command
+    //-91 XX normal ending of the command with extra information from the
+    // proactive SIM containing a command for ME length XX of response data
+    //-9E XX length XX of the response data given in case of a SIM data
+
+    // download error
+    //-9F XX length XX of the response data
+    //This is the busy response
+    //-93 00 SAT is busy. Command cannot be executed at present, further
+    // normal commands are allowed
+    //This is the memory status
+    //-92 0X command succesful but after using and internal update retry
+    // routine x times
+    //-92 40 memory problem
+    //Application independent errors
+    //-67 XX incorrect parameter P3
+    //-6B XX incorrect parameter P1 or P2
+    //-6E XX wrong instruction class given in the command
+    //-6F XX technical problem with no diagnostic given.
+    //Also possible
+    //-94 02 P1 or P2 is caused by the addressed record being out of range
+
+    switch( aSw1 )
+        {
+        case 0x90:
+        case 0x91:
+        case 0x9F:
+            {
+            if( KNotAllowed == aResult )
+                {
+                ret = CMmStaticUtility::EpocErrorCode( 
+                    KErrGeneral,
+                    KErrGsmCCCallRejected );
+                }
+            else if( KAllowedWithModifications == aResult )
+                {
+                ret = CMmStaticUtility::EpocErrorCode( 
+                    KErrAccessDenied,
+                    KErrSatControl );
+                }
+            break;
+            }
+        case 0x93:
+            {
+            if( 0x00 == aSw2 )
+                {
+                ret = CMmStaticUtility::EpocErrorCode( 
+                    KErrAccessDenied,
+                    KErrSatBusy );
+                }
+            break;
+            }
+        case 0x6F:
+            {
+            ret = CMmStaticUtility::EpocErrorCode( 
+                KErrGeneral,
+                KErrGsmCallControlBase );
+            break;
+            }
+        default:
+            {
+TFLOGSTRING("TSY:CMmSupplServMessHandler::MapSw1Sw2ToEpocError: default");
+            ret = CMmStaticUtility::EpocErrorCode( 
+                KErrGeneral,
+                KErrGsmCallControlBase );
+            break;
+            }
+        }
+
+    return ret;
     }
 
 // -----------------------------------------------------------------------------

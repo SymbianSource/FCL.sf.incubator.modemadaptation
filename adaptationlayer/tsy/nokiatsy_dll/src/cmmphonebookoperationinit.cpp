@@ -260,8 +260,11 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
         cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
         cmdParams.filePath.Append(appFileID>>8);
         cmdParams.filePath.Append(appFileID);
-        cmdParams.filePath.Append(static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append(static_cast<TUint8>( DF_PHONEBOOK ));
+        if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
+            {
+            cmdParams.filePath.Append(static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
+            cmdParams.filePath.Append(static_cast<TUint8>( DF_PHONEBOOK ));
+            }
 
         switch( iIniPhase )
             {

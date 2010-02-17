@@ -607,8 +607,9 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMes
             // FDN check should not be done for SAT originated requests
             iFdnCheck = EFalse;
 
-            // In this case also resource control is suppressed.
-            iResourceControlSuppress = ETrue;
+            // Let's check is resource control suppress needed. This info is set
+            // by simatktsy when extFuncL is called with IPC ESatNotifySendSsPCmd
+            aDataPackage->UnPackData ( iResourceControlSuppress );
 
             break;
             }
@@ -1605,8 +1606,10 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "C
                 {
                 //If cause value is KSsGsmSsNotAvailable (comes in SS_OTHER_ERROR sub block)
                 //this indicates that there is not network coverage.
-                if( SS_GSM_SS_NOT_AVAILABLE == aIsiMessage.Get8bit(
-                    sbStartOffset + SS_OTHER_ERROR_OFFSET_ERRORCODE ) )
+                TUint8 errorCode( aIsiMessage.Get8bit(
+                    sbStartOffset + SS_OTHER_ERROR_OFFSET_ERRORCODE ) );
+
+                if( SS_GSM_SS_NOT_AVAILABLE == errorCode )
                     {
                     errorToClient = CMmStaticUtility::EpocErrorCode(
                         KErrCouldNotConnect,
@@ -1614,6 +1617,38 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "C
 TFLOGSTRING("CMmSupplServMessHandler::SsServiceFailedRespL. \
              Cause: KSsGsmSsNotAvailable => No network coverage." );
 OstTrace0( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "CMmSupplServMessHandler::SsServiceFailedResp, Cause: KSsGsmSsNotAvailable => No network coverage" );
+                    }
+                else if( SS_RESOURCE_CONTROL_DENIED == errorCode )
+                    {
+                     if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+                         ISI_HEADER_SIZE + SIZE_SS_SERVICE_FAILED_RESP,
+                         SS_SB_RESOURCE_CONTROL_INFO,
+                         EIsiSubBlockTypeId8Len8,
+                         sbStartOffset ) )
+                         {
+                         TUint8 dataLen( aIsiMessage.Get8bit(
+                             sbStartOffset + SS_SB_RESOURCE_CONTROL_INFO_OFFSET_DATALENGTH ) );
+
+                         TPtrC8 data( aIsiMessage.GetData(
+                             sbStartOffset + SS_SB_RESOURCE_CONTROL_INFO_OFFSET_DATA,
+                             dataLen ) );
+                         // sw1, sw2 and result is inserted to SS_SB_RESOURCE_CONTROL_INFO
+                         // by simatktsy and ther order from first byte is: sw1, sw2 and result
+                         TUint8 sw1 = data[KSw1Index];
+                         TUint8 sw2 = data[KSw2Index];
+                         TUint8 result = data[KResultIndex];
+                         errorToClient = CMmStaticUtility::MapSw1Sw2ToEpocError( 
+                             sw1, 
+                             sw2, 
+                             result );
+                         }
+                     else
+                         {
+                         errorToClient = CMmStaticUtility::CSCauseToEpocError(
+                            PN_SS,
+                            subBlockId,
+                            errorCode );
+                         }
                     }
                 else
                     {

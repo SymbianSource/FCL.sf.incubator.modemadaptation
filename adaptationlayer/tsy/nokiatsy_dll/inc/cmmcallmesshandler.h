@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -469,6 +469,20 @@ class CMmCallMessHandler : public CBase,
             TUint8 origPresentInd);
 
         /**
+        * Read all address connected (needed for COLP)
+        * @param aMobileCallInfo Call info
+        * @param aTargetOrig Target origin
+        * @param aIsiMessage Received ISI message
+        * @param aSbStartOffSet Subblock start offset
+        * @return void
+        */
+        void ReadAllAddressConnected(
+            RMobileCall::TMobileCallInfoV1& aMobileCallInfo,
+            TBuf16<RMobilePhone::KMaxMobileTelNumberSize>& aTargetOrig,
+            const TIsiReceiveC &aIsiMessage,
+            TUint& aSbStartOffSet);
+
+        /**
         * Read origin call info
         * @param aMobileCallInfo Call info
         * @param aTargetOrigName Target origin name
@@ -792,6 +806,9 @@ class CMmCallMessHandler : public CBase,
 
         // call control result
         TUint8 iCcResult;
+
+        // flag telling whether resource control needs to be disabled
+        TUint8 iResourceControlSuppress;
 
     public:     // Friend classes
         // None

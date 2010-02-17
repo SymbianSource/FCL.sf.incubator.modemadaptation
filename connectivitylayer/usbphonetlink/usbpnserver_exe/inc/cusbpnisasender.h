@@ -59,13 +59,14 @@ class CUsbPnIsaSender : public CActive, public MUsbPnControlObserver
         * From MUsbPnControlObserver. Returns usable circular packet if any.
         * @return CUsbPnPacket&. Packet for receiver.
         */
-        CUsbPnPacket& PacketL();
+        CUsbPnPacket& GetNextPacketL();
 
         /**
         * From MUsbPnControlObserver. Adds packet to send queue.
-        * @param aPacket
+        * @param CUsbPnPacket&. Packet for Send
+        * @return void
         */
-        void Send( CUsbPnPacket& aPacket );
+        void AddPacketToSendingQueue( CUsbPnPacket& aPacket );
 
 
     protected:  // Functions from base classes
@@ -108,6 +109,10 @@ class CUsbPnIsaSender : public CActive, public MUsbPnControlObserver
         */
         void TryToSendPacket( CUsbPnPacket& );
 
+        /**
+        * Delete circular buffer objects
+        */
+        void DeletePackets();
 
     private:    // Data
 

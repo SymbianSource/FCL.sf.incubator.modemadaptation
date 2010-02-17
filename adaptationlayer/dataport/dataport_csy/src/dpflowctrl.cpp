@@ -137,6 +137,7 @@ void CDpFlowCtrl::RunL()
             iFlowCtrlDp2Dcs = EFlowControlOn;
             iFlowCtrlDcs2Dp = EFlowControlOn;
             iPifDcs.SetPipeState( CDpPif::EDpPipeDisconnected );
+            iDataPort.ISAHandle().ResetBuffers();
             break;
             }
         default:

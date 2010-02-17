@@ -63,6 +63,10 @@ const TUint16 KNitzNamePmmIndexValue = 0x0000;
 // Call Life Timer index value for PMM. Reserver index '1'.
 const TUint16 KCallLifeTimerPmmIndexValue = 0x0001;
 
+const TUint8 KSw1Index = 0x00;
+const TUint8 KSw2Index = 0x01;
+const TUint8 KResultIndex = 0x02;
+
 // MACROS
     // None
 
@@ -265,6 +269,18 @@ class CMmStaticUtility : public CBase
         static TInt Get16Bit(
             const TDesC8& aSource, //Source
             TInt aIndex );         //Index
+
+        /**
+        * Maps sw1, sw2 and result to client specific error value
+        * @param aSw1: sw1 to be mapped
+        * @param aSw2: sw2 to be mapped
+        * @param aResult:  result to be mapped
+        * @return TInt: mapped error value
+        */
+        static TInt MapSw1Sw2ToEpocError( 
+            const TUint8 aSw1, 
+            const TUint8 aSw2, 
+            const TUint8 aResult );
 
         /**
         * Set value for oper info

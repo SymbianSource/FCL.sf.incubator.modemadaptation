@@ -16,7 +16,7 @@
 */
 
 
-
+//#define INTERNAL_FLAG_ISI_ROUTER_IN_USE // see nameservice,communicationmanager too
 #include <non_foundation_paths.hrh>
 
 #define NCP_COMMON_RD_ISCE_IN_USE
@@ -43,6 +43,10 @@ PRJ_EXPORTS
 ../isinameservice_dll/inc/nsisi.h                   NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(nsisi.h)
 
 // ISC & ISI
+
+#ifdef INTERNAL_FLAG_ISI_ROUTER_IN_USE
+../isirouter_dll/inc/misiif.h                  NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(misiif.h)
+#endif
 ../isaaccessextension_dll/inc/isakernelapi.h        NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(isakernelapi.h)
 ../isaaccessextension_dll/inc/iscnokiadefinitions.h NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(iscnokiadefinitions.h)
 ../iscapi_dll/inc/iscdefinitions.h                  NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(iscdefinitions.h)
@@ -57,15 +61,17 @@ PRJ_MMPFILES
 ../p2prouter_dll/group/p2prouter.mmp
 ../p2papi_dll/group/p2papi.mmp
 // ISC & ISI
+#ifdef INTERNAL_FLAG_ISI_ROUTER_IN_USE
+../isirouter_dll/group/isirouter.mmp
+../isiapi_dll/group/isiapi.mmp
+../isinameservice_dll/group/isinameservice_isirouter.mmp
+../isicommunicationmanager_dll/group/isicommunicationmanager_isirouter.mmp
+#endif
 ../isaaccessextension_dll/group/isaaccessextension.mmp
 ../isaaccessldd_ldd/group/isaaccessesldd.mmp
 ../iscapi_dll/group/isauserapi.mmp
-// NameService
 ../isinameservice_dll/group/isinameservice.mmp
-// CommunicationManager
 ../isicommunicationmanager_dll/group/isicommunicationmanager.mmp
-
-#else
 // No actions
 #endif // NCP_COMMON_RD_ISCE_IN_USE
 

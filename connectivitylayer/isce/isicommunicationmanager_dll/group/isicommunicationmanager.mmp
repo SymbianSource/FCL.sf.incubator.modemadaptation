@@ -19,7 +19,6 @@
 #include        <platform_paths.hrh>
 #include        "kernel/kern_ext.mmh"
 
-
 TARGET          isicommunicationmanager.dll
 TARGETTYPE      kext
 linkas          isicommunicationmanager.dll
@@ -38,6 +37,7 @@ SOURCE          isiindicationhandler.cpp
 
 
 USERINCLUDE     ../inc
+USERINCLUDE     ../../isirouter_dll/inc
 USERINCLUDE     ../../isaaccessextension_dll/inc
 USERINCLUDE     ../../memmanager_dll/inc
 USERINCLUDE     ../../isinameservice_dll/inc

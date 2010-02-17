@@ -24,8 +24,11 @@
 #include "misilinkrouterif.h"     // For MISILinkRouterIf
 #include "misichannelrouterif.h"  // For MISIChannelRouterIf
 #include "isiinternaldefs.h"      // For KMaxAmountOfObjId
+//#include "misiobjectrouterif.h"
+
 
 class MISIRouterChannelIf;
+class MISIRouterObjectIf;
 class MISIRouterLinkIf;
 class DISICLTransceiver;
 class DISIThreadContainer;
@@ -123,10 +126,14 @@ NONSHARABLE_CLASS( DISIRouter ) : public DBase, public MISIChannelRouterIf
         static void InitializeDfc( TAny* aPtr );
         
                         
-    private:
-                
+    public:
         // Written only once no need to synch.
-        static DISIRouter*   iSelfPtr;
+        static DISIRouter*   iSelfPtr;  
+        MISIRouterObjectIf*  iNameService;
+        MISIRouterObjectIf*  iCommunicationManager; 
+                                
+    private:     
+
         // Owned, synchronized internally with fastmutexes.
         RArray< TStaticId* > iStaticObjIdTable;
         // Owned, synchronized internally with fastmutexes.
@@ -138,6 +145,7 @@ NONSHARABLE_CLASS( DISIRouter ) : public DBase, public MISIChannelRouterIf
         TDfcQue*             iInitThread;
         DISICLTransceiver*   iCLTransceiver;
         DISIThreadContainer* iClientThreadContainer;
+
 
     };
 

@@ -106,6 +106,12 @@ class CUsbPnIsaReceiver : public CActive, public MUsbPnBufferListener
         */
         void ConstructMessage();
 
+        /**
+        * Set active for receiving next packet from ISC API
+        */
+        void ReceivingNextPacket();
+
+
 
     private:    // Data
 

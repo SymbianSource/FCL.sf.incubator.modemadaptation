@@ -249,12 +249,16 @@ class CSatCC : public CBase
         /**
         * Creates resource control response for modem SS server
         * @param aTcc internally stored call control structure
+        * @param aSw1 sw1 value inserted to the message
+        * @param aSw2 sw2 value inserted to the message
         * @param aResult call control result from (U)SIM
         * @param aAtkData possible additional response data provided by (U)SIM
         * @return none
         */
         void SendSsResourceControlReq(
             const TCallControl& aTcc,
+            const TUint8 aSw1,
+            const TUint8 aSw2,
             const TUint8 aResult,
             TPtrC8 aAtkData );
 

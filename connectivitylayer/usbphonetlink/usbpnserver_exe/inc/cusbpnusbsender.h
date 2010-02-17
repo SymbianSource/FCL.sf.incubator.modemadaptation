@@ -56,14 +56,13 @@ class CUsbPnUsbSender : public CActive
         * Adds message to sending queue.
         * @param CUsbPnPacket& aPacket. Cell of circular buffer holding received data.
         */
-        void Send( CUsbPnPacket& aPacket );
+        void AddPacketToSendingQueue( CUsbPnPacket& aPacket );
 
         /**
         * Get next free packet from pool.
         * @return reference to usable packet for receiver.
         */
-        CUsbPnPacket& PacketL();
-
+        CUsbPnPacket& GetNextPacketL();
 
     protected:  // Functions from base classes
 
@@ -105,6 +104,10 @@ class CUsbPnUsbSender : public CActive
         */
         void TryToSendPacket( const CUsbPnPacket& );
 
+        /**
+        * Delete circular buffer objects
+        */
+        void DeletePackets();
 
     private:    // Data
 

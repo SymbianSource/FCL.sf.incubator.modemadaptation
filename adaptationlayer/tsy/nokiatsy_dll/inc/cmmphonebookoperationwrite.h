@@ -65,6 +65,7 @@ class CMmPhoneBookOperationWrite
         */
         static CMmPhoneBookOperationWrite* NewL(
             CMmPhoneBookStoreMessHandler* aMmPhoneBookStoreMessHandler,
+            CMmUiccMessHandler* aUiccMessHandler,
             const CMmDataPackage* aDataPackage );
 
         /**
@@ -82,13 +83,54 @@ class CMmPhoneBookOperationWrite
         static CMmPhoneBookOperationWrite* Build(
             TName aPhonebookType,
             TInt aIpc );
-
-  private:
-
+        
         /**
         * By default Symbian OS constructor is private.
         */
         CMmPhoneBookOperationWrite();
+        
+    protected:
+        
+        /**
+        * Creates and sends ISI message in order to read MBI Profile form first record
+        * @param aTraId Transaction id
+        * @param aIndex Location index
+        * @param aDataToWrite Entry to write
+        * @return KErrNone or error value
+        */
+        TInt UiccPbReqReadMBI( TUint8 aIndex, TUint8 aTransId );
+
+        /**
+        * Creates and sends ISI message in order to wite an entry to SIM
+        *
+        * @param aTraId Transaction id
+        * @param aIndex Location index
+        * @param aDataToWrite Entry to write
+        * @return KErrNone or error value
+        */
+        TInt UiccPbReqWriteL(
+            TUint8 aTraId,
+            TInt16 aIndex,
+            CPhoneBookStoreEntry& aDataToWrite );
+
+        /**
+        * Handles SimPbResp ISI -message
+        *
+        * @param aIsiMessage
+        * @param aComplete Indicates if request can remove from
+        *        operationlist or not.
+        * @return KErrNone or error value.
+        */
+        TBool HandleUICCPbRespL(
+                TInt aStatus,
+                TUint8 aDetails,
+                const TDesC8& aFileData,
+                TInt aTransId );
+
+
+
+  private:
+
 
         /**
         * Class attributes are created in ConstructL.
@@ -106,20 +148,6 @@ class CMmPhoneBookOperationWrite
             TInt aIpc,
             const CMmDataPackage* aDataPackage,
             TUint8 aTransId );
-
-        /**
-        * Handles SimPbResp ISI -message
-        *
-        * @param aIsiMessage
-        * @param aComplete Indicates if request can remove from
-        *        operationlist or not.
-        * @return KErrNone or error value.
-        */
-        TBool HandleUICCPbRespL(
-                TInt aStatus,
-                TUint8 aDetails,
-                const TDesC8& aFileData,
-                TInt aTransId );
 
         /**
         * Handles HandleWriteReadEntryResp aFileData
@@ -248,19 +276,6 @@ class CMmPhoneBookOperationWrite
         * @param aDataToWrite Entry to write
         * @return KErrNone or error value
         */
-        TInt UiccPbReqWriteL(
-            TUint8 aTraId,
-            TInt16 aIndex,
-            CPhoneBookStoreEntry& aDataToWrite );
-
-        /**
-        * Creates and sends ISI message in order to wite an entry to SIM
-        *
-        * @param aTraId Transaction id
-        * @param aIndex Location index
-        * @param aDataToWrite Entry to write
-        * @return KErrNone or error value
-        */
         TInt UiccPBReqWriteEntry(
                 TUint16 aFileId,
                 TUint8 aIndex,
@@ -323,15 +338,6 @@ class CMmPhoneBookOperationWrite
                 TUint8 aIndex,
                 TUint8 aTransId );
         
-        /**
-        * Creates and sends ISI message in order to read MBI Profile form first record
-        * @param aTraId Transaction id
-        * @param aIndex Location index
-        * @param aDataToWrite Entry to write
-        * @return KErrNone or error value
-        */
-        TInt UiccPbReqReadMBI( TUint8 aIndex, TUint8 aTransId );
-
         
         /**
         * Creates and sends ISI message in order to write MBI Profile form first record
@@ -345,15 +351,14 @@ class CMmPhoneBookOperationWrite
         // None
 
     protected:  // Data
-        // none
-
-    private:    // Data
-
         // Attribute to hold the write enty while delete -request is on
         CPhoneBookStoreEntry* iPhoneBookEntry;
 
         // Keep track on current write -phase
         TPBWritePhases iCurrentWritePhase;
+
+        // Attribute Store the information if it is location search
+        TBool iLocationSearch;
         
         // Array to Store new EXT records
         RArray<TInt> iExtRecordArrayToBeWrite;
@@ -361,14 +366,15 @@ class CMmPhoneBookOperationWrite
         // Array to store EXT record nos to be delete
        RArray<TInt> iExtRecordArrayToBeDelete; 
        
-       // EXT record number to be read
-       TInt iExtRecordNo;
-       
        // Store the no of ext records already written
        TUint8 iExtRecordWritten;
        
-       // Attribute Store the information if it is location search
-       TBool iLocationSearch;
+        
+    private:    // Data
+
+
+       // EXT record number to be read
+       TInt iExtRecordNo;
        
        // Attribute to store the information if delete EXT operation going on 
        TBool iExtDeleteOperation;

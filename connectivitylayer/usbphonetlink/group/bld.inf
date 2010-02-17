@@ -35,4 +35,3 @@ PRJ_MMPFILES
     // Project doesn't support WINSCW
 #endif
 
-PRJ_TESTMMPFILES

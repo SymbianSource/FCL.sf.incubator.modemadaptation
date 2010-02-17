@@ -16,19 +16,32 @@
 */
 
 
-
+//#define INTERNAL_FLAG_ISI_ROUTER_IN_USE // see communicationmanager too
 // TODO KEXT start order with one .iby if possible (no coreos..ibys)
 
 #ifndef __ISCE_IBY__
 #define __ISCE_IBY__
+
 extension[VARID]=KERNEL_DIR\DEBUG_DIR\memmanager.dll         \Sys\Bin\memmanager.dll
 extension[VARID]=KERNEL_DIR\DEBUG_DIR\ismpmultiplexer.dll    \Sys\Bin\ismpmultiplexer.dll
 extension[VARID]=KERNEL_DIR\DEBUG_DIR\p2prouter.dll          \Sys\Bin\p2prouter.dll
 file=ABI_DIR\DEBUG_DIR\p2papi.dll                            SHARED_LIB_DIR\p2papi.dll
+
 #define ISAACCESSDRIVER_IBY // To prevent problems with old IAD
+
+#ifdef INTERNAL_FLAG_ISI_ROUTER_IN_USE
+
+extension[VARID]=KERNEL_DIR\DEBUG_DIR\isirouter.dll          \Sys\Bin\isirouter.dll
+file=ABI_DIR\DEBUG_DIR\isiapi.dll                            SHARED_LIB_DIR\isiapi.dll
+extension[VARID]=KERNEL_DIR\DEBUG_DIR\isinameservice_isirouter.dll     \Sys\Bin\isinameservice_isirouter.dll
+extension[VARID]=KERNEL_DIR\DEBUG_DIR\isicommunicationmanager_isirouter.dll     \Sys\Bin\isicommunicationmanager_isirouter.dll
+
+#endif // INTERNAL_FLAG_ISI_ROUTER_IN_USE
+
 file=ABI_DIR\DEBUG_DIR\iscapi.dll                             SHARED_LIB_DIR\iscapi.dll
 device[VARID]=KERNEL_DIR\DEBUG_DIR\isaaccessldd.ldd           SHARED_LIB_DIR\isaaccessldd.ldd
 extension[VARID]=KERNEL_DIR\DEBUG_DIR\isaaccessextension.dll  \Sys\Bin\isaaccessextension.dll
-extension[VARID]=KERNEL_DIR\DEBUG_DIR\isinameservice.dll      \Sys\Bin\isinameservice.dll
-extension[VARID]=KERNEL_DIR\DEBUG_DIR\isicommunicationmanager.dll      \Sys\Bin\isicommunicationmanager.dll
+extension[VARID]=KERNEL_DIR\DEBUG_DIR\isinameservice.dll     \Sys\Bin\isinameservice.dll
+extension[VARID]=KERNEL_DIR\DEBUG_DIR\isicommunicationmanager.dll     \Sys\Bin\isicommunicationmanager.dll
+
 #endif // __ISCE_IBY__

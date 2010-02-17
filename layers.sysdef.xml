@@ -5,10 +5,12 @@
 
 <SystemDefinition name="modemadaptation" schema="1.4.0">
   <systemModel>
-    <layer name="adapt">
-        <module name="modemadaptation">
-                <unit name="modemadaptation_group" unitID="modemadaptation.group" bldFile="&layer_real_source_path;/group" mrp="" />
-       </module>
+    <layer name="ncp_layer">
+      <module name="corecom">
+        <component name="modemadaptation">
+          <unit unitID="modemadaptation" mrp="" bldFile="&layer_real_source_path;/group" name="modemadaptation" />
+        </component>
+      </module>
     </layer>
   </systemModel>
 </SystemDefinition>

@@ -226,14 +226,19 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD, "CMmPhoneBookO
     cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
     cmdParams.filePath.Append( APPL_FILE_ID>>8);
     cmdParams.filePath.Append( APPL_FILE_ID);
-    cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
+    
+    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
+        {
+        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
+        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
+        }
+    
     cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;
     cmdParams.record = aRecordNo;
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
     // Convert Phone Book name to file id
     TUint16 fileIdExt ( 0x0000 );
-    TUint16 pbFileId = ConvertToPBfileId( iPhoneBookTypeName, fileIdExt );
+    TUint16 pbFileId = ConvertToPBfileId( iPhoneBookTypeName, fileIdExt, iMmUiccMessHandler->GetCardType() );
     TUint8 arrayIndex = ConvertToConfArrayIndex( pbFileId );
     
     // get the corect Location to be read from phone book
@@ -405,7 +410,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL, "CMmP
 
     // Convert Phone Book name to file id
     TUint16 fileIdExt( 0x0000 );
-    TUint16 pbFileId = ConvertToPBfileId( iPhoneBookTypeName, fileIdExt );
+    TUint16 pbFileId = ConvertToPBfileId( iPhoneBookTypeName, fileIdExt, iMmUiccMessHandler->GetCardType() );
     TUint8 arrayIndex = ConvertToConfArrayIndex( pbFileId );
 
     if ( UICC_STATUS_OK == aStatus )

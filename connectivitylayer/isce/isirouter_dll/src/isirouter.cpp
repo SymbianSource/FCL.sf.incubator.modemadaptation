@@ -24,8 +24,13 @@
 #include "misirouterchannelif.h"  // For MISIRouterChannelIf
 #include "isithreadcontainer.h"   // For DISIThreadContainer
 #include "isicltransceiver.h"     // For DISICLTransceiver
+#include "misirouterobjectif.h"
 
-#define PN_DEV_APE 0x14 //TODO take from real location in future
+#define PN_DEV_OWN 0x6C //TODO take from real location in future
+
+const TInt KDfcPriority( 5 );
+const TUint32 KCommunicationManagerUID( 0x2002B3D0 );
+const TUint32 KNameServiceUID( 0x2002A5A1 );
 
 DISIRouter* DISIRouter::iSelfPtr = NULL;
 
@@ -43,7 +48,7 @@ enum TISIRouterFaults
     EISIRouterNULLThreadPointer,
     };
 
-const TInt KDfcPriority( 5 );
+
 
 void DISIRouter::Connect(
         const TInt32 aUID,
@@ -146,12 +151,14 @@ TDfcQue* DISIRouter::GetDfcThread(
         )
     {
     C_TRACE( ( _T( "DISIRouter::GetDfcThread<>" ) ) );  
+    Kern::Printf( "ISIRouter::GetDfcThread" );
     return iClientThreadContainer->AllocateThread( aType );
     }
 
 void DISIRouter::FreeDfcThread( TDfcQue* aThread )
     {
     C_TRACE( ( _T( "DISIRouter::FreeDfcThread 0x%x>" ), aThread ) );
+    Kern::Printf( "ISIRouter::FreeDfcThread" );
     iClientThreadContainer->DeallocateThread( aThread );
     C_TRACE( ( _T( "DISIRouter::FreeDfcThread 0x%x<" ), aThread ) );
     }
@@ -250,28 +257,65 @@ TInt DISIRouter::Send(
         )
     {
     C_TRACE( ( _T( "DISIRouter::Send 0x%x 0x%x>" ), &aMessage, aObjId ) );
-    TUint8* messageBlockPtr( const_cast<TUint8*>( aMessage.Ptr() ) );
-    SET_SENDER_DEV( messageBlockPtr, PN_DEV_APE );
-    SET_SENDER_OBJ( messageBlockPtr, aObjId );
-    iCLTransceiver->RouteISIMessage( aMessage );
+    Kern::Printf( "ISIRouter::Send" );
+
+    if( ( aObjId != PN_OBJ_ROUTING_REQ ) 
+     && ( aObjId != PN_OBJ_EVENT_MULTICAST ) )
+        {
+        TUint8* messageBlockPtr( const_cast<TUint8*>( aMessage.Ptr() ) );
+        SET_SENDER_DEV( messageBlockPtr, PN_DEV_OWN );
+        SET_SENDER_OBJ( messageBlockPtr, aObjId );
+        }
+    TInt error = iCLTransceiver->RouteISIMessage( aMessage );
     C_TRACE( ( _T( "DISIRouter::Send 0x%x %d 0x%x<" ), &aMessage, aObjId ) );
-    return KErrNone;
+    return error;
     }
 
 TBool DISIRouter::Receive( TDes8& aMessage, const TUint8 aObjId )
     {
     C_TRACE( ( _T( "DISIRouter::Receive 0x%x 0x%x>" ), &aMessage, aObjId ) );
-    NKern::FMWait( iClientTableFastMutex );
-    if( iClientTable[ aObjId ] )
+    TBool error( EFalse );
+    TUint8* messageBlockPtr( const_cast<TUint8*>( aMessage.Ptr() ) ); 
+    switch( GET_RECEIVER_OBJ( aMessage ) )
         {
-        NKern::FMSignal( iClientTableFastMutex );
-        ( iClientTable[ aObjId ]->iChannel )->ReceiveMsg( aMessage ); //may not be safe, consider receive/delete sync
-        C_TRACE( ( _T( "DISIRouter::Receive ok 0x%x 0x%x>" ), &aMessage, aObjId ) );
-        return ETrue;
-    	  }
-    NKern::FMSignal( iClientTableFastMutex );
-    C_TRACE( ( _T( "DISIRouter::Receive failed 0x%x 0x%x<" ), &aMessage, aObjId ) );
-    return EFalse;
+        case PN_OBJ_ROUTING_REQ:
+            {
+            C_TRACE( ( _T( "DISIRouter msg to PN_OBJ_ROUTING_REQ: nameservice" ) ) );
+            //route with resource and nameservice
+            iNameService->Receive( aMessage );
+            C_TRACE( ( _T( "DRouter::HandleIsiMessage to NAMESERVICE<" ) ) );
+            error = ETrue;
+            break;
+            }
+        case PN_OBJ_EVENT_MULTICAST:
+            {
+            C_TRACE( ( _T( "DISIRouter msg to PN_OBJ_EVENT_MULTICAST: communication manager" ) ) );
+            iCommunicationManager->Receive( aMessage );
+            C_TRACE( ( _T( "DRouter::HandleIsiMessage to Communication Manager<" ) ) );
+            error = ETrue;
+            break;
+            }           
+        default:
+            {   //default regular channel
+             NKern::FMWait( iClientTableFastMutex );
+             if( iClientTable[ aObjId ] )
+                {
+                NKern::FMSignal( iClientTableFastMutex );
+                ( iClientTable[ aObjId ]->iChannel )->ReceiveMsg( aMessage ); //may not be safe, consider receive/delete sync
+                C_TRACE( ( _T( "DISIRouter::Receive ok 0x%x 0x%x>" ), &aMessage, aObjId ) );
+                error = ETrue;
+	              }
+	          else
+	              {
+                NKern::FMSignal( iClientTableFastMutex );
+                C_TRACE( ( _T( "DISIRouter::Receive failed 0x%x 0x%x<" ), &aMessage, aObjId ) );
+                error = EFalse;
+                }
+            break;    
+            }
+         }   
+     return error;
+
     }
 
 DECLARE_STANDARD_EXTENSION()
@@ -291,5 +335,32 @@ DECLARE_EXTENSION_LDD()
     TRACE_ASSERT( device );
     Kern::Printf( "ISI Router ldd 0x%x<", device );
     return( device );
+    }
+
+//From objectapi
+EXPORT_C MISIObjectRouterIf* MISIObjectRouterIf::Connect( const TInt32 aUID, TUint8& aObjId, MISIRouterObjectIf* aCallback )
+    {
+    C_TRACE( ( _T( "MISIObjectRouterIf::Connect %d 0x%x 0x%x>" ), aUID, aObjId, aCallback ) );
+    
+    Kern::Printf( "ISIRouter::Connect" );
+    if( aUID == KNameServiceUID )
+        {
+        C_TRACE( ( _T( "MISIObjectRouterIf was nameservice" ) ) );
+        DISIRouter::iSelfPtr->iNameService = aCallback;
+        aObjId = PN_OBJ_ROUTING_REQ; // 0x00
+        }
+    else if( aUID == KCommunicationManagerUID )
+        {
+        C_TRACE( ( _T( "MISIObjectRouterIf was communicationmanager" ) ) );
+        DISIRouter::iSelfPtr->iCommunicationManager = aCallback;
+        aObjId = PN_OBJ_EVENT_MULTICAST; // 0x20
+        }
+    else
+        {
+        C_TRACE( ( _T( "MISIObjectRouterIf unknown object api client" ) ) );
+        }
+    MISIObjectRouterIf* tmp =  DISIRouter::iSelfPtr;
+    C_TRACE( ( _T( "MISIObjectRouterIf::Connect %d 0x%x 0x%x<" ), aUID, aObjId, aCallback ) );
+    return tmp;
     }
 

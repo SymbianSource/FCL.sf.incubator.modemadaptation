@@ -1,4 +1,5 @@
 EXPORTS
 	_Z19CreateLogicalDevicev @ 1 NONAME
 	_ZN6MISIIf8NewISIIfElRh @ 2 NONAME
+	_ZN18MISIObjectRouterIf7ConnectElRhP18MISIRouterObjectIf @ 3 NONAME
 

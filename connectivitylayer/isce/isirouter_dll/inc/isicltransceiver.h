@@ -21,6 +21,7 @@
 #include "misilinkrouterif.h"     // For MISILinkRouterIf
 #include "isiinternaldefs.h"      // For KMaxNumOfObjId
 
+
 class MISIRouterLinkIf;
 class DISIRouter;
 
@@ -43,7 +44,10 @@ NONSHARABLE_CLASS( DISICLTransceiver ) : public DBase, public MISILinkRouterIf
         TInt RouteISIMessage( TDes8& aMessage );
 
     private:
-
+    
+        //From objectapi
+        TInt Send( TDes8& aMessage, const TUint8 aObjId );
+    
         enum TISIMedias
             {
             EISIMediaSharedMemory = 0x00,
@@ -53,7 +57,11 @@ NONSHARABLE_CLASS( DISICLTransceiver ) : public DBase, public MISILinkRouterIf
 
         MISIRouterLinkIf**   iLinksArray;
         DISIRouter*          iRouter;
-
+    
+    public:
+     
+        static DISICLTransceiver* iThisPtr;   
+        
     };
 
 #endif /* __ISICLTRANSCEIVER_H__ */

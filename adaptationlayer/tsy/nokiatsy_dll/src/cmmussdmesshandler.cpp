@@ -241,21 +241,24 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessH
             {
             // User has requested to send MO USSD
             case RMobileUssdMessaging::EUssdMORequest:
+            case RMobileUssdMessaging::EUssdMOReply:
+                {
                 ussdType = SS_GSM_USSD_COMMAND;
                 break;
-            // User is replying to MT USSD.
-            case RMobileUssdMessaging::EUssdMOReply:
-                ussdType = SS_GSM_USSD_MT_REPLY;
-                break;
+                }
             // User is signing for the MT request
             case RMobileUssdMessaging::EUssdMOAcknowledgement:
+                {
                 ussdType = SS_GSM_USSD_NOTIFY;
                 break;
+                }
             // Unknown or illegal cases return error to client
             default:
+                {
                 // ussd type is unknown, report error
                 ret = KErrArgument;
                 break;
+                }
             }
         }
     else
@@ -508,6 +511,7 @@ OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP, "CMmUssdMessHan
 
     // offset where the subblock starts
     TUint sbStartOffset( KErrNone );
+    TBool errorMappingNeeded( ETrue );
 
     //create package.
     CMmDataPackage package;
@@ -549,9 +553,40 @@ OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP, "CMmUssdMessHan
         EIsiSubBlockTypeId8Len8,
         sbStartOffset ) )
         {
-        causeType = SS_OTHER_ERROR;
-        causeValue = aIsiMessage.Get8bit(
-            sbStartOffset + SS_OTHER_ERROR_OFFSET_ERRORCODE );
+        TUint8 errorCode( aIsiMessage.Get8bit(
+            sbStartOffset + SS_OTHER_ERROR_OFFSET_ERRORCODE ) );
+
+        if( SS_RESOURCE_CONTROL_DENIED == errorCode )
+            {
+            if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+                ISI_HEADER_SIZE + SIZE_SS_SERVICE_FAILED_RESP,
+                SS_SB_RESOURCE_CONTROL_INFO,
+                EIsiSubBlockTypeId8Len8,
+                sbStartOffset ) )
+                {
+                TUint8 dataLen( aIsiMessage.Get8bit(
+                sbStartOffset + SS_SB_RESOURCE_CONTROL_INFO_OFFSET_DATALENGTH ) );
+
+                TPtrC8 data( aIsiMessage.GetData(
+                sbStartOffset + SS_SB_RESOURCE_CONTROL_INFO_OFFSET_DATA,
+                dataLen ) );
+                // sw1, sw2 and result is inserted to SS_SB_RESOURCE_CONTROL_INFO
+                // by simatktsy and ther order from first byte is: sw1, sw2 and result
+                TUint8 sw1 = data[KSw1Index];
+                TUint8 sw2 = data[KSw2Index];
+                TUint8 result = data[KResultIndex];
+                epocError = CMmStaticUtility::MapSw1Sw2ToEpocError( 
+                    sw1, 
+                    sw2, 
+                    result );
+                errorMappingNeeded = EFalse;
+                }
+            }
+        else
+            {
+            causeType = SS_OTHER_ERROR;
+            causeValue = errorCode;
+            }
         }
     else if( KErrNone == aIsiMessage.FindSubBlockOffsetById(
         ISI_HEADER_SIZE + SIZE_SS_SERVICE_FAILED_RESP,
@@ -580,11 +615,14 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP, "CMmUssdMe
         }
     else
         {
-        // Translate error to epoc world, Fix RFState problem
-        epocError = CMmStaticUtility::CSCauseToEpocError(
-            PN_SS,
-            causeType,
-            causeValue );
+        if( errorMappingNeeded )
+            {
+            // Translate error to epoc world, Fix RFState problem
+            epocError = CMmStaticUtility::CSCauseToEpocError(
+                PN_SS,
+                causeType,
+                causeValue );
+            }
         }
 
     if ( iIsSendReleaseCalled )

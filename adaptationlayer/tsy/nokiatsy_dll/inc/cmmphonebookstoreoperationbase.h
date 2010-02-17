@@ -122,6 +122,15 @@ const TUint8 KFileSize1       = 2;
 const TUint8 KFileIdentifier1 = 3;
 const TUint8 KFileStatus1     = 4;
 
+const TUint8 KAdditionalData  = 0x02;
+const TUint8 KExtRecordSize  = 13;
+const TUint8 KAdnMandatoryBytes = 13;
+const TUint8 KAnrExtRecIdOffset = 14;
+const TUint8 KExtRecLenWithoutRecId = 12;
+const TUint8 KIapRecordsToBeSearched        = 0 ;     // constant to find unused bytes
+const TUint8 KMaxNoOfRecInOneEf = 254;
+
+
 // UICC constants
 #define MF_FILE                             0x3F00 //Master file
 #define DF_CURRENT_APP                      0x7FFF //
@@ -453,7 +462,7 @@ class CMmPhoneBookStoreOperationBase
         * @param aPBType
         * @return TUint8
         */
-        static TUint16 ConvertToPBfileId( const TName& aPBType, TUint16& aFileIdExt );
+        static TUint16 ConvertToPBfileId( const TName& aPBType, TUint16& aFileIdExt,TUint8 aCardType );
 
 
         /**
@@ -528,6 +537,18 @@ class CMmPhoneBookStoreOperationBase
         * @return TInt: KErrNone or KErrNotFound
         */
         TInt EmptyEntryCheck( const TDesC8 &aFileData );
+
+        /**
+        * Searches wanted file list from EFpbr  
+        * @param aFileData: data of EFpbr record
+        * @param aTag: Tag for file list to be search
+        * @param aFileList: parameter where file list is inserted
+        * @return TInt: KErrNone or KErrNotFound
+        */
+        TInt FetchFileListFromPBR( 
+            const TDesC8 &aFileData, 
+            const TUint8 aTag, 
+            RArray <TPrimitiveTag>& aFileList );
 
     protected:
 

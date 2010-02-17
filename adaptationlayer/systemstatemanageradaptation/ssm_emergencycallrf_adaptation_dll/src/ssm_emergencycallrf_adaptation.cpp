@@ -4,18 +4,18 @@
 *  Part of:        SSMA EmergencyCallRfAdaptation
 *  Interface:      N/A
 *  Description:    Declaration of CEmergencyCallRfAdaptation class
-*  %version:       1 %
-*  %date_modified: Tue Dec 29 15:38:36 2009 %
+*  %version:       3 %
+*  %date_modified: Fri Feb 12 10:59:11 2010 %
 *
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
-* under the terms of the License "Symbian Foundation License v1.0"
+* under the terms of the License "Eclipse Public License v1.0"
 * which accompanies this distribution, and is available
-* at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
 *
 * Initial Contributors:
-* Nokia Corporation - initial contribution.
+* Nokia Corporation - initial contribution
 *
 * Contributors:
 *
@@ -496,9 +496,9 @@ void CEmergencyCallRfAdaptation::ReceiveIsiMessageL( TDesC8& aData )
     TUint8 transId( isiMsg.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
     TUint8 messageId( isiMsg.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
-    OstTraceExt3( TRACE_NORMAL, CEMERGENCYCALLRFADAPTATION_RECEIVEISIMESSAGEL_2,
+/*    OstTraceExt3( TRACE_NORMAL, CEMERGENCYCALLRFADAPTATION_RECEIVEISIMESSAGEL_2,
                "SSMA - CEmergencyCallRfAdaptation::ReceiveIsiMessageL - ISI message Id(0x%x, 0x%x, 0x%x)",
-               resourceId, transId, messageId ); 
+               resourceId, transId, messageId ); */
     INTERNAL_TRACE((_L("SSMA - CEmergencyCallRfAdaptation::ReceiveIsiMessageL - ISI message Id(0x%x, 0x%x, 0x%x)"),
                         resourceId, transId, messageId ));
 

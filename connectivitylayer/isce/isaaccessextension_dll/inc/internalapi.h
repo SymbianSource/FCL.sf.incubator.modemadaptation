@@ -42,8 +42,8 @@ class MDataMessageStatus
 
 #include "iadinternaldefinitions.h"    // For TIADConnectionStatus
 //#include "mist2iadapi.h"  // For TIADConnectionStatus // 
-#include "misiobjectrouterif.h"
-#include "misirouterobjectif.h"
+#include "../../isirouter_dll/inc/misiobjectrouterif.h"
+#include "../../isirouter_dll/inc/misirouterobjectif.h"
 
 // abstract interface for both channels user & kernel 
 // called by extension, provided by extension

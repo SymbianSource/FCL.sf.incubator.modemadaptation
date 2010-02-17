@@ -33,9 +33,6 @@ class MUsbPnAltObserver
 
         /**
         * Handles alternate setting changes.
-        * @since Series ?XX ?SeriesXX_version
-        * @param ?arg1 ?description
-        * @return ?description
         */
         virtual void HandleDeviceStateChange( TUint ) = 0;
 

@@ -70,8 +70,8 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
         */
         ~CMmPhoneBookOperationCache();
 
-    private:
-
+    protected:
+        
         /**
         * By default Symbian OS constructor is private.
         */
@@ -117,7 +117,8 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
         // None
 
     protected: // Data
-        // None
+        // Store information about operation has been canceled or not
+        TBool iCancelOperation;
 
     private: // Data
 
@@ -132,9 +133,6 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
         
         // To Store the information about no of entries filled in commontsy araay
         TInt iNumOfEntriesFilled;
-        
-        // Store information about operation has been canceled or not
-        TBool iCancelOperation;
 
         // Attribute to Store Entry
         TPBEntry* iStoreEntry;

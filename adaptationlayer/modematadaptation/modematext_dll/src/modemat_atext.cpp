@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -19,8 +19,6 @@
 
 #include "modemat_atext.h"
 #include "modemattrace.h"
-
-const TInt KMaxCommandCount(137);
 
 const char* const atCommands[] =
     {
@@ -161,8 +159,11 @@ const char* const atCommands[] =
     ("AT"),
     ("LAST")
     };
- const TInt KPartLength = KDefaultCmdBufLength;
- const TInt KPackets = 10;
+
+const TInt KMaxCommandCount(sizeof(atCommands)/sizeof(const char*));
+
+const TInt KPartLength = KDefaultCmdBufLength;
+const TInt KPackets = 10;
 
 _LIT8(KATDCommand,"ATD");
 _LIT8(KATICommand,"ATI");

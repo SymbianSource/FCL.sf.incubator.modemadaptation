@@ -25,12 +25,16 @@
 #include "memapi.h"               // For MemApi
 #include <trxdefs.h>              // For ETrxTest...
 #include "isicltransceiver.h"     // For DISICLTransceiver
-
+#include <nsisi.h>                // For PN_NAMESERVICE... TODO:Remove this
 
 #define PN_MEDIA_TEST 0xBB //not real
-#define PN_DEV_MODEM 0x12
+//#define PN_DEV_MODEM 0x12
 #define PN_DEV_DUMMYIST 0x13
-#define PN_DEV_APE 0x14
+#define PN_DEV_OWN 0x6C
+
+// CONSTS
+DISICLTransceiver* DISICLTransceiver::iThisPtr = NULL;
+
 
 // Faults
 enum TISICLTransceiverFaults
@@ -120,7 +124,6 @@ TInt DISICLTransceiver::SendCommIsaEntityNotReachableResp( TDes8& aMessage )
 		    tempPtr.Append( 0x00 );
 		    // Filler
             tempPtr.Append( 0x00 );
-		    RouteISIMessage( tempPtr );
             error = RouteISIMessage( tempPtr );
    		    }
 		else
@@ -136,34 +139,22 @@ TInt DISICLTransceiver::RouteISIMessage( TDes8& aMessage )
 	 C_TRACE( ( _T( "DISICLTransceiver::RouteISIMessage 0x%x>" ), &aMessage ) );
 	TInt error( ValidateISIMessage( aMessage ) );
     TBool sendOk( EFalse );
-	TUint8* messageBlockPtr( const_cast<TUint8*>( aMessage.Ptr() ) );
-    switch( messageBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] )
+    if(GET_RECEIVER_DEV( aMessage ) == PN_DEV_OWN )
         {
-        case PN_DEV_APE:
-            {
-            C_TRACE( ( _T( "DISIRouter msg to PN_DEV_APE" ) ) );
-            if( messageBlockPtr[ ISI_HEADER_OFFSET_RECEIVEROBJECT ] == PN_OBJ_ROUTING_REQ )
-                {
-                //route with resource and nameservice
-                }
-            else{
-            	  sendOk = iRouter->Receive( aMessage, messageBlockPtr[ ISI_HEADER_OFFSET_RECEIVEROBJECT ] );
-                C_TRACE( ( _T( "DISIRouter router sendOk %d" ), sendOk ) );
-                }
-            break;
-            }
-        default:
-            {
-            C_TRACE( ( _T( "DISIRouter msg to other device" ) ) );
-            TUint8 linkId = MapDeviceToMedia( messageBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] );
-	          ASSERT_RESET_ALWAYS( linkId < EISIAmountOfMedias, ( EISICLTransceiverNotSupportedMedia | EDISICLTransceiverTraceId << KClassIdentifierShift ) );
-            MISIRouterLinkIf* link = iLinksArray[ linkId ];
-            ASSERT_RESET_ALWAYS( link, ( EISICLTransceiverNULLPtr | EDISICLTransceiverTraceId << KClassIdentifierShift ) );
-            sendOk = link->Send( aMessage );
-            C_TRACE( ( _T( "DISIRouter link sendOk %d" ), sendOk ) );
-            break;
-            }
+        C_TRACE( ( _T( "DISIRouter msg to PN_DEV_APE" ) ) );
+        sendOk = iRouter->Receive( aMessage, GET_RECEIVER_OBJ( aMessage ) );
+        C_TRACE( ( _T( "DISIRouter router sendOk %d" ), sendOk ) );
         }
+    else
+        {
+         C_TRACE( ( _T( "DISIRouter msg to other device" ) ) );
+         TUint8 linkId = MapDeviceToMedia( GET_RECEIVER_DEV( aMessage ) );
+	       ASSERT_RESET_ALWAYS( linkId < EISIAmountOfMedias, ( EISICLTransceiverNotSupportedMedia | EDISICLTransceiverTraceId << KClassIdentifierShift ) );
+         MISIRouterLinkIf* link = iLinksArray[ linkId ];
+         ASSERT_RESET_ALWAYS( link, ( EISICLTransceiverNULLPtr | EDISICLTransceiverTraceId << KClassIdentifierShift ) );
+         sendOk = link->Send( aMessage );
+         C_TRACE( ( _T( "DISIRouter link sendOk %d" ), sendOk ) );
+         }   
     if( !sendOk )
         {
         SendCommIsaEntityNotReachableResp( aMessage );

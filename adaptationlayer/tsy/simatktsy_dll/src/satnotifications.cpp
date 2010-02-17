@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -3778,11 +3778,16 @@ void CSatNotifySendSs::MessageReceived
         // Notify NokiaTSY that next SS request is SAT originated
         if ( KErrNone == ret )
             {
-            TFLOGSTRING("TSY: Inform NokiaTSY SS request being SAT originated");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDSS_MESSAGERECEIVED, "Inform NokiaTSY SS request being SAT originated" );
+            TFLOGSTRING("TSY: Inform NokiaTSY SS request being SAT originated, resource control needed");
+            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDSS_MESSAGERECEIVED, "Inform NokiaTSY SS request being SAT originated, resource control needed" );
+
+            TBool resourceControlSuppress( EFalse );
+            CMmDataPackage dataPackage;
+            dataPackage.PackData( &resourceControlSuppress );
+
             iSatMessaging->GetMessageRouter()->ExtFuncL(
                 ESatNotifySendSsPCmd,
-                NULL );
+                &dataPackage );
             }
 #endif
         }
@@ -5762,12 +5767,20 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                 OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL SetSendSsDetails" );
                 // Set SS string to struct
                 callControl.SetSendSsDetails( tempSs );
-                // Notify NokiaTSY that next SS request is SAT originated
-                TFLOGSTRING("TSY: Inform NokiaTSY SS request being Call Control originated");
-                OstTrace0( TRACE_NORMAL, DUP4_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "Inform NokiaTSY SS request being Call Control originated" );
-                iSatMessaging->GetMessageRouter()->ExtFuncL(
-                    ESatNotifyCallControlRequest,
-                    NULL );
+                if ( ATK_CHANGED == aCcResult )
+                    {
+                    // Notify NokiaTSY that next SS request is SAT originated, because this is changed action made by SAT server
+                    TFLOGSTRING("TSY: Inform NokiaTSY SS request being Call Control originated, no further call control actions needed");
+                    OstTrace0( TRACE_NORMAL, DUP4_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "Inform NokiaTSY SS request being Call Control originated, no further call control actions needed" );
+
+                    TBool resourceControlSuppress( ETrue );
+                    CMmDataPackage dataPackage;
+                    dataPackage.PackData( &resourceControlSuppress );
+
+                    iSatMessaging->GetMessageRouter()->ExtFuncL(
+                        ESatNotifySendSsPCmd,
+                        &dataPackage );
+                    }
                 }
             else
                 {
@@ -5938,6 +5951,19 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                 SetCallSetUpDetails");
             OstTrace0( TRACE_NORMAL, DUP12_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL SetCallSetUpDetails" );
             callControl.SetCallSetUpDetails( tempCallParams );
+            if ( ATK_CHANGED == aCcResult )
+                {
+                // Notify NokiaTSY that next dial request is SAT originated, because this is changed action made by SAT server
+                TFLOGSTRING("TSY: CSatNotifyCallControlRequest::CompleteNotificationL: Notify NTSY next dial request is SAT-originated");
+                OstTrace0( TRACE_NORMAL, DUP16_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL: Notify NTSY next dial request is SAT-originated" );
+                TBool resourceControlSuppress( ETrue );
+                CMmDataPackage dataPackage;
+                dataPackage.PackData( &resourceControlSuppress );
+                iSatMessaging->GetMessageRouter()->ExtFuncL(
+                    ESatNotifySetUpCallPCmd,
+                    &dataPackage );
+                }
+            // No else
             }
         // Check if alpha id present
         TPtrC8 sourceString; // Used with conversions
