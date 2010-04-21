@@ -19,7 +19,7 @@
 #include <non_foundation_paths.hrh>
 
 PRJ_PLATFORMS
-DEFAULT
+BASEDEFAULT
 
 #include "../bcaiscadapter/group/bld.inf"
 #include "../devicemodecontroller/group/bld.inf"

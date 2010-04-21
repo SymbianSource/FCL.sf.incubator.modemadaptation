@@ -176,7 +176,11 @@ EXPORT_C void RIscApi::Open(
     TInt error( KErrInUse );
     if( KNotInitializedChannel == iChannelNumber )
         {
-        TBuf8<KInfoLength> info;
+        HBufC8* buffer = NULL;
+        TRAPD( err, buffer = HBufC8::NewL( KInfoLength ) );        
+        ASSERT_PANIC_ALWAYS( err == KErrNone, KErrNoMemory );
+        
+        TPtr8 info = buffer->Des();
         ASSERT_PANIC_ALWAYS( ( aChannelNumber < EIADNokiaLastUserChannel ), EIADChannelNumberOutofRange );
         C_TRACE( ( _T( "RIscApi::Open ldd" ) ) );
         OstTrace0( TRACE_NORMAL, RISCAPI_OPEN, "RIscApi::Open ldd" );        
@@ -187,6 +191,7 @@ EXPORT_C void RIscApi::Open(
                           NULL, 
                           &info, 
                           aType );
+        delete buffer;
         }
     if( KErrNone != error )
         {

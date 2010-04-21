@@ -72,6 +72,11 @@ class CMmPhoneBookOperationDelete
         ~CMmPhoneBookOperationDelete();
 
         /**
+        * By default Symbian OS constructor is private.
+        */
+        CMmPhoneBookOperationDelete();
+
+        /**
         * This method creates entry point to correct operation
         * @param aPhonebookType PhoneBook type
         * @param aIpc IPC
@@ -81,18 +86,7 @@ class CMmPhoneBookOperationDelete
             TName aPhonebookType,
             TInt aIpc );
 
-  private:
-
-        /**
-        * By default Symbian OS constructor is private.
-        */
-        CMmPhoneBookOperationDelete();
-
-        /**
-        * Class attributes are created in ConstructL.
-        */
-        //void ConstructL();
-
+    protected:
         /**
         * Separates different IPC requests for each other.
         *
@@ -117,6 +111,8 @@ class CMmPhoneBookOperationDelete
             TUint8 aDetails,
             const TDesC8& aFileData,
             TInt aTransId );
+
+    private:
 
         /**
         * Handles request to delete a phonebook entry
@@ -151,6 +147,22 @@ class CMmPhoneBookOperationDelete
         TInt HandleReadEntryResp( const TDesC8& aFileData );
 
         /**
+        * Handles Delete for phoenBook Entry
+        * @param aFileData File data
+        * @return KErrNone or error value
+        */
+        TInt HandleDeleteEntryResp(
+            TBool &aComplete,
+            TInt &aLocation );
+
+        /**
+        * Handles Deelte for phoenBook Entry Ext Data
+        * @param aFileData File data
+        * @return KErrNone or error value
+        */
+        TInt HandleDeleteExtResp();
+
+        /**
         * Creates and sends ISI message in order to read an extension
         * @return KErrNone or error value
         */
@@ -176,7 +188,7 @@ class CMmPhoneBookOperationDelete
         * @param aFileData File data
         * @return KErrNone or error value
         */
-        TInt HandleWriteMBIReadResp(TInt aStatus, TUint8 aDetails, TBool &aComplete, const TDesC8& aFileData );
+        TInt HandleMBIReadResp(TInt aStatus, TUint8 aDetails, TBool &aComplete, const TDesC8& aFileData );
         
         /**
         * Creates request to Delete MBI profile
@@ -189,18 +201,17 @@ class CMmPhoneBookOperationDelete
         // None
 
     protected:  // Data
-        // none
+        // Phone book entry to be deleted
+        CPhoneBookStoreEntry* iPhoneBookEntry;
+
+        // IPC number of operation
+        TInt iIpc;
 
     private:    // Data
 
        // Keep track on current delete phase
        TPBDeletePhases iCurrentDeletePhase;
 
-       // Phone book entry to be deleted
-       CPhoneBookStoreEntry* iPhoneBookEntry;
-
-       // IPC number of operation
-       TInt iIpc;
 
        // Number of entries
        TInt iNumOfEntries;

@@ -23,15 +23,11 @@
 #include <e32base.h>
 #include "mmodematobserver.h"
 
-const TInt KMaxDteIdCount(10);
-const TInt KPluginCount(2); //atext & common plugin
-const TInt KMaxNumOfTransactionIds(256);
 
 // FORWARD DECLARATIONS
 class CModemAtSrv;
 class RIscApi;
 class TIsiReceiveC;
-class MMtiWrapperService;
 class CModemAtPipeController;
 
 
@@ -73,10 +69,10 @@ public:
         const TDesC8& aCmd );
 
     /**
-      *  Connects Handler to modem with specific dteid.
-      *  @param TUint8 aDteId
+      *  Connects handler to modem
+      *  @param aDteId DteId. Default is zero. If pipe is created, pipehandle will be used.
       *  @return KErrNone or
-	  *  @return KErrNoMemory
+      *  @return KErrNoMemory
       */
 
     TInt Connect( const TUint8 aDteId );
@@ -86,7 +82,7 @@ public:
      *  @param TUint8 aDteId
      *  @return Disconnect status
      */
-    TInt Disconnect( const  TUint8 aDteId );
+    TInt Disconnect( const TUint8 aDteId );
     
     /**
      *  Check if disconnect is called directly
@@ -96,10 +92,9 @@ public:
     
     /**
      *  HandleCommandModeChange
-     *  @param TUint8 aDteId
      *  @param TCommandMode aMode
      */
-    void HandleCommandModeChange( TInt aDteid, TCommandMode aMode );
+    void HandleCommandModeChange( TCommandMode aMode );
     
     /**
      *  SendAtModemDataRedirectResultReq
@@ -138,6 +133,12 @@ public:
      *  @param TBool aModemAtExistsInCmt
      */
     void SetModemAtExistsInCmt( TBool aModemAtExistsInCmt );
+    
+    /**
+     *  SendAtModemConnectReq
+     *  @param TUint8 aDteId
+     */
+    TInt SendAtModemConnectReq( const TUint8 aDteId );
 
 protected:
     // from CActive
@@ -195,7 +196,7 @@ private:
     TUint8 iChannel;
     TATPluginInterface iPluginType;
 #endif
-    TUint8 iLastTransactionId[KMaxNumOfTransactionIds];
+    TUint8 iLastTransactionId;
     TBool iDisconnected;
     TBool iModemAtExistInCmt;
     };

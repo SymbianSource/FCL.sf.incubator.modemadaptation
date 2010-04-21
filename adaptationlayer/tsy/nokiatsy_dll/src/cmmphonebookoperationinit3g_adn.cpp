@@ -85,7 +85,6 @@ CMmPhoneBookOperationInit3G_adn::~CMmPhoneBookOperationInit3G_adn
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::CMmPhoneBookOperationInit3G_adn");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_CMMPHONEBOOKOPERATIONINIT3G_ADN, "CMmPhoneBookOperationInit3G_adn::~CMmPhoneBookOperationInit3G_adn" );
-
     }
 
 // -----------------------------------------------------------------------------
@@ -162,17 +161,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CONSTRUCTL, "CMmPhoneBo
     iIniPhase = 0;
     iServiceType = 0;
     iNumOfPBRRecords = 0;
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-    TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler. \
-        INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS is ON.");
-
-    iMmPhoneBookStoreMessHandler->SetMaxNumOfAasEntries( 0 );
-    iMmPhoneBookStoreMessHandler->SetMaxNumberOfGAS( 0 );
-#else
-    TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler. \
-        INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS is OFF.");
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
     }
 
 
@@ -266,7 +254,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCINITIALIZEREQ3
 
             cmdParams.fileId = PB_PBR_FID;
             cmdParams.serviceType = iServiceType;
-            cmdParams.record = 0;
+            cmdParams.record = KStartRecord;
             break;
             }
         case EPBInitPhase_3GADN_Type1:
@@ -317,7 +305,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCINITIALIZEREQ3
 //
 TInt CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile(
     TUiccReadLinearFixed & aparams,
-    const TUint8 aFileType)
+    const TUint8 aFileType )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE, "CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile" );
@@ -398,7 +386,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL,
         iInternalInit = EFalse;
         complete = ETrue;
         return KErrNone;
-        }
+        }  // no else
 
     switch(iIniPhase)
         {
@@ -441,7 +429,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL,
          if ( UICC_STATUS_OK != aStatus )
              {
              ret = CMmStaticUtility::UICCCSCauseToEpocError( aStatus );
-             }
+             }  // no else
 
          iMmPhoneBookStoreMessHandler->MessageRouter()->Complete(
                  EMmTsyPhoneBookStoreInitIPC,
@@ -449,7 +437,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL,
                  ret );
 
          complete = ETrue;
-         }
+         }  // no else
     return complete;
     }
 
@@ -482,6 +470,10 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESP3GADN, 
                     {
                     TFci fci( aFileData );
                     iNumOfPBRRecords = fci.GetNumberOfRecords();
+                    // Store PBR record no in internal conf list
+                    iMmPhoneBookStoreMessHandler->
+                              iPBStoreConf[EPhonebookTypeAdn].
+                                    iPBRNoOfRecords = iNumOfPBRRecords;
 
                     ret = KErrNone;
                     iServiceType = UICC_APPL_READ_LINEAR_FIXED;
@@ -517,12 +509,12 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESP3GADN, 
 
                     iServiceType = UICC_APPL_FILE_INFO;
                     iIniPhase = EPBInitPhase_3GADN_Type1;
-                    }
+                    }  // no else ...
                 }
             else
                 {
                 iADNPbInitilized = EFalse;
-                GetNextPhoneBookInitPhase(iIniPhase);
+                GetNextPhoneBookInitPhase( iIniPhase );
                 }
             break;
             }
@@ -571,7 +563,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESP3GADN, 
             // Call Create request for next phase
             ret = UICCInitializeReq3GADN( aTransId );
             }
-        }
+        }  // no else
 
     return ret;
     }
@@ -606,8 +598,8 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
         if( UICC_EF_ADN_TAG != tagValue )
             {
             ret = CheckForNoOfRecords( noOfRecords );
-            }
-        }
+            }  // no else
+        }  // no else
 
     if( iCurrentArrayCounter < iType1FileArray.Count() )
         {
@@ -646,7 +638,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
                     {
                     // Check for if No of records for this File is same as ADN
                     // phonebook no of records
-                    if(KErrNone == ret)
+                    if( KErrNone == ret )
                         {
                         // Check for fixed size record length
                         ret = CheckRecordSizeForFixedLength(
@@ -670,8 +662,8 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
                             iMmPhoneBookStoreMessHandler->
                                 iPBStoreConf[EPhonebookTypeAdn].iANRNoOfRecords
                                 = iPBStoreInfoData->iANRNumOfEntries;
-                            }
-                        }
+                            } // no else
+                        }  // no else
                     break;
                     }
                 case UICC_EF_EMAIL_TAG:
@@ -698,7 +690,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
                         iMmPhoneBookStoreMessHandler->
                             iPBStoreConf[EPhonebookTypeAdn].iEmailStringLength =
                                 iPBStoreInfoData->iEmailTextLengthMax;
-                        }
+                        }  // no else
                     break;
                     }
 
@@ -709,7 +701,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
                         // get the record record no from file info data
                         iPBStoreInfoData->iGRPNumOfEntriesPerEntry =
                             noOfRecords;
-                        }
+                        }  // no else
                     break;
                     }
                 case UICC_EF_IAP_TAG:
@@ -718,14 +710,14 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
                     if( iType2FileArray.Count()== 0 )
                         {
                         ret = KErrGeneral;
-                        }
+                        }  // no else
                     if( KErrNone == ret )
                         {
                         // Store IAP record record length in internal buffer
                         iMmPhoneBookStoreMessHandler->
                             iPBStoreConf[EPhonebookTypeAdn].iIAPRecordLength =
                                 recordLength;
-                        }
+                        } // no else
                     break;
                     }
                 case UICC_EF_PBC_TAG:
@@ -740,10 +732,9 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
                             // remove this entry from Array
                             iType1FileArray[iCurrentArrayCounter].tagFID = 0x00;
                             iType1FileArray[iCurrentArrayCounter].tagSFI = 0x00;
-                            iType1FileArray[iCurrentArrayCounter].tagValue =
-                                0x00;
-                            }
-                        }
+                            iType1FileArray[iCurrentArrayCounter].tagValue = 0x00;
+                            }  // no else
+                        }  // no else
                     break;
                     }
                 case UICC_EF_SNE_TAG:
@@ -764,7 +755,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
                         iMmPhoneBookStoreMessHandler->
                             iPBStoreConf[EPhonebookTypeAdn].iSNEStringLength =
                                 iPBStoreInfoData->iSNETextLengthMax;
-                        }
+                        }  // no else
                     break;
                     }
                 case UICC_EF_UID_TAG:
@@ -781,7 +772,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
             // iType1FileArray
             if( KErrNone != ret )
                 {
-                iType1FileArray.Remove(iCurrentArrayCounter);
+                iType1FileArray.Remove( iCurrentArrayCounter );
                 }
             else
                 {
@@ -798,7 +789,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
                 // parameters
                 iIniPhase = EPBIniPhase_3GADNDone;
                 return;
-                }
+                }  // no else
             iCurrentArrayCounter++;
             }
 
@@ -809,7 +800,9 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
 
             // Change Phase to read other Files
             if( 0 != iType2FileArray.Count() )
+                {
                 iIniPhase = EPBInitPhase_3GADN_Type2;
+                }
 
             else if( 0 != iType3FileArray.Count() )
                 {
@@ -819,7 +812,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
                 {
                 iIniPhase = EPBIniPhase_3GADNDone;
                 }
-            }
+            }  // no else
         } // End of Type 1 file array handling
     }
 
@@ -831,14 +824,14 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "C
 //
 void CMmPhoneBookOperationInit3G_adn::HandleType2FileResp(
     const TDesC8 &aFileData,
-    TInt aStatus)
+    TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::HandleType2FileResp");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP, "CMmPhoneBookOperationInit3G_adn::HandleType2FileResp" );
 
     TInt ret(KErrNone);
     TInt recordLength( 0 );
-    TInt noOfRecords(0);
+    TInt noOfRecords( 0 );
 
     if( UICC_STATUS_OK  == aStatus )
         {
@@ -846,7 +839,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP, "C
         TFci fci( aFileData );
         recordLength = fci.GetRecordLength();
         noOfRecords = fci.GetNumberOfRecords();
-        }
+        }  // no else
 
     // Get the tag value for current File
     TUint tagValue = iType2FileArray[iCurrentArrayCounter].tagValue;
@@ -855,7 +848,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP, "C
         {
         if( UICC_STATUS_OK  == aStatus )
             {
-            switch(tagValue)
+            switch( tagValue )
                 {
                 case UICC_EF_ANR_TAG:
                     {
@@ -863,7 +856,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP, "C
                         UICC_TYPE2_FILE,
                         UICC_EF_ANR_TAG,recordLength );
 
-                    if(KErrNone == ret)
+                    if( KErrNone == ret )
                         {
                         // total no of entries in all ANR files
                         iPBStoreInfoData->iANRNumOfEntries =
@@ -880,7 +873,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP, "C
                         iMmPhoneBookStoreMessHandler->
                             iPBStoreConf[EPhonebookTypeAdn].iANRNoOfRecords =
                                 iPBStoreInfoData->iANRNumOfEntries;
-                        }
+                        }  // KErrNone
                     break;
                     }
                 case UICC_EF_EMAIL_TAG:
@@ -901,6 +894,10 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP, "C
                     iMmPhoneBookStoreMessHandler->
                         iPBStoreConf[EPhonebookTypeAdn].iEmailNoOfRecords =
                             iPBStoreInfoData->iEmailNumOfEntries;
+                    
+                    iMmPhoneBookStoreMessHandler->
+                        iPBStoreConf[EPhonebookTypeAdn].iEmailStringLength = 
+                            recordLength - 2;
                     break;
                     }
                 case UICC_EF_SNE_TAG:
@@ -919,6 +916,11 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP, "C
                     iMmPhoneBookStoreMessHandler->
                         iPBStoreConf[EPhonebookTypeAdn].iSNENoOfRecords =
                             iPBStoreInfoData->iSNENumOfEntries;
+                    
+                    iMmPhoneBookStoreMessHandler->
+                        iPBStoreConf[EPhonebookTypeAdn].iSNEStringLength =
+                            iPBStoreInfoData->iSNETextLengthMax;
+                                        
                     break;
                     }
                 default:
@@ -945,11 +947,15 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP, "C
             {
             iCurrentArrayCounter = 0;
             if( 0 != iType3FileArray.Count() )
+                {
                 iIniPhase = EPBInitPhase_3GADN_Type3;
+                }
             else
+                {
                 iIniPhase = EPBIniPhase_3GADNDone;
-            }
-        }
+                }
+            }  // no else
+        }  // no else
     }
 
 
@@ -974,7 +980,7 @@ void CMmPhoneBookOperationInit3G_adn::HandleType3FileResp(
         TFci fci( aFileData );
         recordLength = fci.GetRecordLength();
         noOfRecords = fci.GetNumberOfRecords();
-        }
+        }  // no else
 
     // Get the tag value for current File
     TUint tagValue ( iType3FileArray[iCurrentArrayCounter].tagValue );
@@ -993,8 +999,8 @@ void CMmPhoneBookOperationInit3G_adn::HandleType3FileResp(
                     {
                     // Check for Fixed record length
                     ret = CheckRecordSizeForFixedLength(
-                        3,
-                        UICC_EF_EXT1_TAG,recordLength );
+                            UICC_TYPE3_FILE,
+                            UICC_EF_EXT1_TAG,recordLength );
 
                     // check for Error if Length doesn'nt match
                     if( KErrNone == ret )
@@ -1003,15 +1009,15 @@ void CMmPhoneBookOperationInit3G_adn::HandleType3FileResp(
                         // (remove record type and Identifier 2 bytes)
                         TInt fileLength ( ( recordLength - 2 ) * noOfRecords );
                             iPBStoreInfoData->iADNNumberLengthMax =
-                                UICC_NO_EXT_MAX_NUM_LEN+(2*fileLength);
+                                UICC_NO_EXT_MAX_NUM_LEN+( 2*fileLength );
 
                         // Check file is not invalid
                         if( UICC_NO_EXT_MAX_NUM_LEN ==
                             iPBStoreInfoData->iANRNumLengthMax )
                             {
                             iPBStoreInfoData->iANRNumLengthMax =
-                                UICC_NO_EXT_MAX_NUM_LEN+(2*fileLength);
-                            }
+                                UICC_NO_EXT_MAX_NUM_LEN+( 2*fileLength );
+                            }  // no else
 
                         iMmPhoneBookStoreMessHandler->
                             iPBStoreConf[EPhonebookTypeAdn].iNumlength =
@@ -1019,7 +1025,7 @@ void CMmPhoneBookOperationInit3G_adn::HandleType3FileResp(
                         iMmPhoneBookStoreMessHandler->
                             iPBStoreConf[EPhonebookTypeAdn].iExtNoOfRec =
                                 ( noOfRecords * iNumOfPBRRecords );
-                        }
+                        }  // no else
                     break;
                     }
                 case UICC_EF_GAS_TAG:
@@ -1035,12 +1041,12 @@ void CMmPhoneBookOperationInit3G_adn::HandleType3FileResp(
                     break;
                     }
                 }
-            }
+            }  // no else
 
         if( KErrNone != ret )
             {
             // remove from teh Array
-            iType3FileArray.Remove(iCurrentArrayCounter);
+            iType3FileArray.Remove( iCurrentArrayCounter );
             }
         else
             {
@@ -1052,8 +1058,8 @@ void CMmPhoneBookOperationInit3G_adn::HandleType3FileResp(
             {
             iCurrentArrayCounter = 0;
             iIniPhase = EPBIniPhase_3GADNDone;
-            }
-        }
+            }  // no else
+        }  // no else
     }
 
 
@@ -1076,20 +1082,22 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORFILEID, "CMmPho
     for( TInt j=0; j < iType1FileArray.Count(); j++ )
         {
         // Check for Type 1 files
-        for( TInt i = (j+1); i< (iType1FileArray.Count()-j); i++ )
+        for( TInt i = ( j+1 ); i< ( iType1FileArray.Count()-j ); i++ )
             {
             if( iType1FileArray[i].tagFID == iType1FileArray[j].tagFID )
                 {
                 // Check if it is a ADN EF then it will be a failure case
                 if( iType1FileArray[i].tagValue == UICC_ADN_PRIM_TAG )
-                ret = KErrGeneral;
+                    {
+                    ret = KErrGeneral;
+                    }
                 else
                     {
                     // remove Entry
                     iType1FileArray.Remove(i);
                     iType1FileArray.Remove(j);
                     }
-                }
+                }  // no else
             }
         // Check for Type2 file id's
         for(TInt i=0; i<iType2FileArray.Count(); i++)
@@ -1107,60 +1115,64 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORFILEID, "CMmPho
                     iType1FileArray.Remove(j);
                     iType2FileArray.Remove(i);
                     }
-                }
+                }  // no else
             }
         // Check for Type 3 File Id's
         for( TInt i=0; i<iType3FileArray.Count(); i++ )
             {
             if( iType3FileArray[i].tagFID == iType1FileArray[j].tagFID )
+                {
                 // Check for ADN file
                 if( iType1FileArray[j].tagValue == UICC_ADN_PRIM_TAG )
+                    {
                     ret = KErrGeneral;
+                    }
                 else
                     {
                     // remove those entries
-                    iType1FileArray.Remove(j);
-                    iType3FileArray.Remove(i);
+                    iType1FileArray.Remove( j );
+                    iType3FileArray.Remove( i );
                     }
-                }
+                }  // no else
             }
+        }
 
-        // Check for Type2 File Id's with all Type2 and Type3 file Id's
-        for( TInt j=0; j< iType2FileArray.Count(); j++ )
+    // Check for Type2 File Id's with all Type2 and Type3 file Id's
+    for( TInt j=0; j< iType2FileArray.Count(); j++ )
+        {
+        // Check for Type 2 files
+        for( TInt i = (j+1); i< ( iType2FileArray.Count()-j ); i++ )
             {
-            // Check for Type 2 files
-            for( TInt i = (j+1); i< ( iType2FileArray.Count()-j ); i++ )
+            if( iType2FileArray[i].tagFID == iType2FileArray[j].tagFID )
                 {
-                if( iType2FileArray[i].tagFID == iType2FileArray[j].tagFID)
-                    {
-                    iType2FileArray.Remove(j);
-                    iType2FileArray.Remove(i);
-                    }
-                }
-            // Check for Type 3 File Id's
-            for( TInt i=0; i<iType3FileArray.Count(); i++ )
-                {
-                if( iType3FileArray[i].tagFID == iType2FileArray[j].tagFID )
-                    {
-                    iType2FileArray.Remove(j);
-                    iType3FileArray.Remove(i);
-                    }
-                }
+                iType2FileArray.Remove( j );
+                iType2FileArray.Remove( i );
+                }  // no else
             }
+        // Check for Type 3 File Id's
+        for( TInt i=0; i<iType3FileArray.Count(); i++ )
+            {
+            if( iType3FileArray[i].tagFID == iType2FileArray[j].tagFID )
+                {
+                iType2FileArray.Remove( j  );
+                iType3FileArray.Remove( i );
+                }  // no else
+            }
+        }
 
-        //Check for Type3 File Id's with all other Type3 file Id's
-        for( TInt j=0; j< iType3FileArray.Count(); j++ )
+    //Check for Type3 File Id's with all other Type3 file Id's
+    for( TInt j=0; j< iType3FileArray.Count(); j++ )
+        {
+        // Check for Type 2 files
+        for( TInt i = ( j+1 ); i< ( iType3FileArray.Count()-j ); i++ )
             {
-            // Check for Type 2 files
-            for( TInt i = (j+1); i< (iType3FileArray.Count()-j); i++ )
+            if( iType3FileArray[i].tagFID == iType3FileArray[j].tagFID )
                 {
-                if( iType3FileArray[i].tagFID == iType3FileArray[j].tagFID )
-                    {
-                    iType3FileArray.Remove(j);
-                    iType3FileArray.Remove(i);
-                    }
-                }
+                iType3FileArray.Remove( j );
+                iType3FileArray.Remove( i );
+                }  // no else
             }
+        }
 
     return ret;
     }
@@ -1178,10 +1190,15 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORNOOFRECORDS, "C
 
     TInt ret( KErrNone );
 
-    if( iPBStoreInfoData->iADNNumOfEntries != aNoOfRecord )
+    // get the no of records in one ADN Ef
+    TInt maxNoOfRecInOneAdnEf =  ( ( iMmPhoneBookStoreMessHandler->
+                                      iPBStoreConf[EPhonebookTypeAdn].iNoOfRecords ) /  
+                                 ( iMmPhoneBookStoreMessHandler->
+                                      iPBStoreConf[EPhonebookTypeAdn].iPBRNoOfRecords ) ); 
+    if( maxNoOfRecInOneAdnEf != aNoOfRecord )
         {
         ret = KErrGeneral;
-        }
+        }  // no else
     return ret;
     }
 
@@ -1213,10 +1230,10 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORSAMETYPE1ANDTYP
                     }
                 else
                     {
-                    iType1FileArray.Remove(i);
-                    iType2FileArray.Remove(j);
+                    iType1FileArray.Remove( i );
+                    iType2FileArray.Remove( j );
                     }
-                }
+                }  // no else
             }
         }
     return ret;
@@ -1253,7 +1270,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKRECORDSIZEFORFIXED
                     if( ( 2== aFileType )&& ( 17!=aRecordLength ) )
                         {
                         ret =KErrNone;
-                        }
+                        }  // no else
                     }
             break;
             }
@@ -1262,7 +1279,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKRECORDSIZEFORFIXED
             if( 2!=aRecordLength )
                 {
                 ret = KErrGeneral;
-                }
+                }  // no else
             break;
             }
         case UICC_EF_UID_TAG:
@@ -1270,7 +1287,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKRECORDSIZEFORFIXED
             if( 2!= aRecordLength )
                 {
                 ret = KErrGeneral;
-                }
+                }  // no else
             break;
             }
         case UICC_EF_EXT1_TAG:
@@ -1278,7 +1295,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKRECORDSIZEFORFIXED
             if( 13 != aRecordLength )
                 {
                 ret = KErrGeneral;
-                }
+                }  // no else
             break;
             }
         }

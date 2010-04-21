@@ -554,7 +554,7 @@ EXPORT_C TDes8& TIsiSend::Complete
     C_TRACE( ( _T ( "TIsiSend::Complete, length: 0x%x, calcfinallength: 0x%x" ), length, calcFinalLength ) );
     OstTraceExt2( TRACE_NORMAL, DUP1_TISISEND_COMPLETE, "TIsiSend::Complete;length=%hu;calcFinalLength=%hu", length, calcFinalLength );
     
-    #if defined( __WINS__ ) || defined( __WINSCW__ )
+    #if defined( __WINS__ ) || defined( __WINSCW__ ) || defined(ISI_LENGTH_BIG_ENDIAN)
         {
          if( iFinalLength == 0 )    // TIsiSend alternative constructor used
             {

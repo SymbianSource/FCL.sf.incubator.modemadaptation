@@ -287,6 +287,13 @@ void CSatDataDownload::BuildSimMsgReport
         TIsiSubBlock userData( msgBuffer, SMS_SB_USER_DATA,
                 EIsiSubBlockTypeId16Len16 );
 
+        TUint16 maxDataLen( SMS_DELIVER_ACK_UD_MAX_LEN );
+        if( ENone != aTpFailure )
+            {
+            maxDataLen = SMS_DELIVER_ERR_UD_MAX_LEN;
+            }
+        dataLen = Min( dataLen, maxDataLen );
+
         // data length
         // to append MSB byte
         msgBuffer.Append( dataLen >> 8 );
@@ -307,9 +314,8 @@ void CSatDataDownload::BuildSimMsgReport
         msgBuffer.Append( dataLengthInOctets >> 8 );
         msgBuffer.Append( dataLengthInOctets );
 
-        // Append whole msg or SMS_GSM_DELIVER_ACK_UD_MAX_LEN bytes
-        msgBuffer.Append( aUserData.Left(Min( dataLen,
-                SMS_COMMAND_DATA_MAX_LEN ) ) );
+        // Append whole msg or max data len bytes
+        msgBuffer.Append( aUserData.Left( dataLen ) );
         // Increment number of subblock
         msgBuffer[5]++;
 

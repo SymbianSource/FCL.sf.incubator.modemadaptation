@@ -21,7 +21,7 @@
 #include <non_foundation_paths.hrh>
 
 PRJ_PLATFORMS
-DEFAULT
+BASEDEFAULT
 
 PRJ_EXPORTS
 

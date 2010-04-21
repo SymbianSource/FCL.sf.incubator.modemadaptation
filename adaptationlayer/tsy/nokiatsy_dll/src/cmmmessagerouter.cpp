@@ -446,7 +446,14 @@ OstTrace1( TRACE_NORMAL, CMMMESSAGEROUTER_ROUTEREQUEST, "CMmMessageRouter::Route
             case EMobilePhoneGetMailboxNumbers:
             case EMmTsyONStoreReadIPC:
             case EMmTsyONStoreReadEntryIPC:
-                {
+            case EMmTsyONStoreGetInfoIPC:
+            case EMmTsyONStoreDeleteIPC:
+            case EMmTsyONStoreDeleteAllIPC:
+            case EMmTsyONStoreReadSizeIPC:
+            case EMmTsyONStoreWriteSizeIPC:
+            case EMmTsyONStoreWriteEntryIPC:
+            case EMmTsyONStoreWriteIPC:
+                 {
                 messHandler = iMmPhoneBookStoreMessHandler;
                 break;
                 }

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -113,6 +113,59 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
         */
         void CancelReq( TName& aPhoneBook );
 
+        /**
+        * Read application file info from SIM/USIM
+        * @param aFileId
+        * @param aRecordId
+        * @param aTrId Transaction ID:
+        * @return Error code
+        */
+        TInt UiccReadApplFileInfo( const TInt aFileId,
+                                   const TInt aRecordId,
+                                   const TUint8 aTrId );
+
+        /**
+        * Handles Recieved data
+        * @param aTransId Transaction ID:
+        * @param TInt aStatus : To get the UICC Server response status
+        * @param const TDesC8 &aFileData : Data received in ISI Message
+        * @retun EFalse/ETrue to notify is operation completed or not
+        */
+        TBool HandleUiccReadApplFileInfoResp(
+            TInt aTransId,
+            TInt aStatus,
+            const TDesC8 &aFileData );
+
+        /**
+        * Checks is MSISDN service available.
+        * @return value KErrNone or KErrNotSupported
+        */
+        TInt CheckMSISDNSupport();
+
+        /**
+        * Completes given IPC with data package
+        */
+        void CompleteThisIPC
+            (
+            TInt aIPCToBeCompleted,
+            CMmDataPackage* aDataPackage,
+            TInt ret
+            );
+
+        /**
+        * Read application file data from SIM/USIM
+        * @param aFileId
+        * @param aRecordId
+        * @param aTrId Transaction ID:
+        * @return Error code
+        */
+        TInt UiccReadApplFileData
+        	   (
+	           const TInt aFileId,
+             const TInt aRecordId,
+             const TUint8 aTrId
+             );
+
     public: // Data
         // None
 
@@ -120,6 +173,38 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
         // Store information about operation has been canceled or not
         TBool iCancelOperation;
 
+        // Record ID
+        TInt iRecordId;
+
+        // Saved IPC
+        TInt iSavedIPC;
+
+        // Attribute to check what kind of read is ongoing
+        TTypeOfFileToBeRead iTypeOfReading;
+       
+        // Attribute to store file id
+        TUint16 iFileId;
+        
+        // Attribute to store Ext FileID
+        TUint16 iExtFileId;
+        
+        // Attribute to store ArrayIndex
+        TUint8 iArrayIndex;
+
+        // Service type for EMmTsyONStoreGetInfoIPC
+        TServiceType iServiceType;
+
+        // Attribute to Store Entry
+        TPBEntry* iStoreEntry;
+
+        // To Store the information about no of entries filled in commontsy araay
+        TInt iNumOfEntriesFilled;
+
+        // Length of the EXT file
+        TInt iEXTNumberLen;
+
+        // Flag to store EXT needs to be read or not
+        TBool iExtensionToRead;
     private: // Data
 
         // Number of used SDN entries
@@ -128,25 +213,7 @@ class CMmPhoneBookOperationCache : public CMmPhoneBookStoreOperationBase
         // Number of used VMBX entries
         TInt iNumOfUsedVMBXEntries;
         
-        // Flag to store EXT needs to be read or not
-        TBool iExtensionToRead;
         
-        // To Store the information about no of entries filled in commontsy araay
-        TInt iNumOfEntriesFilled;
-
-        // Attribute to Store Entry
-        TPBEntry* iStoreEntry;
-
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-
-        // Flag keeps track if GAS is cashed or not
-        TBool iGASCacheIsReady;
-
-        // Flag keeps track if AAS is cashed or not
-        TBool iAASCacheIsReady;
-
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
 
     };
 #endif // _CMMPHONEBOOK_OPERATION_CACHE_H

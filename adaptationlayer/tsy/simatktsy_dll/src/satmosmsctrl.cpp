@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -364,20 +364,20 @@ TInt CSatMoSmsCtrl::UiccCatRespEnvelopeReceived
 
 
 // -----------------------------------------------------------------------------
-// CSatMoSmsCtrl::SmsResourceIndReceived
+// CSatMoSmsCtrl::SmsResourceIndReceivedL
 // Request received from SMS server with the SMS parameters
 // of the SMS to be sent by the Mobile Equipment.
 // The response will tell whether the SMS can be sent
 // to network or not.
 // -----------------------------------------------------------------------------
 //
-void CSatMoSmsCtrl::SmsResourceIndReceived
+void CSatMoSmsCtrl::SmsResourceIndReceivedL
         (
         const TIsiReceiveC& aIsiMessage //Received data notification
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_SMSRESOURCEINDRECEIVED, "CSatMoSmsCtrl::SmsResourceIndReceived" );
-    TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceived");
+    TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceivedL");
+    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_SMSRESOURCEINDRECEIVEDL, "CSatMoSmsCtrl::SmsResourceIndReceivedL" );
 
     TUint sbOffset;
 
@@ -421,6 +421,10 @@ void CSatMoSmsCtrl::SmsResourceIndReceived
         {
         TUint8 addressLength = aIsiMessage.Get8bit(
             sbOffset + SMS_SB_ADDRESS_OFFSET_ADDRESSDATALENGTH );
+        // According to sms_isi specification
+        __ASSERT_ALWAYS(
+            2 <= addressLength && SMS_ADDRESS_MAX_LEN >= addressLength,
+            User::Leave( KErrCorrupt ) );
         iAddressSubblock = aIsiMessage.GetData(
             sbOffset + SMS_SB_ADDRESS_OFFSET_ADDRESSDATA,
             addressLength );
@@ -1033,8 +1037,8 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
                                  )
                                   {
                                   // Only Ton&Npi is present
-                                  // or TON6NPI has a reserved value
-                                  iUserDataSubblock[3] = 0x00;
+                                  // or TON&NPI has a reserved value
+                                  iUserDataSubblock[2] = 0x00;
                                   }
                               else if ( 0xF0 == ( address2[address2.Length() - 1] & 0xF0 ) )
                                   {
@@ -1084,11 +1088,11 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
         }
     }
 // -----------------------------------------------------------------------------
-// CSatMoSmsCtrl::MessageReceived
+// CSatMoSmsCtrl::MessageReceivedL
 // Handle received messages related to MO-SMS Control
 // -----------------------------------------------------------------------------
 //
-TInt CSatMoSmsCtrl::MessageReceived
+TInt CSatMoSmsCtrl::MessageReceivedL
         (
         const TIsiReceiveC& aIsiMessage
         )
@@ -1115,7 +1119,7 @@ TInt CSatMoSmsCtrl::MessageReceived
             {
             case SMS_RESOURCE_IND:
                 {
-                SmsResourceIndReceived( aIsiMessage );
+                SmsResourceIndReceivedL( aIsiMessage );
                 break;
                 }
             case SMS_RESOURCE_RESP:

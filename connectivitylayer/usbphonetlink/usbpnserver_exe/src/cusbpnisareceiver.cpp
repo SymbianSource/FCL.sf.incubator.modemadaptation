@@ -299,11 +299,12 @@ void CUsbPnIsaReceiver::ConstructMessage()
 
     OstTrace1( TRACE_DETAILED, CUSBPNISARECEIVER_CONSTRUCTMESSAGE, "CUsbPnIsaReceiver::ConstructMessage - Convert endianness;iRecvPtr.Length()=%d", iRecvPtr.Length() );
     E_TRACE( ( _T( "CUsbPnIsaReceiver::ConstructMessage() - Convert endianness - iRecvPtr.Length():%d" ), iRecvPtr.Length() ) );
+#ifdef ISI_LENGTH_LITTLE_ENDIAN
     TUint8 lsb(iRecvPtr[ISI_HEADER_OFFSET_LENGTH]);
     TUint8 msb(iRecvPtr[ISI_HEADER_OFFSET_LENGTH +1]);
     iRecvPtr[ISI_HEADER_OFFSET_LENGTH] = msb;
     iRecvPtr[ISI_HEADER_OFFSET_LENGTH +1] = lsb;
-
+#endif // ISI_LENGTH_LITTLE_ENDIAN
     OstTrace0( TRACE_NORMAL, CUSBPNISARECEIVER_CONSTRUCTMESSAGE_EXIT, "CUsbPnIsaReceiver::ConstructMessage - return void" );
     C_TRACE( ( _T( "CUsbPnIsaReceiver::ConstructMessage() - return void" ) ) );
     }

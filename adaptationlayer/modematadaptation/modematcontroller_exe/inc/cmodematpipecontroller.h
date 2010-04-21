@@ -20,8 +20,8 @@
 #define CMODEMATPIPECONTROLLER_H
 
 #include <e32base.h>
-#include "cmodemathandler.h" //KMaxDteIdCount
-
+#include "cmodemathandler.h"
+const TUint8 KInvalidPipeHandle = 0xff;
 
 class TPipeInfo
 {
@@ -36,13 +36,13 @@ public:
         EPipeRemoving,
         EPipeNoPipe
         };
-        
-    TInt iHandle;
-    TUint8 iFirstObjId;
-    TUint8 iFirstDevId;
-    TUint8 iSecondObjId;
-    TUint8 iSecondDevId;
-    EPipeState iPipeState;
+
+    TUint8 pipeHandle;
+    TUint8 firstObjId;
+    TUint8 firstDevId;
+    TUint8 secondObjId;
+    TUint8 secondDevId;
+    EPipeState pipeState;
 };
 
 /**
@@ -78,37 +78,36 @@ public:
     void RemovePipe( const TUint8 aDteId);
     
     /**
-      * Redirects pipe
-      * @param TUint8 aDteId Connection DteId   
-      * @param TUint8 aNewDevId New PEP
-      * @param TUint8 aNewObjId New PEP
-      */
-    
+     * Redirects pipe
+     * @param TUint8 aDteId Connection DteId   
+     * @param TUint8 aNewDevId New PEP
+     * @param TUint8 aNewObjId New PEP
+     */
     void RedirectPipe( const TUint8 aDteId, const TUint8 aNewDevId, const TUint8 aNewObjId );
 
-    /**
-      * Links dteId to created Pipe
-      * @param TUint8 aDteId Connection DteId   
-      */
-    void LinkDteIdToPipe( const TUint8 aDteId );
-    
     /**
      * Queries AT MODEM object id. 
      */
     void QueryModemAtFromNameService();
+
+    /**
+     * GetPipeHandle
+     * @return pipehandle
+     */
+    TUint8 GetPipeHandle();
+
 #endif
 private:
     /**
      * Default C++ constructor.
-     * @param None
-     * @return
+     * @param RIscApi& aIscApi
+     * @param TUint& aObjId
+     * @param CModemAtHandler& aHandler
      */
     CModemAtPipeController( RIscApi& aIscApi, TUint& aObjId, CModemAtHandler& aHandler );
 
     /**
-     *  Used to send At command to modem
-     *  @param
-     *  @return Send status
+     *  ConstructL
      */
 
     void ConstructL();
@@ -187,31 +186,24 @@ private:
      * @param TUint8 aPipeHandle Pipehandle
      */
     void SendEnablePipeReq( const TUint8 aPipeHandle);
-    /**
-     * Finds dteid of pipe
-     * @param const TInt aHandle pipe handle
-     */
-    TInt FindDteId( const TInt aHandle );
 
     /**
      * ChangePipeState
-     * @param const TInt aDteId
      * @param TPipeInfo::EPipeState aState
      */
-    void ChangePipeState( const TInt aDteId, TPipeInfo::EPipeState aState );
+    void ChangePipeState( TPipeInfo::EPipeState aState );
+    
 #endif
 private:
     
     RIscApi& iIscApi;
     TUint iModemAtObjId;            //Modem AT Controller Obj-id
     TUint iModemAtDevId;            //Modem AT Controller device-id
-    TInt  iPipeHandle;              //handle of created pipe 
     TUint iDataportDevId;           //Dataport device-id
     TUint iDataportObjId;           //Dataport obj-id
-    TPipeInfo iPipeTable[KMaxDteIdCount];   //created pipes
+    TPipeInfo iPipe;                //Pipehandle, pipe status and pipe id's
     CModemAtHandler& iAtHandler;    //forwards AT-commands to the AT MODEM
     CActiveSchedulerWait* iSchedulerWait;
-    TUint8 iDteId;                  // temporary dte id for creating the connection
     };
 
 #endif  // CMODEMATPIPECONTROLLER_H

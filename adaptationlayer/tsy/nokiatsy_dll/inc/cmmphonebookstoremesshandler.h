@@ -22,10 +22,6 @@
 #include <ctsy/serviceapi/cmmgsmphonestorageutility.h>
 #include "mmmmesshandlerbase.h"
 
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-#include <ctsy/rmmcustomapi.h>
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-
 #include "cmmphonetsender.h"
 #include "cmmphonetreceiver.h"
 #include "nokiatsy_internal_variation.h"
@@ -160,11 +156,6 @@ class TIsiReceiveC;
 class CMmPhoneBookStoreOperationBase;
 class CMmPhoneBookStoreOperationList;
 class CMmMessageRouter;
-//class CMmUiccMessHandler;
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-class CMmPhonebookAlphaString;
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
 
 // CLASS DECLARATION
 /**
@@ -246,8 +237,7 @@ class CMmPhoneBookStoreMessHandler
                                           TDes8& aNumber,
                                           CPhoneBookStoreEntry& aEntry,
                                           const TUint16 aFileId,
-                                          const TInt aIndexToRead,
-                                          const TBool aMailboxIdExist );
+                                          const TInt aIndexToRead );
 
         /**
         * Store ANR to phonebook entry
@@ -334,6 +324,29 @@ class CMmPhoneBookStoreMessHandler
             TUint8 aIndex,
             TUint8 aPBIndex,
             TPBEntry& aEntry );
+
+        /**
+        * Get the PBR Record number
+        *
+        * @param aIndexToRead : actual index to be read or write
+        * @param aPBRRecNum : PBR record num calculated
+        * @return None
+        */
+        TInt GetPBRRecordNum(
+            TInt aIndexToRead,
+            TUint8 &aPBRRecNum );
+
+        /**
+        * Get currentElementary File record num
+        *
+        * @param aIndexToRead : actual index to be read or write
+        * @param aCurrentRecNum : Current Ef record num calculated
+        * @return None
+        */
+        TInt GetCurrentEfRecNum(
+            TUint8 aPBRRecNum,
+            TUint8 &aCurrentRecNum,
+            TInt aIndexToRead);
 
         /**
         * Find Index for Present Entry
@@ -468,6 +481,27 @@ class CMmPhoneBookStoreMessHandler
         * @return None
         */
         void SimInd( const TIsiReceiveC& aIsiMessage );
+
+        /**
+        * Get mailbox identifiers
+        *
+        * @return Error code
+        */
+        TInt GetMailboxIdentifiers();
+
+
+        /**
+        * Handle mailbox identifiers
+        *
+        * @param aStatus Status
+        * @param aFileData File data
+        * @return None
+        */
+        void HandleGetMailboxIdentifiers(
+            TInt aStatus,
+            const TDesC8 &aFileData );
+
+
 
     public:     // Data
         // table for All phone books Configuration Data

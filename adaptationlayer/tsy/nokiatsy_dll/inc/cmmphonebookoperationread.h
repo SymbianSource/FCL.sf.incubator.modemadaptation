@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -60,7 +60,8 @@ class CMmPhoneBookOperationRead : public CMmPhoneBookStoreOperationBase
         static CMmPhoneBookOperationRead* NewL(
             CMmPhoneBookStoreMessHandler* aMmPhoneBookStoreMessHandler,
             CMmUiccMessHandler* aUiccMessHandler,
-            const CMmDataPackage* aDataPackage );
+            const CMmDataPackage* aDataPackage,
+            TInt aIpc );
 
         /**
         * Destructor.
@@ -68,30 +69,109 @@ class CMmPhoneBookOperationRead : public CMmPhoneBookStoreOperationBase
         ~CMmPhoneBookOperationRead();
 
         /**
-        * This method created entry point to correct operation
-        * @param TName aPhonebookType:
-        * @param TInt aIpc: Identify number of request.
-        * @return CMmPhoneBookStoreOperation*: pointer to operation.
+        * Sends Request To Get Read and Write Size
+        * for Msisdn PB
+        * @param TUint8 aTransId : TransactionId
+        * @return TInt: KErrNone or error value.
         */
-        static CMmPhoneBookOperationRead* Build(
-            TName aPhonebookType,
-            TInt aIpc );
+        TInt USimReadWriteSizeReq( TUint8 aTransId );
 
+        /**
+        * Construct UICC Req to read Entry
+        * @param
+        * @return TInt: KErrNone or error value.
+        */
+        TInt USimPbReqRead( TInt aRecordNo, TUint8 aTransId );
 
+        /**
+        * Appends Correct record numner to request
+        * @param aParams
+        * @return TInt: KErrNone or error value.
+        */
+        TInt AddParamToReadReq( TUiccReadLinearFixed& aParams );
 
-virtual TInt UICCHandleData3gADNReadReq( TInt /*aFileID*/, TInt /*aFileSFI*/)
-{
-        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::CreateReq - Return KErrNotSupported");
-        return KErrNotSupported;
-}
+        /**
+        * Handles SimPbResp ISI -message
+        * @param  aStatus
+        * @param aTransId
+        * @param aFileData
+        * @param pbFileId
+        * @param fileIdExt
+        * @parma arrayIndex
+        * @return TInt: KErrNone or error value.
+        */
+        TBool  USimPbReadRespL( TInt aStatus, 
+                TUint8 aTransId,
+                const TDesC8 &aFileData );
 
+        /**
+        * Handles response for Msisdn read Write size request
+        * @param  TDesC8 &aFileData :  Response Data
+        * @return TInt: KErrNone or error value.
+        */
+        TBool USimReadWriteSizeResp( const TDesC8 &aFileData, 
+                                    TInt aStatus );
 
-virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileData*/, const TInt /*aTransId*/)
-{
-        TFLOGSTRING("TSY: CMmPhoneBookOperationInit::CreateReq - Return KErrNotSupported");
-        return KErrNotSupported;
-}
   private:
+
+      /**
+      * Separates different IPC requests for each other.
+      * @param TInt aIpc: Identify number of request.
+      * @param const CMmDataPackage* aDataPackage: Packaged data.
+      * @return TInt: KErrNone or error value.
+      */
+      TInt UICCCreateReq( TInt aIpc, const CMmDataPackage* aDataPackage, TUint8 aTransId );
+
+
+      /**
+      * Handles read resp for main Entry
+      * @param  aFileData
+      * @param aTransId
+      * @param aEmptyEntry  : Entry is EMpty or not
+      * @param aEntryStore : ENtry is store in internal list or not
+      * @return TInt: KErrNone or error value.
+      */
+      void HandleReadResp( 
+              const TDesC8 &aFileData, 
+              TUint8 aTransId, 
+              TInt &aEmptyEntry, 
+              TBool &aEntryStore );
+
+      /**
+      * Handles read resp for main Entry when Entry is present
+      * @param  aFileData
+      * @param aTransId
+      * @param aEntryStore : ENtry is store in internal list or not
+      * @return TInt: KErrNone or error value.
+      */
+      void HandleEntryPresentResp( 
+              const TDesC8 &aFileData, 
+              TUint8 aTransId, 
+              TBool &aEntryStore );
+
+      /**
+      * Handles SimPbResp ISI -message
+      * @param  TIsiReceiveC& aIsiMessage
+      * @param TBool& aComplete: Indicates if request can remove from
+      *        operationlist or not.
+      * @return TInt: KErrNone or error value.
+      */
+      TBool HandleUICCPbRespL(
+              TInt aStatus,
+              TUint8 aDetails,
+              const TDesC8 &aFileData,
+              TInt aTransId);
+
+
+      /**
+      * Handles EXT file read resp
+      * @param aFIleData 
+      * @param aTransId
+      * @return TInt: KErrNone or error value.
+      */
+      void HandleExtReadResp( const TDesC8 &aFileData, 
+                              TUint8 aTransId,
+                              TBool &aEntryStored );
 
 
         /**
@@ -100,21 +180,6 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
         void ConstructL();
 
         // Transmit
-
-        /**
-        * Separates different IPC requests for each other.
-        * @param TInt aIpc: Identify number of request.
-        * @param const CMmDataPackage* aDataPackage: Packaged data.
-        * @return TInt: KErrNone or error value.
-        */
-        TInt UICCCreateReq( TInt aIpc, const CMmDataPackage* aDataPackage, TUint8 aTransId );
-
-        /**
-        * Constructs an ISI-message to read entry from SIM
-        * @param
-        * @return TInt: KErrNone or error value.
-        */
-        TInt USimPbReqRead( TInt aRecordNo, TUint8 aTransId );
 
         /**
         * Constructs Data to read entry from USIM ADN Phonebook
@@ -126,20 +191,6 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
 
         // Receive
 
-        /**
-        * Handles SimPbResp ISI -message
-        * @param  TIsiReceiveC& aIsiMessage
-        * @param TBool& aComplete: Indicates if request can remove from
-        *        operationlist or not.
-        * @return TInt: KErrNone or error value.
-        */
-        TBool HandleUICCPbRespL(
-                TInt aStatus,
-                TUint8 aDetails,
-                const TDesC8 &aFileData,
-                TInt aTransId);
-
-
 
         /**
         * Handles SimPbResp ISI -message
@@ -149,6 +200,17 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
         */
         TInt UICCHandleDataADNReadResp( const TDesC8& aFileData);
 
+        /**
+        * Store Entry to internal List and CacheArray
+        * @param  TBool &aEntryStored
+        */
+        void StoreEntryToListL( TBool &aEntryStored );
+
+        /**
+        * Store Own Number Entry to internal and compelte
+        * @param  TInt aRet
+        */
+        void StoreAndCompleteOwnNumber( TInt aRet, TInt aEmptyEntry );
 
     public: // Data
         // None
@@ -164,6 +226,21 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
         // To Store the information about first valid Entry Search
         TBool iLocationSearch;
 
+        // Attribute to Store Entry
+        TPBEntry* iStoreEntry;
+
+        // Saved IPC for complete
+        TInt iSavedIPCForComplete;
+        
+        // Attribute store fileid
+        TUint16 iFileId;
+        
+        // Attribute to store Ext File 
+        TUint16 iExtFileId;
+        
+        // Attribute to store Phonebook conf array index
+        TUint8 iArrayIndex;
+
     private: // Data
 
         // Attribute to check what kind of read is ongoing
@@ -171,11 +248,7 @@ virtual TInt HandleUICC3gADNRespL(const TInt /*aStatus*/, const TDes8& /*aFileDa
 
         TBool iExtensionRead ;
         
-        // Attribute to Store Entry
-        TPBEntry* iStoreEntry;
         
-        // Saved IPC for complete
-        TInt iSavedIPCForComplete;
 
 
 

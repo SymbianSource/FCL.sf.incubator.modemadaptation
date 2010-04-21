@@ -20,7 +20,7 @@
 #include <non_foundation_paths.hrh>
 
 PRJ_PLATFORMS
-DEFAULT
+BASEDEFAULT
 
 PRJ_EXPORTS
 ../rom/sspluginsadaptation.iby    NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(sspluginsadaptation.iby)

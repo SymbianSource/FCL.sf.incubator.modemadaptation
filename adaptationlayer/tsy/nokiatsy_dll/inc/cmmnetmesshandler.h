@@ -211,6 +211,14 @@ class CMmNetMessHandler
             TUint8& aRegistrationStatus
             ) const;
 
+        /**
+        * Handles last received NET_MODEM_REG_STATUS_IND again
+        * so that network information is completed to the upper 
+        * layers
+        * @return void
+        */
+        void HandleLastNetModemRegStatusInd();
+
     private: // Constructors and destructor
 
         /**
@@ -581,6 +589,9 @@ class CMmNetMessHandler
         // Array for queueing NET_MODEM_REG_STATUS_IND,
         // NET_MODEM_REG_STATUS_GET_RESP and NET_SET_RESP messages.
         RPointerArray<HBufC8> iNetMessageQueue;
+
+        // For storing latest received NET_MODEM_REG_STATUS_IND
+        HBufC8* iLastNetModemRegStatusInd;
 
     protected: // Data
 

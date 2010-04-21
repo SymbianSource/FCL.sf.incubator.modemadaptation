@@ -21,7 +21,7 @@
 #include <non_foundation_paths.hrh>
 
 PRJ_PLATFORMS
-DEFAULT
+BASEDEFAULT
 
 // Remove comments if the default "boot reason API" is needed.
 //#include "../internal/boot_reason_api_dummy/group/bld.inf"

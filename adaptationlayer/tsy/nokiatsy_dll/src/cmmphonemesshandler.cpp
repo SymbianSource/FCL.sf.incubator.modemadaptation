@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -65,8 +65,7 @@
 
 // LOCAL CONSTANTS AND MACROS
 
-const TUint8 KPhoneTransId = 6; //hard coded transaction ID
-const TUint8 KImsiSize = 8;
+const TUint8 KPhoneTransId = 6;
 const TUint8 KServiceProviderSize = 36;
 const TUint8 KSpnFileSize = 16;
 
@@ -74,14 +73,26 @@ const TUint8 KServiceAcl( 35 );
 const TUint8 KAclStateMask( 4 );
 const TUint8 KNumOfApnsIndex( 0 );
 const TUint8 KApnDataIndex( 1 );
+const TUint8 KCpsLength( 18 );
+const TUint8 KSpnLength( 17 );
+const TUint8 KLineInfoLength( 1 );
+const TUint8 KAclStatusLength( 1 );
+
+const TUint8 KImsiSize = 9;
+const TUint8 KUnusedNibble = 0x0F;
+const TUint8 KImsiStringByteCount = 0;
+const TUint8 KFirstImsiDigit = 1;
+const TUint8 KSecondImsiDigit = 2;
+const TUint8 KNibbleMask = 0x0f;
+const TUint8 KNibbleShift = 4;
 
 // ------------------------------------------------------
 // --- Alternate Line Service (ALS)-related constants ---
 // ------------------------------------------------------
 // Consts for mapping the Als Line values, as used in SIMSON's
 // SIM_SERV_DYNAMIC_FLAGS_STR structure.
-const TUint8 KAlsAuxiliaryLine = 0x00; // ALS alternate line
-const TUint8 KAlsPrimaryLine = 0x01;   // ALS primary line
+const TUint8 KAlsAuxiliaryLine = 0x00;
+const TUint8 KAlsPrimaryLine = 0x01;
 
 // ----------------------------------------------
 // --- (U)ICC Service Table-related constants ---
@@ -130,9 +141,9 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_CMMPHONEMESSHANDLER, "CMmPhoneMessH
 //
 CMmPhoneMessHandler* CMmPhoneMessHandler::NewL
         (
-        CMmPhoNetSender* aPhoNetSender,  //a ptr to the phonet sender
-        CMmPhoNetReceiver* aPhoNetReceiver,  //a ptr to the phonet receiver
-        CMmMessageRouter* aMessageRouter, // pointer to the msg router
+        CMmPhoNetSender* aPhoNetSender,
+        CMmPhoNetReceiver* aPhoNetReceiver,
+        CMmMessageRouter* aMessageRouter,
         CMmSupplServMessHandler* aSupplServMessHandler,
         CMmUiccMessHandler* aUiccMessHandler
         )
@@ -145,9 +156,11 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_NEWL, "CMmPhoneMessHandler::NewL" )
 
     CleanupStack::PushL( phoneMessHandler );
     phoneMessHandler->iPhoNetSender = aPhoNetSender;
-    phoneMessHandler->ConstructL( aMessageRouter );
-    phoneMessHandler->iSupplServMessHandler = aSupplServMessHandler;
-    phoneMessHandler->iMmUiccMessHandler = aUiccMessHandler;
+    phoneMessHandler->ConstructL(
+        aMessageRouter,
+        aPhoNetSender,
+        aSupplServMessHandler,
+        aUiccMessHandler );
 
     aPhoNetReceiver->RegisterL(
         phoneMessHandler,
@@ -180,18 +193,23 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_NEWL, "CMmPhoneMessHandler::NewL" )
 //
 void CMmPhoneMessHandler::ConstructL
         (
-        CMmMessageRouter* aMessageRouter
+        CMmMessageRouter* aMessageRouter,
+        CMmPhoNetSender* aPhoNetSender,
+        CMmSupplServMessHandler* aSupplServMessHandler,
+        CMmUiccMessHandler* aUiccMessHandler
         )
     {
 TFLOGSTRING("TSY: CMmPhoneMessHandler::ConstructL");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_CONSTRUCTL, "CMmPhoneMessHandler::ConstructL" );
 
-    // Internal pointers, must be nulled before used.
+    iPhoNetSender = aPhoNetSender;
+    iSupplServMessHandler = aSupplServMessHandler;
+    iMmUiccMessHandler = aUiccMessHandler;
+    iMessageRouter = aMessageRouter;
+
     iSSTFileData = NULL;
     iStoreInfo = NULL;
     iLocIndex = 0;
-
-    iMessageRouter = aMessageRouter;
 
     iCommonTSYRefreshPending = EFalse;
     iRefreshError = EFalse;
@@ -212,16 +230,13 @@ CMmPhoneMessHandler::~CMmPhoneMessHandler()
 TFLOGSTRING("TSY: CMmPhoneMessHandler destructed.");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_CMMPHONEMESSHANDLER, "CMmPhoneMessHandler::~CMmPhoneMessHandler" );
 
-    // Delete iStoreInfo and set it to NULL, if it exist.
     if( iStoreInfo )
         {
         delete iStoreInfo;
         }
 
-    // Delete iSSTFileData and set it to NULL, if it exist.
     if( iSSTFileData )
         {
-        // Delete object
         delete iSSTFileData;
         }
 
@@ -352,18 +367,11 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_SUBSCRIBEEVENTSFROMPHONET, "CMmPhon
 TInt CMmPhoneMessHandler::ExtFuncL
         (
         TInt aIpc,
-        const CMmDataPackage* aDataPackage // Data package
+        const CMmDataPackage* aDataPackage
         )
     {
 TFLOGSTRING2("TSY: CMmPhoneMessHandler::ExtFuncL. Licensee specific implemtantion. IPC: %d", aIpc);
 OstTrace1( TRACE_NORMAL, CMMPHONEMESSHANDLER_EXTFUNCL, "CMmPhoneMessHandler::ExtFuncL;Licensee specific implemtantion aIpc=%d", aIpc );
-
-    //*************************************************************//
-    // NOTE.
-    //
-    // LICENSEE SPECIFIC MESSAGE HANDLER IMPLEMENTATION STARTS HERE
-    //
-    //*************************************************************//
 
     TInt ret( KErrNone );
     TUint8 transId( KPhoneTransId );
@@ -378,8 +386,15 @@ OstTrace1( TRACE_NORMAL, CMMPHONEMESSHANDLER_EXTFUNCL, "CMmPhoneMessHandler::Ext
         case EMobilePhoneSetALSLine:
             {
             TUint8 alsLine;
-            aDataPackage->UnPackData( alsLine );
-            ret = UiccWriteDynamicFlagsReq( alsLine );
+            if ( aDataPackage )
+                {
+                aDataPackage->UnPackData( alsLine );
+                ret = UiccWriteDynamicFlagsReq( alsLine );
+                }
+            else
+                {
+                ret = KErrArgument;
+                }
             break;
             }
         case EMobilePhoneGetCustomerServiceProfile:
@@ -567,7 +582,7 @@ OstTrace1( TRACE_NORMAL, DUP7_CMMPHONEMESSHANDLER_EXTFUNCL, "CMmPhoneMessHandler
 //
 void CMmPhoneMessHandler::ReceiveMessageL
         (
-        const TIsiReceiveC &aIsiMessage  // ISI message received
+        const TIsiReceiveC &aIsiMessage
         )
     {
     TInt resource( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_RESOURCEID ) );
@@ -584,44 +599,31 @@ OstTraceExt2( TRACE_NORMAL, CMMPHONEMESSHANDLER_RECEIVEMESSAGEL, "CMmPhoneMessHa
         case PN_MODEM_INFO:
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
             {
-            switch( messageId )
+            if ( INFO_SERIAL_NUMBER_READ_RESP == messageId )
                 {
-                case INFO_SERIAL_NUMBER_READ_RESP:
-                    {
-                    InfoSerialNumberReadResp( aIsiMessage );
-                    break;
-                    }
-                default:
-                    {
+                InfoSerialNumberReadResp( aIsiMessage );
+                }
+            else
+                {
 TFLOGSTRING("TSY: CMmPhoneMessHandler::ReceiveMessageL, switch resource - case PN_MODEM_INFO, switch messageId - default.\n" );
 OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEMESSHANDLER_RECEIVEMESSAGEL, "CMmPhoneMessHandler::ReceiveMessageL, switch resource - case PN_MODEM_INFO, switch messageId - default" );
-                    break;
-                    }
                 }
             break; // end case PN_MODEM_INFO
             }
         case PN_UICC:
             {
-            switch( messageId )
+            if ( UICC_REFRESH_IND == messageId )
                 {
-                case UICC_REFRESH_IND:
-                    {
-                    UiccRefreshInd( aIsiMessage );
-                    break;
-                    }
-                case UICC_REFRESH_RESP:
-                    {
-                    UiccRefreshResp( aIsiMessage );
-                    break;
-                    }
-                default:
-                    {
-                    break;
-                    }
+                UiccRefreshInd( aIsiMessage );
                 }
+            else if ( UICC_REFRESH_RESP == messageId )
+                {
+                UiccRefreshResp( aIsiMessage );
+                }
+            // No else
             break;
             }
-        default:
+       default:
             {
 TFLOGSTRING("TSY: CMmPhoneMessHandler::ReceiveMessageL, switch resource - default.\n" );
 OstTrace0( TRACE_NORMAL, DUP5_CMMPHONEMESSHANDLER_RECEIVEMESSAGEL, "CMmPhoneMessHandler::ReceiveMessageL, switch resource - default" );
@@ -632,13 +634,13 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMPHONEMESSHANDLER_RECEIVEMESSAGEL, "CMmPhoneMess
 
 // --------------------------------------------------------------------------
 // CMmPhoneMessHandler::InfoSerialNumberReadReq
-// Constructs INFO_SERIAL_NUMBER_READ_REQ ISI message..
+// Constructs INFO_SERIAL_NUMBER_READ_REQ ISI message.
 // Returns KErrNone on success, other error value on failure.
 // --------------------------------------------------------------------------
 //
 TInt CMmPhoneMessHandler::InfoSerialNumberReadReq
         (
-        TUint8 aTransactionId, // transaction id
+        TUint8 aTransactionId,
         TUint8 aTarget // type of requested serial number
         )
     {
@@ -673,54 +675,49 @@ void CMmPhoneMessHandler::InfoSerialNumberReadResp
 
     TBuf8<KSerialNumberLength> serialData;
 
-    // Get status
     TUint8 status( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + INFO_SERIAL_NUMBER_READ_RESP_OFFSET_STATUS ) );
 
 TFLOGSTRING2("TSY: CMmPhoneMessHandler::InfoSerialNumberReadResp, status=0x%02x",status);
 OstTraceExt1( TRACE_NORMAL, CMMPHONEMESSHANDLER_INFOSERIALNUMBERREADRESP, "CMmPhoneMessHandler::InfoSerialNumberReadResp;status=%hhx", status );
 
-    // If status is Ok get information from possible sub block(s).
+    // Get information from possible sub block(s).
     if ( INFO_OK == status )
         {
+        TBool subblockFound( EFalse );
+        TUint sbSerialNumberStartOffset( 0 );
+
         // If sub blocks
         if ( 0 != aIsiMessage.Get8bit(
             ISI_HEADER_SIZE +
             INFO_SERIAL_NUMBER_READ_RESP_OFFSET_SUBBLOCKCOUNT ) )
             {
-            TUint sbSerialNumberStartOffset( 0 );
+            subblockFound = ETrue;
+            }
 
-            if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
-                ISI_HEADER_SIZE + SIZE_INFO_SERIAL_NUMBER_READ_RESP,
-                INFO_SB_SN_IMEI_PLAIN,
-                EIsiSubBlockTypeId8Len8,
-                sbSerialNumberStartOffset ) )
-                {
-                // Read the string length - the zero terminator...
-                TUint8 strLength( aIsiMessage.Get8bit(
-                    sbSerialNumberStartOffset +
-                    INFO_SB_SN_IMEI_PLAIN_OFFSET_STRLEN ) - 1 );
-                // ...and compare it to the available buffer size
-                // (50 bytes in etel),
-                // and choose the shorter one strLength =
-                // ( RMobilePhone::KPhoneSerialNumberSize > strLength )?
-                // strLength : RMobilePhone::KPhoneSerialNumberSize;
+        if ( subblockFound && ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
+            ISI_HEADER_SIZE + SIZE_INFO_SERIAL_NUMBER_READ_RESP,
+            INFO_SB_SN_IMEI_PLAIN,
+            EIsiSubBlockTypeId8Len8,
+            sbSerialNumberStartOffset ) ) )
+            {
+            // Read the string length - the zero terminator
+            TUint8 strLength( aIsiMessage.Get8bit(
+                sbSerialNumberStartOffset +
+                INFO_SB_SN_IMEI_PLAIN_OFFSET_STRLEN ) - 1 );
 
-                TUint8 dataOffset(
-                    sbSerialNumberStartOffset +
-                    INFO_SB_SN_IMEI_PLAIN_OFFSET_IMEIPLAINU8 );
+            TUint8 dataOffset(
+                sbSerialNumberStartOffset +
+                INFO_SB_SN_IMEI_PLAIN_OFFSET_IMEIPLAINU8 );
 
-                serialData.Append( aIsiMessage.GetData(
-                    dataOffset,
-                    strLength ).Left( KSerialNumberLength ) );
+            serialData.Append( aIsiMessage.GetData(
+                dataOffset,
+                strLength ).Left( KSerialNumberLength ) );
 
-                err = KErrNone;
-                }
+            err = KErrNone;
             }
         }
 
-    // Complete to CommonTSY, ONLY if all data has already been received
-    // packed parameter: TBuf8<KSerialNumberLength> serialData
     CMmDataPackage dataPackage;
     dataPackage.PackData( &serialData );
     iMessageRouter->Complete( EMobilePhoneGetPhoneId, &dataPackage, err );
@@ -736,22 +733,13 @@ TInt CMmPhoneMessHandler::UiccReadDynamicFlagsReq()
 TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccReadDynamicFlagsReq");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADDYNAMICFLAGSREQ, "CMmPhoneMessHandler::UiccReadDynamicFlagsReq" );
 
-    // Set parameters for UICC_APPL_CMD_REQ message
-    TUiccWriteTransparent params;
-    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-    params.trId = ETrIdReadDynamicFlags;
-    params.dataOffset = 0;
-    params.dataAmount = 0;
-    params.fileId = KElemFileDynFlagsOrange;
-    params.fileIdSfi = UICC_SFI_NOT_PRESENT;
-    params.serviceType = UICC_APPL_READ_TRANSPARENT;
-    // File id path
-    params.filePath.Append( KMasterFileId >> 8 );
-    params.filePath.Append( KMasterFileId );
-    params.filePath.Append( KOrangeDedicatedFile >> 8 );
-    params.filePath.Append( KOrangeDedicatedFile );
-
-    return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    return UiccApplCmdReq(
+        ETrIdReadDynamicFlags,
+        UICC_APPL_READ_TRANSPARENT,
+        0,
+        0,
+        KElemFileDynFlagsOrange,
+        UICC_SFI_NOT_PRESENT );
     }
 
 // --------------------------------------------------------------------------
@@ -785,24 +773,19 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCWRITEDYNAMICFLAGSREQ, "CMmPhone
 
     if ( KErrNone == ret )
         {
-        // Set parameters for UICC_APPL_CMD_REQ message
-        TUiccWriteTransparent params;
-        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-        params.trId = ETrIdWriteDynamicFlags;
-        params.dataOffset = 0;
-        params.fileId = KElemFileDynFlagsOrange;
-        params.fileIdSfi = UICC_SFI_NOT_PRESENT;
-        params.serviceType = UICC_APPL_UPDATE_TRANSPARENT;
-
-        // File id path
-        params.filePath.Append( KMasterFileId >> 8 );
-        params.filePath.Append( KMasterFileId );
-        params.filePath.Append( KOrangeDedicatedFile >> 8 );
-        params.filePath.Append( KOrangeDedicatedFile );
-
-        params.fileData.Append( line );
-        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        TBuf8<KLineInfoLength> fileData;
+        fileData.Append( line );
+        ret = UiccApplCmdReq(
+            ETrIdWriteDynamicFlags,
+            UICC_APPL_UPDATE_TRANSPARENT,
+            0,
+            0,
+            KElemFileDynFlagsOrange,
+            UICC_SFI_NOT_PRESENT,
+            fileData);
         }
+    // No else
+
     return ret;
     }
 
@@ -822,9 +805,9 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADDYNAMICFLAGSRESP, "CMmPhone
         ( RMobilePhone::EAlternateLineUnknown );
 
     TInt ret( KErrNone );
-    if ( UICC_STATUS_OK == aStatus )
+    if ( UICC_STATUS_OK == aStatus && ( 0 < aFileData.Length() ) )
         {
-        // Dynamic flags byte: if bit 0 is 1, it is line 1, else line 2
+        // Dynamic flags byte
         if ( aFileData[0] & 0x1 )
             {
             alsLine = RMobilePhone::EAlternateLinePrimary;
@@ -875,21 +858,13 @@ TInt CMmPhoneMessHandler::UiccCspFileReq()
 TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccCspFileReq");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCCSPFILEREQ, "CMmPhoneMessHandler::UiccCspFileReq" );
 
-    // Set parameters for UICC_APPL_CMD_REQ message
-    TUiccReadTransparent params;
-    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-    params.trId = ETrIdReadCsp;
-    params.dataAmount = 18;
-    params.dataOffset = 0; // Read from first byte
-    params.fileId = KElemFileCustomerServiceProfile;
-    params.serviceType = UICC_APPL_READ_TRANSPARENT;
-
-    // File id path
-    params.filePath.Append( KMasterFileId >> 8 );
-    params.filePath.Append( KMasterFileId );
-    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
-
-    return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    return UiccApplCmdReq(
+        ETrIdReadCsp,
+        UICC_APPL_READ_TRANSPARENT,
+        18,
+        0,
+        KElemFileCustomerServiceProfile,
+        UICC_SFI_NOT_PRESENT );
     }
 
 // --------------------------------------------------------------------------
@@ -905,7 +880,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCCSPFILERESP, "CMmPhoneMessHandl
 
     RMobilePhone::TMobilePhoneCspFileV1 cspFileEtel;
 
-    if ( aStatus == KErrNone )
+    if ( aStatus == KErrNone && ( KCpsLength <= aFileData.Length() ) )
         {
         TUint8 i( 0 );
         // Call offering capabilities
@@ -961,13 +936,12 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCCSPFILERESP, "CMmPhoneMessHandl
             {
             cspFileEtel.iValueAddedServices = aFileData[i++];
             }
-        } // End of if ( aStatus == KErrNone )
+        } // End of if
     else
         {
         aStatus = KErrNotFound;
         }
 
-    // Complete with CSP data and error code
     CMmDataPackage dataPackage;
     dataPackage.PackData( &cspFileEtel );
 
@@ -987,22 +961,13 @@ TInt CMmPhoneMessHandler::UiccImsiReq( )
 TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccImsiReq");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCIMSIREQ, "CMmPhoneMessHandler::UiccImsiReq" );
 
-    // Set parameters for UICC_APPL_CMD_REQ message
-    TUiccReadTransparent params;
-    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-    params.trId = ETrIdReadImsi;
-    params.dataAmount = 9; // Length + IMSI = 9 bytes
-    params.dataOffset = 0; // Read from first byte
-    params.fileId = KElemFileImsi;
-    params.fileIdSfi = 7;
-    params.serviceType = UICC_APPL_READ_TRANSPARENT;
-
-    // File id path
-    params.filePath.Append( KMasterFileId >> 8 );
-    params.filePath.Append( KMasterFileId );
-    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
-
-    return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    return UiccApplCmdReq(
+        ETrIdReadImsi,
+        UICC_APPL_READ_TRANSPARENT,
+        9,
+        0,
+        KElemFileImsi,
+        7 );
     }
 
 // --------------------------------------------------------------------------
@@ -1017,60 +982,50 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCIMSIRESP, "CMmPhoneMessHandler:
 
     TInt err( KErrNone );
     TBuf8<RMobilePhone::KIMSISize> imsiData;
-    if ( UICC_STATUS_OK == aStatus )
+
+    if ( ( UICC_STATUS_OK == aStatus ) &&
+         ( KImsiSize == aFileData.Length() ) )
         {
-        TUint8 i( 0 );
-        TUint8 valueMSB( 0 );
-        TUint8 valueLSB( 0 );
-        // Get length of IMSI (the first byte)
-        TUint8 lengthOfImsi( aFileData[0] );
-        // Get the first IMSI number: MSB semioctet of byte 2
-        valueMSB = static_cast<TUint8>( aFileData[1] >> 4 );
-        // Check the validity
-        if ( KImsiSize >= lengthOfImsi && 10 > valueMSB  )
-            {
-            imsiData.AppendNum( valueMSB, EDecimal);
-            }
-        else
-            {
-            err = KErrCorrupt;
-            }
+        // 1st digit of the buffer is byte count (see 3GPP TS 51.011
+        // 10.3.2 EFIMSI (IMSI)). Get first IMSI number from second byte higher
+        // nibbles. Lower part has parity information and it is ignored.
+        imsiData.AppendNum( 
+            ( ( aFileData[KFirstImsiDigit]>> KNibbleShift )&KNibbleMask ),
+            EDecimal );
 
-        if ( KErrNone == err )
+        for( TUint8 i = KSecondImsiDigit;
+             i <= aFileData[KImsiStringByteCount];
+             i++ )
             {
-            // Check and append the rest of IMSI numbers
-            for ( i = 2; i <= lengthOfImsi; i++ )
+            // Unused nibbles are set to 'F' so pack only valid digits.
+            if ( KUnusedNibble != aFileData[i]&KNibbleMask )
                 {
-                valueLSB = static_cast<TUint8>( aFileData[i] & 0x0F );
-                valueMSB = static_cast<TUint8>( aFileData[i] >> 4 );
-
-                // If both values are valid
-                if ( 10 > valueLSB && 10 > valueMSB )
-                    {
-                    imsiData.AppendNum( valueLSB, EDecimal);
-                    imsiData.AppendNum( valueMSB, EDecimal);
-                    }
-                // Last nibble is unused
-                else if( 10 > valueLSB && 0xF == valueMSB )
-                    {
-                    imsiData.AppendNum( valueLSB, EDecimal);
-                    break;
-                    }
-                // Either is invalid
-                else
-                    {
-                    err = KErrCorrupt;
-                    break;
-                    }
+                imsiData.AppendNum( ( ( aFileData[i]&KNibbleMask ) ), EDecimal );
+                }
+            else
+                {
+                // Last digit found.
+                break;
+                }
+            if ( KUnusedNibble != ( ( aFileData[i]>>KNibbleShift )&KNibbleMask ) )
+                {
+                imsiData.AppendNum( 
+                    ( ( aFileData[i]>>KNibbleShift )&KNibbleMask ),
+                    EDecimal );
+                }
+            else
+                {
+                // Last digit found.
+                break;
                 }
             }
+        err = KErrNone;
         }
     else
         {
         err = KErrNotFound;
         }
 
-    // Complete with packed parameter
     CMmDataPackage dataPackage;
     dataPackage.PackData( &imsiData );
 
@@ -1090,23 +1045,13 @@ TInt CMmPhoneMessHandler::UiccReadServiceProviderName()
 TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccReadServiceProviderName");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADSERVICEPROVIDERNAME, "CMmPhoneMessHandler::UiccReadServiceProviderName" );
 
-    // Read SIM file '6F46', Service Provider Name
-    // Set parameters for UICC_APPL_CMD_REQ message
-    TUiccReadTransparent params;
-    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-    params.trId = ETrIdReadServiceProviderName;
-    // Read all 17 bytes
-    params.dataAmount = 17;
-    params.dataOffset = 0;
-    params.fileId = KElemFileServiceProviderName;
-    params.serviceType = UICC_APPL_READ_TRANSPARENT;
-
-    // File id path
-    params.filePath.Append( KMasterFileId >> 8 );
-    params.filePath.Append( KMasterFileId );
-    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
-
-    return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    return UiccApplCmdReq(
+        ETrIdReadServiceProviderName,
+        UICC_APPL_READ_TRANSPARENT,
+        17,
+        0,
+        KElemFileServiceProviderName,
+        UICC_SFI_NOT_PRESENT );
     }
 
 // --------------------------------------------------------------------------
@@ -1121,8 +1066,8 @@ void CMmPhoneMessHandler::UiccReadServiceProviderNameResp(
 TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccReadServiceProviderNameResp");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADSERVICEPROVIDERNAMERESP, "CMmPhoneMessHandler::UiccReadServiceProviderNameResp" );
 
-    TInt ret( KErrNone );
-    if ( KErrNone == aStatus )
+    TInt ret( KErrNotFound );
+    if ( KErrNone == aStatus && ( KSpnLength == aFileData.Length() ) )
         {
         // Store data and read SPN display info
         ret = UiccProcessServiceTypeCheck( aFileData );
@@ -1230,7 +1175,6 @@ TInt CMmPhoneMessHandler::UiccProcessServiceTypeCheck(
 TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccProcessServiceTypeCheck");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCPROCESSSERVICETYPECHECK, "CMmPhoneMessHandler::UiccProcessServiceTypeCheck" );
 
-    // Copy service provider name, starting from byte 2
     TBuf8<KSpnFileSize> spnBuffer( aFileData.Mid( 1 ) );
     TBuf8<KServiceProviderSize> spnOutputBuffer;
     CMmStaticUtility::ConvertGsmDataToUcs2(
@@ -1266,12 +1210,10 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCPROCESSSERVICETYPECHECK, "CMmPh
         iSecondDisplayCondition = RMobilePhone::KDisplaySPNRequired;
         }
 
-    // PLMN and SPN control information summed up to iDisplayReq field
     iServiceProviderName.iDisplayReq =
         iServiceProviderName.iDisplayReq + iSecondDisplayCondition;
 TFLOGSTRING2("TSY: CMmPhoneMessHandler::UiccProcessServiceTypeCheck - display condition: %d", (TUint8)iServiceProviderName.iDisplayReq);
 
-    // Buffer for service provider name
     TBuf16<KSpnFileSize> tempBuf;
     TIsiUtility::CopyFromBigEndian( spnOutputBuffer, tempBuf );
     // Copy service provider name
@@ -1281,23 +1223,13 @@ TFLOGSTRING2("TSY: CMmPhoneMessHandler::UiccProcessServiceTypeCheck - SPN Name: 
 
     // We still need to get the PLMN list to complete the information.
     // Read the SIM file EF SPDI ('6FCD')
-    // Set parameters for UICC_APPL_CMD_REQ message
-    TUiccReadTransparent params;
-    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-    params.trId = ETrIdReadServiceProviderDisplayInfo;
-    // Read all the data
-    params.dataAmount = 0;
-    params.dataOffset = 0;
-    params.fileId = KElemFileServiceProviderDisplayInfo;
-    params.fileIdSfi = 0x1B;
-    params.serviceType = UICC_APPL_READ_TRANSPARENT;
-
-    // File id path
-    params.filePath.Append( KMasterFileId >> 8 );
-    params.filePath.Append( KMasterFileId );
-    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
-
-    return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    return UiccApplCmdReq(
+        ETrIdReadServiceProviderDisplayInfo,
+        UICC_APPL_READ_TRANSPARENT,
+        0,
+        0,
+        KElemFileServiceProviderDisplayInfo,
+        0x1B );
     }
 
 // --------------------------------------------------------------------------
@@ -1320,7 +1252,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCPROCESSSPNNAMEINFO, "CMmPhoneMe
         TInt lengthOfLengthInBytes( 0 );
 
         // Display info is coded in TLV format in USIM.
-        // Check the tag
         if ( 0xA3 == aFileData[i] )
             {
             i++;
@@ -1333,7 +1264,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCPROCESSSPNNAMEINFO, "CMmPhoneMe
                 }
             i++;
 
-            // Check the tag
             if ( 0x80 == aFileData[i] )
                 {
                 // Check how many bytes are used for length field
@@ -1377,18 +1307,15 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCPROCESSSPNNAMEINFO, "CMmPhoneMe
     // Copy PLMNs and complete
     if ( KErrNone == aStatus )
         {
-        // Number of PLMNs cannot exceed 170
         if ( 170 < numOfPlmns )
             {
             numOfPlmns = 170;
             }
 
-        // At first append number of PLMNs and second display condition
         TUint16 word( static_cast<TUint16>(
                 numOfPlmns << 8 | iSecondDisplayCondition ) );
         iServiceProviderName.iPLMNField.Append( word );
 
-        // Copy PLMNs to 16 bit buffer
         for ( TUint8 j( 0 ); j < lengthOfDataInBytes / 2; j++, i += 2 )
             {
             // PLMN entries are copied to 16-bit buffer as follows:
@@ -1398,10 +1325,9 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCPROCESSSPNNAMEINFO, "CMmPhoneMe
                 ( aFileData[i+1] << 8 ) | aFileData[i] );
             iServiceProviderName.iPLMNField.Append( word );
             }
-        // Last word is added
+
         iServiceProviderName.iPLMNField.Append( ( 0xFF << 8 ) | aFileData[i] );
 
-        // Complete SPN info
         CMmDataPackage dataPackage;
         dataPackage.PackData( &iServiceProviderName );
         iMessageRouter->Complete(
@@ -1409,14 +1335,13 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCPROCESSSPNNAMEINFO, "CMmPhoneMe
             &dataPackage,
             KErrNone );
         }
-    else // Complete error without data
+    else
         {
         iMessageRouter->Complete(
              EMobilePhoneGetServiceProviderName,
              KErrNotFound );
         }
 
-    // Reset iServiceProviderName for next time.
     iServiceProviderName.iSPName.Zero();
     iServiceProviderName.iPLMNField.Zero();
     }
@@ -1485,7 +1410,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREFRESHREQ, "CMmPhoneMessHandle
     // If NTSY or CTSY cacheing is ongoing, message is not sent
     if ( ! iCommonTSYRefreshPending && ! iInternalRefreshFiles )
         {
-        if ( iRefreshError ) // Some cacheing was failed, set error status
+        if ( iRefreshError ) // Some cacheing was failed
             {
             aStatus = UICC_REFRESH_NOT_OK;
             }
@@ -1508,8 +1433,8 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREFRESHREQ, "CMmPhoneMessHandle
         ret = iPhoNetSender->Send( isiMsg.Complete() );
         iRefreshError = EFalse;
 
-        // When NTSY/CTSY refresh was performed, set iCompleteRefresfDone flag
-        // that IPC EMmTsySimRefreshDoneIPC will be completed to CTSY
+        // When NTSY/CTSY refresh was performed
+        // IPC EMmTsySimRefreshDoneIPC will be completed to CTSY
         if ( UICC_REFRESH_DONE == aStatus || UICC_REFRESH_NOT_OK == aStatus )
             {
             iCompleteRefresfDone = ETrue;
@@ -1597,7 +1522,6 @@ OstTrace0( TRACE_NORMAL, DUP7_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMe
                     EMobilePhoneNotifyAPNListChanged,
                     KErrNone );
 
-                // Clear and delete cache
                 if ( iAPNList )
                     {
                     iAPNList->Reset();
@@ -1703,7 +1627,6 @@ OstTrace0( TRACE_NORMAL, DUP13_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneM
         if ( !( refreshFiles & KCacheAdn )
             && !( refreshFiles & KCacheFdn ) )
             {
-            // Creating buffer for phonebook's name
             TName phonebookName;
             phonebookName.Copy( KInternalPhoneBookType );
 
@@ -1726,7 +1649,6 @@ OstTraceExt1( TRACE_NORMAL, DUP14_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPho
 TFLOGSTRING2("TSY: CMmPhoneMessHandler::HandleUiccRefresh: CommonTSY Refresh Pending = %d", iCommonTSYRefreshPending );
 OstTrace1( TRACE_NORMAL, DUP15_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneMessHandler::HandleUiccRefresh;iCommonTSYRefreshPending=%d", iCommonTSYRefreshPending );
 
-        // Packed parameter: List of files needed to be refreshed.
         CMmDataPackage dataPackage;
         dataPackage.PackData( &refreshFiles );
 
@@ -1737,8 +1659,6 @@ OstTrace1( TRACE_NORMAL, DUP15_CMMPHONEMESSHANDLER_HANDLEUICCREFRESH, "CMmPhoneM
             KErrNone );
         }
 
-    // Send refresh done to UICC only if there's no CTSY/NTSY
-    // caching ongoing.
     if ( ! iCommonTSYRefreshPending && ! iInternalRefreshFiles )
         {
         UiccRefreshReq( UICC_REFRESH_DONE );
@@ -1921,22 +1841,13 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADEFESTREQ, "CMmPhoneMessHand
     if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() &&
         iMmUiccMessHandler->GetServiceStatus( KServiceAcl ) )
         {
-        // Set parameters for UICC_APPL_CMD_REQ message
-        TUiccReadTransparent params;
-        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-        params.trId = ETrIdAclStatusReadEfEst;
-        params.dataAmount = 0;
-        params.dataOffset = 0;
-        params.fileId = KElemEst;
-        params.fileIdSfi = 0x05;
-        params.serviceType = UICC_APPL_READ_TRANSPARENT;
-
-        // File id path
-        params.filePath.Append( KMasterFileId >> 8 );
-        params.filePath.Append( KMasterFileId );
-        params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
-
-        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        ret = UiccApplCmdReq(
+            ETrIdAclStatusReadEfEst,
+            UICC_APPL_READ_TRANSPARENT,
+            0,
+            0,
+            KElemEst,
+            5 );
         }
     else
         {
@@ -1963,7 +1874,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCGETACLSTATUSREADEFESTRESP, "CMm
     TInt ret( KErrNone );
     RMobilePhone::TAPNControlListServiceStatus aclStatus;
 
-    if( UICC_STATUS_OK == aStatus )
+    if( ( UICC_STATUS_OK == aStatus ) && ( 0 < aFileData.Length() ) )
         {
         TUint8 aclState( aFileData[0] & KAclStateMask );
         if( aclState )
@@ -1982,7 +1893,6 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCGETACLSTATUSREADEFESTRESP,
         ret = KErrAccessDenied;
         }
 
-    // complete with packed parameter
     CMmDataPackage dataPackage;
 
     if( KErrNone == ret )
@@ -1990,7 +1900,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCGETACLSTATUSREADEFESTRESP,
         dataPackage.PackData( &aclStatus );
         }
 
-    iACLIsProgress = EFalse; //set ACL flag
+    iACLIsProgress = EFalse;
     iMessageRouter->Complete(
         EMobilePhoneGetAPNControlListServiceStatus,
         &dataPackage,
@@ -2011,40 +1921,42 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP, "CMm
 
     TInt ret( KErrNone );
     TBool completeNeeded( ETrue );
+    TUint8 aclState( 0 );
 
-    if( UICC_STATUS_OK == aStatus )
+    if ( 0 < aFileData.Length() )
         {
-        TUint8 aclState( aFileData[0] );
-        if( aclState & KAclStateMask )
+        aclState = aFileData[0];
+        }
+
+    if ( ( UICC_STATUS_OK == aStatus ) && ( aclState & KAclStateMask ) )
+        {
+        if ( RMobilePhone::EAPNControlListServiceDisabled == iAclStatus )
             {
-            if( RMobilePhone::EAPNControlListServiceDisabled == iAclStatus )
-                {
-                // ACL state is enabled and we need to set it to disabled .
-                // So EFest needs to be updated
-                completeNeeded = EFalse;
-                UiccSetAclStatusWriteEfEstReq( aclState );
-                }
-            else
-                {
-                // ACL status already correct, let's complete
-TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP, "CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete" );
-                }
+            // ACL state is enabled and we need to set it to disabled.
+            // So EFest needs to be updated
+            completeNeeded = EFalse;
+            UiccSetAclStatusWriteEfEstReq( aclState );
             }
         else
             {
-            if( RMobilePhone::EAPNControlListServiceEnabled == iAclStatus )
-                {
-                // EFest needs to be updated
-                completeNeeded = EFalse;
-                UiccSetAclStatusWriteEfEstReq( aclState );
-                }
-            else
-                {
-                // ACL status already correct, let's complete
+            // ACL status already correct, let's complete
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete");
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP, "CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete" );
+            }
+        }
+    else if ( ( UICC_STATUS_OK == aStatus ) && ( ! aclState & KAclStateMask ) )
+        {
+        if ( RMobilePhone::EAPNControlListServiceEnabled == iAclStatus )
+            {
+            // EFest needs to be updated
+            completeNeeded = EFalse;
+            UiccSetAclStatusWriteEfEstReq( aclState );
+            }
+        else
+            {
+            // ACL status already correct, let's complete
 TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete");
 OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP, "CMmPhoneMessHandler::UiccSetAclStatusReadEfEstResp: ACL status already correct, let's complete" );
-                }
             }
         }
     else
@@ -2057,8 +1969,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP,
 
     if( completeNeeded )
         {
-        // set flag and complete
-        iACLIsProgress = EFalse; //set ACL flag
+        iACLIsProgress = EFalse;
         iMessageRouter->Complete(
             EMobilePhoneSetAPNControlListServiceStatus,
             ret );
@@ -2070,7 +1981,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMPHONEMESSHANDLER_UICCSETACLSTATUSREADEFESTRESP,
 // Writes ACL status to EFest
 // ----------------------------------------------------------------------------
 //
-TInt CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq(  TUint8 aOldAclState )
+TInt CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq( TUint8 aOldAclState )
     {
 TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCSETACLSTATUSWRITEEFESTREQ, "CMmPhoneMessHandler::UiccSetAclStatusWriteEfEstReq" );
@@ -2093,21 +2004,16 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCSETACLSTATUSWRITEEFESTREQ, "CMm
     if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() &&
         iMmUiccMessHandler->GetServiceStatus( KServiceAcl ) )
         {
-        TUiccWriteTransparent params;
-        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-        params.trId = ETrIdAclStatusWriteEfEst;
-        params.dataOffset = 0;
-        params.dataAmount = 1; // only one byte is update
-        params.fileId = KElemEst;
-        params.fileIdSfi = 0x05;
-        params.serviceType = UICC_APPL_UPDATE_TRANSPARENT;
-        // File id path
-        params.filePath.Append( KMasterFileId >> 8 );
-        params.filePath.Append( KMasterFileId );
-        params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
-        params.fileData.Append( newState );
-
-        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        TBuf8<KAclStatusLength> fileData;
+        fileData.Append( newState );
+        ret = UiccApplCmdReq(
+            ETrIdAclStatusWriteEfEst,
+            UICC_APPL_UPDATE_TRANSPARENT,
+            0,
+            0,
+            KElemEst,
+            5,
+            fileData );
         }
     else
         {
@@ -2169,22 +2075,13 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADACLREQ, "CMmPhoneMessHandle
     if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() &&
         iMmUiccMessHandler->GetServiceStatus( KServiceAcl ) )
         {
-        // Set parameters for UICC_APPL_CMD_REQ message
-        TUiccReadTransparent params;
-        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-        params.trId = ETrIdAclReadEfAcl;
-        params.dataAmount = 0;
-        params.dataOffset = 0;
-        params.fileId = KElemFileAcl;
-        params.fileIdSfi = UICC_SFI_NOT_PRESENT;
-        params.serviceType = UICC_APPL_READ_TRANSPARENT;
-
-        // File id path
-        params.filePath.Append( KMasterFileId >> 8 );
-        params.filePath.Append( KMasterFileId );
-        params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
-
-        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        ret = UiccApplCmdReq(
+            ETrIdAclReadEfAcl,
+            UICC_APPL_READ_TRANSPARENT,
+            0,
+            0,
+            KElemFileAcl,
+            UICC_SFI_NOT_PRESENT );
         }
     else
         {
@@ -2209,7 +2106,8 @@ void CMmPhoneMessHandler::UiccReadAclResp(
 TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccReadAclResp");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCREADACLRESP, "CMmPhoneMessHandler::UiccReadAclResp" );
     TInt ret( KErrNone );
-    if( UICC_STATUS_OK == aStatus )
+    if ( ( UICC_STATUS_OK == aStatus ) &&
+        ( KApnDataIndex < aFileData.Length() ) )
         {
         if( iAPNList )
             {
@@ -2281,13 +2179,11 @@ CDesC8ArrayFlat* CMmPhoneMessHandler::DecodeACL
 TFLOGSTRING2("TSY: CMmPhoneMessHandler::DecodeACL. Number of total entries: %d", aTotalEntries);
 OstTrace1( TRACE_NORMAL, CMMPHONEMESSHANDLER_DECODEACL, "CMmPhoneMessHandler::DecodeACL. Number of total entries: %d", aTotalEntries );
 
-    // allocate new array, 1 is granularity
     CDesC8ArrayFlat* apnList = new( ELeave ) CDesC8ArrayFlat( 1 );
     CleanupStack::PushL( apnList );
 
     TInt offset( 0 );
 
-    //check length before using
     if ( 0 < aTlv.Length() )
         {
         // decode TLV entries to CDesC8ArrayFlat
@@ -2323,12 +2219,10 @@ void CMmPhoneMessHandler::CompleteEnumerateAPNEntries()
 TFLOGSTRING2("TSY: CMmPhoneMessHandler::CompleteEnumerateAPNEntries. Number of APN's: %d",indexCount);
 OstTrace1( TRACE_NORMAL, CMMPHONEMESSHANDLER_COMPLETEENUMERATEAPNENTRIES, "CMmPhoneMessHandler::CompleteEnumerateAPNEntries. Number of APN's: %d", indexCount );
 
-    //package index of TLV's to the client
     CMmDataPackage dataPackage;
     dataPackage.PackData( &indexCount );
 
-    // set flag and complete
-    iACLIsProgress = EFalse; //set ACL flag
+    iACLIsProgress = EFalse;
     iMessageRouter->Complete(
         EMobilePhoneEnumerateAPNEntries,
         &dataPackage,
@@ -2349,7 +2243,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_COMPLETEGETAPNNAME, "CMmPhoneMessHa
     RMobilePhone::TAPNEntryV3 aclEntry;
     TInt err( KErrNone );
 
-    //check if index is valid or not.
     if ( iAPNList->MdcaCount() <= aIndex )
         {
         err = KErrOverflow;
@@ -2363,8 +2256,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_COMPLETEGETAPNNAME, "CMmPhoneM
 
     dataPackage.PackData( &aclEntry );
 
-    // set flag and complete
-    iACLIsProgress = EFalse; //set ACL flag
+    iACLIsProgress = EFalse;
     iMessageRouter->Complete( EMobilePhoneGetAPNname, &dataPackage, err );
     }
 
@@ -2379,16 +2271,12 @@ TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccDeleteApnEntry ");
 OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCDELETEAPNENTRY, "CMmPhoneMessHandler::UiccDeleteApnEntry" );
 
     TInt ret;
-    //check if aIndex is valid or not.
     if ( iAPNList->MdcaCount() <= aIndex )
         {
-        //error occurs
         ret = KErrOverflow;
         }
     else
         {
-        //data is valid
-        //delete data from cache
         iAPNList->Delete( aIndex );
         iAPNList->Compress();
 
@@ -2416,30 +2304,25 @@ OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCWRITEEFACLREQ, "CMmPhoneMessHan
         TInt dataLen( ACLLength( iAPNList ) );
         TUint8 apnCount( iAPNList->MdcaCount() );
 
-        TUiccWriteTransparent params;
-        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-        params.trId = ETrIdAclWriteEfAcl;
-        params.dataOffset = 0;
-        params.dataAmount = dataLen;
-        params.fileId = KElemFileAcl;
-        params.fileIdSfi = UICC_SFI_NOT_PRESENT;
-        params.serviceType = UICC_APPL_UPDATE_TRANSPARENT;
-        // File id path
-        params.filePath.Append( KMasterFileId >> 8 );
-        params.filePath.Append( KMasterFileId );
-        params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
-
-        params.fileData.Append( apnCount );
+        TBuf8<KFileDataLength> fileData;
+        fileData.Append( apnCount );
         for ( TInt i = 0; i < apnCount; i++ )
             {
             TPtrC8 apn = iAPNList->MdcaPoint( i );
             // spec: The tag value of the APN-TLV shall be 'DD'
-            params.fileData.Append( 0xdd );
-            params.fileData.Append( apn.Length() );
-            params.fileData.Append( apn );
+            fileData.Append( 0xdd );
+            fileData.Append( apn.Length() );
+            fileData.Append( apn );
             }
 
-        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        ret = UiccApplCmdReq(
+            ETrIdAclWriteEfAcl,
+            UICC_APPL_UPDATE_TRANSPARENT,
+            0,
+            0,
+            KElemFileAcl,
+            UICC_SFI_NOT_PRESENT,
+            fileData );
         }
     else
         {
@@ -2470,7 +2353,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_UICCWRITEEFACLRESP, "CMmPhoneM
         ret = KErrAccessDenied;
         }
 
-    iACLIsProgress = EFalse; //set ACL flag
+    iACLIsProgress = EFalse;
     iMessageRouter->Complete(
         iOngoingAclIpc,
         ret );
@@ -2488,10 +2371,13 @@ OstTrace1( TRACE_NORMAL, CMMPHONEMESSHANDLER_ACLLENGTH, "CMmPhoneMessHandler::AC
 
     TUint16 length( 0 );
 
-    for ( TInt i = 0; i < aApnList->MdcaCount(); i++ )
+    if ( aApnList )
         {
-        TPtrC8 apn = aApnList->MdcaPoint( i );
-        length += apn.Length() + 2;
+        for ( TInt i = 0; i < aApnList->MdcaCount(); i++ )
+            {
+            TPtrC8 apn = aApnList->MdcaPoint( i );
+            length += apn.Length() + 2;
+            }
         }
 
     // result is incremented by one because of EFacl contains number of tlv objects
@@ -2502,6 +2388,69 @@ TFLOGSTRING2("TSY: CMmPhoneMessHandler::ACLLength. ACL len: %d", length);
 OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEMESSHANDLER_ACLLENGTH, "CMmPhoneMessHandler::ACLLength. ACL len: %d", length );
 
     return length;
+    }
+
+
+// --------------------------------------------------------------------------
+// CMmPhoneMessHandler::UiccApplCmdReq
+//
+// --------------------------------------------------------------------------
+//
+TInt CMmPhoneMessHandler::UiccApplCmdReq(
+    const TUiccTrId aTrId,
+    const TUint8 aServiceType,
+    const TUint16 aDataAmount,
+    const TUint16 aDataOffset,
+    const TUint16 aFileId,
+    const TUint8 aFileIdSfi,
+    const TDesC8& aFileData )
+    {
+TFLOGSTRING("TSY: CMmPhoneMessHandler::UiccApplCmdReq");
+OstTrace0( TRACE_NORMAL, CMMPHONEMESSHANDLER_UICCAPPLCMDREQ, "CMmPhoneMessHandler::UiccApplCmdReq" );
+
+    TInt ret( KErrNone );
+    TBuf8<KFilePathLength> filePath;
+    filePath.Append( KMasterFileId >> 8 );
+    filePath.Append( KMasterFileId );
+    if ( KElemFileDynFlagsOrange == aFileId )
+        {
+        filePath.Append( KOrangeDedicatedFile >> 8 );
+        filePath.Append( KOrangeDedicatedFile );
+        }
+    else
+        {
+        filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+        }
+
+    if ( UICC_APPL_READ_TRANSPARENT == aServiceType )
+        {
+        TUiccReadTransparent params;
+        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+        params.trId = aTrId;
+        params.dataAmount = aDataAmount;
+        params.dataOffset = aDataOffset;
+        params.fileId = aFileId;
+        params.fileIdSfi = aFileIdSfi;
+        params.serviceType = aServiceType;
+        params.filePath.Append( filePath );
+        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        }
+    else if ( UICC_APPL_UPDATE_TRANSPARENT == aServiceType )
+        {
+        TUiccWriteTransparent params;
+        params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+        params.trId = aTrId;
+        params.dataAmount = aDataAmount;
+        params.dataOffset = aDataOffset;
+        params.fileId = aFileId;
+        params.fileIdSfi = aFileIdSfi;
+        params.serviceType = aServiceType;
+        params.fileData.Append( aFileData );
+        params.filePath.Append( filePath );
+        ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+        }
+    // No else
+    return ret;
     }
 
 // End of file

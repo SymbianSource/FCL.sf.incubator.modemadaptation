@@ -216,6 +216,21 @@ DISAUserChannel::~DISAUserChannel(
         delete iDataRxDeAllocate;
         iDataRxDeAllocate = NULL;
         }
+    if( iCleanDfc )
+        {
+        C_TRACE( ( _T( "DISAUserChannel::~DISAUserChannel iCleanDfc 0x%x" ), iCleanDfc ) );
+        iCleanDfc->Cancel();
+        delete iCleanDfc;
+        iCleanDfc = NULL;
+        }
+    if( iCleanDataDfc )
+        {
+        C_TRACE( ( _T( "DISAUserChannel::~DISAUserChannel iCleanDataDfc 0x%x" ), iCleanDataDfc ) );
+        iCleanDataDfc->Cancel();
+        delete iCleanDataDfc;
+        iCleanDataDfc = NULL;
+        }
+
     // Not owned
     OstTraceExt4( TRACE_NORMAL, DUP9_DISAUSERCHANNEL_DISAUSERCHANNEL, "DISAUserChannel::~DISAUserChannel;iIADConnectionStatusPtr=%x;iIADFlowControlStatusPtr=%x;iReceiveBufPtr=%x;iDataReceiveBufPtr=%x", (TUint)iIADConnectionStatusPtr, (TUint)iIADFlowControlStatusPtr, (TUint)iReceiveBufPtr, (TUint)iDataReceiveBufPtr );
     
@@ -290,8 +305,16 @@ TInt DISAUserChannel::DoCreate(
     if( !Kern::CurrentThreadHasCapability( ECapabilityCommDD, __PLATSEC_DIAGNOSTIC_STRING( "Check by: ISAAccessDriver" ) ) ) return KErrPermissionDenied;  
     ASSERT_RESET_ALWAYS( anInfo, EIADChannelNumberNotSpecifiedInInfo | EIADFaultIdentifier1 << KFaultIdentifierShift );
     // Check for channel number inside anInfo.
-    ASSERT_RESET_ALWAYS( anInfo->Length() > 0 , EIADOverTheLimits | EIADFaultIdentifier39 << KFaultIdentifierShift );                                                
-    TUint16 channel = static_cast<TUint16>( ( *anInfo )[ 0 ] );
+    TUint8* buffer = reinterpret_cast<TUint8*>( Kern::Alloc( 1 ) );
+    ASSERT_RESET_ALWAYS( buffer, EIADMemoryAllocationFailure | EIADFaultIdentifier25 << KFaultIdentifierShift );
+    
+    TPtr8* bufferPtr = new TPtr8( buffer, 1 );    
+    ASSERT_RESET_ALWAYS( bufferPtr, EIADMemoryAllocationFailure | EIADFaultIdentifier26 << KFaultIdentifierShift );
+    
+    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, anInfo, *bufferPtr, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier10 << KFaultIdentifierShift );
+    ASSERT_RESET_ALWAYS( bufferPtr->Length() > 0 , EIADOverTheLimits | EIADFaultIdentifier39 << KFaultIdentifierShift );
+    
+    TUint16 channel = static_cast<TUint16>( ( *bufferPtr )[ 0 ] );
     ASSERT_RESET_ALWAYS( ( channel < EIADNokiaLastUserChannel ),EIADWrongParameter | EIADFaultIdentifier19 << KFaultIdentifierShift );
     iChannelNumber = ~channel; // In user thread context thread in CS, cannot be pre-empted.
     C_TRACE( ( _T( "DISAUserChannel::DoCreate channelnumber 0x%x 0x%x" ), iChannelNumber, this ) );
@@ -313,7 +336,10 @@ TInt DISAUserChannel::DoCreate(
     TInt threadOpen( thread->Open() );
     TRACE_ASSERT_INFO( threadOpen == KErrNone, (TUint8)iChannelNumber << KChannelNumberShift );
     C_TRACE( ( _T( "DISAUserChannel::DoCreate 0x%x %d <-" ), iChannelNumber, threadOpen ) );
-
+    
+    Kern::Free( buffer );
+    delete bufferPtr;
+    
     OstTraceExt3( TRACE_NORMAL, DISAUSERCHANNEL_DOCREATE_EXIT, "<DISAUserChannel::DoCreate;iChannelNumber=%hx;this=%x;retVal=%d", iChannelNumber, (TUint)this, threadOpen );    
     return threadOpen;
     }
@@ -1168,30 +1194,34 @@ void DISAUserChannel::HandleAsyncRequest(
             case EIADAsyncSend:
                 {
                 C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSend" ) ) );
-                TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
-                TAny* secondParam = reinterpret_cast<TAny*>( tablePtr[ KSecondParam ] );
-                ASSERT_RESET_ALWAYS( secondParam, EIADNullParameter | EIADFaultIdentifier23 << KFaultIdentifierShift  );
-                TInt msgLength( Kern::ThreadGetDesLength( iThread, secondParam ) );
-                C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSend 0x%x %d" ), secondParam, msgLength ) );
-                OstTraceExt2( TRACE_NORMAL, DUP10_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSend;secondParam=%x;msgLength=%d", (TUint)secondParam, msgLength );
-                
-                TInt error( KErrBadDescriptor );
-                if( msgLength > 0 )
+                TInt error(KErrNotReady);
+                if ( iExtensionApi->GetConnectionStatus() == EIADConnectionOk )
                     {
-                    // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
-                    // one copy from user to allocated block that is to be send.
-                    TDes8& sendBlock = iExtensionApi->AllocateBlock( msgLength );
-                    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, secondParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier2 << KFaultIdentifierShift );
-                    TRACE_ASSERT_INFO( sendBlock.Length() == msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
-                    C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSend 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
-                    OstTraceExt2( TRACE_NORMAL, DUP16_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSend;sendBlock=%x;iChannelNumber=%hx", (TUint)&sendBlock, iChannelNumber );
+                    TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
+                    TAny* secondParam = reinterpret_cast<TAny*>( tablePtr[ KSecondParam ] );
+                    ASSERT_RESET_ALWAYS( secondParam, EIADNullParameter | EIADFaultIdentifier23 << KFaultIdentifierShift  );
+                    TInt msgLength( Kern::ThreadGetDesLength( iThread, secondParam ) );
+                    C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSend 0x%x %d" ), secondParam, msgLength ) );
+                    OstTraceExt2( TRACE_NORMAL, DUP10_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSend;secondParam=%x;msgLength=%d", (TUint)secondParam, msgLength );
                     
-                    error = iExtensionApi->SendMessage( sendBlock, iChannelNumber );
-                    }
-                else
-                    {
-                    error = ( msgLength == KErrNone ) ? KErrBadDescriptor : msgLength;
-                    TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)msgLength );
+                    error = KErrBadDescriptor;
+                    if( msgLength > 0 )
+                        {
+                        // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
+                        // one copy from user to allocated block that is to be send.
+                        TDes8& sendBlock = iExtensionApi->AllocateBlock( msgLength );
+                        ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, secondParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier2 << KFaultIdentifierShift );
+                        TRACE_ASSERT_INFO( sendBlock.Length() == msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
+                        C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSend 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
+                        OstTraceExt2( TRACE_NORMAL, DUP16_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSend;sendBlock=%x;iChannelNumber=%hx", (TUint)&sendBlock, iChannelNumber );
+                        
+                        error = iExtensionApi->SendMessage( sendBlock, iChannelNumber );
+                        }
+                    else
+                        {
+                        error = ( msgLength == KErrNone ) ? KErrBadDescriptor : msgLength;
+                        TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)msgLength );
+                        }
                     }
                 CompleteChannelRequest( aRequest, error );
                 break;
@@ -1199,39 +1229,43 @@ void DISAUserChannel::HandleAsyncRequest(
             case EIADAsyncDataSend:
                 {
                 C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncDataSend" ) ) );
-                TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
-                TAny* secondParam = reinterpret_cast<TAny*>( tablePtr[ KSecondParam ] );
-                ASSERT_RESET_ALWAYS( secondParam, EIADNullParameter | EIADFaultIdentifier24 << KFaultIdentifierShift  );
-                TInt msgLength( Kern::ThreadGetDesLength( iThread, secondParam ) );
-                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADAsyncDataSend 0x%x %d" ), secondParam, msgLength ) );
-                OstTraceExt2( TRACE_NORMAL, DUP9_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncDataSend;secondParam=%x;msgLength=%d", (TUint)secondParam, msgLength );                
-                TInt error( KErrBadDescriptor );
-                if( msgLength > KErrNone )
+                TInt error(KErrNotReady);
+                if ( iExtensionApi->GetConnectionStatus() == EIADConnectionOk )
                     {
-                    // Allocate a block for data. Allocation adds +11 to the msglength for pipe headers
-                    TDes8& sendBlock = iExtensionApi->AllocateDataBlock( msgLength );
-                    C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncDataSend max %d length %d" ), sendBlock.MaxLength(), sendBlock.Length() ) );
-                    // Use pre-allocated TPtr (no memory allocation from heap nor stack).
-                    // Set it to point to +11 from sendblock and to be as long as data to be send
-                    TInt tmpMaxLength( sendBlock.MaxLength() - KPipeDataHeader );
-                    TUint8* tmpPtr( const_cast<TUint8*>( ( sendBlock.Ptr() + KPipeDataHeader ) ) );
-                    TPtr* test = static_cast<TPtr8*>( &sendBlock );
-                    test->Set( tmpPtr, 0, tmpMaxLength );
-                    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, secondParam, *test, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier3 << KFaultIdentifierShift );
-                    TInt tmpMaxLength2( sendBlock.MaxLength() + KPipeDataHeader );
-                    TInt tmpLength2( sendBlock.Length() + KPipeDataHeader );
-                    TUint8* tmpPtr2( const_cast<TUint8*>( ( sendBlock.Ptr() - KPipeDataHeader ) ) );
-                    test->Set( tmpPtr2, tmpLength2, tmpMaxLength2 );
-                    TRACE_ASSERT_INFO( sendBlock.Length() > msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
-                    C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncDataSend 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
-                    OstTraceExt4( TRACE_NORMAL, DUP15_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncDataSend;sendBlock=%x;sendBlock.MaxLength()=%d;sendBlock.Length()=%d;iChannelNumber=%hx", (TUint)&sendBlock, sendBlock.MaxLength(), sendBlock.Length(), iChannelNumber );
-                    
-                    error = iExtensionApi->SendMessage( sendBlock, iChannelNumber );
-                    }
-                else
-                    {
-                    error = ( msgLength == KErrNone ) ? KErrBadDescriptor : msgLength;
-                    TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)msgLength );
+                    TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
+                    TAny* secondParam = reinterpret_cast<TAny*>( tablePtr[ KSecondParam ] );
+                    ASSERT_RESET_ALWAYS( secondParam, EIADNullParameter | EIADFaultIdentifier24 << KFaultIdentifierShift  );
+                    TInt msgLength( Kern::ThreadGetDesLength( iThread, secondParam ) );
+                    C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADAsyncDataSend 0x%x %d" ), secondParam, msgLength ) );
+                    OstTraceExt2( TRACE_NORMAL, DUP9_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncDataSend;secondParam=%x;msgLength=%d", (TUint)secondParam, msgLength );                
+                    error = KErrBadDescriptor;
+                    if( msgLength > KErrNone )
+                        {
+                        // Allocate a block for data. Allocation adds +11 to the msglength for pipe headers
+                        TDes8& sendBlock = iExtensionApi->AllocateDataBlock( msgLength );
+                        C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncDataSend max %d length %d" ), sendBlock.MaxLength(), sendBlock.Length() ) );
+                        // Use pre-allocated TPtr (no memory allocation from heap nor stack).
+                        // Set it to point to +11 from sendblock and to be as long as data to be send
+                        TInt tmpMaxLength( sendBlock.MaxLength() - KPipeDataHeader );
+                        TUint8* tmpPtr( const_cast<TUint8*>( ( sendBlock.Ptr() + KPipeDataHeader ) ) );
+                        TPtr* test = static_cast<TPtr8*>( &sendBlock );
+                        test->Set( tmpPtr, 0, tmpMaxLength );
+                        ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, secondParam, *test, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier3 << KFaultIdentifierShift );
+                        TInt tmpMaxLength2( sendBlock.MaxLength() + KPipeDataHeader );
+                        TInt tmpLength2( sendBlock.Length() + KPipeDataHeader );
+                        TUint8* tmpPtr2( const_cast<TUint8*>( ( sendBlock.Ptr() - KPipeDataHeader ) ) );
+                        test->Set( tmpPtr2, tmpLength2, tmpMaxLength2 );
+                        TRACE_ASSERT_INFO( sendBlock.Length() > msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
+                        C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncDataSend 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
+                        OstTraceExt4( TRACE_NORMAL, DUP15_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncDataSend;sendBlock=%x;sendBlock.MaxLength()=%d;sendBlock.Length()=%d;iChannelNumber=%hx", (TUint)&sendBlock, sendBlock.MaxLength(), sendBlock.Length(), iChannelNumber );
+                        
+                        error = iExtensionApi->SendMessage( sendBlock, iChannelNumber );
+                        }
+                    else
+                        {
+                        error = ( msgLength == KErrNone ) ? KErrBadDescriptor : msgLength;
+                        TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)msgLength );
+                        }
                     }
                 CompleteChannelRequest( aRequest, error );
                 break;
@@ -1240,33 +1274,37 @@ void DISAUserChannel::HandleAsyncRequest(
             case EIADAsyncSubscribeIndications32Bit:
                 {
                 C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSubscribeIndications | EIADAsyncSubscribeIndications32Bit" ) ) );
-                TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
-                TAny* secondParam = reinterpret_cast<TAny*>(tablePtr[ KSecondParam ]);
-                ASSERT_RESET_ALWAYS( secondParam, EIADNullParameter | EIADFaultIdentifier25 << KFaultIdentifierShift  );
-                TInt orderLength( Kern::ThreadGetDesLength( iThread, secondParam ) );
-                C_TRACE( ( _T( "DISAUserChannel::DISAUserChannel::HandleAsyncRequest EIADAsyncSubscribeIndications | EIADAsyncSubscribeIndications32Bit 0x%x %d" ), secondParam, orderLength ) );
-                OstTraceExt2( TRACE_NORMAL, DUP12_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSubscribeIndications(8/32bit);secondParam=%x;orderLength=%d", (TUint)secondParam, orderLength );
-                
-                TInt error( KErrBadDescriptor );
-                if( orderLength > 0 )
+                TInt error(KErrNotReady);
+                if ( iExtensionApi->GetConnectionStatus() == EIADConnectionOk )
                     {
-                    // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
-                    // one copy from user to allocated block that is to be send.
-                    TDes8& sendBlock = iExtensionApi->AllocateBlock( ( orderLength ) );
-                    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, secondParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier4 << KFaultIdentifierShift );
-                    C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSubscribeIndications | EIADAsyncSubscribeIndications32Bit 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
-                    OstTraceExt2( TRACE_NORMAL, DUP14_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSubscribeIndications(8/32bit);sendBlock=%x;iChannelNumber=%hx", (TUint)&sendBlock, iChannelNumber );
+                    TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
+                    TAny* secondParam = reinterpret_cast<TAny*>(tablePtr[ KSecondParam ]);
+                    ASSERT_RESET_ALWAYS( secondParam, EIADNullParameter | EIADFaultIdentifier25 << KFaultIdentifierShift  );
+                    TInt orderLength( Kern::ThreadGetDesLength( iThread, secondParam ) );
+                    C_TRACE( ( _T( "DISAUserChannel::DISAUserChannel::HandleAsyncRequest EIADAsyncSubscribeIndications | EIADAsyncSubscribeIndications32Bit 0x%x %d" ), secondParam, orderLength ) );
+                    OstTraceExt2( TRACE_NORMAL, DUP12_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSubscribeIndications(8/32bit);secondParam=%x;orderLength=%d", (TUint)secondParam, orderLength );
                     
-                    TRACE_ASSERT_INFO( sendBlock.Length() == orderLength, (TUint8)iChannelNumber << KChannelNumberShift );
-                    // No return values check needed. Request completed with error value by multiplexer
-                    TBool thirtyTwoBit( ( EIADSubscribeIndications32Bit == aRequest ) ? ETrue : EFalse );
-                    error = iExtensionApi->OrderIndication( sendBlock, iChannelNumber, thirtyTwoBit );
-                    iExtensionApi->DeAllocateBlock( sendBlock );
-                    }
-                else
-                    {
-                    error = orderLength;
-                    TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)error );                    
+                    error = KErrBadDescriptor;
+                    if( orderLength > 0 )
+                        {
+                        // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
+                        // one copy from user to allocated block that is to be send.
+                        TDes8& sendBlock = iExtensionApi->AllocateBlock( ( orderLength ) );
+                        ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, secondParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier4 << KFaultIdentifierShift );
+                        C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSubscribeIndications | EIADAsyncSubscribeIndications32Bit 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
+                        OstTraceExt2( TRACE_NORMAL, DUP14_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSubscribeIndications(8/32bit);sendBlock=%x;iChannelNumber=%hx", (TUint)&sendBlock, iChannelNumber );
+                        
+                        TRACE_ASSERT_INFO( sendBlock.Length() == orderLength, (TUint8)iChannelNumber << KChannelNumberShift );
+                        // No return values check needed. Request completed with error value by multiplexer
+                        TBool thirtyTwoBit( ( EIADSubscribeIndications32Bit == aRequest ) ? ETrue : EFalse );
+                        error = iExtensionApi->OrderIndication( sendBlock, iChannelNumber, thirtyTwoBit );
+                        iExtensionApi->DeAllocateBlock( sendBlock );
+                        }
+                    else
+                        {
+                        error = orderLength;
+                        TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)error );                    
+                        }
                     }
                 CompleteChannelRequest( aRequest, error );
                 break;
@@ -1274,29 +1312,33 @@ void DISAUserChannel::HandleAsyncRequest(
             case EIADAsyncSendIndication:
                 {
                 C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSendIndication" ) ) );
-                TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
-                TAny* secondParam = reinterpret_cast<TAny*>(tablePtr[ KSecondParam ]);
-                ASSERT_RESET_ALWAYS( secondParam, EIADNullParameter | EIADFaultIdentifier26 << KFaultIdentifierShift  );
-                TInt msgLength( Kern::ThreadGetDesLength( iThread, secondParam ) );
-                C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSendIndication TBR 0x%x %d" ), secondParam, msgLength ) );
-                OstTraceExt2( TRACE_NORMAL, DUP11_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSendIndication;secondParam=%x;msgLength=%d", (TUint)secondParam, msgLength );                
-                TInt error( KErrBadDescriptor );
-                if( msgLength > 0 )
+                TInt error(KErrNotReady);
+                if ( iExtensionApi->GetConnectionStatus() == EIADConnectionOk )
                     {
-                    // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made now only
-                    // one copy from user to allocated block that is to be send.
-                    TDes8& sendBlock = iExtensionApi->AllocateBlock( msgLength );
-                    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, secondParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier5 << KFaultIdentifierShift );
-                    TRACE_ASSERT_INFO( sendBlock.Length() == msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
-                    C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSendIndication 0x%x %d %d 0x%x" ), &sendBlock, sendBlock.Length(), msgLength, iChannelNumber ) );
-                    OstTraceExt5( TRACE_NORMAL, DUP13_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSendIndication;sendBlock=%x;sendBlock.Length()=%d;sendBlock.MaxLength()=%d;msgLength=%d;iChannelNumber=%hx", (TUint)&sendBlock, sendBlock.Length(), sendBlock.MaxLength(), msgLength, iChannelNumber );
-                    
-                    error = iExtensionApi->SendIndication( sendBlock, iChannelNumber );
-                    }
-                else
-                    {
-                    error = msgLength;
-                    TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)error );
+                    TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
+                    TAny* secondParam = reinterpret_cast<TAny*>(tablePtr[ KSecondParam ]);
+                    ASSERT_RESET_ALWAYS( secondParam, EIADNullParameter | EIADFaultIdentifier26 << KFaultIdentifierShift  );
+                    TInt msgLength( Kern::ThreadGetDesLength( iThread, secondParam ) );
+                    C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSendIndication TBR 0x%x %d" ), secondParam, msgLength ) );
+                    OstTraceExt2( TRACE_NORMAL, DUP11_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSendIndication;secondParam=%x;msgLength=%d", (TUint)secondParam, msgLength );                
+                    error = KErrBadDescriptor;
+                    if( msgLength > 0 )
+                        {
+                        // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made now only
+                        // one copy from user to allocated block that is to be send.
+                        TDes8& sendBlock = iExtensionApi->AllocateBlock( msgLength );
+                        ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, secondParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier5 << KFaultIdentifierShift );
+                        TRACE_ASSERT_INFO( sendBlock.Length() == msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
+                        C_TRACE( ( _T( "DISAUserChannel::HandleAsyncRequest EIADAsyncSendIndication 0x%x %d %d 0x%x" ), &sendBlock, sendBlock.Length(), msgLength, iChannelNumber ) );
+                        OstTraceExt5( TRACE_NORMAL, DUP13_DISAUSERCHANNEL_HANDLEASYNCREQUEST, "DISAUserChannel::HandleAsyncRequest EIADAsyncSendIndication;sendBlock=%x;sendBlock.Length()=%d;sendBlock.MaxLength()=%d;msgLength=%d;iChannelNumber=%hx", (TUint)&sendBlock, sendBlock.Length(), sendBlock.MaxLength(), msgLength, iChannelNumber );
+                        
+                        error = iExtensionApi->SendIndication( sendBlock, iChannelNumber );
+                        }
+                    else
+                        {
+                        error = msgLength;
+                        TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)error );
+                        }
                     }
                 CompleteChannelRequest( aRequest, error );
                 break;
@@ -1395,70 +1437,78 @@ TInt DISAUserChannel::HandleSyncRequest(
         case EIADSend:
             {
             C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSend" ) ) );
-            TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
-            TAny* firstParam = reinterpret_cast<TAny*>(tablePtr[ KFirstParam ]);
-            ASSERT_RESET_ALWAYS( firstParam, EIADNullParameter | EIADFaultIdentifier27 << KFaultIdentifierShift  );
-            TInt msgLength( Kern::ThreadGetDesLength( iThread, firstParam ) );
-            C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSend 0x%x %d" ), firstParam, msgLength ) );
-            OstTraceExt2( TRACE_NORMAL, DUP2_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSend;firstParam=%x;msgLength=%d", (TUint)firstParam, msgLength );
-            
-            if( msgLength > 0 )
-                {
-                // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
-                // one copy from user to allocated block that is to be send.
-                TDes8& sendBlock = iExtensionApi->AllocateBlock( msgLength );
-                ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, firstParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier6 << KFaultIdentifierShift );
-                TRACE_ASSERT_INFO( sendBlock.Length() == msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
-                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSend 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
-                OstTraceExt2( TRACE_NORMAL, DUP13_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSend;sendBlock=%x;iChannelNumber=%hx", (TUint)&sendBlock, iChannelNumber );
+            error = KErrNotReady;
+            if ( iExtensionApi->GetConnectionStatus() == EIADConnectionOk )
+                {                
+                TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
+                TAny* firstParam = reinterpret_cast<TAny*>(tablePtr[ KFirstParam ]);
+                ASSERT_RESET_ALWAYS( firstParam, EIADNullParameter | EIADFaultIdentifier27 << KFaultIdentifierShift  );
+                TInt msgLength( Kern::ThreadGetDesLength( iThread, firstParam ) );
+                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSend 0x%x %d" ), firstParam, msgLength ) );
+                OstTraceExt2( TRACE_NORMAL, DUP2_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSend;firstParam=%x;msgLength=%d", (TUint)firstParam, msgLength );
                 
-                error = iExtensionApi->SendMessage( sendBlock, iChannelNumber );
-                }
-            else
-                {
-                error = ( msgLength == KErrNone ) ? KErrBadDescriptor : msgLength;
-                TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)msgLength );
+                if( msgLength > 0 )
+                    {
+                    // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
+                    // one copy from user to allocated block that is to be send.
+                    TDes8& sendBlock = iExtensionApi->AllocateBlock( msgLength );
+                    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, firstParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier6 << KFaultIdentifierShift );
+                    TRACE_ASSERT_INFO( sendBlock.Length() == msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
+                    C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSend 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
+                    OstTraceExt2( TRACE_NORMAL, DUP13_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSend;sendBlock=%x;iChannelNumber=%hx", (TUint)&sendBlock, iChannelNumber );
+                    
+                    error = iExtensionApi->SendMessage( sendBlock, iChannelNumber );
+                    }
+                else
+                    {
+                    error = ( msgLength == KErrNone ) ? KErrBadDescriptor : msgLength;
+                    TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)msgLength );
+                    }
                 }
             break;
             }
         case EIADDataSend:
             {
             C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADDataSend" ) ) );
-            TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
-            TAny* firstParam = reinterpret_cast<TAny*>(tablePtr[ KFirstParam ]);
-            ASSERT_RESET_ALWAYS( firstParam, EIADNullParameter | EIADFaultIdentifier32 << KFaultIdentifierShift  );
-            TInt msgLength( Kern::ThreadGetDesLength( iThread, firstParam ) );
-            C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADDataSend 0x%x %d" ), firstParam, msgLength ) );
-            OstTraceExt2( TRACE_NORMAL, DUP3_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADDataSend;firstParam=%x;msgLength=%d", (TUint)firstParam, msgLength );            
-            if( msgLength > 0 )
-                {
-                // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
-                // one copy from user to allocated block that is to be send.
-                
-                // Allocate a block for data. Allocation adds +11 to the msglength for pipe headers
-                TDes8& sendBlock = iExtensionApi->AllocateDataBlock( msgLength );
-                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest max %d length %d" ), sendBlock.MaxLength(), sendBlock.Length() ) );
-                // Use pre-allocated TPtr (no memory allocation from heap nor stack).
-                // Set it to point to +11 from sendblock and to be as long as data to be send
-                TInt tmpMaxLength( sendBlock.MaxLength() - KPipeDataHeader );
-                TUint8* tmpPtr( const_cast<TUint8*>( ( sendBlock.Ptr() + KPipeDataHeader ) ) );
-                TPtr* test = static_cast<TPtr8*>( &sendBlock );
-                test->Set( tmpPtr, 0, tmpMaxLength );
-                ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, firstParam, *test, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier7 << KFaultIdentifierShift );
-                TInt tmpMaxLength2( sendBlock.MaxLength() + KPipeDataHeader );
-                TInt tmpLength2( sendBlock.Length() + KPipeDataHeader );
-                TUint8* tmpPtr2( const_cast<TUint8*>( ( sendBlock.Ptr() - KPipeDataHeader ) ) );
-                test->Set( tmpPtr2, tmpLength2, tmpMaxLength2 );
-                TRACE_ASSERT_INFO( sendBlock.Length() > msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
-                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADDataSend 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
-                OstTraceExt4( TRACE_NORMAL, DUP4_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADDataSend;sendBlock=%x;Length=%x;MaxLength=%x;iChannelNumber=%hx", (TUint)&sendBlock, sendBlock.Length(), sendBlock.MaxLength(), iChannelNumber );
-                
-                error = iExtensionApi->SendMessage( sendBlock, iChannelNumber );
-                }
-            else
-                {
-                error = ( msgLength == KErrNone ) ? KErrBadDescriptor : msgLength;
-                TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)msgLength );
+            error = KErrNotReady;
+            if ( iExtensionApi->GetConnectionStatus() == EIADConnectionOk )
+                {                
+                TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
+                TAny* firstParam = reinterpret_cast<TAny*>(tablePtr[ KFirstParam ]);
+                ASSERT_RESET_ALWAYS( firstParam, EIADNullParameter | EIADFaultIdentifier32 << KFaultIdentifierShift  );
+                TInt msgLength( Kern::ThreadGetDesLength( iThread, firstParam ) );
+                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADDataSend 0x%x %d" ), firstParam, msgLength ) );
+                OstTraceExt2( TRACE_NORMAL, DUP3_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADDataSend;firstParam=%x;msgLength=%d", (TUint)firstParam, msgLength );            
+                if( msgLength > 0 )
+                    {
+                    // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
+                    // one copy from user to allocated block that is to be send.
+                    
+                    // Allocate a block for data. Allocation adds +11 to the msglength for pipe headers
+                    TDes8& sendBlock = iExtensionApi->AllocateDataBlock( msgLength );
+                    C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest max %d length %d" ), sendBlock.MaxLength(), sendBlock.Length() ) );
+                    // Use pre-allocated TPtr (no memory allocation from heap nor stack).
+                    // Set it to point to +11 from sendblock and to be as long as data to be send
+                    TInt tmpMaxLength( sendBlock.MaxLength() - KPipeDataHeader );
+                    TUint8* tmpPtr( const_cast<TUint8*>( ( sendBlock.Ptr() + KPipeDataHeader ) ) );
+                    TPtr* test = static_cast<TPtr8*>( &sendBlock );
+                    test->Set( tmpPtr, 0, tmpMaxLength );
+                    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, firstParam, *test, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier7 << KFaultIdentifierShift );
+                    TInt tmpMaxLength2( sendBlock.MaxLength() + KPipeDataHeader );
+                    TInt tmpLength2( sendBlock.Length() + KPipeDataHeader );
+                    TUint8* tmpPtr2( const_cast<TUint8*>( ( sendBlock.Ptr() - KPipeDataHeader ) ) );
+                    test->Set( tmpPtr2, tmpLength2, tmpMaxLength2 );
+                    TRACE_ASSERT_INFO( sendBlock.Length() > msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
+                    C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADDataSend 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
+                    OstTraceExt4( TRACE_NORMAL, DUP4_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADDataSend;sendBlock=%x;Length=%x;MaxLength=%x;iChannelNumber=%hx", (TUint)&sendBlock, sendBlock.Length(), sendBlock.MaxLength(), iChannelNumber );
+                    
+                    error = iExtensionApi->SendMessage( sendBlock, iChannelNumber );
+                    }
+                else
+                    {
+                    error = ( msgLength == KErrNone ) ? KErrBadDescriptor : msgLength;
+                    TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)msgLength );
+                    }
                 }
             break;
             }
@@ -1466,59 +1516,67 @@ TInt DISAUserChannel::HandleSyncRequest(
         case EIADSubscribeIndications32Bit:
             {
             C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSubscribeIndications | EIADSubscribeIndications32Bit" ) ) );
-            TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
-            TAny* firstParam = reinterpret_cast<TAny*>(tablePtr[ KFirstParam ]);
-            ASSERT_RESET_ALWAYS( firstParam, EIADNullParameter | EIADFaultIdentifier29 << KFaultIdentifierShift  );
-            TInt orderLength( Kern::ThreadGetDesLength( iThread, firstParam ) );
-            C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSubscribeIndications | EIADSubscribeIndications32Bit 0x%x %d" ), firstParam, orderLength ) );
-            OstTraceExt2( TRACE_NORMAL, DUP5_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSubscribeIndications(8/32bit);firstParam=%x;orderLength=%d", (TUint)firstParam, orderLength );
-            
-            if( orderLength > KErrNone )
+            error = KErrNotReady;
+            if ( iExtensionApi->GetConnectionStatus() == EIADConnectionOk )
                 {
-                // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
-                // one copy from user to allocated block that is to be send.
-                TDes8& sendBlock = iExtensionApi->AllocateBlock( ( orderLength ) );
-                ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, firstParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier8 << KFaultIdentifierShift );
-                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSubscribeIndications 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
-                OstTraceExt2( TRACE_NORMAL, DUP7_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSubscribeIndications(8/32bit);sendBlock=%x;iChannelNumber=%hx", (TUint)&sendBlock, iChannelNumber );                
-                TRACE_ASSERT_INFO( sendBlock.Length() == orderLength, (TUint8)iChannelNumber << KChannelNumberShift );
-                // No return values check needed. Request completed with error value by multiplexer
-                TBool thirtyTwoBit( ( EIADSubscribeIndications32Bit == aRequest ) ? ETrue : EFalse );
-                error = iExtensionApi->OrderIndication( sendBlock, iChannelNumber, thirtyTwoBit );
-                iExtensionApi->DeAllocateBlock( sendBlock );
-                }
-            else
-                {
-                error = orderLength;
-                TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)error);
+                TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
+                TAny* firstParam = reinterpret_cast<TAny*>(tablePtr[ KFirstParam ]);
+                ASSERT_RESET_ALWAYS( firstParam, EIADNullParameter | EIADFaultIdentifier29 << KFaultIdentifierShift  );
+                TInt orderLength( Kern::ThreadGetDesLength( iThread, firstParam ) );
+                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSubscribeIndications | EIADSubscribeIndications32Bit 0x%x %d" ), firstParam, orderLength ) );
+                OstTraceExt2( TRACE_NORMAL, DUP5_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSubscribeIndications(8/32bit);firstParam=%x;orderLength=%d", (TUint)firstParam, orderLength );
+                
+                if( orderLength > KErrNone )
+                    {
+                    // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made no only
+                    // one copy from user to allocated block that is to be send.
+                    TDes8& sendBlock = iExtensionApi->AllocateBlock( ( orderLength ) );
+                    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, firstParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier8 << KFaultIdentifierShift );
+                    C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSubscribeIndications 0x%x 0x%x" ), &sendBlock, iChannelNumber ) );
+                    OstTraceExt2( TRACE_NORMAL, DUP7_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSubscribeIndications(8/32bit);sendBlock=%x;iChannelNumber=%hx", (TUint)&sendBlock, iChannelNumber );                
+                    TRACE_ASSERT_INFO( sendBlock.Length() == orderLength, (TUint8)iChannelNumber << KChannelNumberShift );
+                    // No return values check needed. Request completed with error value by multiplexer
+                    TBool thirtyTwoBit( ( EIADSubscribeIndications32Bit == aRequest ) ? ETrue : EFalse );
+                    error = iExtensionApi->OrderIndication( sendBlock, iChannelNumber, thirtyTwoBit );
+                    iExtensionApi->DeAllocateBlock( sendBlock );
+                    }
+                else
+                    {
+                    error = orderLength;
+                    TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)error);
+                    }
                 }
             break;
             }
         case EIADSendIndication:
             {
             C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSendIndication" ) ) );
-            TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
-            TAny* firstParam = reinterpret_cast<TAny*>(tablePtr[ KFirstParam ]);
-            ASSERT_RESET_ALWAYS( firstParam, EIADNullParameter | EIADFaultIdentifier30 << KFaultIdentifierShift  );
-            TInt msgLength( Kern::ThreadGetDesLength( iThread, firstParam ) );
-            C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSendIndication TBR 0x%x %d" ), firstParam, msgLength ) );
-            OstTraceExt2( TRACE_NORMAL, DUP6_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSendIndication;firstParam=%x;msgLength=%d", (TUint)firstParam, msgLength );
-            if( msgLength > KErrNone )
+            error = KErrNotReady;
+            if ( iExtensionApi->GetConnectionStatus() == EIADConnectionOk )
                 {
-                // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made now only
-                // one copy from user to allocated block that is to be send.
-                TDes8& sendBlock = iExtensionApi->AllocateBlock( msgLength );
-                ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, firstParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier9 << KFaultIdentifierShift );
-                TRACE_ASSERT_INFO( sendBlock.Length() == msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
-                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSendIndication 0x%x %d %d 0x%x" ), &sendBlock, sendBlock.Length(), msgLength, iChannelNumber ) );
-                OstTraceExt4( TRACE_NORMAL, DUP8_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSendIndication;sendBlock=%x;sendBlock.Length()=%d;msgLength=%d;iChannelNumber=%hx", (TUint)&sendBlock, sendBlock.Length(), msgLength, iChannelNumber );
-                // No return values check needed. Request completed with error value by multiplexer
-                error = iExtensionApi->SendIndication( sendBlock, iChannelNumber );
-                }
-            else
-                {
-                error = msgLength;
-                TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)error );
+                TUint32* tablePtr = reinterpret_cast<TUint32*>( a1 );
+                TAny* firstParam = reinterpret_cast<TAny*>(tablePtr[ KFirstParam ]);
+                ASSERT_RESET_ALWAYS( firstParam, EIADNullParameter | EIADFaultIdentifier30 << KFaultIdentifierShift  );
+                TInt msgLength( Kern::ThreadGetDesLength( iThread, firstParam ) );
+                C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSendIndication TBR 0x%x %d" ), firstParam, msgLength ) );
+                OstTraceExt2( TRACE_NORMAL, DUP6_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSendIndication;firstParam=%x;msgLength=%d", (TUint)firstParam, msgLength );
+                if( msgLength > KErrNone )
+                    {
+                    // Previously there were Kern::Alloc (allocating from kernel memory a block where copy from user was made now only
+                    // one copy from user to allocated block that is to be send.
+                    TDes8& sendBlock = iExtensionApi->AllocateBlock( msgLength );
+                    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, firstParam, sendBlock, 0, KChunkShiftBy0 ), EIADDesReadFailed | EIADFaultIdentifier9 << KFaultIdentifierShift );
+                    TRACE_ASSERT_INFO( sendBlock.Length() == msgLength, (TUint8)iChannelNumber << KChannelNumberShift );
+                    C_TRACE( ( _T( "DISAUserChannel::HandleSyncRequest EIADSendIndication 0x%x %d %d 0x%x" ), &sendBlock, sendBlock.Length(), msgLength, iChannelNumber ) );
+                    OstTraceExt4( TRACE_NORMAL, DUP8_DISAUSERCHANNEL_HANDLESYNCREQUEST, "DISAUserChannel::HandleSyncRequest EIADSendIndication;sendBlock=%x;sendBlock.Length()=%d;msgLength=%d;iChannelNumber=%hx", (TUint)&sendBlock, sendBlock.Length(), msgLength, iChannelNumber );
+                    // No return values check needed. Request completed with error value by multiplexer
+                    error = iExtensionApi->SendIndication( sendBlock, iChannelNumber );
+                    }
+                else
+                    {
+                    error = msgLength;
+                    TRACE_ASSERT_INFO( 0, (TUint8)iChannelNumber << KChannelNumberShift | (TUint16)error );
+                    }
                 }
             break;
             }

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -55,9 +55,6 @@ const TUint8 KNetPadding = 0x00;
 const TUint8 KNetNoHplmnPnnRecordNumber = 0x00;
 const TUint8 KNetHplmnPnnRecordNumber = 0x01;
 
-// Max buffer length for Operator name.
-const TInt KMaxLengthOfOperatorName = 124;
-
 // Max data string length in FULL_NAME or SHORT_NAME.
 // Length is enough big to hold max data length converted
 // to 7-bit characters.
@@ -69,10 +66,10 @@ const TUint8 KSpareBitsMask = 0x07; // Mask bits 1-3.
 const TUint8 KCountryInitialsMask = 0x08; // Mask bit 4.
 const TUint8 KCodingSchemeMask = 0x70; // Mask bits 5-7.
 
-// Wild char mask for BCD code checking.
-const TUint8 KBCDWildChar = 0x0D;
-// Character mask.
-const TUint8 KBCDOneCharMask = 0x0F;
+// Wild char 'D' for OPL rule checking.
+const TUint16 KWildCharD = 0x000D;
+// Wild char 'F' for OPL rule checking.
+const TUint16 KWildCharF = 0x000F;
 
 // Extended table.
 const TUint8 KExtendedTable = 0x1B;
@@ -207,6 +204,11 @@ OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_CONSTRUCTL, "CMmNetOperatorNa
     // Initialization of Operator Name String (ONS).
     iOperatorNameString.Zero();
 
+    // Initialize custom EONS and NITZ name buffers.
+    iCustomNitzLongNameString.Zero();
+    iCustomNitzShortNameString.Zero();
+    iCustomEonsNameString.Zero();
+
     // Operator PLMN list available flag initialization.
     iOplListAvailable = EFalse;
 
@@ -272,6 +274,8 @@ OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_NETNITZNAMEIND, "CMmNetOperat
     iNitzName.iMNC = 0;
     iNitzName.iLongName.Zero();
     iNitzName.iShortName.Zero();
+    iCustomNitzLongNameString.Zero();
+    iCustomNitzShortNameString.Zero();
 
     // Initialize.
     TUint tempMCC( 0 ); // Mobile Country Code
@@ -330,6 +334,9 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMNETOPERATORNAMEHANDLER_NETNITZNAMEIND, "CMmNetO
             nitzFullNameData,
             longNitzName );
 
+        // Store NITZ Long name for custom request use.
+        iCustomNitzLongNameString.Copy( longNitzName );
+
         // Store NITZ Long name.
         iNitzName.iLongName.Copy( longNitzName.Left(
             iNitzName.iLongName.MaxLength() ) );
@@ -365,6 +372,9 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_NETNITZNAMEIND, "CMmNetO
             nitzShortNameData,
             shortNitzName );
 
+        // Store NITZ Short name for custom request use.
+        iCustomNitzShortNameString.Copy( shortNitzName );
+
         // Store NITZ Short name.
         iNitzName.iShortName.Copy( shortNitzName.Left(
             iNitzName.iShortName.MaxLength() ) );
@@ -374,13 +384,21 @@ TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::NetNitzNameInd - iNitzName.iMCC: %
 TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::NetNitzNameInd - iNitzName.iMNC: %d", iNitzName.iMNC);
 TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::NetNitzNameInd - iNitzName.iLongName: %S", &iNitzName.iLongName);
 TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::NetNitzNameInd - iNitzName.iShortName: %S", &iNitzName.iShortName);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::NetNitzNameInd - iCustomNitzLongNameString: %S", &iCustomNitzLongNameString);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::NetNitzNameInd - iCustomNitzShortNameString: %S", &iCustomNitzShortNameString);
 OstTrace1( TRACE_NORMAL, DUP3_CMMNETOPERATORNAMEHANDLER_NETNITZNAMEIND, "CMmNetOperatorNameHandler::NetNitzNameInd - iNitzName.iMCC=%u", iNitzName.iMCC );
 OstTrace1( TRACE_NORMAL, DUP4_CMMNETOPERATORNAMEHANDLER_NETNITZNAMEIND, "CMmNetOperatorNameHandler::NetNitzNameInd - iNitzName.iMNC=%u", iNitzName.iMNC );
 OstTraceExt1( TRACE_NORMAL, DUP5_CMMNETOPERATORNAMEHANDLER_NETNITZNAMEIND, "CMmNetOperatorNameHandler::NetNitzNameInd - iNitzName.iLongName=%S", iNitzName.iLongName );
 OstTraceExt1( TRACE_NORMAL, DUP6_CMMNETOPERATORNAMEHANDLER_NETNITZNAMEIND, "CMmNetOperatorNameHandler::NetNitzNameInd - iNitzName.iShortName=%S", iNitzName.iShortName );
+OstTraceExt1( TRACE_NORMAL, DUP7_CMMNETOPERATORNAMEHANDLER_NETNITZNAMEIND, "CMmNetOperatorNameHandler::NetNitzNameInd - iCustomNitzLongNameString=%S", iCustomNitzLongNameString );
+OstTraceExt1( TRACE_NORMAL, DUP8_CMMNETOPERATORNAMEHANDLER_NETNITZNAMEIND, "CMmNetOperatorNameHandler::NetNitzNameInd - iCustomNitzShortNameString=%S", iCustomNitzShortNameString );
 
     // Compare NITZ name got in NET_NITZ_NAME_IND to stored values in PMM.
     CompareNitzNameToPmmValues();
+
+    // last received NET_MODEM_REG_STATUS_IND is needed to handle again
+    // so that NITZ information is updated to upper layers
+    iNetMessHandler->HandleLastNetModemRegStatusInd();
     }
 
 // -----------------------------------------------------------------------------
@@ -1797,7 +1815,8 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_PERMPMRECORDREADRESP, "C
             iNitzNamePmm.iMNC = tempMNC;
             iNitzNamePmm.iLongName.Copy( tempLongName );
             iNitzNamePmm.iShortName.Copy( tempShortName );
-
+            iCustomNitzLongNameString.Copy( tempLongName );
+            iCustomNitzShortNameString.Copy( tempShortName );
             // Copy name data to iNitzName struct to keep PMM data in handle.
             iNitzName = iNitzNamePmm;
             }
@@ -2085,8 +2104,7 @@ OstTraceExt1( TRACE_NORMAL, DUP4_CMMNETOPERATORNAMEHANDLER_OPLRULESCHECKER, "CMm
 
 // -----------------------------------------------------------------------------
 // CMmNetOperatorNameHandler::OplRuleRecordChecker
-// Checks one OPL rule record against received Operator Code in BCD format
-// and LAC value.
+// Checks one OPL rule record against received Operator Code and LAC value.
 // -----------------------------------------------------------------------------
 //
 void CMmNetOperatorNameHandler::OplRuleRecordChecker
@@ -2099,54 +2117,140 @@ void CMmNetOperatorNameHandler::OplRuleRecordChecker
 TFLOGSTRING("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker");
 OstTrace0( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker" );
 
-    // Temp data.
-    TUint8 operCodeChar( 0 );
-    TUint8 plmnListChar( 0 );
+    // Buffer for SIM Operator code, length is 3.
+    TBuf8<KBCDLength> simOperatorCode;
 
-    // Setting ret value to KErrNone first to get compare working.
-    TInt ret( KErrNone );
+    TUint16 bcchMcc1( 0 );
+    TUint16 bcchMcc2( 0 );
+    TUint16 bcchMcc3( 0 );
 
-    // Compare one BCD code byte at time.
-    for ( TUint8 i = 0; i < KBCDLength; i++ )
+    TUint16 bcchMnc1( 0 );
+    TUint16 bcchMnc2( 0 );
+    TUint16 bcchMnc3( 0 );
+
+    TUint16 simMcc1( 0 );
+    TUint16 simMcc2( 0 );
+    TUint16 simMcc3( 0 );
+
+    TUint16 simMnc1( 0 );
+    TUint16 simMnc2( 0 );
+    TUint16 simMnc3( 0 );
+
+    TUint bcchMccNumber( 0 );
+
+    // BCCH MCC/MNC mapping.
+    CMmStaticUtility::GetMccCodes( aOperCode, &bcchMcc1, &bcchMcc2, &bcchMcc3 );
+    CMmStaticUtility::GetMncCodes( aOperCode, &bcchMnc1, &bcchMnc2, &bcchMnc3 );
+
+TFLOGSTRING4("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - BCCH MCC1 MCC2 MCC3 : %X %X %X", bcchMcc1, bcchMcc2, bcchMcc3);
+TFLOGSTRING4("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - BCCH MNC1 MNC2 MNC3 : %X %X %X", bcchMnc1, bcchMnc2, bcchMnc3);
+OstTraceExt3( TRACE_NORMAL, DUP6_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - BCCH MCC1 MCC2 MCC3 : %hx %hx %hx", bcchMcc1, bcchMcc2, bcchMcc3 );
+OstTraceExt3( TRACE_NORMAL, DUP7_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - BCCH MNC1 MNC2 MNC3 : %hx %hx %hx", bcchMnc1, bcchMnc2, bcchMnc3 );
+
+    // BCCH MCC.
+    bcchMccNumber = 100 * bcchMcc1 + 10 * bcchMcc2 + bcchMcc3;
+
+    // SIM operator code in BCD string format.
+    simOperatorCode.Copy( iOperatorPlmnListTable[aIndex].iOperCodeBCD );
+
+    // SIM MCC/MNC mapping.
+    CMmStaticUtility::GetMccCodes( simOperatorCode, &simMcc1, &simMcc2, &simMcc3 );
+    CMmStaticUtility::GetMncCodes( simOperatorCode, &simMnc1, &simMnc2, &simMnc3 );
+
+TFLOGSTRING4("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - SIM MCC1 MCC2 MCC3 : %X %X %X", simMcc1, simMcc2, simMcc3);
+TFLOGSTRING4("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - SIM MNC1 MNC2 MNC3 : %X %X %X", simMnc1, simMnc2, simMnc3);
+OstTraceExt3( TRACE_NORMAL, DUP8_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - SIM MCC1 MCC2 MCC3 : %hx %hx %hx", simMcc1, simMcc2, simMcc3 );
+OstTraceExt3( TRACE_NORMAL, DUP9_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - SIM MNC1 MNC2 MNC3 : %hx %hx %hx", simMnc1, simMnc2, simMnc3 );
+
+    // Flag for OPL rule checking.
+    TBool digitMatch( EFalse );
+
+    // - BCD value of 'D' in any of the MCC and/or MNC digits shall be used
+    //   to indicate a "wild" value for that corresponding MCC/MNC digit.
+    //   3GPP spec 31.102/4.2.59.
+    // - Other special cases for handling of OPL rules.
+    //   3GPP 23.122 Annex A.
+
+    // SIM MCC = BCCH MCC.
+    if ( ( bcchMcc1 == simMcc1 || KWildCharD == simMcc1 )
+        && ( bcchMcc2 == simMcc2 || KWildCharD == simMcc2 )
+        && ( bcchMcc3 == simMcc3 || KWildCharD == simMcc3 ) )
         {
-        if ( KErrNone == ret )
+        // 1st and 2nd digit SIM MNC and BCCH MNC match.
+        if ( ( bcchMnc1 == simMnc1 || KWildCharD == simMnc1 )
+            && ( bcchMnc2 == simMnc2 || KWildCharD == simMnc2 ) )
             {
-            // Check upper part of byte.
-            operCodeChar = ( aOperCode[i] >> 4 ) & KBCDOneCharMask;
-            plmnListChar =
-                ( iOperatorPlmnListTable[aIndex].iOperCodeBCD[i] >> 4 ) &
-                KBCDOneCharMask;
-
-            ret = BCDCharChecker( operCodeChar, plmnListChar );
-
-            // Continue checking lower part if previous matches.
-            if ( KErrNone == ret )
+            // 3rd digit SIM MNC and BCCH MNC match.
+            if ( bcchMnc3 == simMnc3 || KWildCharD == simMnc3 )
                 {
-                // Check lower part of byte.
-                operCodeChar = aOperCode[i] & KBCDOneCharMask;
-                plmnListChar =
-                    iOperatorPlmnListTable[aIndex].iOperCodeBCD[i] &
-                    KBCDOneCharMask;
-
-                ret = BCDCharChecker( operCodeChar, plmnListChar );
+                // Match.
+                digitMatch = ETrue;
+                }
+            else
+                {
+                // Check whether the PLMN is from country where '0'
+                // and 'F' are treated equally in MNC digit 3.
+                // BCCH MCC in the range 302, 310-316.
+                if ( 302 == bcchMccNumber
+                    || 310 == bcchMccNumber
+                    || 311 == bcchMccNumber
+                    || 312 == bcchMccNumber
+                    || 313 == bcchMccNumber
+                    || 314 == bcchMccNumber
+                    || 315 == bcchMccNumber
+                    || 316 == bcchMccNumber )
+                    {
+                    if ( ( 0 == bcchMnc3 && KWildCharF == simMnc3 )
+                        || ( KWildCharF == bcchMnc3 && 0 == simMnc3 ) )
+                        {
+                        // Match.
+                        digitMatch = ETrue;
+                        }
+                    else
+                        {
+                        // No match.
+                        digitMatch = EFalse;
+                        }
+                    }
+                else
+                    {
+                    // No match.
+                    digitMatch = EFalse;
+                    }
                 }
             }
+        else
+            {
+            // No match.
+            digitMatch = EFalse;
+            }
+        }
+    else
+        {
+        // No match.
+        digitMatch = EFalse;
         }
 
     // Compare Location Area Value information.
     // LAC should be in between upper and lower limit.
     //
-    // If BCD code match then continue to check LAC values.
-    if ( KErrNone == ret )
+    // If MCC and MNC code match then continue to check LAC values.
+    if ( digitMatch )
         {
-TFLOGSTRING("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - BCD code match");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - BCD code match" );
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - MCC and MNC match");
+OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - MCC and MNC match" );
+
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - BCCH LAC: %d", aLac);
+TFLOGSTRING3("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - SIM LAC between: %d - %d", iOperatorPlmnListTable[aIndex].iLACUpperLimit, iOperatorPlmnListTable[aIndex].iLACLowerLimit);
+OstTrace1( TRACE_NORMAL, DUP10_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - BCCH LAC: %u", aLac );
+OstTraceExt2( TRACE_NORMAL, DUP11_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - SIM LAC between: %u - %u", iOperatorPlmnListTable[aIndex].iLACUpperLimit, iOperatorPlmnListTable[aIndex].iLACLowerLimit );
+
         if ( ( aLac <= iOperatorPlmnListTable[aIndex].iLACUpperLimit )
             && ( aLac >= iOperatorPlmnListTable[aIndex].iLACLowerLimit ) )
             {
 TFLOGSTRING("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - LAC match => OPL Rule match");
 OstTrace0( TRACE_NORMAL, DUP2_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - LAC match => OPL Rule match" );
-            // Both BCD code and LAC value match.
+            // MCC, MNC and LAC value match.
             // Set iOplRuleMatch value to ETrue.
             // This informs that OPL record match.
             iOplRuleMatch = ETrue;
@@ -2163,46 +2267,13 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "C
         }
     else
         {
-TFLOGSTRING("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - BCD code didn't match => OPL Rule doesn't match");
-OstTrace0( TRACE_NORMAL, DUP4_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - BCD code didn't match => OPL Rule doesn't match" );
+TFLOGSTRING("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - MCC or MNC didn't match => OPL Rule doesn't match");
+OstTrace0( TRACE_NORMAL, DUP4_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker - MCC or MNC didn't match => OPL Rule doesn't match" );
         // Set iOplRuleMatch value to EFalse.
         // This informs that OPL record didn't match.
         iOplRuleMatch = EFalse;
         }
 TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::OplRuleRecordChecker - OPL Rule Match value T/F: %d", iOplRuleMatch);
-OstTrace1( TRACE_NORMAL, DUP6_CMMNETOPERATORNAMEHANDLER_OPLRULERECORDCHECKER, "CMmNetOperatorNameHandler::OplRuleRecordChecker;iOplRuleMatch=%d", iOplRuleMatch );
-    }
-
-// -----------------------------------------------------------------------------
-// CMmNetOperatorNameHandler::BCDCharChecker
-// Check BCD char against rule to find out is that matching with OPL list.
-// -----------------------------------------------------------------------------
-//
-TInt CMmNetOperatorNameHandler::BCDCharChecker
-        (
-        TUint8 aOperCodeChar,
-        TUint8 aPlmnListChar
-        )
-    {
-TFLOGSTRING3("TSY: CMmNetOperatorNameHandler::BCDCharChecker - Operator code char : Plmn list char = %X : %X", aOperCodeChar, aPlmnListChar);
-OstTraceExt2( TRACE_NORMAL, DUP2_CMMNETOPERATORNAMEHANDLER_BCDCHARCHECKER, "CMmNetOperatorNameHandler::BCDCharChecker - Operator code char : Plmn list char = %hhx : %hhx", aOperCodeChar, aPlmnListChar );
-
-    TInt ret( KErrGeneral );
-
-    // Check character.
-    // Operator code character needs to match OPL list Operator character
-    // or if OPL list character value is 'D' it indicates "wild" value what
-    // corresponding to all values.
-    if ( aOperCodeChar == aPlmnListChar || KBCDWildChar == aPlmnListChar )
-        {
-TFLOGSTRING("TSY: CMmNetOperatorNameHandler::BCDCharChecker - Character match");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_BCDCHARCHECKER, "CMmNetOperatorNameHandler::BCDCharChecker - Character match" );
-        // Character match.
-        ret = KErrNone;
-        }
-    // No else, ret is already set to KErrGeneral.
-
-    return ret;
     }
 
 // -----------------------------------------------------------------------------
@@ -2230,7 +2301,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_COPYEONSNAME, "CMmNetOpe
 
         // Add Operator name info data.
         iOperNameInfo.iType = RMmCustomAPI::EOperatorNameFlexiblePlmn;
-        iOperNameInfo.iName.Copy( iEonsName.iLongName );
+        iOperNameInfo.iName.Copy( iCustomEonsNameString );
 
         // Copy Short EONS name if exist.
         if ( 0 < iEonsName.iShortName.Length() )
@@ -2275,7 +2346,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_NITZNAMECHECKER, "CMmNet
 
             // Add Operator name info data.
             iOperNameInfo.iType = RMmCustomAPI::EOperatorNameNitzFull;
-            iOperNameInfo.iName.Copy( iNitzName.iLongName );
+            iOperNameInfo.iName.Copy( iCustomNitzLongNameString );
             }
 
         // Copy Short NITZ name if exist.
@@ -2289,7 +2360,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_NITZNAMECHECKER, "CMmNet
                 {
                 // Add Operator name info data.
                 iOperNameInfo.iType = RMmCustomAPI::EOperatorNameNitzShort;
-                iOperNameInfo.iName.Copy( iNitzName.iShortName );
+                iOperNameInfo.iName.Copy( iCustomNitzShortNameString );
                 }
             }
         }
@@ -3074,6 +3145,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_UICCOPERATORREQREADPNN, 
         // Reset EONS names.
         iEonsName.iLongName.Zero();
         iEonsName.iShortName.Zero();
+        iCustomEonsNameString.Zero();
 
         // Temporary buffer for full EONS name. Full name is mandatory.
         TBuf<KMaxLengthOfOperatorName> longEonsName;
@@ -3087,9 +3159,14 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_UICCOPERATORREQREADPNN, 
             iEonsName.iMCC,
             eonsFullNameData,
             longEonsName );
+
+        // Store EONS Long name for custom request use.
+        iCustomEonsNameString.Copy( longEonsName );
+
         // Store EONS long name.
         iEonsName.iLongName.Copy( longEonsName.Left(
             iEonsName.iLongName.MaxLength() ) );
+
         // Check if long name was read succesfully.
         if ( 0 < iEonsName.iLongName.Length() )
             {
@@ -3125,11 +3202,14 @@ TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iEonsNa
 TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iEonsName.iLongName: %S", &iEonsName.iLongName);
 TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iEonsName.iShortName: %S", &iEonsName.iShortName);
 TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iEonsName.iPNNIdentifier: %d", iEonsName.iPNNIdentifier);
+TFLOGSTRING2("TSY: CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL - iCustomEonsNameString: %S", &iCustomEonsNameString);
+
 OstTrace1( TRACE_NORMAL, CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iMCC=%u", iEonsName.iMCC );
 OstTrace1( TRACE_NORMAL, DUP1_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iMNC=%u", iEonsName.iMNC );
 OstTraceExt1( TRACE_NORMAL, DUP2_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iLongName=%S", iEonsName.iLongName );
 OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iShortName=%S", iEonsName.iShortName );
 OstTraceExt1( TRACE_NORMAL, DUP4_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iEonsName.iPNNIdentifier=%hhu", iEonsName.iPNNIdentifier );
+OstTraceExt1( TRACE_NORMAL, DUP23_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL, "CMmNetOperatorNameHandler::UiccOperatorRespReadPnnL;iCustomEonsNameString=%S", iCustomEonsNameString );
         }
     else
         {
@@ -3141,6 +3221,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMNETOPERATORNAMEHANDLER_UICCOPERATORRESPREADPNNL
         // Reset EONS names.
         iEonsName.iLongName.Zero();
         iEonsName.iShortName.Zero();
+        iCustomEonsNameString.Zero();
         }
 
     // This completes NetModemRegStatusInd method IPC

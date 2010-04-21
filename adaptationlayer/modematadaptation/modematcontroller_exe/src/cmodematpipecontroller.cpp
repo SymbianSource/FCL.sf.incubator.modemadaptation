@@ -22,24 +22,23 @@
 #include <pn_const.h>
 #ifndef NCP_COMMON_BRIDGE_FAMILY       
 #include <nsisi.h>
-#endif
-#include <tisi.h>                   //for isimessage
 #include <pipeisi.h>                //pipe
 #include <pipe_sharedisi.h>         //pipe
+#endif
+#include <tisi.h>                   //for isimessage
 #include "cmodematpipecontroller.h"    
 #include "cmodemathandler.h"
 #include <at_modemisi.h>            //redirectreq error codes
 #include "modemattrace.h"
 #include "cmodematsrv.h"
 
-const TInt KInvalidPipeHandle = -1;
+
 #ifndef NCP_COMMON_BRIDGE_FAMILY
-const TUint8 PEP_COMM_IND_ID_ESCAPE(0x07);
-const TInt KInvalidDteId = -1;
+const TUint8 PEP_COMM_IND_ID_ESCAPE = 0x07;
 const TUint8 KFiller = 0;
-const TUint8 KDefaultTrId(0);
-#endif
+const TUint8 KDefaultTrId = 0;
 const TInt KLastByteIndex = 3;
+#endif
 
 CModemAtPipeController* CModemAtPipeController::NewL( RIscApi& aIscApi,
     TUint& aObjId,
@@ -76,14 +75,20 @@ CModemAtPipeController::CModemAtPipeController( RIscApi& aIscApi,
     iIscApi( aIscApi ),
     iModemAtObjId( aObjId ),
     iModemAtDevId( THIS_DEVICE ),
-    iPipeHandle( KInvalidPipeHandle ),
     iDataportDevId( 0 ),
     iDataportObjId( 0 ),
     iAtHandler( aHandler ),
-    iSchedulerWait( NULL ),
-    iDteId( KInitialDteId )
+    iSchedulerWait( NULL )
     {
-    C_TRACE (( _T("CModemAtPipeController::CModemAtPipeController()") ));
+    C_TRACE (( _T("CModemAtPipeController::CModemAtPipeController()>") ));
+    iPipe.pipeHandle = KInvalidPipeHandle;
+    iPipe.firstDevId = 0;
+    iPipe.firstObjId = 0;
+    iPipe.secondDevId = 0;
+    iPipe.secondDevId = 0;
+    iPipe.pipeState = TPipeInfo::EPipeNoPipe;
+
+    C_TRACE (( _T("CModemAtPipeController::CModemAtPipeController()<") ));
     }
 
  
@@ -121,7 +126,7 @@ CModemAtPipeController::CModemAtPipeController( RIscApi& aIscApi,
      switch( aReceivedMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) )
         {
         case PNS_PIPE_CREATE_RESP:
-            C_TRACE(_L("PIPE CREATE RESP"));
+            C_TRACE(_L("PNS_PIPE_CREATE_RESP"));
             HandlePipeCreateResp( aReceivedMessage );
             break;
 
@@ -141,7 +146,7 @@ CModemAtPipeController::CModemAtPipeController( RIscApi& aIscApi,
             break;
 
         case PNS_PEP_STATUS_IND :
-            C_TRACE(_L("PNS_PEP_STATUS_IND "));
+            C_TRACE(_L("PNS_PEP_STATUS_IND"));
             HandlePepStatusInd( aReceivedMessage );
             break;
 
@@ -212,13 +217,15 @@ void CModemAtPipeController::HandleNameAddInd( const TIsiReceiveC& aReceivedMess
                PNS_NAME_ADD_IND_OFFSET_NAMEENTRYTBL * i +
                PN_NAME_SRV_ITEM_STR_OFFSET_OBJ);
 
-             if( iDataportDevId == THIS_DEVICE )
+             if( ( iDataportDevId == THIS_DEVICE ) &&
+                 ( iPipe.pipeState == TPipeInfo::EPipeNoPipe ) )
                 {
-                C_TRACE((_L("CREATE PIPE FROM DATAPORT when ATEXT plugins connect (devid %x  o-bjid %x) "),iDataportDevId,iDataportObjId));
+                C_TRACE((_L("Creating pipe. (Dataport device id 0x%x,  object id: 0x%x)"),iDataportDevId,iDataportObjId));
+                SendCreatePipeMessage( iDataportDevId, iDataportObjId );
                 }
              else
                 {
-                C_TRACE((_L("ERROR: PIPE not Created due to unmatching DevId: 0x%x or ObjId 0x%x"),iDataportDevId, iDataportObjId ));
+                C_TRACE((_L("ERROR: Pipe is not created. (Dataport device id 0x%x,  object id: 0x%x)"),iDataportDevId, iDataportObjId ));
                 TRACE_ASSERT_ALWAYS;
                 }
              }
@@ -330,65 +337,38 @@ void CModemAtPipeController::SendCreatePipeMessage( const TUint8 aDevId, const T
  void CModemAtPipeController::HandlePipeCreateResp( const TIsiReceiveC& aReceivedMessage )
     {
     C_TRACE (( _T("CModemAtPipeController::HandlePipeCreateResp()") ));
-    TInt error = aReceivedMessage.Get8bit(ISI_HEADER_SIZE +  PNS_PIPE_CREATE_RESP_OFFSET_ERRORCODE );
+    TInt error = aReceivedMessage.Get8bit(ISI_HEADER_SIZE +
+      PNS_PIPE_CREATE_RESP_OFFSET_ERRORCODE );
     C_TRACE((_L("Pipe create resp: %d"), error ));
-    TRACE_ASSERT( iDteId != KInitialDteId );
-
+    
     if( error == PN_PIPE_NO_ERROR)
         {
-        iPipeHandle = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
+        iPipe.pipeHandle = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
           PNS_PIPE_CREATE_RESP_OFFSET_PIPEHANDLE );
-        C_TRACE( (_L("handle %d"), iPipeHandle ));
-        iPipeTable[iDteId].iHandle = iPipeHandle;
-        iPipeTable[iDteId].iFirstDevId = iDataportDevId;
-        iPipeTable[iDteId].iFirstObjId =  iDataportObjId; 
-        iPipeTable[iDteId].iSecondDevId = THIS_DEVICE;
-        iPipeTable[iDteId].iSecondObjId =  iModemAtObjId;
-        ChangePipeState( iDteId, TPipeInfo::EPipeCreated );
-        iPipeHandle = KInvalidPipeHandle;
-        iDteId = KInitialDteId;
+        C_TRACE( (_L("Pipe created successfully. Pipehandle: %d"), iPipe.pipeHandle ));
+        
+        // Now that pipehandle is received, it will also be used as dteId when connecting to AT Modem.
+        
+        iPipe.firstDevId = iDataportDevId;
+        iPipe.firstObjId =  iDataportObjId; 
+        iPipe.secondDevId = THIS_DEVICE;
+        iPipe.secondObjId =  iModemAtObjId;
+        ChangePipeState( TPipeInfo::EPipeCreated );
+
         }
     else
         {
-        C_TRACE (( _T("iPipeHandle == KInvalidPipeHandle ")));
-        iPipeTable[iDteId].iHandle = KInvalidPipeHandle;
-        iPipeTable[iDteId].iFirstDevId = 0;
-        iPipeTable[iDteId].iFirstObjId = 0;
-        iPipeTable[iDteId].iSecondDevId = 0;
-        iPipeTable[iDteId].iSecondObjId = 0;
-        ChangePipeState( iDteId, TPipeInfo::EPipeNoPipe );
+        C_TRACE((_L("Pipe creation failed: %d"), error ));
+        iPipe.pipeHandle = KInvalidPipeHandle;
+        iPipe.firstDevId = 0;
+        iPipe.firstObjId = 0;
+        iPipe.secondDevId = 0;
+        iPipe.secondObjId = 0;
+        ChangePipeState( TPipeInfo::EPipeNoPipe );
         ASSERT_ALWAYS;
         }
     }
 
- void CModemAtPipeController::LinkDteIdToPipe( const TUint8 aDteId )
-    {
-    C_TRACE (( _T("CModemAtPipeController::LinkDteIdToPipe(0x%x)"), aDteId ));
-    TRACE_ASSERT( aDteId < KMaxDteIdCount );
-    if( !(aDteId < KMaxDteIdCount) )
-        {
-        C_TRACE(( _T("CModemAtPipeController::LinkDteIdToPipe() illegal dteid %d"), aDteId ));
-        return;
-        }
-
-    iDteId = aDteId;
-    if( iDataportDevId == THIS_DEVICE )
-        {
-        C_TRACE((_L("CREATE PIPE FROM DATAPORT (plugins are connecting) (devid %x  o-bjid %x) "),iDataportDevId,iDataportObjId));
-        SendCreatePipeMessage( iDataportDevId, iDataportObjId );
-        }
-    else
-        {
-        C_TRACE((_L("Dataport has not been created (devid %x  o-bjid %x) "), iDataportDevId, iDataportObjId ));
-        C_TRACE (( _T("iPipeHandle == KInvalidPipeHandle ")));
-        iPipeTable[aDteId].iHandle = KInvalidPipeHandle;
-        iPipeTable[aDteId].iFirstDevId = 0;
-        iPipeTable[aDteId].iFirstObjId = 0;
-        iPipeTable[aDteId].iSecondDevId = 0;
-        iPipeTable[aDteId].iSecondObjId = 0;
-        ChangePipeState( aDteId, TPipeInfo::EPipeNoPipe );
-        }
-    }
 
 
 void CModemAtPipeController::HandlePipeRemoveResp( const TIsiReceiveC& aReceivedMessage )
@@ -399,12 +379,10 @@ void CModemAtPipeController::HandlePipeRemoveResp( const TIsiReceiveC& aReceived
     TInt pipehandle = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
       PNS_PIPE_REMOVE_RESP_OFFSET_PIPEHANDLE );
 
-    TInt dteId = FindDteId( pipehandle );
-    
-    TRACE_ASSERT( dteId < KMaxDteIdCount )
-    if( !(dteId < KMaxDteIdCount) )
+    TRACE_ASSERT( pipehandle == iPipe.pipeHandle );
+    if( pipehandle != iPipe.pipeHandle )
         {
-        C_TRACE(( _T("CModemAtPipeController::HandlePipeRemoveResp() illegal dteid %d"), dteId ));
+        C_TRACE(( _T("CModemAtPipeController::HandlePipeRemoveResp() illegal pipehandle %d"), pipehandle ));
         return;
         }
     
@@ -415,9 +393,9 @@ void CModemAtPipeController::HandlePipeRemoveResp( const TIsiReceiveC& aReceived
         return;
         }
 
-    ChangePipeState( dteId, TPipeInfo::EPipeNoPipe );
+    ChangePipeState( TPipeInfo::EPipeNoPipe );
 
-    iPipeTable[ dteId ].iHandle = KInvalidPipeHandle; 
+    iPipe.pipeHandle = KInvalidPipeHandle; 
 
     if( iSchedulerWait )
         {
@@ -434,31 +412,31 @@ void CModemAtPipeController::RemovePipe( const TUint8 aDteId )
     {
     C_TRACE (( _T("CModemAtPipeController::RemovePipe(%d, 0x%x)"), aDteId, this ));
 
-    TRACE_ASSERT( aDteId < KMaxDteIdCount );
-    if( !(aDteId < KMaxDteIdCount) )
-        {
-        C_TRACE(( _T("CModemAtPipeController::RemovePipe() illegal dteid %d"), aDteId ));
-        return;
-        }
-
-    C_TRACE (( _T("iPipeTable[aDteId]:0x%x"), &iPipeTable[aDteId] ));
-    C_TRACE (( _T("iHandle: %d"), iPipeTable[aDteId].iHandle ));
-    C_TRACE (( _T("i1stDevId: %d"), iPipeTable[aDteId].iFirstDevId ));
-    C_TRACE (( _T("i1stObjId: %d"), iPipeTable[aDteId].iFirstObjId )); 
-    C_TRACE (( _T("i2ndDevId: %d"), iPipeTable[aDteId].iSecondDevId ));
-    C_TRACE (( _T("i2ndObjId: %d"), iPipeTable[aDteId].iSecondObjId ));
+    C_TRACE (( _T("iPipe:0x%x"), &iPipe ));
+    C_TRACE (( _T("iHandle: %d"), iPipe.pipeHandle ));
+    C_TRACE (( _T("i1stDevId: %d"), iPipe.firstDevId ));
+    C_TRACE (( _T("i1stObjId: %d"), iPipe.firstObjId )); 
+    C_TRACE (( _T("i2ndDevId: %d"), iPipe.secondDevId ));
+    C_TRACE (( _T("i2ndObjId: %d"), iPipe.secondObjId ));
     
-    if( iPipeTable[aDteId].iHandle != KInvalidPipeHandle )   
+    if( iPipe.pipeHandle != KInvalidPipeHandle )   
         {
-        if( ( iPipeTable[aDteId].iPipeState == TPipeInfo::EPipeRemoving ) || 
-            ( iPipeTable[aDteId].iPipeState == TPipeInfo::EPipeNoPipe ) )
+        if( ( iPipe.pipeState == TPipeInfo::EPipeRemoving ) || 
+            ( iPipe.pipeState == TPipeInfo::EPipeNoPipe ) )
             {
-            C_TRACE((_L("Already removing pipe or pipe is removed. Handle %d"), iPipeTable[aDteId].iHandle));
+            C_TRACE((_L("Already removing pipe or pipe is removed. Handle %d"), iPipe.pipeHandle));
             return;
             }
-        C_TRACE((_L("Remove pipe. Handle %d"), iPipeTable[aDteId].iHandle));
-        ChangePipeState( aDteId, TPipeInfo::EPipeRemoving );
-        SendRemovePipeReq( iPipeTable[aDteId].iHandle );
+        
+        if( aDteId != iPipe.pipeHandle )
+            {
+            C_TRACE(( _T("Dteid %d is not same as pipehandle %d, so there is no pipe to remove."), aDteId, iPipe.pipeHandle ));
+            return;
+            }
+        
+        C_TRACE((_L("Remove pipe. Handle %d"), iPipe.pipeHandle));
+        ChangePipeState( TPipeInfo::EPipeRemoving );
+        SendRemovePipeReq( iPipe.pipeHandle );
         }
     else
         {
@@ -504,23 +482,23 @@ void CModemAtPipeController::RedirectPipe( const TUint8 aDteId,
     const TUint8 aNewDevId,
     const TUint8 aNewObjId ) 
     {
-    C_TRACE (( _T("CModemAtPipeController::RedirectPipe() dteid %d"), aDteId ));
+    C_TRACE (( _T("CModemAtPipeController::RedirectPipe() dteid %d, iPipe.pipeHandle: %d"), aDteId, iPipe.pipeHandle ));
     C_TRACE((_L("CModemAtPipeController::RedirectPipe() New pep, deviceId: 0x%x objId: 0x%x "), aNewDevId, aNewObjId));
-    TRACE_ASSERT( aDteId < KMaxDteIdCount );
-    if( !(aDteId < KMaxDteIdCount) )
+    TRACE_ASSERT( aDteId == iPipe.pipeHandle );
+    if( aDteId != iPipe.pipeHandle )
         {
         C_TRACE(( _T("CModemAtPipeController::RedirectPipe() illegal dteid %d"), aDteId ));
         return;
         }
-    TRACE_ASSERT( iPipeTable[aDteId].iHandle != KInvalidPipeHandle );
-    if( iPipeTable[aDteId].iHandle == KInvalidPipeHandle )
+    TRACE_ASSERT( iPipe.pipeHandle != KInvalidPipeHandle );
+    if( iPipe.pipeHandle == KInvalidPipeHandle )
         {
-        C_TRACE(( _T("CModemAtPipeController::RedirectPipe() invalid pipe handle %d"), iPipeTable[aDteId].iHandle ));
+        C_TRACE(( _T("CModemAtPipeController::RedirectPipe() invalid pipe handle %d"), iPipe.pipeHandle ));
         return;
         }
 
-    if( iPipeTable[aDteId].iPipeState == TPipeInfo::EPipeRemoving || 
-        iPipeTable[aDteId].iPipeState == TPipeInfo::EPipeNoPipe ) 
+    if( iPipe.pipeState == TPipeInfo::EPipeRemoving || 
+        iPipe.pipeState == TPipeInfo::EPipeNoPipe ) 
         {
         C_TRACE(_L("CModemAtPipeController::RedirectPipe() Pipe is already removed -> cant redirect"));
         return;
@@ -529,12 +507,12 @@ void CModemAtPipeController::RedirectPipe( const TUint8 aDteId,
     if( aNewDevId == THIS_DEVICE && aNewObjId == iModemAtObjId )
         {
         C_TRACE((_L("CModemAtPipeController::RedirectPipe() EPipeDisabled. iModemAtObjId: 0x%x"), iModemAtObjId));
-        ChangePipeState( aDteId, TPipeInfo::EPipeDisabled );
+        ChangePipeState( TPipeInfo::EPipeDisabled );
         }
     else
         {
         C_TRACE(_L("CModemAtPipeController::RedirectPipe() EPipeRedirected"));
-        ChangePipeState( aDteId, TPipeInfo::EPipeRedirected );
+        ChangePipeState( TPipeInfo::EPipeRedirected );
         }
 
     C_TRACE(_L("CModemAtPipeController::RedirectPipe() Redirecting pipe"));
@@ -549,14 +527,14 @@ void CModemAtPipeController::RedirectPipe( const TUint8 aDteId,
     isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_REQ_OFFSET_SUBFUNCTION,
       PNS_PIPE_REDIRECT_REQ );
     isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_REQ_OFFSET_PIPEHANDLE,
-      iPipeTable[aDteId].iHandle ); 
+      iPipe.pipeHandle );
     isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_REQ_OFFSET_STATEAFTERCREATION,
       PN_PIPE_DISABLE );
     //old pep 
     isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_REQ_OFFSET_OLDPEPDEV,
-      iPipeTable[aDteId].iSecondDevId );
+      iPipe.secondDevId );
     isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_REQ_OFFSET_OLDPEPOBJ, 
-      iPipeTable[aDteId].iSecondObjId );
+      iPipe.secondObjId );
     isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_REQ_OFFSET_OLDPEPTYPE, PN_PEP_TYPE_COMMON); 
     isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_REQ_OFFSET_FILLERBYTE1, KFiller );
 
@@ -565,8 +543,8 @@ void CModemAtPipeController::RedirectPipe( const TUint8 aDteId,
     isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_REQ_OFFSET_REPLACEMENTPEPTYPE, 
       PN_PEP_TYPE_COMMON ); 
 
-    iPipeTable[aDteId].iSecondDevId = aNewDevId;
-    iPipeTable[aDteId].iSecondObjId = aNewObjId;
+    iPipe.secondDevId = aNewDevId;
+    iPipe.secondObjId = aNewObjId;
 
     isimessage.Set8bit(ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_REQ_OFFSET_NSB, KFiller );
     isimessage.Complete();
@@ -585,32 +563,37 @@ void CModemAtPipeController::HandlePipeRedirectResp( const TIsiReceiveC& aReceiv
     TInt pipeHandle = aReceivedMessage.Get8bit( ISI_HEADER_SIZE + 
       PNS_PIPE_REDIRECT_RESP_OFFSET_PIPEHANDLE );
     C_TRACE((_L("CModemAtPipeController::HandlePipeRedirectResp() pipehandle: %d"), pipeHandle ));
-    TInt dteId = FindDteId( pipeHandle );
     
     if( error != PN_PIPE_NO_ERROR )
         {
-        if( dteId != KInvalidDteId )
+        if( pipeHandle == iPipe.pipeHandle )
             {
             C_TRACE(( _L("CModemAtPipeController::HandlePipeRedirectResp() pipe error: %d"), error ));
-            iAtHandler.SendAtModemDataRedirectResultReq( dteId, AT_MODEM_REDIRECT_RESULT_ERROR);
-            RemovePipe( dteId );
+            iAtHandler.SendAtModemDataRedirectResultReq( pipeHandle, AT_MODEM_REDIRECT_RESULT_ERROR);
+            RemovePipe( pipeHandle );
             return;
             }
         else
             {
-            C_TRACE(( _L("CModemAtPipeController::HandlePipeRedirectResp() dteId not found, pipe error: %d"), error ));
+            C_TRACE(( _L("CModemAtPipeController::HandlePipeRedirectResp() pipeHandle not found, pipe error: %d"), error ));
             TRACE_ASSERT_ALWAYS;
             return;
             }
         }
 
-    iAtHandler.SendAtModemDataRedirectResultReq( dteId, AT_MODEM_REDIRECT_RESULT_OK );
+    if( pipeHandle != iPipe.pipeHandle )
+        {
+        C_TRACE(( _L("CModemAtPipeController::HandlePipeRedirectResp() unknown pipehandle %d"), pipeHandle ));
+        TRACE_ASSERT_ALWAYS;
+        return;
+        }
 
-    if( iPipeTable[ dteId ].iPipeState != TPipeInfo::EPipeDisabled )
+    iAtHandler.SendAtModemDataRedirectResultReq( pipeHandle, AT_MODEM_REDIRECT_RESULT_OK );
+
+    if( iPipe.pipeState != TPipeInfo::EPipeDisabled )
         {
         SendEnablePipeReq( pipeHandle );
         }
-
     }
 
 void CModemAtPipeController::QueryModemAtFromNameService() 
@@ -658,25 +641,6 @@ void CModemAtPipeController::SendEnablePipeReq( const TUint8 aPipeHandle )
     delete message;
     }
 
- TInt CModemAtPipeController::FindDteId( const TInt aHandle )
-    {
-    C_TRACE (( _T("CModemAtPipeController::FindDteId()") ));
-    TInt dteId = KInvalidDteId;
-    for( TInt i = 0 ; i < KMaxDteIdCount ; i++ ) 
-        {
-        if( iPipeTable[i].iHandle == aHandle ) 
-            {
-            dteId = i;
-            break;
-            }
-        }
-
-    TRACE_ASSERT( dteId != KInvalidDteId );
-    C_TRACE((_L("CModemAtPipeController::FindDteId() returns dteid: %d"),dteId));
-    return dteId;
-    } 
-
- 
 void CModemAtPipeController::HandlePipeEnabledResp( const TIsiReceiveC& aReceivedMessage )
     {
     C_TRACE (( _T("CModemAtPipeController::HandlePipeEnabledResp()") ));
@@ -684,12 +648,18 @@ void CModemAtPipeController::HandlePipeEnabledResp( const TIsiReceiveC& aReceive
       PNS_PIPE_ENABLE_RESP_OFFSET_ERRORCODE);
     TInt pipeHandle = aReceivedMessage.Get8bit(ISI_HEADER_SIZE + 
       PNS_PIPE_ENABLE_RESP_OFFSET_PIPEHANDLE);
-    TInt dteId = FindDteId(pipeHandle);           
+    if( pipeHandle != iPipe.pipeHandle )
+        {
+        C_TRACE((_L("CModemAtPipeController::HandlePipeEnabledResp() unknown pipeHandle received")));
+        TRACE_ASSERT_ALWAYS;
+        return;
+        }
+
     C_TRACE((_L("CModemAtPipeController::HandlePipeEnabledResp() pipehandle %d"), pipeHandle));
        
     if( error == PN_PIPE_NO_ERROR )
         {
-        ChangePipeState( dteId, TPipeInfo::EPipeEnabled );
+        ChangePipeState( TPipeInfo::EPipeEnabled );
         }
     else
         {
@@ -699,22 +669,20 @@ void CModemAtPipeController::HandlePipeEnabledResp( const TIsiReceiveC& aReceive
     }
 
 
-void CModemAtPipeController::ChangePipeState(
-    const TInt aDteId,
-    TPipeInfo::EPipeState aState )
+void CModemAtPipeController::ChangePipeState( TPipeInfo::EPipeState aState )
     {
-    C_TRACE((_L("CModemAtPipeController::ChangePipeState(%d, %d)"), aDteId, aState));
-    C_TRACE(( _L("Was: iPipeTable[ %d ].iPipeState = %d"), aDteId, (TInt)iPipeTable[ aDteId ].iPipeState ));
-    iPipeTable[ aDteId ].iPipeState = aState;
+    C_TRACE((_L("CModemAtPipeController::ChangePipeState( New state: %d )"), (TInt)aState));
+    C_TRACE(( _L("Old iPipe.pipeState = %d"), (TInt)iPipe.pipeState ));
+    iPipe.pipeState = aState;
     if( aState == TPipeInfo::EPipeEnabled )
         {
         C_TRACE(( _T("DATA MODE") ));
-        iAtHandler.HandleCommandModeChange( aDteId, EDataMode );
+        iAtHandler.HandleCommandModeChange( EDataMode );
         }
     else if( aState == TPipeInfo::EPipeDisabled )
         {
         C_TRACE(( _T("COMMAND MODE") ));
-        iAtHandler.HandleCommandModeChange( aDteId, ECommandMode );
+        iAtHandler.HandleCommandModeChange( ECommandMode );
         }
     }
 
@@ -731,13 +699,13 @@ void CModemAtPipeController::HandlePepStatusInd( const TIsiReceiveC& aReceivedMe
             {
             TUint8 pipeHandle( aReceivedMessage.Get8bit( ISI_HEADER_SIZE +
               PNS_PEP_STATUS_IND_OFFSET_PIPEHANDLE ) );
-            TInt dteId( FindDteId( pipeHandle ) );           
-            C_TRACE( (_L("CModemAtPipeController PEP_COMM_IND_ID_ESCAPE received, pipehandle %d dteid %d"), pipeHandle, dteId ));
+          
+            C_TRACE( (_L("CModemAtPipeController PEP_COMM_IND_ID_ESCAPE received, pipehandle: %d iPipe.pipeHandle: %d"), pipeHandle, iPipe.pipeHandle ));
 
-            if( dteId != KInvalidDteId )
+            if( pipeHandle == iPipe.pipeHandle )
                 {
-                C_TRACE( (_L("SendEscapeSignalDetection dteid %d"), dteId ));
-                iAtHandler.SendEscapeSignalDetection( dteId );
+                C_TRACE( (_L("SendEscapeSignalDetection dteid %d"), pipeHandle ));
+                iAtHandler.SendEscapeSignalDetection( pipeHandle );
                 }
             }
         // Not know should any other indicationid from comm pep type to be handled
@@ -751,6 +719,12 @@ void CModemAtPipeController::HandlePepStatusInd( const TIsiReceiveC& aReceivedMe
         {
         C_TRACE((_L("CModemAtPipeController Peptype ignored %d "), pepType));
         }
+    }
+
+TUint8 CModemAtPipeController::GetPipeHandle()
+    {
+    C_TRACE((_L("CModemAtPipeController::GetPipeHandle %d"), iPipe.pipeHandle));
+    return iPipe.pipeHandle;
     }
 
  #endif // NCP_COMMON_BRIDGE_FAMILY

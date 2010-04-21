@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -70,6 +70,7 @@ SOURCE        cmmphonebookoperationwrite.cpp
 SOURCE        cmmenstoremesshandler.cpp
 SOURCE        cmmphonebookoperationdelete.cpp
 SOURCE        cmmphonebookoperationwrite3g_adn.cpp
+SOURCE        cmmphonebookoperationdelete3g_adn.cpp
 
 // SMS & other messaging
 SOURCE        cmmsmsmesshandler.cpp
@@ -115,6 +116,7 @@ LIBRARY       insock.lib   // IP address handling
 LIBRARY       flogger.lib  // Logging
 LIBRARY       c32.lib      // Comms server
 LIBRARY       commdb.lib   // For data call
+LIBRARY       esock.lib    // For TSockAddr
 
 // ETel
 LIBRARY       etel.lib     // ETel Server

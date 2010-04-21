@@ -1781,8 +1781,14 @@ class CSatNotifyLocalInfo : public CSatNotificationsBase
         * @param aClearSatus If true clear status
         * @return TBool iLocalInfoIsOngoing
         */
-        TBool Status( TBool aClearStatus = EFalse );
+        TBool LocalInfoStatus( TBool aClearStatus = EFalse );
 
+        /**
+        * From CSatNotificationsBase Handles the LocalInfo terminal response
+        * @param aClearSatus If true clear status
+        * @return TBool iLocalInfoAccTechOngoing
+        */
+        TBool LocalInfoAccTechStatus( TBool aClearStatus = EFalse );
 
     private: // Data
 
@@ -1791,10 +1797,11 @@ class CSatNotifyLocalInfo : public CSatNotificationsBase
 
         // Response package allocated by SimAtkTsy. In use when terminal
         // response result and parameters are determined in SimAtkTsy.
-        RSat::TLocalInfoRspV3   iLocalInfoRspV3;
+        RSat::TLocalInfoRspV3 iLocalInfoRspV3;
 
-        // Flag
-        TBool                   iLocalInfoIsOngoing;
+        // Flags
+        TBool iLocalInfoIsOngoing;
+        TBool iLocalInfoAccTechOngoing;
     };
 
 

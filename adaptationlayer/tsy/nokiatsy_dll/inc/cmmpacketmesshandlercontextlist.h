@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -75,15 +75,6 @@ const TInt KTIntNotDefined = 0xFF;
             TBool iChannelOpened;
         };
 
-    // Proxy Id List contains TMmProxyIdList elements.
-    class TMmProxyIdList
-        {
-        public:
-            TUint8 iObjectId;
-            TUint8 iChannelId;
-            TBool iIsFree;
-        };
-
 // FUNCTION PROTOTYPES
     // None
 
@@ -147,15 +138,6 @@ class CMmPacketContextMesshandlerList : public CBase
         * @return TInt: number of created contexts in the context info list
         */
         TInt NumberOfContexts() const;
-
-        /**
-        * Generates new proxy id.
-        * @param aProxyId: proxy id (channel id) of the context
-        * @return TInt: KErrNone or error code
-        *     (KErrOverflow: maximum number of context already created)
-        */
-        TInt GenerateProxyId(
-            TUint8& aProxyId );
 
         /**
         * Sets context id to the context info list.
@@ -634,6 +616,13 @@ class CMmPacketContextMesshandlerList : public CBase
         */
         TUint8 GetContextTypeById( const TUint8 aContextId );
 
+        /**
+        * Initialize context info list
+        * @param aContextId: id of the context
+        * @return none
+        */
+        void InitializeContextInfoList( const TUint8 aContextId );
+
     public: // Functions from base classes
         // None
 
@@ -670,9 +659,6 @@ class CMmPacketContextMesshandlerList : public CBase
 
         // A context info list.
         TMmContextInfo iContextInfoArray[KMmMaxNumberOfContexts];
-
-        // A proxy id list.
-        TMmProxyIdList iProxyIdList[KMmMaxNumberOfContexts];
 
         // Number of created contexts in context info list.
         TInt iNumberOfCreatedContexts;

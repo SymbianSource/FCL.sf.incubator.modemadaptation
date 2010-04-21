@@ -19,7 +19,7 @@
 #include <non_foundation_paths.hrh>
 
 PRJ_PLATFORMS
-DEFAULT
+BASEDEFAULT
 
 #include "../rom/bld.inf"
 #include "../adaptationlayer/group/bld.inf"

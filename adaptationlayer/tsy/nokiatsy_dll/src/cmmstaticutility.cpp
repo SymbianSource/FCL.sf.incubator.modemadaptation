@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -1739,6 +1739,7 @@ OstTraceExt1( TRACE_NORMAL, DUP12_CMMSTATICUTILITY_UICCCSCAUSETOEPOCERROR, "CMmS
 
     return epocError;
     }
+
 // -----------------------------------------------------------------------------
 // CMmStaticUtility::PacketDataCSCauseToEpocError
 // Converts Packet Data CS cause to EPOC error value
@@ -2171,6 +2172,62 @@ void CMmStaticUtility::ConvertIPAddressToClient
     // no else
     }
 
+// -----------------------------------------------------------------------------
+// CMmStaticUtility::ConvertIPAddressFromClient
+// Converts IP address string from client into GPDS suitable format
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt CMmStaticUtility::ConvertIPAddressFromClient
+        (
+        const TDesC8& aClientAddr,
+        TDes8& aGpdsAddr
+        )
+    {
+TFLOGSTRING("TSY: CMmStaticUtility::ConvertIPAddressFromClient");
+OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT, "CMmStaticUtility::ConvertIPAddressFromClient" );
+    TInt ret(KErrNone);
+
+    TBuf<RPacketContext::KMaxPDPAddressLength> tmpClientAddress;
+    tmpClientAddress.Copy(aClientAddr);
+    TInetAddr inetAddr;
+    ret = inetAddr.Input(tmpClientAddress);
+
+    if ( KErrNone == ret )
+        {
+        if ( KAfInet == inetAddr.Family() )
+            {
+            TUint32 ipV4Address = inetAddr.Address();
+            TPtrC8 ptrIpV4Address( (TUint8*)&ipV4Address, KIpv4AddressLen );
+            aGpdsAddr.SetLength( KIpv4AddressLen );
+            // reverse copy IP address bytes to get correct endianness
+            for ( TInt i=0; i<KIpv4AddressLen; i++)
+                {
+                aGpdsAddr[i] = ptrIpV4Address[KIpv4AddressLen - i - 1];
+                }
+            }
+        else if ( KAfInet6 == inetAddr.Family() )
+            {
+            TPtrC8 ptrIpV6Address(
+                inetAddr.Ip6Address().u.iAddr8,
+                KIpv6AddressLen );
+            aGpdsAddr.Copy( ptrIpV6Address );
+            }
+        else
+            {
+TFLOGSTRING2("TSY: CMmStaticUtility::ConvertIPAddressFromClient; not supported family(%d)", inetAddr.Family());
+OstTrace1( TRACE_NORMAL, DUP2_CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT, "CMmStaticUtility::ConvertIPAddressFromClient; not supported family(%d)", inetAddr.Family() );
+            ret = KErrNotSupported;
+            }
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmStaticUtility::ConvertIPAddressFromClient; TInetAddr::Input failed");
+OstTrace0( TRACE_NORMAL, DUP1_CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT, "CMmStaticUtility::ConvertIPAddressFromClient; TInetAddr::Input failed" );
+        }
+
+    return ret;
+    }
 
 // -----------------------------------------------------------------------------
 // CMmStaticUtility::GetIntFromDescriptor
@@ -3447,6 +3504,37 @@ OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GETUNICODEGSM, "CMmStaticUtility::GetU
     }
 
 
+// -----------------------------------------------------------------------------
+// CMmStaticUtility::ConvertUcs2To7BitCodedData
+// Convert data to 7 bit GSM format.
+// -----------------------------------------------------------------------------
+//
+void CMmStaticUtility::ConvertUcs2To7BitCodedData(
+    TDesC16& aInputString,
+    TDes8& aGsmDataString )
+    {
+TFLOGSTRING("TSY: CMmStaticUtility::ConvertUcs2To7BitCodedData");
+OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTUCS2TO7BITCODEDDATA, "CMmStaticUtility::ConvertUcs2To7BitCodedData" );
+
+    if ( 0 < aInputString.Length() )
+        {
+        // Store string in GSM default coding scheme
+        for( TInt count = 0; count < aInputString.Length(); count++)
+            {
+            // get the GSM defalut Character for UCS character
+            TUint8 gsmChar = GetGsmForUnicode( aInputString[count] );
+            if( gsmChar > 0x7F )
+                {
+                aGsmDataString.Append( 0x1B );
+                }
+            aGsmDataString.Append(gsmChar & 0x7F);
+            }
+            // Append 0xFF for End of the String
+            aGsmDataString.Append( 0xFF );
+        }   // End of if there is no Input String
+    } // End of function
+
+
 
 // -----------------------------------------------------------------------------
 // CMmStaticUtility::ConvertUcs2ToGsmUcs2Data
@@ -4246,6 +4334,8 @@ TInt CMmStaticUtility::Get16Bit
      
  return target;
  }
+
+
 
 // ==================== OTHER EXPORTED FUNCTIONS ===============================
     //None

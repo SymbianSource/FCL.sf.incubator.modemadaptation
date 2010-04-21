@@ -27,7 +27,9 @@
 
 
 CModemAtSrv::CModemAtSrv( TInt aPriority ) :
-    CPolicyServer( aPriority, KSrvPolicy ), iHandler(NULL)
+    CPolicyServer( aPriority, KSrvPolicy ),
+    iHandler(NULL),
+    iDteId( 0 )  // iDteId defaults to 0 and it is updated by PNS_PIPE_CREATE_RESP
     {
     }
 
@@ -49,10 +51,10 @@ CModemAtSrv* CModemAtSrv::NewLC()
     return self;
     }
 
-void CModemAtSrv::RemovePipe( const TUint8 aDteId )
+void CModemAtSrv::RemovePipe()
     {
     C_TRACE((_L("CModemAtSrv::RemovePipe()") ));
-    iHandler->RemovePipe( aDteId );
+    iHandler->RemovePipe( iDteId );
     }
 
 void CModemAtSrv::ClientClosed( CModemAtSession* aSession )
@@ -61,21 +63,16 @@ void CModemAtSrv::ClientClosed( CModemAtSession* aSession )
     TInt index = iSessions.Find( aSession );
     if( index >= 0 )
         {
-        //remove session from routing table, if dteId exists
-        if(iSessions[index]->GetDteId() != KInitialDteId )
-            {
-            iRouteTable[ iSessions[index]->GetPluginType() ][ iSessions[index]->GetDteId() ] = NULL;
-            }
         
         if( iSessions.Count() == 1 )
             {
             C_TRACE((_L("Disconnecting ISI message handler ") ));
-            iHandler->Disconnect( iSessions[ index ]->GetDteId() );
+            iHandler->Disconnect( iDteId );
             }
-    
-        C_TRACE((_L("Removing session (plugin type %d dteid: %d)"), iSessions[index]->GetPluginType(), iSessions[index]->GetDteId() ));
+
+        C_TRACE((_L("Removing session (plugin type %d)"), iSessions[index]->GetPluginType() ));
         iSessions.Remove( index );
-        
+
         C_TRACE((_T("<<CModemAtSrv::ClientClosed()") ));
         }
     }
@@ -96,23 +93,14 @@ void CModemAtSrv::ConstructL()
     {
     C_TRACE (( _T("CModemAtSrv::ConstructL()") ));
     iHandler = CModemAtHandler::NewL( *this );
-    
-     //setup routing table
-    for( TInt i = 0 ; i < KPluginCount ; i++)
-        {
-        for(TInt o = 0; o < KMaxDteIdCount; o++)
-            {
-            iRouteTable[ i ][ o ] = NULL;
-            }
-        }
     } 
 
-void CModemAtSrv::HandleSignalInd( const TInt aDteId )
+void CModemAtSrv::HandleSignalInd( const TUint8 aDteId )
     {
     C_TRACE ((_T("CModemAtSrv::HandleSignalInd aDteId = %d sessions = %d"), aDteId, iSessions.Count() ));
     for( TInt i = 0; i < iSessions.Count(); i++ )
         {
-        if( iSessions[i]->GetDteId() == aDteId  && iSessions[i]->IsSignalIndReqActive() )
+        if( iDteId == aDteId  && iSessions[i]->IsSignalIndReqActive() )
             {
             C_TRACE (( _T("CModemAtSrv::HandleSignalInd() session found") ));
             iSessions[i]->SignalIndReceived();
@@ -120,12 +108,12 @@ void CModemAtSrv::HandleSignalInd( const TInt aDteId )
         }
     }
 
-void CModemAtSrv::HandleUnsolicitedData( const TInt aDteId, const TDesC8& aData )
+void CModemAtSrv::HandleUnsolicitedData( const TUint8 aDteId, const TDesC8& aData )
     {
     C_TRACE ((_T("CModemAtSrv::HandleUnsolicitedData aDteId = %d sessions = %d"), aDteId, iSessions.Count() ));
     for( TInt i = 0; i < iSessions.Count(); i++ )
         {
-        if( (iSessions[i]->GetDteId() == aDteId || aDteId == KUnsolicitedDataDteId )&&
+        if( ( iDteId == aDteId || aDteId == KUnsolicitedDataDteId )&&
             iSessions[i]->IsUnsolicitedDataReqActive() &&
             iSessions[i]->GetPluginType() == EATExtPlugin )
             {
@@ -135,13 +123,12 @@ void CModemAtSrv::HandleUnsolicitedData( const TInt aDteId, const TDesC8& aData 
         }
     }
 
-void CModemAtSrv::HandleCommandModeChange( TInt aDteId, TCommandMode aMode )
+void CModemAtSrv::HandleCommandModeChange( TCommandMode aMode )
     {
-    C_TRACE ((_T("CModemAtSrv::HandleCommandModeChange aDteId = %d sessions = %d mode = %d"), aDteId, iSessions.Count(), (TInt) aMode ));
+    C_TRACE ((_T("CModemAtSrv::HandleCommandModeChange sessions = %d mode = %d"), iSessions.Count(), (TInt) aMode ));
     for( TInt i = 0; i < iSessions.Count(); i++ )
         {
-        if( iSessions[i]->GetDteId() == aDteId &&
-            iSessions[i]->IsCommandModeReqActive() &&
+        if( iSessions[i]->IsCommandModeReqActive() &&
             iSessions[i]->GetPluginType() == ECommonPlugin )
             {
             C_TRACE (( _T("CModemAtSrv::HandleCommandModeChange() session found") ));
@@ -150,20 +137,7 @@ void CModemAtSrv::HandleCommandModeChange( TInt aDteId, TCommandMode aMode )
         }
     }
 
-void CModemAtSrv::BroadcastModemConnected(const TUint aDteId, TInt aErr )
-    {
-    C_TRACE ((_T("CModemAtSrv::BroadcastModemConnected aDteId = %d err = %d sessions = %d"), aDteId, aErr, iSessions.Count() ));
-    for( TInt i = 0; i < iSessions.Count(); i++ )
-        {
-        if( iSessions[i]->GetDteId() == aDteId  && iSessions[i]->IsConnectReqActive() )
-            {
-            C_TRACE (( _T("CModemAtSrv::BroadcastModemConnected() session found") ));
-            iSessions[i]->ModemConnected( aErr );
-            }
-        }
-    }
-
-void CModemAtSrv::HandleIntermediateDataInd( const TInt aDteId,
+void CModemAtSrv::HandleIntermediateDataInd( const TUint8 aDteId,
     const TATPluginInterface aPluginType,
     const TDesC8& aResponse,
     const TUint8 aCommand )
@@ -182,7 +156,7 @@ void CModemAtSrv::HandleIntermediateDataInd( const TInt aDteId,
         }
     }
 
-void CModemAtSrv::HandleATResponse( const TInt aDteId, const TDesC8& aResponse, const TUint8 aCommand )
+void CModemAtSrv::HandleATResponse( const TUint8 aDteId, const TDesC8& aResponse, const TUint8 aCommand )
     {
     C_TRACE ((_T(">>CModemAtSrv::HandleATResponse aDteId = %d sessions = %d "), aDteId, iSessions.Count() ));
     C_TRACE ((_T("CModemAtSrv::HandleATResponse command = %d"), aCommand ));
@@ -204,67 +178,39 @@ void CModemAtSrv::HandleATResponse( const TInt aDteId, const TDesC8& aResponse, 
     C_TRACE ((_T("<<CModemAtSrv::HandleATResponse()") ));
     }
 
-TInt CModemAtSrv::ConnectToModem(CModemAtSession* aSession) 
+TInt CModemAtSrv::ConnectToModem( CModemAtSession* aSession, TATPluginInterface aPluginType ) 
     {
     C_TRACE ((_T(">>CModemAtSrv::ConnectToModem 0x%x"), aSession));
-    TInt type = aSession->GetPluginType();
-   
-    C_TRACE(( _L("session count: %d, type: %d"), iSessions.Count(), type ));
-    //find already defined dteid
-    for(TInt i = 0; i < iSessions.Count(); i++) 
-        {
-        TInt dteid = iSessions[i]->GetDteId();
-        TDesC8& name = iSessions[i]->GetName();
-        C_TRACE((_L("i: %d, dteid: %d"), i, dteid));
-        
-        //Is there plugin with samename
-        if( name.Compare(aSession->GetName())== 0 && dteid != KInitialDteId )
-            {
-            if( type == iSessions[i]->GetPluginType())
-                {
-                TRACE_ASSERT_ALWAYS;
-                aSession->SetDteId( dteid );
-                C_TRACE ((_T("<<CModemAtSrv::ConnectToModem KErrAlreadyExists 0x%x"), aSession));
-                return KErrAlreadyExists;
-                }
-            //add current session to route table
-            C_TRACE((_L("AddSessionToRouteTable type: %d, dteid: %d"), type, aSession->GetDteId()));
-            iRouteTable[aSession->GetPluginType()][dteid] = aSession;
-            C_TRACE((_L("Interface exists=> %d"),dteid));
 
-            aSession->SetDteId( dteid );
-            C_TRACE ((_T("<<CModemAtSrv::ConnectToModem KErrNone 0x%x"), aSession));
-            return KErrNone;
-            }
+    C_TRACE(( _L("session count: %d, type: %d"), iSessions.Count(), (TInt) aPluginType ));
+
+    if( aPluginType == ECommonPlugin )
+        {
+        C_TRACE ((_T("Common plug-in connecting")));
+        C_TRACE ((_T("<<CModemAtSrv::ConnectToModem iDteId: %d, session: 0x%x"), iDteId, aSession));
+        return iHandler->Connect( iDteId );
+        }
+    else
+        {
+        C_TRACE ((_T("Atext plug-in connecting")));
+
+        aSession->ModemConnected( KErrNone );
+        C_TRACE ((_T("<<CModemAtSrv::ConnectToModem 0x%x"), aSession));
+        return KErrNone;
         }
 
-    //no AT-plugin& Common plugin, find first free dteid
-    TInt dteId = 0;
-    while(iRouteTable[0][dteId] || iRouteTable[1][dteId])
-        {
-        dteId++;
-      }     
-    ASSERT_PANIC_ALWAYS( dteId < KMaxDteIdCount );
-    iRouteTable[type][dteId] = aSession;
-    C_TRACE((_L("Added new dteid: %d"),dteId));
-
-    aSession->SetDteId(dteId);
-    C_TRACE ((_T("<<CModemAtSrv::ConnectToModem session: 0x%x"), aSession));
-    return iHandler->Connect( dteId );
     }
 
-void CModemAtSrv::AddToSendFifo( const TUint8 aDteId,
-    const TATPluginInterface aPluginType,
-    CAtMessage* aMessage )
+void CModemAtSrv::AddToSendFifo( const TATPluginInterface aPluginType, CAtMessage* aMessage )
     {
-    C_TRACE (( _T("CModemAtSrv::AddToSendFifo( dteId = %d,0x%x)"), aDteId, aMessage  ));
+    C_TRACE (( _T("CModemAtSrv::AddToSendFifo( aPluginType: %d, aMessage: 0x%x)"), (TInt)aPluginType, aMessage));
 
     iAtMessageArray.Append( aMessage ); // only one AT command at the time in modem
 
     if( iAtMessageArray.Count() == 1 ) //if empty Fifo send immediately
         {
         C_TRACE((_L("Sending message immediately")));
-        iHandler->SendATCommand( aDteId, 
+        iHandler->SendATCommand( iDteId, 
            aPluginType,
            aMessage->GetMessageType(),
            aMessage->GetBuffer() );
@@ -305,7 +251,7 @@ void CModemAtSrv::SendNextFromFifo()
         ptr.Set( iAtMessageArray[0]->GetBuffer() );
         
         C_TRACE (( _T("iHandler->SendATCommand()") ));
-        iHandler->SendATCommand( iAtMessageArray[0]->GetSession()->GetDteId(), 
+        iHandler->SendATCommand( iDteId, 
            iAtMessageArray[0]->GetSession()->GetPluginType(),
            iAtMessageArray[0]->GetMessageType(),
            ptr );
@@ -344,5 +290,21 @@ TInt CModemAtSrv::SessionCount()
     {
     C_TRACE(( _T("CModemAtSrv::SessionCount() %d"), iSessions.Count() ));
     return iSessions.Count();
+    }
+
+void CModemAtSrv::SetDteIdAndConnect( const TUint8 aDteId, const TInt aConnectionError ) 
+    {
+    C_TRACE(( _T("CModemAtSrv::SetDteIdAndConnect( %d )"), aDteId ));
+    iDteId = aDteId;
+
+    C_TRACE ((_T("sessions = %d"), iSessions.Count() ));
+    for( TInt i = 0; i < iSessions.Count(); i++ )
+        {
+        if( iSessions[i]->IsConnectReqActive() )
+            {
+            C_TRACE (( _T("set sessions to connected") ));
+            iSessions[i]->ModemConnected( aConnectionError );
+            }
+        }
     }
 

@@ -24,7 +24,6 @@
 #include "cmodemathandler.h"  //KMaxDteIdCount
 #include "modemattrace.h"
 
-const TUint8 KInitialDteId = 999;
 const TUint8 EAtCmd = 0;
 const TUint8 EGetNvramStatus = 1;
 
@@ -80,21 +79,22 @@ public:
     /**
      * Connect session to the modem  
      * @param CModemAtSession* aSession Pointer to the session
+     * @param TATPluginInterface aPluginType Atext or common plugin
      * @return Connection status: KErrNone, KErrAlreadyExists
      */    
-    TInt ConnectToModem( CModemAtSession* aSession);
+    TInt ConnectToModem( CModemAtSession* aSession, TATPluginInterface aPluginType);
 
     /**
      * HandleSignalInd  
      * @param aDteId Device Terminal ID
      */ 
-    void HandleSignalInd( const TInt aDteId );
+    void HandleSignalInd( const TUint8 aDteId );
     /**
      * HandleUnsolicitedData 
      * @param aDteId Device Terminal ID
      * @param aData Descriptor data
      */ 
-    void HandleUnsolicitedData( const TInt aDteId, const TDesC8& aData );
+    void HandleUnsolicitedData( const TUint8 aDteId, const TDesC8& aData );
     /**
      * HandleIntermediateDataInd
      * @param aDteId Device Terminal ID
@@ -102,36 +102,27 @@ public:
      * @param aResponse Response buffer
      * @param aCommand Command buffer
      */ 
-    void HandleIntermediateDataInd( const TInt aDteId, const TATPluginInterface aPluginType, const TDesC8& aResponse, const TUint8 aCommand );
+    void HandleIntermediateDataInd( const TUint8 aDteId, const TATPluginInterface aPluginType, const TDesC8& aResponse, const TUint8 aCommand );
 
     /**
      * HandleATResponse
      * @param aDteId Device Terminal ID
      * @param aResponse Response buffer
      */ 
-    void HandleATResponse( const TInt aDteId, const TDesC8& aResponse, const TUint8 aCommand );
-    
-    /**
-     * BroadcastModemConnected
-     * @param aDteId Device Terminal ID
-     * @param aErr KErrNone if connected, otherwise KErrGeneral
-     */ 
-    void BroadcastModemConnected(const TUint aDteId, TInt aErr );
+    void HandleATResponse( const TUint8 aDteId, const TDesC8& aResponse, const TUint8 aCommand );
     
     /**
      * HandleCommandModeChange
-     * @param aDteId Device Terminal ID
      * @param aMode Command mode 0 or data mode 1
      */ 
-    void HandleCommandModeChange( TInt aDteId, TCommandMode aMode );
+    void HandleCommandModeChange( TCommandMode aMode );
     
     /**
      * AddToSendFifo
-     * @param aDteId Device Terminal ID
      * @param aPluginType Plugin type
      * @param aMessage RMessage2 container class
      */ 
-    void AddToSendFifo( const TUint8 aDteId, const TATPluginInterface aPluginType, CAtMessage* aMessage );
+    void AddToSendFifo( const TATPluginInterface aPluginType, CAtMessage* aMessage );
 
     /**
      * RemoveFirstFromSendFifo 
@@ -151,9 +142,15 @@ public:
     
     /**
      * RemovePipe
-     * @param aDteId Device Terminal ID
      */ 
-    void RemovePipe( const TUint8 aDteId );
+    void RemovePipe();
+
+    /**
+      *  Sets DteID for this session
+      *  @param aDteId DteId
+      * @param aConnectionError error
+      */    
+    void SetDteIdAndConnect( const TUint8 aDteId, const TInt aConnectionError );
 
 private:
 
@@ -183,9 +180,9 @@ private:
 private:  // data
 
     RPointerArray<CModemAtSession> iSessions;       //Sessions from R-interface
-    CModemAtSession* iRouteTable[KPluginCount][KMaxDteIdCount]; //Messages are routed to session by this table
     RPointerArray<CAtMessage> iAtMessageArray;
     CModemAtHandler* iHandler;
+    TUint8 iDteId;
     };
 
 #endif  // CMODEMATSRV_H

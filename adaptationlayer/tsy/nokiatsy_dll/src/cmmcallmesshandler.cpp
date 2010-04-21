@@ -245,8 +245,6 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CONSTRUCTL, "CMmCallMessHandler::Con
     // Read "HSDPA Disabled" status from product profile
     InfoPpDataReadReq();
 
-    iCallOperationID = CSD_CALL_CREATE;
-    iVideoCallReleased = EFalse;
     iCallControlCallId = CALL_MODEM_ID_NONE;
     iCcResult = KCcResultAllowedNoModification;
     iResourceControlSuppress = EFalse;
@@ -289,7 +287,6 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_NEWL, "CMmCallMessHandler::NewL" );
     aPhoNetReceiver->RegisterL( callMessHandler, PN_CSD );
 
     aPhoNetReceiver->RegisterL( callMessHandler, PN_PIPE, PNS_PIPE_CREATE_RESP );
-    aPhoNetReceiver->RegisterL( callMessHandler, PN_PIPE, PNS_PIPE_REMOVE_RESP );
 
     callMessHandler->iDtmfMessHandler = aDtmfMessHandler;
     CleanupStack::Pop( callMessHandler );
@@ -306,6 +303,12 @@ CMmCallMessHandler::~CMmCallMessHandler()
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::~CMmCallMessHandler");
 OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CMMCALLMESSHANDLER, "CMmCallMessHandler::~CMmCallMessHandler" );
+
+    if ( KInvalidPipeHandle != iPipeHandle )
+        {
+        // error ignored
+        PnsPipeRemoveReq();
+        }
 
     if ( iDataPortHandler )
         {
@@ -488,11 +491,6 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHa
                 case PNS_PIPE_CREATE_RESP:
                     {
                     PnsPipeCreateResp( aIsiMessage );
-                    break;
-                    }
-                case PNS_PIPE_REMOVE_RESP:
-                    {
-                    PnsPipeRemoveResp( aIsiMessage );
                     break;
                     }
                 default:
@@ -3316,15 +3314,6 @@ TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_STATUS subbl
         iCallDirection = RMobileCall::EMobileTerminated;
         }
 
-    // Check if Video Call is MT Released.
-    // Pipe have to remove to make next call possible.
-    // Have to wait that Csd videoCall is disconnected.
-    if ( CALL_MODEM_STATUS_MT_RELEASE == callStatusISA ||
-         CALL_MODEM_STATUS_MO_RELEASE == callStatusISA )
-        {
-        iVideoCallReleased = ETrue;
-        }
-
     // Read call mode
     if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
         ISI_HEADER_SIZE + CALL_MODEM_STATUS_IND_OFFSET_MODE,
@@ -4585,10 +4574,10 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_INITIALIZEDATAPORTL, "CMmCallMessHan
     // SIM is ready, start dataport handling
     if ( !iDataPortHandler )
         {
-TFLOGSTRING("NTSY: CMmCallMessHandler::InitializeDataportL - Start dataport handling");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_INITIALIZEDATAPORTL, "CMmCallMessHandler::InitializeDataportL - Start dataport handling" );
-        // Deleted in CMmCallMessHandler::~CMmCallMessHandler()
+TFLOGSTRING("NTSY: CMmCallMessHandler::InitializeDataportL - Create pipe for videotelephony");
+OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_INITIALIZEDATAPORTL, "CMmCallMessHandler::InitializeDataportL - Create pipe for videotelephony" );
         iDataPortHandler = CMmDataPortHandler::NewL( iMessageRouter );
+        User::LeaveIfError( PnsPipeCreateReq( PN_PIPE_ENABLE ) );
         }
     }
 
@@ -5264,18 +5253,8 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCall
                 EEtelCallAnswer, &callData, KErrNone );
             }
         }
-    else
-        {
-        // MO/MT video call released. we have to remove pipe.
-        if ( iVideoCallReleased )
-            {
-TFLOGSTRING("TSY: CMmCallMessHandler::CsdVideoCallStatusInd: call MO/MT released");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessHandler::CsdVideoCallStatusInd: call MO/MT released" );
-            //Remove Pipe for wideo telephony
-            PnsPipeRemoveReq();
-            iVideoCallReleased = EFalse;
-            }
-        }
+    // no else
+
     // CSD_VIDEO_CALL_STATUS_DISCONNECT arrives also when call establishment
     // fails
     // reset call direction to avoid further unnecessary IPC completions
@@ -5512,13 +5491,8 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_DIALDATACALL, "CMmCallMessHandl
         iTelNumber = callInfo->iDialledParty.iTelNumber;
 
         // Dial the call
-        iCallOperationID = CSD_CALL_CREATE;
         iCallDirection = RMobileCall::EMobileOriginated;
-
-        // Create Pipe for wideo telephony
-        // If creation succeed, then CsdCallControlReq( CSD_CALL_CREATE )
-        // is called on PnsPipeCreateResp()
-        PnsPipeCreateReq( PN_PIPE_ENABLE );
+        CsdCallControlReq( CSD_CALL_CREATE );
         }
     else
         {
@@ -5559,12 +5533,7 @@ TFLOGSTRING("TSY: CMmCallMessHandler::AnswerIncomingDataCall. Send ATA");
 OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_ANSWERINCOMINGDATACALL, "CMmCallMessHandler::AnswerIncomingDataCall, Send ATA" );
 
         // Answer the call
-        iCallOperationID = CSD_CALL_ANSWER;
-
-        //Create Pipe for wideo telephony
-        // If creation succeed, then CsdCallControlReq( CSD_CALL_ANSWER )
-        // is called on PnsPipeCreateResp()
-        PnsPipeCreateReq( PN_PIPE_ENABLE );
+        CsdCallControlReq( CSD_CALL_ANSWER );
         }
         // If we are setting auto answer, the status is unknown
     else if ( RMobileCall::EStatusIdle >= iMobileCallInfo.iStatus )
@@ -5680,39 +5649,14 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPECREATERESP, "CMmCallMessHandl
 TFLOGSTRING4("TSY: CMmCallMessHandler::PnsPipeCreateResp. TransactionId: %d, PipeHandle: %d, error code: %d", transId, iPipeHandle, errorCode );
 OstTraceExt3( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPECREATERESP, "CMmCallMessHandler::PnsPipeCreateResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, iPipeHandle, errorCode );
 
-        if ( PN_PIPE_NO_ERROR == errorCode )
+        if ( PN_PIPE_NO_ERROR != errorCode )
             {
-            // Dial or Answer the call
-            CsdCallControlReq( iCallOperationID );
+            delete iDataPortHandler;
+            iDataPortHandler = NULL;
             }
-        else
-            {
-            CCallDataPackage callData;
-            // set call id and mode
-            callData.SetCallIdAndMode(
-                iMobileCallInfo.iCallId, iMobileCallInfo.iService );
-            TInt err = CMmStaticUtility::PacketDataCSCauseToEpocError(
-                 errorCode, PN_PIPE );
-            if ( RMobileCall::EMobileTerminated == iCallDirection )
-                {
-                // answering video call fails
-                iMessageRouter->Complete(
-                    EEtelCallAnswer,
-                    &callData,
-                    err );
-                }
-            else
-                {
-                // dialling video call fails
-                // for MO calls pipe is created before iCallDirection is set
-                iMessageRouter->Complete(
-                    EEtelCallDial,
-                    &callData,
-                    err );
-                }
-            iCallDirection = RMobileCall::EDirectionUnknown;
-            }
+        // no else
         }
+    // no else
     }
 
 // ----------------------------------------------------------------------------
@@ -5724,6 +5668,8 @@ TInt CMmCallMessHandler::PnsPipeRemoveReq()
     {
     TFLOGSTRING2("TSY: CMmCallMessHandler::PnsPipeRemoveReq. PipeHandle: %d", iPipeHandle );
 OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPEREMOVEREQ, "CMmCallMessHandler::PnsPipeRemoveReq;aPipeHandle=%hhu", iPipeHandle );
+
+    iPipeHandle = KInvalidPipeHandle;
 
     // Create buffer for isi msg data
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
@@ -5741,37 +5687,6 @@ OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPEREMOVEREQ, "CMmCallMessHan
         KPipeTransID,
         PNS_PIPE_REMOVE_REQ,
         data );
-    }
-
-// ----------------------------------------------------------------------------
-// CMmCallMessHandler::PnsPipeRemoveResp
-// Breaks a PNS_PIPE_REMOVE_RESP ISI-message.
-// ----------------------------------------------------------------------------
-//
-void CMmCallMessHandler::PnsPipeRemoveResp(
-    const TIsiReceiveC& aIsiMessage )
-    {
-TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeRemoveResp");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPEREMOVERESP, "CMmCallMessHandler::PnsPipeRemoveResp" );
-    // Get Transaction Id from the ISI message
-    TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
-
-    if ( KPipeTransID == transId )
-        {
-        // Get Errorcode from the ISI message
-        TUint8 errorCode( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-            ISI_HEADER_SIZE + PNS_PIPE_REMOVE_RESP_OFFSET_ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_REMOVE_RESP_OFFSET_ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-TFLOGSTRING4("TSY: CMmCallMessHandler::PnsPipeRemoveResp - traId: %d, PipeHandle: %d, ErrorCode: %d", transId, iPipeHandle, errorCode );
-OstTraceExt3( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPEREMOVERESP, "CMmCallMessHandler::PnsPipeRemoveResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, iPipeHandle, errorCode );
-
-        iPipeHandle = KInvalidPipeHandle;
-        }
-    // no else
     }
 
 // ========================== OTHER EXPORTED FUNCTIONS =========================

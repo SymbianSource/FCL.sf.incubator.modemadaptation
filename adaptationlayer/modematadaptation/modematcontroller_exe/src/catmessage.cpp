@@ -111,8 +111,3 @@ void CAtMessage::ReceiveATResponse( const TDesC8& aResponse, TBool aComplete )
         }
     }
 
-TBool CAtMessage::IsRequestActive()
-    {
-    C_TRACE(( _T("CAtMessage::IsRequestActive ret: %d"), (TInt) !iRequest.IsNull() ));
-    return !iRequest.IsNull();
-    }

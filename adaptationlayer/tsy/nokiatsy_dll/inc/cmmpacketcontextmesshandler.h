@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -11,11 +11,9 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
-
-
 
 #ifndef CMMPACKETCONTEXTMESSHANDLER_H
 #define CMMPACKETCONTEXTMESSHANDLER_H
@@ -113,14 +111,6 @@ const TUint8 KCallPadding = 0x00;
 
 // Subbclock length
 const TInt KSubBlockLengthOffset1 = 1;
-
-// masks for detailed cause values.
-// see 3GPP TS 24.008 V5.16.0 spec
-const TUint8 KDiagnosticsOctet2( 0x02 ); // B0000_0100
-const TUint8 KDiagnosticsOctet3( 0xC0 ); // B1100_0000
-const TUint8 KDiagnosticsOctet4( 0x95 ); // B1001_0101
-const TUint8 KDiagnosticsOctet5( 0x82 ); // B1000_0010
-const TUint8 KDiagnosticsOctet6( 0x02 ); // B0000_0010
 
 // MACROS
     // None
@@ -230,7 +220,7 @@ class CMmPacketContextMessHandler : public CBase,
         * By default Symbian 2nd phase constructor is private.
         */
         void ConstructL();
-        
+
     private: // New functions
 
         /**
@@ -825,21 +815,31 @@ class CMmPacketContextMessHandler : public CBase,
         * @param aIsiMessage: received Isi message.
         */
         void CallModemResourceResp( const TIsiReceiveC &aIsiMessage );
-        
+
         /**
         * Creates SendCallmodemResourceDenied ISI message to modem call server.
         * @param aDatapackage
         * @return None
         */
-        void CallModemResourceReqDenied();
-        
+        void CallModemResourceReqDenied(
+            const TUint8 aCauseType,
+            const TUint8 aCause,
+            const TDesC8& aDetailedCause );
+
         /*
-        * This method completes drive mode functions, if drive mode flag 
+        * This method completes drive mode functions, if drive mode flag
         * is enabled
         * @param aDataPackage: data package
-        * @return TInt: KErrNone 
+        * @return TInt: KErrNone
         */
         void CompleteDCMdrivemodeFunctionalityL();
+
+        /*
+        * This method interpretes channel ID from context name.
+        * @param TInfoName: Context name
+        * @return TInt: Channel ID
+        */
+        TInt getProxyId(const TInfoName& contextName);
 
     public: // Data
         // None
@@ -893,8 +893,8 @@ class CMmPacketContextMessHandler : public CBase,
 
         // Buffer for isimessage. Used in resource control
         HBufC8* iResourceControlMsg;
-        
-        //drive mode flag 
+
+        // drive mode flag
         TBool iDriveModeFlag;
 
     };

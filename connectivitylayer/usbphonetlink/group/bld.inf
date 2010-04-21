@@ -19,7 +19,7 @@
 #include <non_foundation_paths.hrh>
 
 PRJ_PLATFORMS
-DEFAULT
+BASEDEFAULT
 
 PRJ_EXPORTS
 ../usbpnclient_dll/inc/rusbpnclient.h                           NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(rusbpnclient.h)

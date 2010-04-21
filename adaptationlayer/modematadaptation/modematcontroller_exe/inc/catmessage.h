@@ -68,11 +68,6 @@ public:
      */
     CModemAtSession* GetSession();
 
-    /** IsRequestActive
-     * @return ETrue if request is not NULL, EFalse otherwise
-     */
-    TBool IsRequestActive();
-
 private:    
     HBufC8* iMessage;
     TUint8 iMessageType;

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -11,11 +11,9 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
-
-
 
 //  Include Files
 
@@ -113,6 +111,8 @@ OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_CONSTRUCTL, "CMmUssdMessHandler::Con
     iIsSendReleaseReqPending = EFalse;
 
     iNoFdnUSSDReq = EFalse;
+
+    iLastMtUssdIsRequest = EFalse;
     }
 
 // -----------------------------------------------------------------------------
@@ -221,7 +221,7 @@ OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessHandle
     TInt ret ( KErrNone );
     TBuf8<RMobileUssdMessaging::KGsmUssdDataSize> data( 0 );
     TDes8* attributes( 0 );
-    TUint8 numOfSubblocks( 2 );
+    TUint8 numOfSubblocks( 0 );
 
     aDataPackage->UnPackData( data, attributes );
 
@@ -241,9 +241,24 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessH
             {
             // User has requested to send MO USSD
             case RMobileUssdMessaging::EUssdMORequest:
-            case RMobileUssdMessaging::EUssdMOReply:
                 {
                 ussdType = SS_GSM_USSD_COMMAND;
+                break;
+                }
+            case RMobileUssdMessaging::EUssdMOReply:
+                {
+TFLOGSTRING2("TSY: CMmUssdMessHandler::SsGsmUssdSendReq; iLastMtUssdIsRequest = %d", iLastMtUssdIsRequest);
+OstTrace1( TRACE_NORMAL, DUP5_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessHandler::SsGsmUssdSendReq;iLastMtUssdIsRequest=%d", iLastMtUssdIsRequest );
+                if ( iLastMtUssdIsRequest )
+                    {
+                    ussdType = SS_GSM_USSD_MT_REPLY;
+                    }
+                else
+                    {
+                    ussdType = SS_GSM_USSD_COMMAND;
+                    }
+                // no need to reset the field, because MT USSD indication
+                // will always precede this kind of response
                 break;
                 }
             // User is signing for the MT request
@@ -303,49 +318,54 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessH
             ssGsmUssdSendReq.Set8bit( ISI_HEADER_SIZE +
                 SS_GSM_USSD_SEND_REQ_OFFSET_USSDTYPE, ussdType );
 
-            // Create SsGsmUssdString subblock.
-            // subblock header + ussd string length subblock max length = 164
-
-            TBuf8<KMaxLengthOfUssdMessage + 3> ssGsmUssdStringSb( 0 );
-
-            TIsiSubBlock subblockSSGsmUssdString(
-                ssGsmUssdStringSb, SS_GSM_USSD_STRING, EIsiSubBlockTypeId8Len8 );
-
-            ssGsmUssdStringSb.Append( codingInfo );
-            ssGsmUssdStringSb.Append( data.Length() );
-            ssGsmUssdStringSb.Append( data );
-
-            ssGsmUssdSendReq.CopyData( ISI_HEADER_SIZE +
-                SIZE_SS_GSM_USSD_SEND_REQ,
-                subblockSSGsmUssdString.CompleteSubBlock() );
-
-            // create subblock SS_SB_CHECK_INFO
-            TBuf8<SIZE_SS_SB_CHECK_INFO>sbData( 0 );
-            TIsiSubBlock ssCheckInfoSb(
-                sbData,
-                SS_SB_CHECK_INFO,
-                EIsiSubBlockTypeId8Len8 );
-
-            if( iNoFdnUSSDReq )
+            if ( SS_GSM_USSD_NOTIFY != ussdType )
                 {
-                sbData.Append( SS_FDN_CHECK_SUPPRESS );
-                }
-            else
-                {
-                sbData.Append( SS_NO_FDN_CHECK_SUPPRESS );
-                }
+                // Create SsGsmUssdString subblock.
+                // subblock header + ussd string length subblock max length = 164
+                TBuf8<KMaxLengthOfUssdMessage + 3> ssGsmUssdStringSb( 0 );
+                TIsiSubBlock subblockSSGsmUssdString(
+                    ssGsmUssdStringSb, SS_GSM_USSD_STRING, EIsiSubBlockTypeId8Len8 );
 
-            sbData.Append( SS_NO_RESOURCE_CONTROL_SUPPRESS );
+                ssGsmUssdStringSb.Append( codingInfo );
+                ssGsmUssdStringSb.Append( data.Length() );
+                ssGsmUssdStringSb.Append( data );
 
-            // add the SIZE_SS_SB_CHECK_INFO subblock to service req
-            ssGsmUssdSendReq.CopyData(
-                ISI_HEADER_SIZE + SIZE_SS_GSM_USSD_SEND_REQ +
-                ssGsmUssdStringSb.Length(),
-                ssCheckInfoSb.CompleteSubBlock( ) );
+                ssGsmUssdSendReq.CopyData( ISI_HEADER_SIZE +
+                    SIZE_SS_GSM_USSD_SEND_REQ,
+                    subblockSSGsmUssdString.CompleteSubBlock() );
+                numOfSubblocks++;
+
+                if ( SS_GSM_USSD_COMMAND == ussdType )
+                    {
+                    // create subblock SS_SB_CHECK_INFO
+                    TBuf8<SIZE_SS_SB_CHECK_INFO>sbData( 0 );
+                    TIsiSubBlock ssCheckInfoSb(
+                        sbData,
+                        SS_SB_CHECK_INFO,
+                        EIsiSubBlockTypeId8Len8 );
+
+                    if( iNoFdnUSSDReq )
+                        {
+                        sbData.Append( SS_FDN_CHECK_SUPPRESS );
+                        }
+                    else
+                        {
+                        sbData.Append( SS_NO_FDN_CHECK_SUPPRESS );
+                        }
+
+                    sbData.Append( SS_NO_RESOURCE_CONTROL_SUPPRESS );
+
+                    // add the SIZE_SS_SB_CHECK_INFO subblock to service req
+                    ssGsmUssdSendReq.CopyData(
+                        ISI_HEADER_SIZE + SIZE_SS_GSM_USSD_SEND_REQ +
+                        ssGsmUssdStringSb.Length(),
+                        ssCheckInfoSb.CompleteSubBlock( ) );
+                    numOfSubblocks++;
+                    }
+                }
 
             ssGsmUssdSendReq.Set8bit( ISI_HEADER_SIZE +
                 SS_GSM_USSD_SEND_REQ_OFFSET_SUBBLOCKCOUNT, numOfSubblocks );
-
 
             //send message via phonet
             ret = iPhoNetSender->Send( ssGsmUssdSendReq.Complete() );
@@ -575,9 +595,9 @@ OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP, "CMmUssdMessHan
                 TUint8 sw1 = data[KSw1Index];
                 TUint8 sw2 = data[KSw2Index];
                 TUint8 result = data[KResultIndex];
-                epocError = CMmStaticUtility::MapSw1Sw2ToEpocError( 
-                    sw1, 
-                    sw2, 
+                epocError = CMmStaticUtility::MapSw1Sw2ToEpocError(
+                    sw1,
+                    sw2,
                     result );
                 errorMappingNeeded = EFalse;
                 }
@@ -739,6 +759,9 @@ OstTraceExt1( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND, "CMmUssdMess
         case SS_GSM_USSD_REQUEST:
         case SS_GSM_USSD_COMMAND:
             {
+            iLastMtUssdIsRequest = SS_GSM_USSD_REQUEST == ussdType;
+TFLOGSTRING2("TSY: CMmUssdMessHandler::SsGsmUssdSendReq; iLastMtUssdIsRequest = %d", iLastMtUssdIsRequest);
+OstTrace1( TRACE_NORMAL, DUP3_CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND, "CMmUssdMessHandler::SsGsmUssdReceiveInd;iLastMtUssdIsRequest=%d", iLastMtUssdIsRequest );
             receiveUssdMessageAttributes.iType =
                 RMobileUssdMessaging::EUssdMTRequest;
             break;

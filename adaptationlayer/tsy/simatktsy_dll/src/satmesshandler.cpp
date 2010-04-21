@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -268,7 +268,7 @@ void CSatMessHandler::ProactiveProcedureMessageReceivedL
     iTsySatMessaging->DataDownloadReceivedL( aIsiMessage );
 
     // handle MO-SMS Control related messages
-    iTsySatMessaging->MoSmsControlReceived( aIsiMessage );
+    iTsySatMessaging->MoSmsControlReceivedL( aIsiMessage );
     }
 
 // -----------------------------------------------------------------------------
@@ -317,11 +317,6 @@ void CSatMessHandler::NetServerMessageReceived
         case NET_TIME_IND:
             {
             NetTimeInd( aIsiMessage );
-            break;
-            }
-        case NET_RAT_RESP:
-            {
-            NetRatResp( aIsiMessage );
             break;
             }
         case NET_RAT_IND:
@@ -1541,13 +1536,13 @@ TInt CSatMessHandler::UiccCatReqEnvelope
 // Stores location information and network service status
 // -----------------------------------------------------------------------------
 //
-void CSatMessHandler::StoreNetServiceStatus
+TInt CSatMessHandler::StoreNetServiceStatus
         (
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus" );
-    TFLOGSTRING("TSY: CSatMessHandler::StoreNetServiceStatus");
+OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus" );
+TFLOGSTRING("TSY: CSatMessHandler::StoreNetServiceStatus");
 
     // SubBlock offset
     TUint sbOffset( 0 );
@@ -1555,6 +1550,8 @@ void CSatMessHandler::StoreNetServiceStatus
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
     TInt headerSize( KErrNotFound );
+
+    TInt retValue( KErrNone );
 
     if ( NET_CELL_INFO_IND == messageId )
         {
@@ -1595,9 +1592,8 @@ void CSatMessHandler::StoreNetServiceStatus
             iLocInfo.iRegStatus = aIsiMessage.Get8bit(
                 sbOffset + NET_GSM_CELL_INFO_OFFSET_SERVICESTATUS );
 
-            TFLOGSTRING2("TSY: CSatMessHandler::StoreNetServiceStatus: \
-                NET_REGISTRATION_STATUS = %d", iLocInfo.iRegStatus );
-            OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus NET_REGISTRATION_STATUS = %d", iLocInfo.iRegStatus );
+TFLOGSTRING2("TSY: CSatMessHandler::StoreNetServiceStatus: NET_REGISTRATION_STATUS = %d", iLocInfo.iRegStatus );
+OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus NET_REGISTRATION_STATUS = %d", iLocInfo.iRegStatus );
 
             if ( NET_SERVICE == iLocInfo.iRegStatus ||
                 NET_LIMITED_SERVICE == iLocInfo.iRegStatus )
@@ -1639,17 +1635,21 @@ void CSatMessHandler::StoreNetServiceStatus
             }
         else
             {
-            TFLOGSTRING("TSY: CSatMessHandler::StoreNetServiceStatus \
-                NET_GSM_CELL_INFO or NET_WCDMA_CELL_INFO not found!");
-            OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus NET_GSM_CELL_INFO or NET_WCDMA_CELL_INFO not found!" );
+TFLOGSTRING("TSY: CSatMessHandler::StoreNetServiceStatus - NET_GSM_CELL_INFO or NET_WCDMA_CELL_INFO not found!");
+OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus NET_GSM_CELL_INFO or NET_WCDMA_CELL_INFO not found!" );
+
+            retValue = KErrNotFound;
             }
         }
     else
         {
-        TFLOGSTRING2("TSY: CSatMessHandler::StoreNetServiceStatus \
-            Unexpected message id: %d", messageId );
-        OstTrace1( TRACE_NORMAL, DUP3_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus Unexpected message id: %d", messageId );
+TFLOGSTRING2("TSY: CSatMessHandler::StoreNetServiceStatus - Unexpected message id: %d", messageId );
+OstTrace1( TRACE_NORMAL, DUP3_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus Unexpected message id: %d", messageId );
+
+        retValue = KErrNotFound;
         }
+
+    return retValue;
     }
 
 // -----------------------------------------------------------------------------
@@ -2078,7 +2078,7 @@ void CSatMessHandler::NetNeighbourCellResp
 
     TUint8 result( RSat::KSuccess );
 
-    if ( iTsySatMessaging->GetNotifyLocalInfo()->Status() )
+    if ( iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus() )
         {
         // Provide local info proactive command is ongoing
 
@@ -2192,7 +2192,7 @@ void CSatMessHandler::NetNeighbourCellResp
                 additionalInfo );
             }
         // Clear local info flag
-        iTsySatMessaging->GetNotifyLocalInfo()->Status( ETrue );
+        iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus( ETrue );
         }
     }
 
@@ -3055,61 +3055,93 @@ void CSatMessHandler::NetCellInfoGetResp
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETCELLINFOGETRESP, "CSatMessHandler::NetCellInfoGetResp" );
-    TFLOGSTRING("TSY: CSatMessHandler::NetCellInfoGetResp");
+OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETCELLINFOGETRESP, "CSatMessHandler::NetCellInfoGetResp" );
+TFLOGSTRING("TSY: CSatMessHandler::NetCellInfoGetResp");
+
+    TUint8 successCode( aIsiMessage.Get8bit(
+        ISI_HEADER_SIZE + NET_CELL_INFO_GET_RESP_OFFSET_SUCCESSCODE ) );
 
     TBuf<1> additionalInfo;
+    additionalInfo.Zero();
 
     // Default result
     TUint8 result( RSat::KMeUnableToProcessCmd );
 
     // Store recieved network parameters
-    StoreNetServiceStatus( aIsiMessage );
+    TInt retValue( StoreNetServiceStatus( aIsiMessage ) );
 
-    switch ( iLocInfo.iRegStatus )
+    if ( iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoAccTechStatus() )
         {
-        case NET_SERVICE:
+        if ( NET_CAUSE_OK == successCode )
             {
-            result = RSat::KSuccess;
-            break;
+            if ( KErrNone == retValue )
+                {
+                if ( NET_SERVICE == iLocInfo.iRegStatus
+                    || NET_LIMITED_SERVICE == iLocInfo.iRegStatus )
+                    {
+                    result = RSat::KSuccess;
+                    }
+                else
+                    {
+                    // No service.
+                    additionalInfo.Append( RSat::KNoService );
+                    }
+                }
+                // No else, result already set.
             }
-        case NET_LIMITED_SERVICE:
+            // No else, result already set.
+
+        // Clear local info access technology flag
+        iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoAccTechStatus( ETrue );
+        }
+    else
+        {
+        switch ( iLocInfo.iRegStatus )
             {
-            result = RSat::KSuccessLimitedService;
-            break;
-            }
-        case NET_NO_COVERAGE:
-            {
-            // Default result value already set
-            additionalInfo.Append( RSat::KNoService );
-            break;
-            }
-        default:
-            {
-            // Default result value already set
-            TFLOGSTRING2("TSY: CSatMessHandler::NetCellInfoGetResp, Unexpected iRegStatus: %d", iLocInfo.iRegStatus );
-            OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_NETCELLINFOGETRESP, "CSatMessHandler::NetCellInfoGetResp Unexpected iRegStatus: %d", iLocInfo.iRegStatus );
-            additionalInfo.Append( RSat::KNoSpecificMeProblem );
-            break;
+            case NET_SERVICE:
+                {
+                result = RSat::KSuccess;
+                break;
+                }
+            case NET_LIMITED_SERVICE:
+                {
+                result = RSat::KSuccessLimitedService;
+                break;
+                }
+            case NET_NO_COVERAGE:
+                {
+                // Default result value already set
+                additionalInfo.Append( RSat::KNoService );
+                break;
+                }
+            default:
+                {
+                // Default result value already set
+TFLOGSTRING2("TSY: CSatMessHandler::NetCellInfoGetResp - Unexpected iRegStatus: %d", iLocInfo.iRegStatus );
+OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_NETCELLINFOGETRESP, "CSatMessHandler::NetCellInfoGetResp Unexpected iRegStatus: %d", iLocInfo.iRegStatus );
+
+                additionalInfo.Append( RSat::KNoSpecificMeProblem );
+                break;
+                }
             }
         }
 
     TInt trId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
 
     // Check if this response is for provide local info proactive command.
-    if ( iTsySatMessaging->GetNotifyLocalInfo()->Status()
+    if ( iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus()
         && iTsySatMessaging->GetNotifyLocalInfo()->GetTransactionId()
             == trId )
         {
         // Send terminal response
-        LocalInfoTerminalResp( iTsySatMessaging->GetNotifyLocalInfo()
-                                    ->GetTransactionId(),
-                                iTsySatMessaging->GetNotifyLocalInfo()
-                                    ->GetCmdDetails(),
-                                result,
-                                additionalInfo );
+        LocalInfoTerminalResp(
+            iTsySatMessaging->GetNotifyLocalInfo()->GetTransactionId(),
+            iTsySatMessaging->GetNotifyLocalInfo()->GetCmdDetails(),
+            result,
+            additionalInfo );
+
         // Clear local info flag
-        iTsySatMessaging->GetNotifyLocalInfo()->Status( ETrue );
+        iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus( ETrue );
         }
     }
 
@@ -3147,7 +3179,7 @@ void CSatMessHandler::GssCsServiceResp
     OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GSSCSSERVICERESP, "CSatMessHandler::GssCsServiceResp" );
     TFLOGSTRING("CSatMessHandler::GssCsServiceResp ");
 
-    if ( iTsySatMessaging->GetNotifyLocalInfo()->Status() )
+    if ( iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus() )
         {
         TUint8 generalResult ( RSat::KSuccess );
 
@@ -3215,7 +3247,7 @@ void CSatMessHandler::GssCsServiceResp
                                     additionalInfo );
 
             // Clear local info flag
-            iTsySatMessaging->GetNotifyLocalInfo()->Status( ETrue );
+            iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus( ETrue );
             }
         else
             {
@@ -3223,7 +3255,7 @@ void CSatMessHandler::GssCsServiceResp
             additionalInfo.Append( RSat::KNoService );
 
             // Clear local info flag
-            iTsySatMessaging->GetNotifyLocalInfo()->Status( ETrue );
+            iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus( ETrue );
 
             // Call local info terminal response method to send
             // terminal response to the sim card.
@@ -3248,7 +3280,7 @@ void CSatMessHandler::GssCsServiceFailResp
     OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GSSCSSERVICEFAILRESP, "CSatMessHandler::GssCsServiceFailResp" );
     TFLOGSTRING("CSatMessHandler::GssCsServiceFailResp ");
 
-    if ( iTsySatMessaging->GetNotifyLocalInfo()->Status() )
+    if ( iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus() )
         {
         if ( GSS_ATK_TIMING_ADVANCE_GET == aIsiMessage.Get8bit(
              ISI_HEADER_SIZE + GSS_CS_SERVICE_RESP_OFFSET_OPERATION ) )
@@ -3272,7 +3304,7 @@ void CSatMessHandler::GssCsServiceFailResp
                                     additionalInfo );
 
             // Clear local info flag
-            iTsySatMessaging->GetNotifyLocalInfo()->Status( ETrue );
+            iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus( ETrue );
             }
         }
     }
@@ -3346,127 +3378,6 @@ void CSatMessHandler::NetTimeInd
         iTimeZone = aIsiMessage.Get8bit( sbOffset + NET_TIME_INFO_OFFSET_TIMEZONE );
         TFLOGSTRING2("TSY: CSatMessHandler::NetTimeInd, Time zone: 0x%x", iTimeZone );
         OstTraceExt1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_NETTIMEIND, "CSatMessHandler::NetTimeInd Time zone: %hhu", iTimeZone );
-        }
-    }
-
-// -----------------------------------------------------------------------------
-// CSatMessHandler::NetRatReq
-// Constructs NET_RAT_REQ ISI message.
-// -----------------------------------------------------------------------------
-//
-TInt CSatMessHandler::NetRatReq
-        (
-        TUint8 aTransId         // Transaction Id
-        )
-    {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETRATREQ, "CSatMessHandler::NetRatReq" );
-    TFLOGSTRING("TSY: CSatMessHandler::NetRatReq ");
-
-    TBuf8<1> data;
-    //we need to know the current RAT
-    data.Append( NET_CURRENT_RAT );
-
-    return iPnSend->Send( PN_MODEM_NETWORK, aTransId, NET_RAT_REQ, data );
-    }
-
-// -----------------------------------------------------------------------------
-// CSatMessHandler::NetRatResp
-// Constructs NET_RAT_RESP ISI message.
-// -----------------------------------------------------------------------------
-//
-void CSatMessHandler::NetRatResp
-        (
-        const TIsiReceiveC& aIsiMessage //received ISI message
-        )
-    {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETRATRESP, "CSatMessHandler::NetRatResp" );
-    TFLOGSTRING("TSY:CSatMessHandler::NetRatResp");
-
-    if ( iTsySatMessaging->GetNotifyLocalInfo()->Status() )
-        {
-        TBuf<1> additionalInfo;
-        additionalInfo.Zero();
-
-        // Get transaction id
-        TUint8 transId(
-            iTsySatMessaging->GetNotifyLocalInfo()->GetTransactionId() );
-
-        // Get command details tlv
-        TBuf8<5> commandDetails;
-        commandDetails =
-            iTsySatMessaging->GetNotifyLocalInfo()->GetCmdDetails();
-
-        if ( NET_CAUSE_OK == aIsiMessage.Get8bit(
-            ISI_HEADER_SIZE + NET_RAT_RESP_OFFSET_SUCCESSCODE ) )
-            {
-            TUint8 generalResult ( RSat::KSuccess );
-
-            // Subblock offset
-            TUint sbOffset( 0 );
-
-            // Check if NET_RAT_INFO sub block is present
-            TInt ret( aIsiMessage.FindSubBlockOffsetById(
-                ISI_HEADER_SIZE + SIZE_NET_RAT_RESP,
-                NET_RAT_INFO,
-                EIsiSubBlockTypeId8Len8,
-                sbOffset ) );
-
-            if ( KErrNone == ret )
-                {
-                // Get ratName
-                TUint8 ratName( aIsiMessage.Get8bit(
-                    sbOffset + NET_RAT_INFO_OFFSET_RATNAME ) );
-
-                switch ( ratName )
-                    {
-                    case NET_GSM_RAT:
-                        {
-                        iCurrentAccTech = KNetworkModeGsm;
-                        break;
-                        }
-                    case NET_UMTS_RAT:
-                        {
-                        iCurrentAccTech = KNetworkModeUtran;
-                        break;
-                        }
-                    default:
-                        {
-                        generalResult= RSat::KMeUnableToProcessCmd;
-                        break;
-                        }
-                    }
-                }
-            else
-                {
-                generalResult = RSat::KMeUnableToProcessCmd;
-                }
-
-            // Call local info terminal response method to send
-            // terminal response to the sim card.
-            LocalInfoTerminalResp( transId,
-                                commandDetails,
-                                generalResult,
-                                additionalInfo );
-
-            // Clear local info flag
-            iTsySatMessaging->GetNotifyLocalInfo()->Status( ETrue );
-
-            }
-         else
-            {
-            // No service
-            additionalInfo.Append( RSat::KNoService );
-
-            // Clear local info flag
-            iTsySatMessaging->GetNotifyLocalInfo()->Status( ETrue );
-
-            // Call local info terminal response method to send
-            // terminal response to the sim card.
-            LocalInfoTerminalResp( transId,
-                                    commandDetails,
-                                    RSat::KMeUnableToProcessCmd,
-                                    additionalInfo );
-            }
         }
     }
 
@@ -4662,40 +4573,40 @@ void CSatMessHandler::SimMoSmsControlAvail( TUint8 aStatus )
     TFLOGSTRING("TSY: CSatMessHandler::SimMoSmsControlAvail" );
     OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SIMMOSMSCONTROLAVAIL, "CSatMessHandler::SimMoSmsControlAvail" );
 
-    // Activate the MO-SMS Control in SMS server. This is done by
-    // sending a request SMS_RESOURCE_CONF_REQ to SMS server
-    TBuf8<SIZE_SMS_RESOURCE_CONF_REQ + SIZE_SMS_SB_RESOURCE_CONF> data;
-    // Append Confoguration operation
-    data.Append( SMS_RES_CONF_SET );
-    // Number of Subblocks
-    data.Append( 1 );
-    // Add Subblock
-    TIsiSubBlock ResourceConfReqSb(
-        data,
-        SMS_SB_RESOURCE_CONF,
-        EIsiSubBlockTypeId16Len16 );
-
-    TSatUtility::AppendWord( SMS_RES_ID_MO_SM_INIT, data );
-
-    if( aStatus )
+    if( SIM_SERV_OK == aStatus )
         {
         // Set MoSmsCtrl object´s member iIsMoSmsCtrlActivated to ETrue
         iTsySatMessaging->GetMoSmsCtrl()->Activate();
+        // Activate the MO-SMS Control in SMS server. This is done by
+        // sending a request SMS_RESOURCE_CONF_REQ to SMS server
+        TBuf8<SIZE_SMS_RESOURCE_CONF_REQ + SIZE_SMS_SB_RESOURCE_CONF> data;
+        // Append Configuration operation
+        data.Append( SMS_RES_CONF_SET );
+        // Number of Subblocks
+        data.Append( 1 );
+        // Add Subblock
+        //SMS_RESOURCE_IDS to zero SMS_RES_ID_MASK_MO_SM_INIT 
+        TIsiSubBlock ResourceConfReqSb(
+            data,
+            SMS_SB_RESOURCE_CONF,
+            EIsiSubBlockTypeId16Len16 );
+    
+        TSatUtility::AppendWord( SMS_RES_ID_MO_SM_INIT, data );
         TSatUtility::AppendWord( SMS_RES_ID_MASK_MO_SM_INIT, data);
-        }
-    else
-        {
-        // Set MoSmsCtrl object´s member IsMoSmsCtrlDeActivated to EFalse
-        iTsySatMessaging->GetMoSmsCtrl()->Deactivate();
-        TSatUtility::AppendWord( 0x0000, data);
-        }
-    ResourceConfReqSb.CompleteSubBlock();
-    SmsResoureConfReq(
-        iTsySatMessaging->GetTransactionId(),
-        SMS_RESOURCE_CONF_REQ,
-        data );
-    }
 
+        ResourceConfReqSb.CompleteSubBlock();
+        SmsResoureConfReq(
+            iTsySatMessaging->GetTransactionId(),
+            SMS_RESOURCE_CONF_REQ,
+            data );
+      }
+    // should not send SMS_RESOURCE_CONF_REQ if there is no MO SMS control enabled in SIM card
+    else
+      {
+      // Set MoSmsCtrl object´s member IsMoSmsCtrlDeActivated to EFalse
+      iTsySatMessaging->GetMoSmsCtrl()->Deactivate();
+      }
+    }
 
 // -----------------------------------------------------------------------------
 // CSatMessHandler::UiccTerminalProfileReq

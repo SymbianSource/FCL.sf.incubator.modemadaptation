@@ -37,6 +37,7 @@
 #include "cmmphonebookoperationwrite.h"
 #include "cmmphonebookoperationwrite3g_adn.h"
 #include "cmmphonebookoperationdelete.h"
+#include "cmmphonebookoperationdelete3g_adn.h"
 #include "cmmphonebookstoreoperationlist.h"
 #include "cmmphonebookstoreoperationbase.h"
 #include "cmmmessagerouter.h"
@@ -55,6 +56,10 @@
 // CONSTANTS
 const TUint8 KMaxAnrLength( 100 );
 const TUint8 KMaxSneLength( 241 );
+const TUint8 KOffsetVoicemail( 0 );
+const TUint8 KOffsetFax( 1 );
+const TUint8 KOffsetData( 2 );
+const TUint8 KOffsetOther( 3 );
 
 // MACROS
     // None
@@ -178,19 +183,6 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREMESSHANDLER_CMMPHONEBOOKSTOREMESS
         }
 
     delete iOperationlist;
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-    if ( iAas )
-      {
-      iAas->Reset();
-      delete iAas;
-      }
-    if ( iGas )
-      {
-      iGas->Reset();
-      delete iGas;
-      }
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
     }
 
 // ---------------------------------------------------------------------------
@@ -268,6 +260,10 @@ OstTrace1( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_EXTFUNCL, "CMmPhoneBookSto
         // processing cache cancel IPC
         iOperationlist->CancelOperation( phonebookTypeName ); // seek from the beginning
         }  // end of EMmTsyPhoneBookStoreCacheCancelIPC
+    else if ( EMobilePhoneGetMailboxNumbers == aIpc )
+        {
+        GetMailboxIdentifiers();
+        }
     else
         { // all other IPC's
         // Check for Empty Index
@@ -315,33 +311,38 @@ TInt CMmPhoneBookStoreMessHandler::ProcessUiccMsg(
     TInt aTraId,
     TInt aStatus,
     TUint8 aDetails,
-    const TDesC8 &aFileData  ) // received data in UICC Server Message
+    const TDesC8 &aFileData ) // received data in UICC Server Message
     {
     TInt ret(KErrNone);
-
 
 TFLOGSTRING2("TSY: CMmPhoneBookStoreMessHandler::ProcessUiccMsg. transactId:%d", aTraId);
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG, "CMmPhoneBookStoreMessHandler::ProcessUiccMsg" );
 
-
-    // Check for operation with transaction id
-    CMmPhoneBookStoreOperationBase* operation;
-    operation = iOperationlist->Find( aTraId );
-    if( operation )
+    if ( ETrIdReadMailboxIdentifier != aTraId )
         {
-        if( operation->HandleUICCPbRespL( aStatus, aDetails, aFileData, aTraId ))
+        // Check for operation with transaction id
+        CMmPhoneBookStoreOperationBase* operation;
+        operation = iOperationlist->Find( aTraId );
+        if( operation )
             {
+            if( operation->HandleUICCPbRespL( aStatus, aDetails, aFileData, aTraId ))
+                {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Remove Operation from the list ");
 OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG, "CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Remove operation from the list " );
 
-            // remove operation From the list
-            iOperationlist->RemoveOperationFromList( aTraId );
-            } // End of operation remove from thelist
-        }
-    else
-        {
+                // remove operation From the list
+                iOperationlist->RemoveOperationFromList( aTraId );
+                } // End of operation remove from thelist
+            }
+        else
+            {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Operation not Found ");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG, "CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Operation not found " );
+            }
+        }
+    else // Mailbox identifiers is special case
+        {
+        HandleGetMailboxIdentifiers( aStatus, aFileData );
         }
 
     return(ret);
@@ -401,11 +402,12 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CREATENEWOPERATION, "CMm
 
         case EMmTsyPhoneBookStoreGetInfoIPC:
         case EMmTsyPhoneBookStoreCacheIPC:
+        case EMmTsyONStoreGetInfoIPC:
             {
 
             if(UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
                 {
-                //call CmmPhonebookOperationCache Phonebook
+                //call CmmPhonebookOperationCache3G_adn Phonebook
                 pointer = CMmPhoneBookOperationCache3G_adn::NewL(
                         this,
                         iMmUiccMessHandler,
@@ -426,9 +428,8 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CREATENEWOPERATION, "CMm
         case EMmTsyPhoneBookStoreReadIPC:
         case EMmTsyONStoreReadIPC:
         case EMmTsyONStoreReadEntryIPC:
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-        case ECustomReadAlphaStringIPC:
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
+        case EMmTsyONStoreReadSizeIPC:
+        case EMmTsyONStoreWriteSizeIPC:
             {
             //call CmmPhonebookOperatorRead
             if( UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
@@ -436,18 +437,22 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CREATENEWOPERATION, "CMm
                 pointer = CMmPhoneBookOperationRead::NewL(
                     this,
                     iMmUiccMessHandler,
-                    aDataPackage );
+                    aDataPackage,
+                    aIpc );
                 }
             else if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
                 {
-                pointer = CMmPhoneBookOperationRead::NewL(
+                pointer = CMmPhoneBookOperationRead3g_adn::NewL(
                         this,
                         iMmUiccMessHandler,
-                        aDataPackage );
+                        aDataPackage,
+                        aIpc );
                 }
             break;
             }
         case EMmTsyPhoneBookStoreWriteIPC:
+        case EMmTsyONStoreWriteEntryIPC:
+        case EMmTsyONStoreWriteIPC:
             {
             if( UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType())
                 {
@@ -455,7 +460,8 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CREATENEWOPERATION, "CMm
                 pointer = CMmPhoneBookOperationWrite::NewL(
                     this,
                     iMmUiccMessHandler,
-                    aDataPackage );
+                    aDataPackage,
+                    aIpc);
                 }
             else if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
                 {
@@ -464,15 +470,13 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CREATENEWOPERATION, "CMm
                 pointer = CMmPhoneBookOperationWrite3g_adn::NewL(
                     this,
                     iMmUiccMessHandler,
-                    aDataPackage );
+                    aDataPackage,
+                    aIpc );
                 }
             break;
             }
         case EMmTsyPhoneBookStoreDeleteIPC:
         case EMmTsyPhoneBookStoreDeleteAllIPC:
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-        case ECustomDeleteAlphaStringIPC:
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
             {
             if( UICC_CARD_TYPE_ICC == iMmUiccMessHandler->GetCardType() )
                 {
@@ -486,25 +490,26 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CREATENEWOPERATION, "CMm
                 {
                 // To be implemented for 3G
                 // needs to be changed after 3G ADN implementation
-                pointer = CMmPhoneBookOperationDelete::NewL(
+                pointer = CMmPhoneBookOperationDelete3g_adn::NewL(
                     this,
                     iMmUiccMessHandler,
                     aDataPackage );
                 }
             break;
             }
-        /*
-        case EMobilePhoneGetMailboxNumbers:
+        case EMmTsyONStoreDeleteIPC:
+        case EMmTsyONStoreDeleteAllIPC:
             {
-            pointer =  new ( ELeave )CMmPhonebookOperationCustom(
-                iMmPhoneBookStoreMessHandler );
-            CleanupStack::PushL( pointer );
-            // Add pointer to array
-            iPtrOperationArray.AppendL( pointer );
-            CleanupStack::Pop( pointer );
+            TName phonebookName;
+            phonebookName.Copy( KETelIccMsisdnPhoneBook );
+            CPhoneBookDataPackage package;
+            package.SetPhoneBookName( phonebookName );
+            pointer = CMmPhoneBookOperationDelete::NewL(
+                this,
+                iMmUiccMessHandler,
+                &package );
             break;
             }
-            */
         default:
             {
             // Nothing to do here
@@ -532,8 +537,7 @@ void CMmPhoneBookStoreMessHandler::StorePhonebookEntryL(
         TDes8& aNumber,
         CPhoneBookStoreEntry& aEntry,
         const TUint16 aFileId,
-        const TInt aIndexToRead,
-        const TBool aMailboxIdExist )
+        const TInt aIndexToRead )
     {
     // Save Name
 
@@ -581,15 +585,8 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_STOREPHONEBOOKENTRY
 
         }
 
-
-    // If mailbox exists set 1 into higher 8 bits (iLocation is TUint16)
-    if ( aMailboxIdExist )
-        {
-        aEntry.iLocation = 0x0100;
-        }
-
     // Set record index
-    aEntry.iLocation = aEntry.iLocation | aIndexToRead;
+    aEntry.iLocation = aIndexToRead;
 
     // reset both buffers after storing data to commonTSY buffer
     aName.Zero();
@@ -1188,6 +1185,159 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETENTRYFORTYPE2FILEID, "C
             }
         }
     }
+
+
+// ---------------------------------------------------------------------------
+// CMmPhoneBookStoreMessHandler::GetMailboxIdentifiers
+//
+// ---------------------------------------------------------------------------
+//
+TInt CMmPhoneBookStoreMessHandler::GetMailboxIdentifiers()
+    {
+TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::GetMailboxIdentifiers");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETMAILBOXNUMBERS, "CMmPhoneBookStoreMessHandler::GetMailboxIdentifiers" );
+    // Set parameters for UICC_APPL_CMD_REQ message
+    TUiccReadLinearFixed params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdReadMailboxIdentifier;
+    params.dataOffset = 0;
+    params.dataAmount = 0;
+    params.record = 1; // Profile 1 is supported only
+
+    params.fileId = KElemFileMailboxIdentifier;
+    params.fileIdSfi = UICC_SFI_NOT_PRESENT;
+    params.serviceType = UICC_APPL_READ_LINEAR_FIXED;
+
+    // File id path
+    params.filePath.Append( KMasterFileId >> 8 );
+    params.filePath.Append( KMasterFileId );
+    params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
+    return iMmUiccMessHandler->CreateUiccApplCmdReq( params );
+    }
+
+
+// -----------------------------------------------------------------------------
+// CMmPhoneBookStoreMessHandler::HandleGetMailboxIdentifiers
+//
+// -----------------------------------------------------------------------------
+//
+void CMmPhoneBookStoreMessHandler::HandleGetMailboxIdentifiers(
+    TInt aStatus,
+    const TDesC8 &aFileData )
+    {
+TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::HandleGetMailboxIdentifiers");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_HANDLEGETMAILBOXIDENTIFIERS, "CMmPhoneBookStoreMessHandler::HandleGetMailboxIdentifiers" );
+
+    RMobilePhone::TMobilePhoneVoicemailIdsV3* voicemailIds(
+        new ( ELeave ) RMobilePhone::TMobilePhoneVoicemailIdsV3() );
+
+    TPtrC8 data;
+    TInt error( KErrNone );
+
+    if ( ( UICC_STATUS_OK == aStatus ) &&
+        ( KOffsetOther < aFileData.Length() ) )
+        {
+        voicemailIds->iVoice = aFileData[KOffsetVoicemail];
+        voicemailIds->iFax = aFileData[KOffsetFax];
+        voicemailIds->iData = aFileData[KOffsetData];
+        voicemailIds->iOther = aFileData[KOffsetOther];
+        }
+    else
+        {
+        error = KErrGeneral;
+        }
+
+    CMmDataPackage dataPackage;
+    dataPackage.PackData( &voicemailIds );
+    iMessageRouter->Complete(
+        EMobilePhoneGetMailboxNumbers,
+        &dataPackage,
+        error );
+
+    delete voicemailIds;
+    voicemailIds = NULL;
+    }
+
+
+
+// -----------------------------------------------------------------------------
+// CMmPhoneBookStoreMessHandler::GetPBRRecordNum
+//
+// -----------------------------------------------------------------------------
+//
+TInt CMmPhoneBookStoreMessHandler::GetPBRRecordNum(
+    TInt aIndexToRead,
+    TUint8 &aPBRRecNum )
+    {
+TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::GetPBRRecordNum");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETPBRRECORDNUM, "CMmPhoneBookStoreMessHandler::GetPBRRecordNum" );
+
+    TInt ret( KErrNone );
+
+    // Calculate The PBR Record Number needs to be read
+    // get the Max no of Entries in one PBR record
+    TInt maxNoOfEntry( iPBStoreConf[EPhonebookTypeAdn].iNoOfRecords  );
+
+    TInt maxNoOfPbrRec( iPBStoreConf[EPhonebookTypeAdn].iPBRNoOfRecords );
+
+    if( maxNoOfPbrRec > 0 )
+        {
+        if( 0 != ( aIndexToRead%( maxNoOfEntry/maxNoOfPbrRec ) ) )
+            {
+            aPBRRecNum = 
+            ( aIndexToRead / ( maxNoOfEntry/maxNoOfPbrRec ) ) + 1;
+            }
+        else
+            {
+            aPBRRecNum = 
+            ( aIndexToRead / ( maxNoOfEntry/maxNoOfPbrRec ) );
+            }
+        }
+    else
+        {
+        ret = KErrNotFound;
+        }
+    return ret;
+    }
+
+
+
+
+// -----------------------------------------------------------------------------
+// CMmPhoneBookStoreMessHandler::GetCurrentEfRecNum
+//
+// -----------------------------------------------------------------------------
+//
+TInt CMmPhoneBookStoreMessHandler::GetCurrentEfRecNum(
+    TUint8 aPBRRecNum,
+    TUint8 &aCurrentRecNum, 
+    TInt aIndexToRead )
+    {
+TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::GetCurrentEfRecNum");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETCURRENTEFRECNUM, "CMmPhoneBookStoreMessHandler::GetCurrentEfRecNum" );
+
+    TInt ret( KErrNone );
+    // get ADN anf PBR Max no of records
+    TInt maxNoOfEntry( iPBStoreConf[EPhonebookTypeAdn].iNoOfRecords );
+
+    TInt maxPbrNoOfRec(  iPBStoreConf[EPhonebookTypeAdn].iPBRNoOfRecords );
+
+
+    if( maxPbrNoOfRec > 0 )
+        {
+        // Get the Entry index in Elementary File
+        aCurrentRecNum = aIndexToRead - 
+        ( ( maxNoOfEntry/maxPbrNoOfRec )*
+                ( aPBRRecNum - 1 ) );
+        }
+    else
+        {
+        ret = KErrNotFound;
+        }
+    return ret;
+    }
+
 
 
 // End of File

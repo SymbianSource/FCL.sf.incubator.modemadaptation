@@ -94,6 +94,10 @@ CUsbPnAlt::~CUsbPnAlt()
     OstTrace0( TRACE_NORMAL, CUSBPNALT_CUSBPNALT_DESTRUCTOR_ENTRY, "CUsbPnAlt::~CUsbPnAlt" );
     C_TRACE( ( _T( "CUsbPnAlt::~CUsbPnAlt()" ) ) );
 
+#ifndef NCP_COMMON_BRIDGE_FAMILY
+    SendControlMessage( PNS_USB_CABLE_UNPLUGGED );
+#endif /* NCP_COMMON_BRIDGE_FAMILY */
+
     Cancel();
 
     OstTrace0( TRACE_NORMAL, CUSBPNALT_CUSBPNALT_DESTRUCTOR_EXIT, "CUsbPnAlt::~CUsbPnAlt - return" );

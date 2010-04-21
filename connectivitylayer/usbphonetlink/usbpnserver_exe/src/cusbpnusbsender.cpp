@@ -319,13 +319,12 @@ TInt CUsbPnUsbSender::RunError( TInt aError )
         default:
             {
             TRACE_ASSERT_ALWAYS;
-            User::Panic( KUsbPnPanicCat, aError );       
             break;     
             }
         }
 
     OstTrace0( TRACE_NORMAL, CUSBPNUSBSENDER_RUNERROR_EXIT, "CUsbPnUsbSender::RunError - return" );
-    C_TRACE( ( _T( "CUsbPnUsbSender::RunL() - return" ) ) );
+    C_TRACE( ( _T( "CUsbPnUsbSender::RunError() - return" ) ) );
     return KErrNone;
     }
 

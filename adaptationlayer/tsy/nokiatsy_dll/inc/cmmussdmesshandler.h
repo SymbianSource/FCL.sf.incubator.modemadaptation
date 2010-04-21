@@ -42,7 +42,6 @@
 
     //none
 
-
 //  EXTERNAL DATA STRUCTURES
 
     //none
@@ -192,6 +191,8 @@ class CMmUssdMessHandler :
         // Etrue if NoFdn request is in active
         TBool iNoFdnUSSDReq;
 
+        // Used to distinguish between command and request MT USSD's
+        TBool iLastMtUssdIsRequest;
 };
 
 #endif // CMMUSSDMESSHANDLER

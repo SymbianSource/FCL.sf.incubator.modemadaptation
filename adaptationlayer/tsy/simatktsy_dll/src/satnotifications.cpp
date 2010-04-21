@@ -6171,44 +6171,52 @@ void CSatNotifyLaunchBrowser::MessageReceived
                 KTlvBrowserIdentityTag );
             if ( KErrNotFound != returnValue )
                 {
-                // Browser id 0x00-0x04 allowed, other values are RFU
-                switch ( browserId.GetShortInfo( ETLV_BrowserIdentity ) )
+                // Check if real data present in TLV
+                if ( browserId.GetLength() )
                     {
-                    case KDefaultBrowser:
+                    // Browser id 0x00-0x04 allowed, other values are RFU
+                    switch ( browserId.GetShortInfo( ETLV_BrowserIdentity ) )
                         {
-                        launchBrowserV2.iBrowserId = RSat::EDefaultBrowser;
-                        break;
+                        case KDefaultBrowser:
+                            {
+                            launchBrowserV2.iBrowserId = RSat::EDefaultBrowser;
+                            break;
+                            }
+                        case KWMLBrowser:
+                            {
+                            launchBrowserV2.iBrowserId = RSat::EWMLBrowser;
+                            break;
+                            }
+                        case KHTMLBrowser:
+                            {
+                            launchBrowserV2.iBrowserId = RSat::EHTMLBrowser;
+                            break;
+                            }
+                        case KXHTMLBrowser:
+                            {
+                            launchBrowserV2.iBrowserId = RSat::EXHTMLBrowser;
+                            break;
+                            }
+                        case KCHTMLBrowser:
+                            {
+                            launchBrowserV2.iBrowserId = RSat::ECHTMLBrowser;
+                            break;
+                            }
+                        default:
+                            {
+                            // Object present but does not identify a known
+                            // browser ID
+                            launchBrowserV2.iBrowserId =
+                                RSat::EBrowserIdNotSpecified;
+                            break;
+                            }
                         }
-#if ( NCP_COMMON_S60_VERSION_SUPPORT >= S60_VERSION_50 )
-                    case KWMLBrowser:
-                        {
-                        launchBrowserV2.iBrowserId = RSat::EWMLBrowser;
-                        break;
-                        }
-                    case KHTMLBrowser:
-                        {
-                        launchBrowserV2.iBrowserId = RSat::EHTMLBrowser;
-                        break;
-                        }
-                    case KXHTMLBrowser:
-                        {
-                        launchBrowserV2.iBrowserId = RSat::EXHTMLBrowser;
-                        break;
-                        }
-                    case KCHTMLBrowser:
-                        {
-                        launchBrowserV2.iBrowserId = RSat::ECHTMLBrowser;
-                        break;
-                        }
-#endif
-                    default:
-                        {
-                        // Object present but does not identify a known
-                        // browser ID
-                        launchBrowserV2.iBrowserId =
-                            RSat::EBrowserIdNotSpecified;
-                        break;
-                        }
+                    }
+                else
+                    {
+                    // TLV present without real browser ID
+                    launchBrowserV2.iBrowserId =
+                        RSat::EBrowserIdNotSpecified;
                     }
                 }
             else
@@ -6231,7 +6239,12 @@ void CSatNotifyLaunchBrowser::MessageReceived
                     }
                 else
                     {
-                    launchBrowserV2.iUrl.Copy( url.GetData( ETLV_Url ) );
+                    // Check if URL is really given
+                    // If not, SAT server will use default URL address
+                    if ( url.GetLength() )
+                        {
+                        launchBrowserV2.iUrl.Copy( url.GetData( ETLV_Url ) );
+                        }
                     }
                 }
             else
@@ -6873,7 +6886,8 @@ CSatNotifyLocalInfo::CSatNotifyLocalInfo
         :
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iLocalInfoV3Pckg( NULL ),
-        iLocalInfoIsOngoing( EFalse )
+        iLocalInfoIsOngoing( EFalse ),
+        iLocalInfoAccTechOngoing( EFalse )
     {
     OstTrace0( TRACE_NORMAL, CSATNOTIFYLOCALINFO_CSATNOTIFYLOCALINFO, "CSatNotifyLocalInfo::CSatNotifyLocalInfo" );
     TFLOGSTRING("CSatNotifyLocalInfo::CSatNotifyLocalInfo");
@@ -7163,8 +7177,12 @@ void CSatNotifyLocalInfo::MessageReceived
             TFLOGSTRING("CSatNotifyLocalInfo:: request: Access Technology");
             OstTrace0( TRACE_NORMAL, DUP13_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived Request: Access Technology" );
             iLocalInfoIsOngoing = ETrue;
-            //request NET_RAT_REQ
-            iSatMessHandler->NetRatReq( iSatMessaging->GetTransactionId() );
+            iLocalInfoAccTechOngoing = ETrue;
+
+            // Use same transaction id what comes with proactive
+            // command and compare that when response is received
+            iSatMessHandler->NetCellInfoGetReq( iTransId );
+
             break;
             }
         // Currently not supported:
@@ -7257,26 +7275,50 @@ TInt CSatNotifyLocalInfo::TerminalResponse
     }
 
 // -----------------------------------------------------------------------------
-// CSatNotifyLocalInfo::Status
+// CSatNotifyLocalInfo::LocalInfoStatus
 // Method to check and set local info status. This is used when
 // SIM request NMR or Local Info.
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-TBool CSatNotifyLocalInfo::Status
+TBool CSatNotifyLocalInfo::LocalInfoStatus
         (
         TBool aClearStatus
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLOCALINFO_STATUS, "CSatNotifyLocalInfo::Status" );
-    TFLOGSTRING("CSatNotifyLocalInfo::Status");
+    OstTrace0( TRACE_NORMAL, CSATNOTIFYLOCALINFO_LOCALINFOSTATUS, "CSatNotifyLocalInfo::LocalInfoStatus" );
+    TFLOGSTRING("CSatNotifyLocalInfo::LocalInfoStatus");
+
     if ( aClearStatus )
         {
         iLocalInfoIsOngoing = EFalse;
         }
+
     return iLocalInfoIsOngoing;
     }
 
+// -----------------------------------------------------------------------------
+// CSatNotifyLocalInfo::LocalInfoAccTechStatus
+// Method to check and set local info access technology status.
+// This is used when SIM request Local Info access technology.
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TBool CSatNotifyLocalInfo::LocalInfoAccTechStatus
+        (
+        TBool aClearStatus
+        )
+    {
+OstTrace0( TRACE_NORMAL, CSATNOTIFYLOCALINFO_LOCALINFOACCTECHSTATUS, "CSatNotifyLocalInfo::LocalInfoAccTechStatus" );
+TFLOGSTRING("CSatNotifyLocalInfo::LocalInfoAccTechStatus");
+
+    if ( aClearStatus )
+        {
+        iLocalInfoAccTechOngoing = EFalse;
+        }
+
+    return iLocalInfoAccTechOngoing;
+    }
 
 // -----------------------------------------------------------------------------
 // CSatNotifyTimerMgmt::CSatNotifyTimerMgmt

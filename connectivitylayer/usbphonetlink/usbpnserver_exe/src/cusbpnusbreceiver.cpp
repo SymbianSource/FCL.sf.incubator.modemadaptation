@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -132,7 +132,14 @@ void CUsbPnUsbReceiver::DoCancel( )
     C_TRACE( ( _T( "CUsbPnUsbReceiver::DoCancel()" ) ) );
 
     iLdd.ReadCancel( EEndpoint2 );
+
+#ifdef _DEBUG
     TRAPD(err, iPacket->ReleaseL());
+#elif defined OST_TRACE_COMPILER_IN_USE
+    TRAPD(err, iPacket->ReleaseL());
+#else
+    TRAP_IGNORE(iPacket->ReleaseL());
+#endif
 
     OstTrace1( TRACE_NORMAL, CUSBPNUSBRECEIVER_DOCANCEL, "CUsbPnUsbReceiver::DoCancel - err=%d", err );
     C_TRACE( ( _T( "CUsbPnUsbReceiver::DoCancel() - err=%d" ), err ) );
@@ -232,14 +239,13 @@ TInt CUsbPnUsbReceiver::RunError( TInt aError )
             }
         default:
             {
-            TRACE_ASSERT_ALWAYS;
-            User::Panic( KUsbPnPanicCat, aError );
+            TRACE_ASSERT_ALWAYS;           
             break;
             }
         }
 
     OstTrace0( TRACE_NORMAL, CUSBPNUSBRECEIVER_RUNERROR_EXIT, "CUsbPnUsbReceiver::RunError - return" );
-    C_TRACE( ( _T( "CUsbPnUsbReceiver::RunL() - return" ) ) );
+    C_TRACE( ( _T( "CUsbPnUsbReceiver::RunError() - return" ) ) );
     return KErrNone;
     }
 
@@ -377,11 +383,13 @@ void CUsbPnUsbReceiver::ConstructMessageL()
             iStorage = NULL;
             }
 
+#ifdef ISI_LENGTH_LITTLE_ENDIAN
         // Converts the endianess of message length
         TUint8 tmp4(iRecvPtr[ISI_HEADER_OFFSET_LENGTH]);
         TUint8 tmp5(iRecvPtr[ISI_HEADER_OFFSET_LENGTH +1]);
         iRecvPtr[ISI_HEADER_OFFSET_LENGTH] = tmp5;
         iRecvPtr[ISI_HEADER_OFFSET_LENGTH +1] = tmp4;
+#endif // #ifdef ISI_LENGTH_LITTLE_ENDIAN
 
 #ifndef NCP_COMMON_BRIDGE_FAMILY
         // Message directly to APE Test Server.

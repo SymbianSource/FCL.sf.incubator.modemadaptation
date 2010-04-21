@@ -661,13 +661,6 @@ class CMmCallMessHandler : public CBase,
         */
         void PnsPipeCreateResp( const TIsiReceiveC &aIsiMessage );
 
-        /**
-        * PnsPipeRemove response.
-        * @param aIsiMessage, reference to the received message.
-        * @return void
-        */
-        void PnsPipeRemoveResp( const TIsiReceiveC& aIsiMessage );
-
     public:     // Data
         // None
 
@@ -794,12 +787,6 @@ class CMmCallMessHandler : public CBase,
 
         // Pipe handle for video/multimediacall
         TUint8 iPipeHandle;
-
-        // Call Operation ID
-        TUint8 iCallOperationID;
-
-        // Video call mo/mt released
-        TBool iVideoCallReleased;
 
         // CALL_ID of the call controlled request
         TUint8 iCallControlCallId;

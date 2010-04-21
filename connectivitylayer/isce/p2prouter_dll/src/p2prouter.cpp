@@ -309,7 +309,7 @@ void DP2PRouter::Init(
         }
     // TODO:do more clever way to create links.
     // Configuration of links.
-    iLinksArray[ EP2PRpc ] = MP2PRouterLinkIf::CreateLinkF( this, EP2PRpc, ETrxTest );
+    iLinksArray[ EP2PRpc ] = MP2PRouterLinkIf::CreateLinkF( this, EP2PRpc, ETrxSharedMemory );
     iLinksArray[ EP2PTest ] = MP2PRouterLinkIf::CreateLinkF( this, EP2PTest, ETrxTest );
     iLinksArray[ EP2PTest2 ] = MP2PRouterLinkIf::CreateLinkF( this, EP2PTest2, ETrxTest );
     iTrxPrecentDfc = new TDfc( TrxPrecentDfc, this, iP2PDfcQueList[ MP2PChRouterIf::EP2PDfcThread ], KDfcPriority );

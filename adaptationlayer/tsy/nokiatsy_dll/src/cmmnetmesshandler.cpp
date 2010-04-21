@@ -360,6 +360,8 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_CONSTRUCTL, "CMmNetMessHandler::Const
 
     iNetMessageHandlingOngoing = EFalse;
 
+    iLastNetModemRegStatusInd = NULL;
+
     // Request network signal strength (RSSI)
     NetRssiGetReq();
     }
@@ -2913,6 +2915,11 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSME
 TFLOGSTRING("TSY: CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_IND");
 OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_IND" );
 
+            // destroy previous ind and store current NET_MODEM_REG_STATUS_IND 
+            // for later use
+            delete iLastNetModemRegStatusInd;
+            iLastNetModemRegStatusInd = tempHBuf;
+
             // Start handling NET_MODEM_REG_STATUS_IND message.
             NetModemRegStatusInd( isimessage );
             }
@@ -3060,8 +3067,13 @@ OstTraceExt1( TRACE_NORMAL, DUP6_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATU
                 }
             }
 
-        // Delete used message.
-        delete tempHBuf;
+        // if message is NET_MODEM_REG_STATUS_IND it's not destroyed
+        // because of it can be needed later on.
+        if ( NET_MODEM_REG_STATUS_IND != messageId )
+            {
+            // Delete used message.
+            delete tempHBuf;
+            }
         }
     }
 
@@ -3180,6 +3192,52 @@ CMmNetOperatorNameHandler* CMmNetMessHandler::GetNetOperatorNameHandler()
 TFLOGSTRING("TSY: CMmNetMessHandler::GetNetOperatorNameHandler");
 OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_GETNETOPERATORNAMEHANDLER, "CMmNetMessHandler::GetNetOperatorNameHandler" );
     return iNetOperatorNameHandler;
+    }
+
+// ---------------------------------------------------------------------------
+// CMmNetMessHandler::HandleLastNetModemRegStatusInd
+// Handles last received NET_MODEM_REG_STATUS_IND so that network info
+// is completed to upper layers
+// ---------------------------------------------------------------------------
+//
+void CMmNetMessHandler::HandleLastNetModemRegStatusInd()
+    {
+TFLOGSTRING("TSY: CMmNetMessHandler::HandleLastNetModemRegStatusInd");
+OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_HANDLELASTNETMODEMREGSTATUSIND, "CMmNetMessHandler::HandleLastNetModemRegStatusInd" );
+
+    TBool handlingNeeded( ETrue );
+    if( iNetMessageQueue.Count() )
+        {
+        // we need to check is there any NET_MODEM_REG_STATUS_IND or
+        // NET_MODEM_REG_STATUS_GET_RESP in queue. If there is one
+        // of these two messages, we don't need to handle last received
+        // NET_MODEM_REG_STATUS_IND
+        for( int i = 0; i < iNetMessageQueue.Count(); i++ )
+            {
+            const TDesC8& message( *iNetMessageQueue[i] );
+            TIsiReceiveC isimessage( ( TIsiReceiveC ) message );
+            TInt messageId( isimessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
+
+            if( NET_MODEM_REG_STATUS_IND == messageId ||
+                NET_MODEM_REG_STATUS_GET_RESP == messageId )
+                {
+TFLOGSTRING("TSY: CMmNetMessHandler::HandleLastNetModemRegStatusInd: Similar messages already in queue, no need to handle last received ind");
+OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_HANDLELASTNETMODEMREGSTATUSIND, "CMmNetMessHandler::HandleLastNetModemRegStatusInd:: Similar messages already in queue, no need to handle last received ind" );
+                handlingNeeded = EFalse;
+                break;
+                }
+            }
+        }
+
+    if( iLastNetModemRegStatusInd && handlingNeeded )
+        {
+        // We need to handle last received NET_MODEM_REG_STATUS_IND
+        // so that we complete network info to upper layers (for example
+        // NITZ name)
+        const TDesC8& message( *iLastNetModemRegStatusInd );
+        TIsiReceiveC isimessage( ( TIsiReceiveC ) message );
+        QueueNetModemRegStatusMessagesL( message );
+        }
     }
 
 // =============================================================================

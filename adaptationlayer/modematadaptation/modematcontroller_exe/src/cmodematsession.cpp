@@ -145,9 +145,9 @@ TBool CModemAtSession::CheckAndCompleteExistingRequest( const RMessage2& aMessag
             break;
 
         default:
-            C_TRACE(_L("default"));
-            _LIT( KPanicString, "AtServer");
-            aMessage.Panic( KPanicString, KErrNotSupported );
+            C_TRACE(_L("CModemAtSession::CheckAndCompleteExistingRequest Message not supported"));
+            _LIT( KApplicationName, "Modematconroller.exe");
+            aMessage.Panic( KApplicationName, KErrNotSupported );
             break;
         }
    
@@ -164,7 +164,7 @@ TBool CModemAtSession::CheckAndCompleteExistingRequest( const RMessage2& aMessag
 void CModemAtSession::DoServiceL( const RMessage2& aMessage )
     {
     C_TRACE (( _T("CModemAtSession::DoServiceL() function: %d message: 0x%x handle: 0x%x"), aMessage.Function(), &aMessage, aMessage.Handle() ));
-    TInt err( KErrNone );
+
     if( CheckAndCompleteExistingRequest( aMessage ) )
         {
         C_TRACE (( _T("CModemAtSession::DoServiceL() - return") ));
@@ -185,8 +185,7 @@ void CModemAtSession::DoServiceL( const RMessage2& aMessage )
             iClientNamePtr.Set( iClientName->Des() );
             aMessage.Read( KATModemResponseArgumentIndex, iClientNamePtr );
             iConnectReq = aMessage;
-            err = iServer.ConnectToModem( this );
-            ModemConnected( err );
+            iServer.ConnectToModem( this, iPluginType );
             break;
 
         case  EReceiveUnsolicitedResult:
@@ -216,7 +215,7 @@ void CModemAtSession::DoServiceL( const RMessage2& aMessage )
 
         case EModemAtRemovePipe:
             C_TRACE (( _T("EModemAtRemovePipe") ));
-            iServer.RemovePipe( iDteId );
+            iServer.RemovePipe();
             aMessage.Complete(KErrNone);
             break;
 
@@ -238,7 +237,7 @@ void CModemAtSession::DoServiceL( const RMessage2& aMessage )
             CAtMessage* message = new CAtMessage( EAtCmd, this, aMessage );
             TRACE_ASSERT( message );
             C_TRACE(_L("iServer.AddToSendFifo EAtCmd"));
-            iServer.AddToSendFifo( iDteId, iPluginType, message  );
+            iServer.AddToSendFifo( iPluginType, message  );
             }
             break;
         
@@ -255,14 +254,15 @@ void CModemAtSession::DoServiceL( const RMessage2& aMessage )
             CAtMessage* message = new CAtMessage( EGetNvramStatus, this, aMessage );
             TRACE_ASSERT( message );
             C_TRACE(_L("iServer.AddToSendFifo EGetNvramStatus"));
-            iServer.AddToSendFifo( iDteId, iPluginType, message  );
+            iServer.AddToSendFifo( iPluginType, message  );
             break;
             }
         default:
             {
             C_TRACE(_L("CModemAtSession::DoServiceL message not supported"));
             aMessage.Complete( KErrNotSupported );
-            User::Panic(_L("ATServer"),KErrNotSupported);
+            _LIT( KApplicationName, "Modematconroller.exe");
+            aMessage.Panic( KApplicationName, KErrNotSupported );
             break;
             }
         }  
@@ -272,7 +272,6 @@ CModemAtSession::CModemAtSession( CModemAtSrv& aServer,
     const TVersion& aVersion ) :
     iServer( aServer ),
     iVersion( aVersion ),
-    iDteId( KInitialDteId ),
     iClientName( NULL ),
     iClientNamePtr( NULL, 0 )
     {
@@ -294,30 +293,16 @@ void CModemAtSession::UnsolicitedData( const TDesC8& aData )
         }
     }
 
-TUint8 CModemAtSession::GetDteId() 
-    {
-    C_TRACE (( _T("CModemAtSession::GetDteId()") ));
-    return iDteId;    
-    }
-
-
 TATPluginInterface CModemAtSession::GetPluginType()
     {
     C_TRACE (( _T("CCModemAtSession::GetPluginType(%d)"),iPluginType ));
     return iPluginType;
     }
 
-
 TDesC8& CModemAtSession::GetName() 
     {
     C_TRACE( _T("CModemAtSession::GetName()") ); 
     return *iClientName;
-    }
-
-void CModemAtSession::SetDteId( const TUint8 aDteId ) 
-    {
-    C_TRACE(( _T("CModemAtSession::SetDteId( %d )"), aDteId ));
-    iDteId = aDteId;   
     }
 
 void CModemAtSession::ModemConnected( const TInt aErr ) 

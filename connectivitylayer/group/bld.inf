@@ -19,7 +19,7 @@
 #include <non_foundation_paths.hrh>
 
 PRJ_PLATFORMS
-DEFAULT
+BASEDEFAULT
 
 #include "../usbphonetlink/group/bld.inf"
 #include "../isce/group/bld.inf"

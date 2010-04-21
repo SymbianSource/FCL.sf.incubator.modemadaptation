@@ -758,12 +758,11 @@ OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEve
                                 sbStartOffset +
                                 CALL_MODEM_SB_ORIGIN_CS_ADDRESS_OFFSET_ADDR )
                                 | KMSBMask );
-                            // Append BCD address. Skip call type and mode
-                            // ( 2 first bytes, not required in envelope )
+                            // Append BCD address. Skip TON/NPI
                             BCDAddress.Append( aIsiMessage.GetData(
                                 sbStartOffset +
-                                CALL_MODEM_SB_ORIGIN_CS_ADDRESS_OFFSET_ADDR + 2,
-                                addressLength - 2 ) );
+                                CALL_MODEM_SB_ORIGIN_CS_ADDRESS_OFFSET_ADDR + 1,
+                                addressLength - 1 ) );
                             }
                         // Extract subaddress
                         retValue = aIsiMessage.FindSubBlockOffsetById(

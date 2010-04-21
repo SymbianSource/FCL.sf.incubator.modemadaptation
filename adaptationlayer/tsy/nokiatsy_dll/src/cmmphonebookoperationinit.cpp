@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -156,18 +156,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_CONSTRUCTL, "CMmPhoneBookOper
     iServiceType = 0;
     iNumOfPBRRecords = 0;
     iADNPbInitilized = EFalse;
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-    TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler. \
-        INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS is ON.");
-
-    iMmPhoneBookStoreMessHandler->SetMaxNumOfAasEntries( 0 );
-    iMmPhoneBookStoreMessHandler->SetMaxNumberOfGAS( 0 );
-#else
-    TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler. \
-        INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS is OFF.");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONINIT_CONSTRUCTL, "CMmPhoneBookOperationInit::ConstructL, CASW_RD_USIM_PHONEBOOK_GAS_AND_AAS is OFF" );
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
     }
 
 
@@ -862,7 +850,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                             {
                             // Chekc for Extension
                             // Check for EXT1 Service is present or not
-                            if( !iMmUiccMessHandler->GetServiceStatus( UICC_EXT5_SERVICE_NUM ) || ( iTypeOfReading  == EBasicEfRead ))
+                            if( !iMmUiccMessHandler->GetServiceStatus( UICC_EXT5_SERVICE_NUM ) )
                                 {
                                 // Store MSISDN Phone book configuration in local array if EXT is not present in UICC Card
                                 TPrimitiveInitInfo primConfMsisdn;

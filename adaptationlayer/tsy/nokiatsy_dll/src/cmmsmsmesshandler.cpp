@@ -1540,26 +1540,8 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_SMSRECEIVEDPPREPORTRESP, "CMm
         if ( SMS_OK != cause )
             {
             //Acknowledging failed.
-            //Complete possible receive message request with KErrGeneral and
-            //set routing activity to false. SMS Stack makes new ReceiveMessage
-            //request.
-            //Client continues receiving MT SM indications if NACKing failed
             iMemoryCapacityExceeded = EFalse;
-
-            TBool smsInd( EFalse );
-            TSmsMsg* nullSms = NULL;
-
-            //Complete request to client
-            CMmDataPackage package;
-            package.PackData( &smsInd, &nullSms );
             iSmsSlotLocation = 0;
-
-            // ISI message construction failed or phonet sender
-            // returned error
-            iMessageRouter->Complete(
-                EMobileSmsMessagingReceiveMessage,
-                &package,
-                KErrGeneral );
             }
         else if ( ESmsMessagingNackSmsStoredCapacityExceeded == traId )
             {
@@ -1978,7 +1960,7 @@ OstTraceExt1( TRACE_NORMAL, CMMSMSMESSHANDLER_CHECKTPPIDANDSENDERANDSERVICECENTE
     // of the number of useful semi-octets of address field
     // Add two mandatory bytes of TP-OA, too.
 
-    messageReference = ( ( messageReference + 1 ) / 2) + 2;
+    messageReference = ( ( messageReference + 1 ) / 2 ) + 2;
     offset += messageReference;
 
     TUint8 protocolId( aSMSOnSIM->iMsgData[offset] );
@@ -3398,7 +3380,9 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_UICCREADSMSRESP, "CMmSmsMessH
 
             position++;
             TUint8 addressDataLength( aFileData[position] );
-            position++;
+            // Also length byte should be included to addressDataLength so it
+            // is added by one
+            addressDataLength++;
             TPtrC8 scA( aFileData.Mid( position, addressDataLength ) );
             CMmSmsGsmAddress::GsmConv0411AddrToUnicode(
                 receivedMsgServiceCentre,
@@ -3413,8 +3397,11 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMSMSMESSHANDLER_UICCREADSMSRESP, "CMmSmsMessH
             position += addressDataLength; // Start of the TPDU
             TUint8 totalLength( aFileData.Length() ); // Total aFileData length
             TUint8 tpduLength( totalLength - position );
+            if ( RMobileSmsMessaging::KGsmTpduSize < tpduLength )
+                {
+                tpduLength = RMobileSmsMessaging::KGsmTpduSize;
+                }
             smsData.iMsgData = aFileData.Mid( position, tpduLength  );
-
             iSmsCache.AddEntryL( &smsData, iRecordId );
             }
 
@@ -3527,7 +3514,10 @@ OstTraceExt1( TRACE_NORMAL, CMMSMSMESSHANDLER_UICCREADSMSRESPFORCOMPLETE, "CMmSm
 
             position++;
             TUint8 addressDataLength( aFileData[position] );
-            position++;
+            // Also length byte should be included to addressDataLength so it
+            // is added by one
+            addressDataLength++;
+
             TPtrC8 scA( aFileData.Mid( position, addressDataLength ) );
             CMmSmsGsmAddress::GsmConv0411AddrToUnicode(
                 receivedMsgServiceCentre,
@@ -3690,10 +3680,6 @@ OstTraceExt1( TRACE_NORMAL, CMMSMSMESSHANDLER_UICCWRITESMSREQ, "CMmSmsMessHandle
         aEntry.iServiceCentre.iNumberPlan,
         scAddress,
         telNumber );
-
-    // addressDataLength
-    fileDataBuf.Append( scAddress.Length() );
-    totalDataLength++;
 
     fileDataBuf.Append( scAddress );
 

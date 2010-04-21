@@ -1045,34 +1045,40 @@ void TSatUtility::FillDurationStructure
         aBerTlv.TlvByTagValue( &duration, KTlvDurationTag ) );
     if ( KErrNotFound != returnValue )
         {
-        TUint8 durationTimeUnit = duration.GetShortInfo( ETLV_TimeUnit );
-        switch ( durationTimeUnit )
+        // Check if Duration TLV has real data
+        if ( duration.GetLength() )
             {
-            case KMinutes:
+            TUint8 durationTimeUnit( duration.GetShortInfo( ETLV_TimeUnit ) );
+            switch ( durationTimeUnit )
                 {
-                // Minutes
-                aTDuration.iTimeUnit = RSat::EMinutes;
-                break;
+                case KMinutes:
+                    {
+                    // Minutes
+                    aTDuration.iTimeUnit = RSat::EMinutes;
+                    break;
+                    }
+                case KSeconds:
+                    {
+                    // Seconds
+                    aTDuration.iTimeUnit = RSat::ESeconds;
+                    break;
+                    }
+                case KTenthsOfSeconds:
+                    {
+                    // Tenths of seconds
+                    aTDuration.iTimeUnit = RSat::ETenthsOfSeconds;
+                    break;
+                    }
+                default:
+                    {
+                    aTDuration.iTimeUnit = RSat::ETimeUnitNotSet;
+                    break;
+                    }
                 }
-            case KSeconds:
-                {
-                // Seconds
-                aTDuration.iTimeUnit = RSat::ESeconds;
-                break;
-                }
-            case KTenthsOfSeconds:
-                {
-                // Tenths of seconds
-                aTDuration.iTimeUnit = RSat::ETenthsOfSeconds;
-                break;
-                }
-            default:
-                {
-                aTDuration.iTimeUnit = RSat::ETimeUnitNotSet;
-                }
+                // Time interval
+                aTDuration.iNumOfUnits =
+                    duration.GetShortInfo( ETLV_TimeInteval );
             }
-            // Time interval
-            aTDuration.iNumOfUnits = duration.GetShortInfo( ETLV_TimeInteval );
         }
     }
 

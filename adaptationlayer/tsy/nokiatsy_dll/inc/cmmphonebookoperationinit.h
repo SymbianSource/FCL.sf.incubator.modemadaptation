@@ -61,9 +61,6 @@
     // None
 
 // FORWARD DECLARATION
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-class CAlphaString;
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
 class CMmPhoneBookOperationInit3G_adn;
 
 

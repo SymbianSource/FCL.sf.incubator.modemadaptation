@@ -23,7 +23,7 @@
 
 // MACROS
 
-#if defined ( __WINS__ )
+#if defined ( __WINS__ ) || defined(ISI_LENGTH_BIG_ENDIAN)
 #define MESSAGELENGTH_LSB 5
 #define MESSAGELENGTH_MSB 4
 #else

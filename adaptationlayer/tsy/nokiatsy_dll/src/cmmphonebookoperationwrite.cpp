@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -27,7 +27,7 @@
 #include "cmmmessagerouter.h"
 #include "cmmphonebookoperationwrite.h"
 #include "cmmphonebookalphastring.h"
-#include "osttracedefinitions.h"
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
 #include "cmmphonebookoperationwritetraces.h"
 #endif
@@ -40,6 +40,8 @@
 
 // CONSTANTS
 
+const TUint8 KOwnNumberTextSize = 20;
+const TUint8 KMaxMobileTelNumberSize = 100;
 // MACROS
     // None
 
@@ -91,7 +93,8 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_CMMPHONEBOOKOPERATIONWR
 CMmPhoneBookOperationWrite* CMmPhoneBookOperationWrite::NewL(
     CMmPhoneBookStoreMessHandler* aMmPhoneBookStoreMessHandler,
     CMmUiccMessHandler* aUiccMessHandler,
-    const CMmDataPackage* aDataPackage ) // Data
+    const CMmDataPackage* aDataPackage,
+    TInt aIpc ) // Data
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::NewL");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_NEWL, "CMmPhoneBookOperationWrite::NewL" );
@@ -101,12 +104,19 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_NEWL, "CMmPhoneBookOperation
     CMmPhoneBookOperationWrite* mmPhoneBookOperationWrite =
         new( ELeave ) CMmPhoneBookOperationWrite();
 
-    const CPhoneBookDataPackage* phoneBookData =
-        static_cast<const CPhoneBookDataPackage*>( aDataPackage );
+    if( ( EMmTsyONStoreWriteIPC != aIpc )&&
+        ( EMmTsyONStoreWriteEntryIPC != aIpc ) )
+        {
+        TName phonebookTypeName;
 
-    phoneBookData->GetPhoneBookName( phonebookTypeName );
-    // Store phonebook name 
-    mmPhoneBookOperationWrite->iPhoneBookTypeName = phonebookTypeName;
+        const CPhoneBookDataPackage* phoneBookData =
+            static_cast<const CPhoneBookDataPackage*>( aDataPackage );
+
+        phoneBookData->GetPhoneBookName( phonebookTypeName );
+        // Store phonebook name 
+        mmPhoneBookOperationWrite->iPhoneBookTypeName = phonebookTypeName;
+        }
+
 
     mmPhoneBookOperationWrite->iMmPhoneBookStoreMessHandler =
         aMmPhoneBookStoreMessHandler;
@@ -143,11 +153,15 @@ TFLOGSTRING2("TSY: CMmPhoneBookOperationWrite::UICCCreateReq Ipc: %d", aIpc);
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCCREATEREQ, "CMmPhoneBookOperationWrite::UICCCreateReq;aIpc=%hd", aIpc );
     
     TInt ret (KErrNotSupported);
+    iSavedIpc = aIpc;
+    
     const CPhoneBookDataPackage* phoneBookData =
         static_cast<const CPhoneBookDataPackage*>( aDataPackage );
 
-        if( aIpc == EMmTsyPhoneBookStoreWriteIPC )
+        switch( aIpc )
             {
+            case EMmTsyPhoneBookStoreWriteIPC:
+                {
                 TInt16 index( 0 );
                 // Store Entry to the operation which needs to be write in SIM
                 phoneBookData->UnPackData( index, iPhoneBookEntry );
@@ -158,41 +172,95 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCCREATEREQ, "CMmP
                     iPhoneBookEntry->iLocation = static_cast<TUint16>( index );
                     
                     // Convert Phone Book name to file id
-                    TUint16 fileIdExt ( UICC_ILLEGAL_FILE_ID );
-                    TUint16 pbFileId = ConvertToPBfileId( 
+                    iFileId = ConvertToPBfileId( 
                                          iPhoneBookTypeName,
-                                         fileIdExt,
+                                         iExtFileId,
                                          iMmUiccMessHandler->GetCardType() );
                                          
-                    TUint8 pbArrayIndex ( ConvertToConfArrayIndex( pbFileId ) );
-
-                    if( PB_MBDN_FID == pbFileId )
-                        {
-                        // For MBDN PhoneBook first read MBI file 
-                        // Check if the mailbox inidcation type is correct
-                        if( index <= iMmPhoneBookStoreMessHandler->
-                                iPBStoreConf[pbArrayIndex].iMbiRecLen )
-                            {
-                            iCurrentWritePhase = EPBWritePhase_Read_MBI_profile;
-                            // read MBDN record number from MBI first record 
-                            //Profile number
-                            ret = UiccPbReqReadMBI( index, aTransId );
-                            }
-                        else
-                            {
-                            ret = KErrArgument;
-                            }
-                        }
-                    else
-                        {
-                        ret = UiccPbReqWriteL( aTransId, index, *iPhoneBookEntry );
-                        }
+                    iArrayIndex = ConvertToConfArrayIndex( iFileId );
+                    ret = UiccPbReqWriteL( aTransId, index, *iPhoneBookEntry );
                     }
-            }
-        else
-            {
+                break;
+                }
+            case EMmTsyONStoreWriteEntryIPC:
+                {
+                iFileId = PB_MSISDN_FID;
+                iExtFileId = PB_EXT1_FID;
+                iArrayIndex = EPhonebookTypeMSISDN;
+                
+                RMobileONStore::TMobileONEntryV1 entry;
+                aDataPackage->UnPackData( entry );
+
+                iPhoneBookEntry = new( ELeave ) CPhoneBookStoreEntry;
+                CleanupStack::PushL( iPhoneBookEntry );
+                iPhoneBookEntry->ConstructL();
+                
+                // Copy index number
+                iPhoneBookEntry->iLocation = entry.iIndex;
+
+                iPhoneBookEntry->iText = HBufC::NewL( KOwnNumberTextSize );
+                // Copy name
+                TPtr ptrToName ( iPhoneBookEntry->iText->Des() );
+                CopyData( entry.iText,  ptrToName );
+
+                iPhoneBookEntry->iNumber = HBufC::NewL( KMaxMobileTelNumberSize );
+                // Copy Number
+                TPtr ptrToNumber( iPhoneBookEntry->iNumber->Des() );
+                CopyData( entry.iNumber.iTelNumber, ptrToNumber );
+                
+                CleanupStack::Pop( iPhoneBookEntry );
+
+                // Send Request 
+                ret = UiccPbReqWriteL( aTransId, entry.iIndex, *iPhoneBookEntry );
+
+                break;
+                }
+            case EMmTsyONStoreWriteIPC:
+                {
+                iFileId = PB_MSISDN_FID;
+                iExtFileId = PB_EXT1_FID;
+                
+                iArrayIndex = EPhonebookTypeMSISDN;
+
+                TDesC8* entry = NULL;
+                aDataPackage->UnPackData( entry );
+
+                // Unpack entry param to get the location
+                RMobileONStore::TMobileONEntryV1Pckg* entryPckg =
+                    reinterpret_cast<RMobileONStore::TMobileONEntryV1Pckg*>( entry );
+                RMobileONStore::TMobileONEntryV1& onEntry = ( *entryPckg )();
+
+                iPhoneBookEntry = new( ELeave ) CPhoneBookStoreEntry;
+                CleanupStack::PushL( iPhoneBookEntry );
+                iPhoneBookEntry->ConstructL();
+                
+                // Copy index number
+                iPhoneBookEntry->iLocation = onEntry.iIndex;
+
+                iPhoneBookEntry->iText = HBufC::NewL( KOwnNumberTextSize );
+                // Copy name
+                TPtr ptrToName ( iPhoneBookEntry->iText->Des() );
+                CopyData( onEntry.iText,  ptrToName );
+
+                iPhoneBookEntry->iNumber = HBufC::NewL( KMaxMobileTelNumberSize );
+                // Copy Number
+                TPtr ptrToNumber( iPhoneBookEntry->iNumber->Des() );
+                CopyData( onEntry.iNumber.iTelNumber, ptrToNumber );
+                
+                CleanupStack::Pop( iPhoneBookEntry );
+
+                // Send Request 
+                ret = UiccPbReqWriteL( aTransId, onEntry.iIndex, *iPhoneBookEntry );
+
+                break;
+                }
+            default:
+                {
 TFLOGSTRING2("TSY: CMmPhoneBookOperationWrite::UICCCreateReq Unknown Ipc: %d", aIpc);
 OstTraceExt1( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONWRITE_UICCCREATEREQ, "CMmPhoneBookOperationWrite::UICCCreateReq;Unknown aIpc =%hd", aIpc );
+                 
+                break;
+                }
             }
     return ret;
     }
@@ -212,185 +280,40 @@ TFLOGSTRING3("TSY: CMmPhoneBookOperationWrite::SimPbReqWriteL, aTransId:%d,index
 OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEL, "CMmPhoneBookOperationWrite::UiccPbReqWriteL;aTransId=%hhu;aIndex=%hd", aTransId, aIndex );
     
     TInt ret( KErrNone );
-    // Check for no of EXT records required for Writing this Entry
-    TUint8 extRecordNo ( 0 ); 
-
-    if( UICC_EF_FDN_NO_EXT_NUM_LEN < iPhoneBookEntry->iNumber->Length() )
+    
+    if( ( PB_MBDN_FID == iFileId )&&
+        ( 0 == iCurrentWritePhase ) )
         {
-        extRecordNo++;
-        TInt extDataLength = iPhoneBookEntry->iNumber->Length() - 
-                             UICC_EF_FDN_NO_EXT_NUM_LEN;
-        while ( extDataLength > UICC_EF_EXT_REC_NUM_LEN)
-            {
-            extRecordNo++;
-            extDataLength = extDataLength - UICC_EF_EXT_REC_NUM_LEN;
-            }
+        iCurrentWritePhase = EPBWritePhase_Read_MBI_profile;
+        // read MBDN record number from MBI first record 
+        //Profile number
+        ret = UiccPbReqReadMBI( aIndex, aTransId );
         }
-        
-    // reserve Space for ext record no
-    iExtRecordArrayToBeWrite.ReserveL( extRecordNo );
-    // File reserved memory with 0
-    for( TInt count = 0; count < extRecordNo; count++ )
+    else
         {
-        iExtRecordArrayToBeWrite.Insert( 0 , count );
-        }
-
-    // Convert Phone Book name to file id
-    TUint16 fileIdExt ( UICC_ILLEGAL_FILE_ID );
-    TUint16 pbFileId = ConvertToPBfileId( 
-                          iPhoneBookTypeName,
-                          fileIdExt,
-                          iMmUiccMessHandler->GetCardType() );
-
-    if( UICC_ILLEGAL_FILE_ID != pbFileId )
-        {
-        TUint8 pbArrayIndex ( ConvertToConfArrayIndex( pbFileId ) );
+        // Check for no of EXT records required for Writing this Entry
+        TUint8 extRecordNo ( 0 ); 
+        GetExtRecNum( extRecordNo );
 
         // Check if the index To read is valid
-        if(  aIndex <= iMmPhoneBookStoreMessHandler->
-                iPBStoreConf[pbArrayIndex].iNoOfRecords )
+        if( ( UICC_ILLEGAL_FILE_ID != iFileId ) &&
+            ( aIndex <= iMmPhoneBookStoreMessHandler->
+                 iPBStoreConf[iArrayIndex].iNoOfRecords ) )
             {
-            // if Entry present in list Store it locally
-            TPBEntry entry;
             if( 0 < aIndex )
                 {
-                // Check for index present the store list
-                if( iMmPhoneBookStoreMessHandler->IndexCheckInPBList(
+                ret =  StartWriteEntryIndex( 
                         aIndex,
-                        pbArrayIndex,
-                        entry ) )
-                    {
-                    // Check if Entry is present or not 
-                    if( entry.iEntryPresent )
-                        {
-                        // Check if no if ext records are sufficient from 
-                        //previous Entry
-                        if( extRecordNo  > entry.PBEntryExtRecord.Count() )
-                            {
-                            // Update old record number which needs to be 
-                            //updated by new entry
-                            if( entry.PBEntryExtRecord.Count() > 0 )
-                                {
-                                for( TInt i=0; 
-                                      i < entry.PBEntryExtRecord.Count();
-                                      i++ )
-                                    {
-                                    // Append record number to be write from 
-                                    //old Entry
-                                    iExtRecordArrayToBeWrite.Append( 
-                                            entry.PBEntryExtRecord[i] );
-                                    iExtRecordArrayToBeDelete.Append( 
-                                            entry.PBEntryExtRecord[i] );
-                                    }
-                                }
-                            // Search for more free records
-                            iCurrentWritePhase = EPBWritePhase_Search_Ext_Entry;
-                            
-                            // Send request to read first entry in Ext
-                            iExtRecordNo = 1 ;
-                            ret = UiccPbReqWriteReadExt(
-                                    pbFileId,
-                                    fileIdExt,
-                                    iExtRecordNo,
-                                    aTransId);
-                            }
-                        else  // when reocrds to be delete and write are 0 or to
-                              // be write record less
-                            {
-                            // Check of both records are 0
-                            if( ( extRecordNo == 0 ) && 
-                                    ( entry.PBEntryExtRecord.Count() == 0 ))
-                                {
-                                // Start Writing Entry
-                                iCurrentWritePhase = EPBWritePhase_Write_Entry;
-                                ret = UiccPBReqWriteEntry( 
-                                        pbFileId,
-                                        aIndex,
-                                        aTransId,
-                                        aDataToWrite );
-                                }
-                            else
-                                {
-                                // Start copy Ext record number to be write array
-                                for( TInt i=0; i <  extRecordNo; i++ )
-                                    {
-                                    // Append record number to be write from old
-                                    //Entry
-                                    iExtRecordArrayToBeWrite.Append(
-                                            entry.PBEntryExtRecord[i]);
-                                    iExtRecordArrayToBeDelete.Append(
-                                            entry.PBEntryExtRecord[i]);
-                                    }
-                                // Update records needs to be deleted
-                                // From old Entry
-                                for( TInt i=extRecordNo;
-                                       i < entry.PBEntryExtRecord.Count();
-                                       i++ )
-                                    {
-                                    // Append record number to be deleted from 
-                                    //old Entry
-                                    iExtRecordArrayToBeDelete.Append( 
-                                            entry.PBEntryExtRecord[i]);
-                                    }
-                                // Start Deleting the EXT Records
-                                iCurrentWritePhase = EPBWritePhase_Write_Ext_Entry;
-                                iExtDeleteOperation = ETrue;
-                                TUint8 index ( iExtRecordArrayToBeDelete[0] );
-                                // Send request to Write main Entry
-                                ret = UiccPbReqWriteExtDelete(
-                                        pbFileId,
-                                        fileIdExt,
-                                        index,
-                                        aTransId );
-                                }
-                            }
-                        }
-                    else
-                        {
-                        // If entry not present
-                        // Check if EXT Records are needed for Entry to be written
-                        if( 0 < extRecordNo )
-                            {
-                            // Search for free ext records 
-                            iCurrentWritePhase = EPBWritePhase_Search_Ext_Entry;
-                            
-                            // Send request To read First EXT record
-                            iExtRecordNo = 1;
-                            ret = UiccPbReqWriteReadExt(
-                                    pbFileId,
-                                    fileIdExt,
-                                    iExtRecordNo,
-                                    aTransId );
-                            }
-                        else
-                            {
-                            // Start Writting Entry
-                            iCurrentWritePhase = EPBWritePhase_Write_Entry;
-                            TUint8 indexToWrite = iPhoneBookEntry->iLocation;
-                            ret = UiccPBReqWriteEntry(
-                                    pbFileId,
-                                    indexToWrite,
-                                    aTransId,
-                                    aDataToWrite );
-                            }
-                        }
-                    }   // end of if Entry is present in the list
-                else
-                    {
-                    // First Read that Entry from SIM and then delete that entry
-                    // with EXT records if there are Any
-                    iCurrentWritePhase = EPBWritePhase_Read_Entry;
-                    ret = UiccPbReqWriteRead( pbFileId, aIndex, aTransId );
-                    
-                    // read Main entry with given index number
-                    }
+                        extRecordNo, 
+                        aTransId, 
+                        aDataToWrite );                
                 }
             else
                 {
                 // Start Serching For first free Entry in the Stored list
-                TInt index = iMmPhoneBookStoreMessHandler->
-                EmptyEntryCheckInPBList( pbArrayIndex );
-                if( 0 < index )
+                iEntryToWrite = iMmPhoneBookStoreMessHandler->
+                EmptyEntryCheckInPBList( iArrayIndex );
+                if( 0 < iEntryToWrite )
                     {
                     //Check if EXT records Are needed or not
                     if( 0 < extRecordNo )
@@ -398,12 +321,10 @@ OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEL, "CMmPhon
                         // Start Serching for EXT records
                         // Search for free ext records 
                         iCurrentWritePhase = EPBWritePhase_Search_Ext_Entry;
-                            
+                        
                         // Send request To read First EXT record
                         iExtRecordNo = 1;
                         ret = UiccPbReqWriteReadExt(
-                                pbFileId,
-                                fileIdExt,
                                 iExtRecordNo,
                                 aTransId );
                         }
@@ -413,8 +334,7 @@ OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEL, "CMmPhon
                         // Start Writting Entry
                         iCurrentWritePhase = EPBWritePhase_Write_Entry;
                         ret = UiccPBReqWriteEntry(
-                                pbFileId,
-                                index,
+                                iEntryToWrite,
                                 aTransId,
                                 aDataToWrite );
                         }
@@ -426,7 +346,6 @@ OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEL, "CMmPhon
                     iLocationSearch = ETrue;
                     iEntryToWrite = 1;
                     ret = UiccPbReqWriteRead(
-                            pbFileId,
                             iEntryToWrite,
                             aTransId );
                     }
@@ -435,15 +354,11 @@ OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEL, "CMmPhon
         else
             {
             ret = KErrArgument;
-            }            
+            }
         }
-    else
-        {
-        ret = KErrArgument;
-        }
+
     return ret;
     }
-
 
 
 // ---------------------------------------------------------------------------
@@ -452,7 +367,6 @@ OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEL, "CMmPhon
 // ---------------------------------------------------------------------------
 //
 TInt CMmPhoneBookOperationWrite::UiccPBReqWriteEntry( 
-             TUint16 aFileId,
              TUint8 aIndex,
              TUint8 aTransId,
              CPhoneBookStoreEntry& aDataToWrite )
@@ -477,12 +391,11 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEENTRY, "CMmPho
         }
     
     cmdParams.serviceType = UICC_APPL_UPDATE_LINEAR_FIXED;
-    cmdParams.fileId = aFileId;
+    cmdParams.fileId = iFileId;
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
     // Check for valid record number
-    TUint8 arrayIndex ( ConvertToConfArrayIndex( aFileId ) );
     if( aIndex <= iMmPhoneBookStoreMessHandler->
-                     iPBStoreConf[arrayIndex].iNoOfRecords )
+                     iPBStoreConf[iArrayIndex].iNoOfRecords )
         {
         cmdParams.record = aIndex;
         }
@@ -498,21 +411,24 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEENTRY, "CMmPho
     // Convert the Entry Name from ASCII format to UCS2
     CMmStaticUtility::ConvertUcs2ToGsmUcs2Data( ptrToName, nameBuf );
     if( nameBuf.Length() < iMmPhoneBookStoreMessHandler->
-                           iPBStoreConf[ arrayIndex ].iAlphaStringlength )
+                           iPBStoreConf[iArrayIndex].iAlphaStringlength )
         {
         // Fill rest of the Bytes 
         for( TInt count = nameBuf.Length(); count < ( iMmPhoneBookStoreMessHandler->
-                      iPBStoreConf[ arrayIndex ].iAlphaStringlength ); count++ )
+                      iPBStoreConf[ iArrayIndex ].iAlphaStringlength ); count++ )
             {
             nameBuf.Append( KTagUnusedbyte );
             }
         }
     TBuf8<300>numberBuf;
     TPtr16 ptrToNumber = aDataToWrite.iNumber->Des();
-    iMmPhoneBookStoreMessHandler->ConvertToBCDFromUCS2(
-                                  ptrToNumber,
-                                  numberBuf,
-                                  aFileId );
+    if( ptrToNumber.Length() > 0 )
+        {
+        iMmPhoneBookStoreMessHandler->ConvertToBCDFromUCS2(
+                                      ptrToNumber,
+                                      numberBuf,
+                                      iFileId );
+        }
     
     // Store number length
     TUint8 numLength ( numberBuf.Length() );
@@ -530,7 +446,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEENTRY, "CMmPho
     
     TBuf8<200>fileDataWrite;
     fileDataWrite.Append( nameBuf.Mid( 0, iMmPhoneBookStoreMessHandler->
-                          iPBStoreConf[ arrayIndex ].iAlphaStringlength ) );
+                          iPBStoreConf[ iArrayIndex ].iAlphaStringlength ) );
     fileDataWrite.Append( numLength );
     fileDataWrite.Append( numberBuf.Mid( 0, UICC_EF_EXT_REC_NUM_LEN ) );
     // Append Capability configuration byte as not used
@@ -573,8 +489,6 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEENTRY,
 TInt CMmPhoneBookOperationWrite::UiccPbReqWriteExt(
         TUint8 aTransId,
         TUint8 aIndex,
-        TUint16 aFileId,
-        TUint16 aFileIdExt,
         CPhoneBookStoreEntry& aDataToWrite )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPbReqWriteExt");
@@ -596,7 +510,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBWRITEEXT, "CMmPhoneBoo
         cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
         }
     
-    cmdParams.fileId = aFileIdExt;
+    cmdParams.fileId = iExtFileId;
     cmdParams.serviceType = UICC_APPL_UPDATE_LINEAR_FIXED;
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
     
@@ -608,7 +522,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBWRITEEXT, "CMmPhoneBoo
     iMmPhoneBookStoreMessHandler->ConvertToBCDFromUCS2(
                                   ptrToNumber,
                                   numBuf,
-                                  aFileId );
+                                  iFileId );
     
         if( numBuf.Length() > ( 10 + ( iExtRecordWritten* 11 ) ))
             {
@@ -655,8 +569,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBWRITEEXT, "CMmPhoneBoo
         
         cmdParams.fileData.Append( extFileData );
 
-    TUint8 arrayIndex ( ConvertToConfArrayIndex( aFileId ));
-    if( aIndex <= iMmPhoneBookStoreMessHandler->iPBStoreConf[arrayIndex].iExtNoOfRec )
+    if( aIndex <= iMmPhoneBookStoreMessHandler->iPBStoreConf[iArrayIndex].iExtNoOfRec )
         {
         cmdParams.record = aIndex;
         }
@@ -686,8 +599,6 @@ OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXT, "CMmPh
 // ---------------------------------------------------------------------------
 //
 TInt CMmPhoneBookOperationWrite::UiccPbReqWriteReadExt(
-             TUint16 aFileId,
-             TUint16 aFileIdExt,
              TUint8 aIndex,
              TUint8 aTransId)
     {
@@ -714,16 +625,15 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREADEXT, "CMmP
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
     
     // Append File id
-    cmdParams.fileId = aFileIdExt;
+    cmdParams.fileId = iExtFileId;
     
     // Append serviceType
     cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;
     
     
-    TUint8 arrayIndex( ConvertToConfArrayIndex( aFileId ) );
     // Check for the valid index neds to be read
     if( aIndex <= iMmPhoneBookStoreMessHandler->
-                   iPBStoreConf[arrayIndex].iExtNoOfRec )
+                   iPBStoreConf[iArrayIndex].iExtNoOfRec )
         {
         // Append recor number
         cmdParams.record = aIndex;
@@ -751,7 +661,6 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREADEX
 // ---------------------------------------------------------------------------
 //
 TInt CMmPhoneBookOperationWrite::UiccPbReqWriteRead(
-                     TUint16 aFileId,
                      TUint8 aIndex,
                      TUint8 aTransId )
     {
@@ -775,11 +684,10 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREAD, "CMmPhon
         }
     
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
-    cmdParams.fileId = aFileId;
+    cmdParams.fileId = iFileId;
     cmdParams.serviceType =  UICC_APPL_READ_LINEAR_FIXED ;
-    TUint8 arrayIndex ( ConvertToConfArrayIndex( aFileId ) );
     if( aIndex <= iMmPhoneBookStoreMessHandler->
-                    iPBStoreConf[arrayIndex].iNoOfRecords )
+                    iPBStoreConf[iArrayIndex].iNoOfRecords )
         {
         cmdParams.record = aIndex;
         }
@@ -805,8 +713,6 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREAD, 
 // ---------------------------------------------------------------------------
 //
 TInt CMmPhoneBookOperationWrite::UiccPbReqWriteExtDelete(
-                  TUint16 aFileId,
-                  TUint16 aFileIdExt,
                   TUint8 aIndex,
                   TUint8 aTransId )
     {
@@ -831,14 +737,11 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXTDELETE, "CM
         }
     
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
-    cmdParams.fileId = aFileIdExt;
+    cmdParams.fileId = iExtFileId;
     cmdParams.serviceType =  UICC_APPL_UPDATE_LINEAR_FIXED ;
-    
-    TUint8 arrayIndex ( ConvertToConfArrayIndex( aFileId ) );
-
-    
+   
     if( aIndex <= iMmPhoneBookStoreMessHandler->
-                   iPBStoreConf[arrayIndex].iExtNoOfRec)
+                   iPBStoreConf[iArrayIndex].iExtNoOfRec)
         {
         cmdParams.record = aIndex;
         }
@@ -869,12 +772,92 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXTDEL
     }
 
 
+
 // ---------------------------------------------------------------------------
 // CMmPhoneBookOperationWrite::UiccPbReqReadMBI
 // Constructs an ISI-message to Read MBI profile from first record 
 // ---------------------------------------------------------------------------
 //
-TInt CMmPhoneBookOperationWrite::UiccPbReqReadMBI( TUint8 aIndex, TUint8 aTransId )
+TInt CMmPhoneBookOperationWrite::StartWriteEntryIndex( 
+        TUint16 aIndex,
+        TUint8 aExtRecNo, 
+        TUint8 aTransId, 
+        CPhoneBookStoreEntry& aDataToWrite )
+    {
+TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::StartWriteForEntryPresentInList");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_STARTWRITEFORENTRYPRESENTINLIST, "CMmPhoneBookOperationWrite::StartWriteForEntryPresentInList" );
+
+    TInt ret( KErrNone );
+    // if Entry present in list Store it locally
+    TPBEntry entry;
+        // Check for index present the store list
+        if( iMmPhoneBookStoreMessHandler->IndexCheckInPBList(
+                aIndex,
+                iArrayIndex,
+                entry ) )
+            {
+            // Check if Entry is present or not 
+            if( entry.iEntryPresent )
+                {
+                // Check if no if ext records are sufficient from 
+                //previous Entry
+                if( aExtRecNo  > entry.PBEntryExtRecord.Count() )
+                    {
+                    ret = CheckForExtRecordNum( entry, aTransId );
+                    }
+                else  
+                    {
+                    // check for reocrds to be delete
+                    ret = ContinueWriteEntry( aExtRecNo, 
+                                              entry, 
+                                              aTransId, 
+                                              aDataToWrite );
+                    }
+                }
+            else
+                {
+                // If entry not present
+                // Check if EXT Records are needed for Entry to be written
+                if( 0 < aExtRecNo )
+                    {
+                    // Search for free ext records 
+                    iCurrentWritePhase = EPBWritePhase_Search_Ext_Entry;
+                    // Send request To read First EXT record
+                    iExtRecordNo = 1;
+                    ret = UiccPbReqWriteReadExt(
+                            iExtRecordNo,
+                            aTransId );
+                    }
+                else
+                    {
+                    // Start Writting Entry
+                    iCurrentWritePhase = EPBWritePhase_Write_Entry;
+                    TUint8 indexToWrite = iPhoneBookEntry->iLocation;
+                    ret = UiccPBReqWriteEntry(
+                            indexToWrite,
+                            aTransId,
+                            aDataToWrite );
+                    }
+                }
+            }   // end of if Entry is present in the list
+        else
+            {
+            // First Read that Entry from SIM and then delete that entry
+            // with EXT records if there are Any
+            iCurrentWritePhase = EPBWritePhase_Read_Entry;
+            ret = UiccPbReqWriteRead( aIndex, aTransId );
+            }
+
+    return ret;
+    }
+
+
+// ---------------------------------------------------------------------------
+// CMmPhoneBookOperationWrite::UiccPbReqReadMBI
+// Constructs an ISI-message to Read MBI profile from first record 
+// ---------------------------------------------------------------------------
+//
+TInt CMmPhoneBookOperationWrite::UiccPbReqReadMBI( TUint8 aOffset, TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPbReqReadMBI");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQREADMBI, "CMmPhoneBookOperationWrite::UiccPbReqReadMBI" );
@@ -898,7 +881,17 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQREADMBI, "CMmP
         cmdParams.fileId = PB_MBI_FID;
         cmdParams.serviceType =  UICC_APPL_READ_LINEAR_FIXED ;
         cmdParams.dataAmount = 1;
-        cmdParams.dataOffset = aIndex;
+        
+        if( aOffset <= iMmPhoneBookStoreMessHandler->
+                iPBStoreConf[iArrayIndex].iMbiRecLen )
+            {
+            cmdParams.dataOffset = aOffset;
+            }
+        else
+            {
+            ret = KErrArgument;
+            }
+        
         cmdParams.record = 1;   // only first profile number is supported
         
         
@@ -920,7 +913,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQREADMBI, "CMmP
 TInt CMmPhoneBookOperationWrite::UiccPBReqWriteMBIProfile( 
         TUint8 aTransId,
         TUint8 aIndex,
-        TUint8 aOperationType)
+        TUint8 aOperationType )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPBReqWriteMBIProfile");
 OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEMBIPROFILE, "CMmPhoneBookOperationWrite::UiccPBReqWriteMBIProfile" );
@@ -984,11 +977,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMmPhone
     TBool complete ( EFalse );
     TInt ret ( KErrNone );
     
-    TUint16 fileIdExt ( 0x0000 );
-    TUint16 fileId = ConvertToPBfileId( iPhoneBookTypeName, fileIdExt, iMmUiccMessHandler->GetCardType() );
-    //// Check for PhoenBook Index for which needs to checked
-    TUint8 pbArrayIndex = ConvertToConfArrayIndex( fileId );
-
     switch( iCurrentWritePhase )
         {
         case EPBWritePhase_Read_Entry:
@@ -996,10 +984,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMmPhone
             ret = HandleWriteReadEntryResp(
                   aStatus,
                   aFileData,
-                  aTransId,
-                  fileId,
-                  fileIdExt,
-                  pbArrayIndex );
+                  aTransId );
             break;
             }
         case EPBWritePhase_Read_Ext_Entry:
@@ -1007,9 +992,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMmPhone
             ret = HandleWriteReadExtEntryResp(
                   aStatus,
                   aFileData,
-                  aTransId,
-                  fileId,
-                  fileIdExt );
+                  aTransId );
             break;
             }
         case EPBWritePhase_Search_Ext_Entry:
@@ -1017,27 +1000,21 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMmPhone
             ret = HandleWriteSearchExtEntryResp(
                   aStatus,
                   aFileData,
-                  aTransId,
-                  fileId,
-                  fileIdExt );
+                  aTransId );
             break;
             }
         case EPBWritePhase_Write_Entry:
             {
             ret = HandleWriteEntryResp(
                   aStatus,
-                  aTransId,
-                  fileId,
-                  fileIdExt );
+                  aTransId );
             break;
             }
         case EPBWritePhase_Write_Ext_Entry:
             {
             ret = HandleWriteExtEntryResp(
                   aStatus,
-                  aTransId,
-                  fileId,
-                  fileIdExt );
+                  aTransId );
             break;
             }
         case EPBWritePhase_Read_MBI_profile:
@@ -1066,33 +1043,97 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMm
     
     if( ( KErrNone != ret ) || ( iCurrentWritePhase == EPBWritePhase_complete ))
         {
-        // Complete the to common TSY
-        CPhoneBookDataPackage phoneBookData;
-
-        //create a struct
-        TPBEntryInfo pbEntryInfo;
-        // Set the structure as it has failed, we don't care of following
-        // information so set to 0
-        pbEntryInfo.iMaxNumLength = 0;
-        pbEntryInfo.iLocation = 0;
-        if( KErrNone == ret )
+        switch( iSavedIpc )
             {
-            pbEntryInfo.iLocation = iPhoneBookEntry->iLocation;
-            }
-        // For EXT file Errors need not to pass to commontsy
-        if( KErrGeneral == ret )
-            {
-            ret = KErrNone;
-            }
-        phoneBookData.SetPhoneBookName( iPhoneBookTypeName );
+            case EMmTsyONStoreWriteIPC:
+                {
+                // Reset SavedIpc IPC.
+                iSavedIpc = 0;
+                if( KErrNone != ret )
+                    {
+                    // Complete failed request
+                    iMmPhoneBookStoreMessHandler->MessageRouter()->Complete(
+                            EMmTsyONStoreWriteIPC,
+                            NULL,
+                            ret );
+                    }
+                else
+                    {
+                    // Create data package
+                    CMmDataPackage numberData;
+                    numberData.PackData( &iPhoneBookEntry->iLocation );
 
-        //Pack Data and complete
-        phoneBookData.PackData( &pbEntryInfo );
-        iMmPhoneBookStoreMessHandler->MessageRouter()->Complete(
-            EMmTsyPhoneBookStoreWriteIPC,
-            &phoneBookData,
-            ret );
+                    // Complete request
+                    iMmPhoneBookStoreMessHandler->MessageRouter()->Complete(
+                            EMmTsyONStoreWriteIPC,
+                            &numberData,
+                            ret );
+                    }
+                
+                // delete PhoneBook Entry
+                delete iPhoneBookEntry;
+                break;
+                }
+            case EMmTsyONStoreWriteEntryIPC:
+                {
+                // Reset saved IPC.
+                iSavedIpc = 0;
+                // Complete request
+                iMmPhoneBookStoreMessHandler->MessageRouter()->Complete(
+                        EMmTsyONStoreWriteEntryIPC,
+                        ret );
+                
+                // Delete Phone Book Entry
+                delete iPhoneBookEntry;
+                break;
+                }
+            case EMmTsyPhoneBookStoreWriteIPC:
+                {
+                // Complete the to common TSY
+                CPhoneBookDataPackage phoneBookData;
 
+                //create a struct
+                TPBEntryInfo pbEntryInfo;
+                // Set the structure as it has failed, we don't care of following
+                // information so set to 0
+                pbEntryInfo.iMaxNumLength = 0;
+                pbEntryInfo.iLocation = 0;
+                if( KErrNone == ret )
+                    {
+                    // Convert Phone Book name to file id
+                    pbEntryInfo.iMaxNumLength = iMmPhoneBookStoreMessHandler->
+                                     iPBStoreConf[iArrayIndex].iNumlength;
+                    if( 0 != iPhoneBookEntry->iLocation )
+                        {
+                        pbEntryInfo.iLocation = iPhoneBookEntry->iLocation;
+                        }
+                    else
+                        {
+                        pbEntryInfo.iLocation = iEntryToWrite;
+                        }
+                    }
+                // For EXT file Errors need not to pass to commontsy
+                if( KErrGeneral == ret )
+                    {
+                    ret = KErrNone;
+                    }
+                phoneBookData.SetPhoneBookName( iPhoneBookTypeName );
+
+                //Pack Data and complete
+                phoneBookData.PackData( &pbEntryInfo );
+                iMmPhoneBookStoreMessHandler->MessageRouter()->Complete(
+                        EMmTsyPhoneBookStoreWriteIPC,
+                        &phoneBookData,
+                        ret );
+                break;
+                }
+            default:
+                {
+TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleSimPbRespL - unknown Ipc ");
+OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationWrite::HandleUICCPbRespL - unknown Ipc" );
+                break;
+                }
+            }
         // set flag to indicate that we can remove this operation from array
         complete = ETrue;
         }
@@ -1108,10 +1149,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMm
 TInt CMmPhoneBookOperationWrite::HandleWriteReadEntryResp(
     TInt aStatus,
     const TDesC8& aFileData,
-    TUint8 aTransId,
-    TUint16 aFileId,
-    TUint16 aFileIdExt,
-    TUint8 aArrayIndex )
+    TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteReadEntryResp");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteReadEntryResp" );
@@ -1129,7 +1167,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
                 
                 // Check for Ext data present or not
                 if( 0xFF == aFileData[iMmPhoneBookStoreMessHandler->
-                            iPBStoreConf[aArrayIndex].iAlphaStringlength+ 13] )
+                            iPBStoreConf[iArrayIndex].iAlphaStringlength+ 13] )
                     {
                     // No EXT Records 
                     // Check if EXT reords needed for Entry to be write
@@ -1142,8 +1180,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
                         // Send request to read first entry in Ext
                         iExtRecordNo = 1;
                         ret = UiccPbReqWriteReadExt(
-                              aFileId,
-                              aFileIdExt,
                               iExtRecordNo,
                               aTransId );
                         }
@@ -1152,7 +1188,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
                         // Start Write main Entry
                         iCurrentWritePhase = EPBWritePhase_Write_Entry;
                         TUint8 indexToWrite ( 0 );
-                        if( PB_MBDN_FID == aFileId )
+                        if( PB_MBDN_FID == iFileId )
                             {
                             indexToWrite = iEntryToWrite;
                             }
@@ -1161,7 +1197,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
                             indexToWrite = iPhoneBookEntry->iLocation;
                             }
                         ret = UiccPBReqWriteEntry(
-                              aFileId,
                               indexToWrite,
                               aTransId,
                               *iPhoneBookEntry );
@@ -1172,15 +1207,13 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
                     // Append this Record number to be Delete record Array
                     iExtRecordArrayToBeDelete.Append(
                                     iMmPhoneBookStoreMessHandler->
-                                    iPBStoreConf[aArrayIndex].iAlphaStringlength+ 13 );
+                                    iPBStoreConf[iArrayIndex].iAlphaStringlength+ 13 );
                     
                     // Start Reading EXT Record
                     iCurrentWritePhase = EPBWritePhase_Read_Ext_Entry;
                     TUint8 indexToRead = iMmPhoneBookStoreMessHandler->
-                               iPBStoreConf[aArrayIndex].iAlphaStringlength+ 13;
+                               iPBStoreConf[iArrayIndex].iAlphaStringlength+ 13;
                     ret = UiccPbReqWriteReadExt(
-                          aFileId,
-                          aFileIdExt,
                           indexToRead,
                           aTransId );
                     }
@@ -1192,7 +1225,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
                 iCurrentWritePhase = EPBWritePhase_Read_Entry;
                 iEntryToWrite++;
                 ret = UiccPbReqWriteRead(
-                      aFileId,
                       iEntryToWrite,
                       aTransId );
                 }
@@ -1211,8 +1243,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
                 // Send request to read first entry in Ext
                 iExtRecordNo = 1;
                 ret = UiccPbReqWriteReadExt(
-                      aFileId,
-                      aFileIdExt,
                       iExtRecordNo,
                       aTransId);
                 }
@@ -1223,7 +1253,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
                 // Start Write Entry
                 iCurrentWritePhase = EPBWritePhase_Write_Entry;
                 TUint8 index ( 0 ); 
-                if( ( PB_MBDN_FID == aFileId )|| ( 0 == iPhoneBookEntry->iLocation ))
+                if( ( PB_MBDN_FID == iFileId )|| ( 0 == iPhoneBookEntry->iLocation ))
                     {
                     index = iEntryToWrite; 
                     }
@@ -1232,7 +1262,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
                     index = iPhoneBookEntry->iLocation;
                     }
                 ret = UiccPBReqWriteEntry(
-                        aFileId,
                         index,
                         aTransId,
                         *iPhoneBookEntry );
@@ -1259,9 +1288,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "C
 TInt CMmPhoneBookOperationWrite::HandleWriteReadExtEntryResp(
     TInt aStatus,
     const TDesC8& aFileData,
-    TUint8 aTransId,
-    TUint16 aFileId,
-    TUint16 aFileIdExt)
+    TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteReadExtEntryResp");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteReadExtEntryResp" );
@@ -1292,8 +1319,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP,
                     TUint8 index = iExtRecordArrayToBeDelete[
                                         iExtRecordArrayToBeDelete.Count() -1 ];
                     ret = UiccPbReqWriteExtDelete(
-                          aFileId,
-                          aFileIdExt,
                           index,
                           aTransId );
                     }
@@ -1309,8 +1334,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP,
                     // Start Searching for first location
                     iExtRecordNo = 1;
                     ret = UiccPbReqWriteReadExt(
-                          aFileId,
-                          aFileIdExt,
                           iExtRecordNo,
                           aTransId );
                     }
@@ -1327,8 +1350,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP,
                     TUint8 index = 
                       iExtRecordArrayToBeDelete[ iExtRecordArrayToBeDelete.Count() -1 ];
                     ret = UiccPbReqWriteExtDelete(
-                          aFileId,
-                          aFileIdExt,
                           index,
                           aTransId );
                     }
@@ -1338,7 +1359,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP,
                     iCurrentWritePhase = EPBWritePhase_Write_Entry;
                     //last index
                     TUint8 index (0 );
-                    if( PB_MBDN_FID == aFileId )
+                    if( PB_MBDN_FID == iFileId )
                         {
                         index = iEntryToWrite;
                         }
@@ -1347,7 +1368,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP,
                         index = iPhoneBookEntry->iLocation;
                         }
                     ret = UiccPBReqWriteEntry(
-                          aFileId,
                           index,
                           aTransId,
                           *iPhoneBookEntry );
@@ -1361,8 +1381,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP,
             // Raed Next 
             iCurrentWritePhase = EPBWritePhase_Read_Ext_Entry;
             ret = UiccPbReqWriteReadExt(
-                  aFileId,
-                  aFileIdExt,
                   aFileData[UICC_EXT_REC_NO_OFFSET],
                   aTransId );
             }
@@ -1383,15 +1401,12 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP,
 TInt CMmPhoneBookOperationWrite::HandleWriteSearchExtEntryResp(
     TInt aStatus,
     const TDesC8& aFileData,
-    TUint8 aTransId,
-    TUint16 aFileId,
-    TUint16 aFileIdExt)
+    TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteSearchExtEntryResp");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITESEARCHEXTENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteSearchExtEntryResp" );
     TInt ret ( KErrNone );
-    TUint8 arrayIndex ( ConvertToConfArrayIndex( aFileId ) );
-    
+
     if( UICC_STATUS_OK == aStatus)
         {
         // Check if Entry is Free
@@ -1413,8 +1428,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITESEARCHEXTENTRYRES
                     TUint8 index = 
                     iExtRecordArrayToBeDelete[ iExtRecordArrayToBeDelete.Count() -1 ];
                     ret = UiccPbReqWriteExtDelete( 
-                            aFileId,
-                            aFileIdExt,
                             index,
                             aTransId );
                     iExtRecordArrayToBeDelete.Remove( 
@@ -1428,7 +1441,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITESEARCHEXTENTRYRES
                     TUint8 index ( 0 );
                         // Start writing main Entry
                     if( ( iPhoneBookEntry->iLocation == 0 )||
-                        ( PB_MBDN_FID == aFileId ) )
+                        ( PB_MBDN_FID == iFileId ) )
                         {
                         index = iEntryToWrite;
                         }
@@ -1439,7 +1452,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITESEARCHEXTENTRYRES
                     if( 0 < index )
                         {
                         ret = UiccPBReqWriteEntry(
-                                aFileId,
                                 index,
                                 aTransId,
                                 *iPhoneBookEntry );
@@ -1456,11 +1468,9 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITESEARCHEXTENTRYRES
                 iCurrentWritePhase = EPBWritePhase_Search_Ext_Entry;
                 TUint8 index = iExtRecordNo++;
                 if( index < iMmPhoneBookStoreMessHandler->
-                            iPBStoreConf[ arrayIndex ].iExtNoOfRec )
+                            iPBStoreConf[ iArrayIndex ].iExtNoOfRec )
                     {
                     ret = UiccPbReqWriteReadExt(
-                          aFileId,
-                          aFileIdExt,
                           index,
                           aTransId );
                     }
@@ -1476,11 +1486,9 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITESEARCHEXTENTRYRES
             iCurrentWritePhase = EPBWritePhase_Search_Ext_Entry;
             TUint8 index = iExtRecordNo++;
             if( index < iMmPhoneBookStoreMessHandler->
-                        iPBStoreConf[ arrayIndex ].iExtNoOfRec )
+                        iPBStoreConf[ iArrayIndex ].iExtNoOfRec )
                 {
                 ret = UiccPbReqWriteReadExt(
-                      aFileId,
-                      aFileIdExt,
                       index,
                       aTransId );
                 }
@@ -1507,21 +1515,18 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITESEARCHEXTENTRYRES
 //
 TInt CMmPhoneBookOperationWrite::HandleWriteEntryResp(
     TInt aStatus,
-    TUint8 aTransId,
-    TUint16 aFileId,
-    TUint16 aFileIdExt) 
+    TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteEntryResp");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteEntryResp" );
     TInt ret ( KErrNone );
-    TUint8 arrayIndex ( ConvertToConfArrayIndex( aFileId ));
-    
+
     if( UICC_STATUS_OK == aStatus )
         {
         iEntryToUpdateInList = new ( ELeave ) TPBEntry();
         
         // Update the Entry needs to be Stored
-        if( ( 0 == iPhoneBookEntry->iLocation )|| ( PB_MBDN_FID == aFileId ) )
+        if( ( 0 == iPhoneBookEntry->iLocation )|| ( PB_MBDN_FID == iFileId ) )
             {
             iEntryToUpdateInList->iEntryIndex = iEntryToWrite;
             iEntryToUpdateInList->iEntryPresent = ETrue;
@@ -1543,31 +1548,29 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEENTRYRESP, "CMmPh
             ret = UiccPbReqWriteExt(
                     aTransId,
                     index,
-                    aFileId,
-                    aFileIdExt,
                     *iPhoneBookEntry );
             }
         else
             {
             // Remove old Entry from the list 
             TInt index = iMmPhoneBookStoreMessHandler->
-                         GetIndexForPresentEntry( iPhoneBookEntry->iLocation, arrayIndex );
+                         GetIndexForPresentEntry( iPhoneBookEntry->iLocation, iArrayIndex );
             if( 0 <= index )
                 {
                 iMmPhoneBookStoreMessHandler->UpdateEntryFromList( 
                                                 iEntryToUpdateInList,
                                                 index,
-                                                arrayIndex );
+                                                iArrayIndex );
                 }
             else
                 {
                 // Append the Entry to the List
                 iMmPhoneBookStoreMessHandler->StoreEntryToPhoneBookList(
                                                 iEntryToUpdateInList,
-                                                arrayIndex );
+                                                iArrayIndex );
                 }
             // If it is MBDN Phone Book then update MBI File also
-            if( PB_MBDN_FID == aFileId)
+            if( PB_MBDN_FID == iFileId)
                 {
                 // Start Writing MBI file
                 iCurrentWritePhase = EPBWritePhase_Write_MBI_profile;
@@ -1586,7 +1589,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEENTRYRESP, "CMmPh
     else
         {
         // If it is a MBDN PhoneBook Then delete MBI profile by writin 0
-        if( PB_MBDN_FID == aFileId)
+        if( PB_MBDN_FID == iFileId)
             {
             // Start Writing MBI file
             iCurrentWritePhase = EPBWritePhase_Write_MBI_profile;
@@ -1614,14 +1617,11 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEENTRYRESP, "CMmPh
 //
 TInt CMmPhoneBookOperationWrite::HandleWriteExtEntryResp(
     TInt aStatus,
-    TUint8 aTransId,
-    TUint16 aFileId,
-    TUint16 aFileIdExt) 
+    TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteExtEntryResp");
 OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteExtEntryResp" );
     TInt ret ( KErrNone );
-    TUint8 arrayIndex ( ConvertToConfArrayIndex( aFileId ));
     
     if( UICC_STATUS_OK  == aStatus )
         {
@@ -1637,12 +1637,12 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP, "CM
             // Remove old Entry from the list 
             TInt index = iMmPhoneBookStoreMessHandler->GetIndexForPresentEntry(
                                                         iPhoneBookEntry->iLocation,
-                                                        arrayIndex );
+                                                        iArrayIndex );
             if( 0 <= index )
                 {
                 iMmPhoneBookStoreMessHandler->RemoveExtEntryFromList(
                                                 index,
-                                                arrayIndex);
+                                                iArrayIndex);
                 }
             
             if( iExtRecordArrayToBeDelete.Count() > 0 )
@@ -1652,8 +1652,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP, "CM
                 TUint8 index = iExtRecordArrayToBeDelete[
                                iExtRecordArrayToBeDelete.Count() -1 ];
                 ret = UiccPbReqWriteExtDelete(
-                              aFileId,
-                              aFileIdExt,
                               index,
                               aTransId );
                 }
@@ -1664,7 +1662,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP, "CM
                 TUint8 index ( 0 );
                 // Start writing main Entry
                 if( ( iPhoneBookEntry->iLocation == 0 )||
-                      ( PB_MBDN_FID == aFileId ) )
+                      ( PB_MBDN_FID == iFileId ) )
                     {
                     index = iEntryToWrite;
                     }
@@ -1675,7 +1673,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP, "CM
                 if( 0 < index )
                     {
                     ret = UiccPBReqWriteEntry(
-                          aFileId,
                           index,
                           aTransId,
                           *iPhoneBookEntry );
@@ -1705,8 +1702,6 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP, "CM
                 ret = UiccPbReqWriteExt(
                       aTransId,
                       index,
-                      aFileId,
-                      aFileIdExt,
                       *iPhoneBookEntry );
                 }
             else
@@ -1715,23 +1710,23 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP, "CM
                 TInt index = iMmPhoneBookStoreMessHandler->
                                 GetIndexForPresentEntry( 
                                   iPhoneBookEntry->iLocation,
-                                  arrayIndex );
+                                  iArrayIndex );
                 if( 0 <= index )
                     {
                     iMmPhoneBookStoreMessHandler->UpdateEntryFromList(
                                                    iEntryToUpdateInList,
                                                    index,
-                                                   arrayIndex );
+                                                   iArrayIndex );
                     }
                 else
                     {
                     // Append the Entry to the List
                     iMmPhoneBookStoreMessHandler->StoreEntryToPhoneBookList(
                                                     iEntryToUpdateInList,
-                                                    arrayIndex );
+                                                    iArrayIndex );
                     }
                 // If it is MBDN PhoenBook then update MBI Profile also
-                if( PB_MBDN_FID == aFileId)
+                if( PB_MBDN_FID == iFileId)
                     {
                     // Start Writing MBI file
                     iCurrentWritePhase = EPBWritePhase_Write_MBI_profile;
@@ -1751,7 +1746,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP, "CM
         }
     else
         {
-        if( PB_MBDN_FID == aFileId )
+        if( PB_MBDN_FID == iFileId )
             {
             // Start Writing MBI File
             iCurrentWritePhase = EPBWritePhase_Write_MBI_profile;
@@ -1842,9 +1837,173 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEMBIWRITERESP, "CMm
             ret = KErrArgument;
             }
         }
+    return ret;
+    }
 
+
+
+
+// ---------------------------------------------------------------------------
+// void CMmPhoneBookOperationWrite::GetExtRecNum
+// Get the total number of Ext records needed for new entry
+// ---------------------------------------------------------------------------
+//
+void CMmPhoneBookOperationWrite::GetExtRecNum( TUint8 &aExtRecordNo )
+{
+TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::GetExtRecNum");
+OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEMSISDN, "CMmPhoneBookOperationWrite::UiccPbReqWriteMsisdn" );
+
+
+    if( UICC_EF_FDN_NO_EXT_NUM_LEN < iPhoneBookEntry->iNumber->Length() )
+        {
+        aExtRecordNo++;
+        TInt extDataLength = iPhoneBookEntry->iNumber->Length() - 
+                              UICC_EF_FDN_NO_EXT_NUM_LEN;
+        while ( extDataLength > UICC_EF_EXT_REC_NUM_LEN)
+            {
+            aExtRecordNo++;
+            extDataLength = extDataLength - UICC_EF_EXT_REC_NUM_LEN;
+            }
+        }
+    
+    // reserve Space for ext record no
+    iExtRecordArrayToBeWrite.ReserveL( aExtRecordNo );
+    // File reserved memory with 0
+    for( TInt count = 0; count < aExtRecordNo; count++ )
+        {
+        iExtRecordArrayToBeWrite.Insert( 0, count );
+        }
+}
+
+
+
+// ---------------------------------------------------------------------------
+// void CMmPhoneBookOperationWrite::CheckForExtRecordNum
+// Check for EXT number of records for new Entry is sufficiet or not
+// ---------------------------------------------------------------------------
+//
+TInt CMmPhoneBookOperationWrite::CheckForExtRecordNum( 
+        TPBEntry entry, 
+        TUint8 aTransId )
+    {
+TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::CheckForExtRecordNum");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_CHECKFOREXTRECORDNUM, "CMmPhoneBookOperationWrite::CheckForExtRecordNum" );
+
+    TInt ret( KErrNone );
+    
+    // Update old record number which needs to be 
+    //updated by new entry
+    if( entry.PBEntryExtRecord.Count() > 0 )
+        {
+        for( TInt i=0; 
+             i < entry.PBEntryExtRecord.Count();
+             i++ )
+            {
+            // Append record number to be write from 
+            //old Entry
+            iExtRecordArrayToBeWrite.Append( 
+                    entry.PBEntryExtRecord[i] );
+            iExtRecordArrayToBeDelete.Append( 
+                    entry.PBEntryExtRecord[i] );
+            }
+        }
+    // Search for more free records
+    iCurrentWritePhase = EPBWritePhase_Search_Ext_Entry;
+    
+    // Send request to read first entry in Ext
+    iExtRecordNo = 1 ;
+    ret = UiccPbReqWriteReadExt(
+            iExtRecordNo,
+            aTransId);
 
     return ret;
     }
+
+
+
+// ---------------------------------------------------------------------------
+// void CMmPhoneBookOperationWrite::ContinueWriteEntry
+// Check for records to deleted else start writing new entry
+// ---------------------------------------------------------------------------
+//
+TInt CMmPhoneBookOperationWrite::ContinueWriteEntry( 
+        TUint8 aExtRecNo, 
+        TPBEntry entry, 
+        TUint8 aTransId,
+        CPhoneBookStoreEntry& aDataToWrite )
+    {
+TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::ContinueWriteEntry");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_CONTINUEWRITEENTRY, "CMmPhoneBookOperationWrite::ContinueWriteEntry" );
+
+    TInt ret( KErrNone );
+    
+    // Check of both records are 0
+    if( ( aExtRecNo == 0 ) && 
+        ( entry.PBEntryExtRecord.Count() == 0 ))
+        {
+        // Start Writing Entry
+        iCurrentWritePhase = EPBWritePhase_Write_Entry;
+        ret = UiccPBReqWriteEntry( 
+                iPhoneBookEntry->iLocation,
+                aTransId,
+                aDataToWrite );
+        }
+    else
+        {
+        // Start copy Ext record number to be write array
+        for( TInt i=0; i <  aExtRecNo; i++ )
+            {
+            // Append record number to be write from old
+            //Entry
+            iExtRecordArrayToBeWrite.Append(
+                    entry.PBEntryExtRecord[i]);
+            iExtRecordArrayToBeDelete.Append(
+                    entry.PBEntryExtRecord[i]);
+            }
+        // Update records needs to be deleted
+        // From old Entry
+        for( TInt i=aExtRecNo;
+             i < entry.PBEntryExtRecord.Count();
+             i++ )
+            {
+            // Append record number to be deleted from 
+            //old Entry
+            iExtRecordArrayToBeDelete.Append( 
+                    entry.PBEntryExtRecord[i]);
+            }
+        // Start Deleting the EXT Records
+        iCurrentWritePhase = EPBWritePhase_Write_Ext_Entry;
+        iExtDeleteOperation = ETrue;
+        TUint8 index ( iExtRecordArrayToBeDelete[0] );
+        // Send request to Write main Entry
+        ret = UiccPbReqWriteExtDelete(
+                index,
+                aTransId );
+        }
+
+    return ret;
+    }
+
+// ---------------------------------------------------------------------------
+// void CMmPhoneBookOperationWrite::GetExtRecNum
+// Get the total number of Ext records needed for new entry
+// ---------------------------------------------------------------------------
+//
+void CMmPhoneBookOperationWrite::CopyData( const TDesC16& aSource, TDes16& aTarget )
+{
+TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::CopyData");
+OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_COPYDATA, "CMmPhoneBookOperationWrite::CopyData" );
+
+TInt temp ( aSource.Length() );
+TInt temp1( aTarget.MaxLength() );
+    if( aSource.Length() <= aTarget.MaxLength() )
+        {
+        // Start Copy Data
+        for( TInt count(0); count < aSource.Length(); count++ )
+            {
+            aTarget.Append( aSource[count] );
+            }
+        }
+}
 
 // End of file

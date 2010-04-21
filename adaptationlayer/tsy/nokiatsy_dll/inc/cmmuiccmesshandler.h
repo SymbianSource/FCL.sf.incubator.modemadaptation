@@ -93,6 +93,7 @@ const TUint16 KElemFileOpl                        ( 0x6FC6 );
 const TUint16 KElemFilePlmnNetworkName            ( 0x6FC5 );
 const TUint16 KElemFileFixedDiallingNumbers       ( 0x6F3B );
 const TUint16 KElemEmergencyCallCodes             ( 0x6FB7 );
+const TUint16 KElemFileMailboxIdentifier          ( 0x6FC9 );
 
 const TUint8 KEfSstSize (0xFF);
 const TUint8 KEfUstSize (0xFF);
@@ -203,6 +204,7 @@ enum TUiccTrId
     ETrIdReadPnn,
     ETrIdEnStoreRead,
     ETrIdEnStoreGetInfo,
+    ETrIdEMmTsyONStoreGetInfo,
     ENumOfUiccTrIds
     };
 

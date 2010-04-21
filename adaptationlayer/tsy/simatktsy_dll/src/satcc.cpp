@@ -66,6 +66,7 @@ const TInt KMaximumCcBufferSize =
 
 const TUint8 KMSBMask = 0x80;
 const TUint8 KSw1Sw2Unknown = 0;
+const TUint8 KValidTonNpi   = 0x3F;
 
 
 // ==================== MEMBER FUNCTIONS ====================================
@@ -1150,6 +1151,8 @@ void CSatCC::SendCallModemResourceReq(
 
     TBuf8<KMaximumCcBufferSize> isiMessage;
     TInt ret( KErrNotFound );
+    TBool checkInfoNeeded( EFalse );
+    TUint8 checkInfoParams( 0 );
     CBerTlv response;
     response.SetData( aApduData );
     // Set initial cc result, e.g. the SIM has responded with sw1/sw2 90 00
@@ -1227,6 +1230,8 @@ void CSatCC::SendCallModemResourceReq(
                 isiMessage.Append( CALL_MODEM_RESOURCE_ALLOWED );
                 isiMessage.Append( KPadding );
                 internalCcResult = KModified;
+                checkInfoNeeded = ETrue;
+                checkInfoParams += CALL_MODEM_CHK_DISABLE_FDN;
                 }
             break;
             }
@@ -1296,7 +1301,21 @@ void CSatCC::SendCallModemResourceReq(
         if ( KErrNone == ret  )
             {
             // CALL_MODEM_ADDRESS_TYPE, mask MSB off
-            isiMessage.Append( addressTlv.GetValue()[ 0 ] ^KMSBMask );
+            TUint8 tonNpi( addressTlv.GetValue()[ 0 ] ^ KMSBMask );
+
+            // check if valid TON/NPI
+            if( KValidTonNpi >= tonNpi )
+                {
+                isiMessage.Append( tonNpi );
+                }
+            else
+                {
+                // use default TON/NPI in reserved cases
+                isiMessage.Append( 
+                    CALL_MODEM_NBR_TYPE_UNKNOWN | 
+                    CALL_MODEM_NBR_PLAN_ISDN_TELEPHONY );
+                }
+
             isiMessage.Append( KPadding );
             isiMessage.Append( KPadding );
 
@@ -1304,6 +1323,18 @@ void CSatCC::SendCallModemResourceReq(
             TBuf8<2 * KCallServerMaxAddressLenght> asciiAddress;
             TSatUtility::BCDToAscii( addressTlv.GetValue().Mid( 1 ),
                 asciiAddress );
+
+            // let's check is new number "112". This because of if number 
+            // is "112" emergency call is needed to establish. otherwise 
+            // normal call needs to be established, even new number is found 
+            // from EFecc. So if number is not "112" we need to add subblock 
+            // CALL_MODEM_CHECK_INFO with CALL_MODEM_CHK_DISABLE_EMERG
+            _LIT8(KEccNbr, "112");
+            if( 0 != asciiAddress.Compare( KEccNbr ) )
+                {
+                checkInfoNeeded = ETrue;
+                checkInfoParams += CALL_MODEM_CHK_DISABLE_EMERG;
+                }
 
             //add the number string as unicode.
             TBuf16<KCallServerMaxAddressLenght> unicodeNumber;
@@ -1350,9 +1381,35 @@ void CSatCC::SendCallModemResourceReq(
     // should be ignored in Call Modem Server
     if ( aTcc.iCheckInfo.Length() )
         {
-        isiMessage.Append( aTcc.iCheckInfo );
         sbcount++;
+        if( checkInfoNeeded )
+            {
+            TUint8 oldInfo( aTcc.iCheckInfo[CALL_MODEM_SB_CHECK_INFO_OFFSET_CHECKINFO] );
+            TUint8 newInfo( checkInfoParams | oldInfo );
+            TIsiSubBlock checkInfo(
+                isiMessage,
+                CALL_MODEM_SB_CHECK_INFO,
+                EIsiSubBlockTypeId8Len8 );
+            isiMessage.Append( newInfo );
+            checkInfo.CompleteSubBlock();
+            }
+        else
+            {
+            isiMessage.Append( aTcc.iCheckInfo );
+            }
         }
+    else if( checkInfoNeeded )
+        {
+        sbcount++;
+        TIsiSubBlock checkInfo(
+            isiMessage,
+            CALL_MODEM_SB_CHECK_INFO,
+            EIsiSubBlockTypeId8Len8 );
+        isiMessage.Append( checkInfoParams );
+        checkInfo.CompleteSubBlock();
+        }
+    // no else
+
     TBuf8<1> numOfSubblocks;
     numOfSubblocks.Append( sbcount);
     isiMessage.Insert( 1, numOfSubblocks );

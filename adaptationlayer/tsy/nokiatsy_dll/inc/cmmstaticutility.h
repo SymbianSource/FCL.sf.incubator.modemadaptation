@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -147,6 +147,16 @@ class CMmStaticUtility : public CBase
         static void ConvertIPAddressToClient(
             const TDesC8& aGPDSAddres,
             TDes8& aInetAddr );
+
+        /**
+        * Converts IP address string from client into GPDS suitable format
+        * @param TDes8& aClientAddr: Clients IP address
+        * @param TDesC8& aGpdsAddres: GPDS IP address
+        */
+        static TInt ConvertIPAddressFromClient(
+            const TDesC8& aClientAddr,
+            TDes8& aGpdsAddr );
+
         /**
         * Converts number string to integer
         * @param TUint& integer: integer value
@@ -234,6 +244,16 @@ class CMmStaticUtility : public CBase
         * @return Unicode character
         */
         static TUint16 GetUnicodeGsm( TUint8 aCharacter);
+
+        /**
+        * Converts data to GSM format
+        * @param aInputString Input string
+        * @param aGsmDataString Output string
+        * @return None
+        */
+        static void ConvertUcs2To7BitCodedData(
+            TDesC16& aInputString,
+            TDes8& aGsmDataString );
 
         /**
         * Converts data to GSM format

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -244,8 +244,7 @@ void CTsySatMessaging::ConstructL()
     //Initalize flag, this is used to check if proactiveCommand is ongoing
     iSatTimer->SetProactiveCommandOnGoingStatus( EFalse );
 
-    // Request access technology type
-    iSatMessHandler->NetRatReq( GetTransactionId() );
+
 
 #ifdef INFO_PP_SIM_OLD_POLL_INTERVAL
     // Check old poll interval is supported by ME's Product Profile
@@ -2063,20 +2062,21 @@ void CTsySatMessaging::DataDownloadReceivedL
     }
 
 // -----------------------------------------------------------------------------
-// CTsySatMessaging::MoSmsControlReceived
+// CTsySatMessaging::MoSmsControlReceivedL
 // Processes ISI messages that are relevant for MoSm control
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void CTsySatMessaging::MoSmsControlReceived
+void CTsySatMessaging::MoSmsControlReceivedL
         (
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_MOSMSCONTROLRECEIVED, "CTsySatMessaging::MoSmsControlReceived" );
+    TFLOGSTRING("TSY: CTsySatMessaging::MoSmsControlReceivedL");
+    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_MOSMSCONTROLRECEIVEDL, "CTsySatMessaging::MoSmsControlReceivedL" );
     if ( iSatMoSmsCtrl->IsActivated() )
         {
-        iSatMoSmsCtrl->MessageReceived( aIsiMessage );
+        iSatMoSmsCtrl->MessageReceivedL( aIsiMessage );
         }
     }
 

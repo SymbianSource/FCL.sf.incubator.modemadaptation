@@ -21,7 +21,7 @@
 
 PRJ_PLATFORMS
 
-DEFAULT
+BASEDEFAULT
 
 PRJ_EXPORTS
 ../rom/bcaiscadapter.iby                          NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(bcaiscadapter.iby)

@@ -22,7 +22,7 @@
 #define NOKIATSY_RELEASE_H
 
 // UPDATE THIS STRING FOR EVERY RELEASE!!!
-#define NOKIATSY_RELEASE_STR "TSY: RELEASE --> modemadaptation-MCL_201006"
+#define NOKIATSY_RELEASE_STR "TSY: RELEASE --> modemadaptation-MCL_201015"
 #endif // NOKIATSY_RELEASE_H
            
 // End of File

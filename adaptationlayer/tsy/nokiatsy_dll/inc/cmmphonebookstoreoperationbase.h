@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -25,10 +25,6 @@
 #include <badesca.h>    //for arrays
 #include <e32base.h>
 
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-#include <ctsy/rmmcustomapi.h>
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-
 #include "cmmphonetsender.h"
 #include "cmmphonetreceiver.h"
 #include "cmmphonebookstoremesshandler.h"
@@ -51,11 +47,6 @@ _LIT(KInternalPhoneBookType,"Init");
 
 const TUint8 KPadding = 0;
 
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-const TUint8 SIM_AAS  = 0x10;
-const TUint8 SIM_GAS  = 0x11;
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-
 // Mask that is used to separate phonebooktype from transaction Id
 const TUint8 KMaskPhonebookType = 0xF0;
 
@@ -69,11 +60,6 @@ const TUint8 KMaskSdnType = 0x30;       //0011 0000 = SDN
 const TUint8 KMaskBdnType = 0x40;       //0100 0000 = BDN
 const TUint8 KMaskMbdnType = 0x50;      //0101 0000 = MBDN
 const TUint8 KMaskVoiceMailBox = 0x60;  //0110 0000 = VMBX
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-const TUint8 KMaskAasType = 0x70; //0111 0000 = Additional Alpha String
-const TUint8 KMaskGasType = 0x80;     //1000 0000 = Group Alpha String
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
 
 //const TUint8 KMaskFreeType = 0x09;  //1001 0000 = Free
 //const TUint8 KMaskFreeType = 0xA0;  //1010 0000 = Free
@@ -121,6 +107,7 @@ const TUint8 KNoOfRecords    = 1;
 const TUint8 KFileSize1       = 2;
 const TUint8 KFileIdentifier1 = 3;
 const TUint8 KFileStatus1     = 4;
+const TUint8 KStartRecord = 1; // Record numbering starts from 1
 
 const TUint8 KAdditionalData  = 0x02;
 const TUint8 KExtRecordSize  = 13;
@@ -130,7 +117,7 @@ const TUint8 KExtRecLenWithoutRecId = 12;
 const TUint8 KIapRecordsToBeSearched        = 0 ;     // constant to find unused bytes
 const TUint8 KMaxNoOfRecInOneEf = 254;
 
-
+const TUint8 KAdditionalNoType = 0x02;
 // UICC constants
 #define MF_FILE                             0x3F00 //Master file
 #define DF_CURRENT_APP                      0x7FFF //
@@ -150,8 +137,8 @@ const TUint8 KMaxNoOfRecInOneEf = 254;
 #define PB_EXT1_FID                         0x6F4A
 #define PB_EXT2_FID                         0x6F4B
 #define PB_EXT3_FID                         0x6F4C
-#define PB_EXT4_FID                         0x6F4E
-#define PB_EXT5_FID                         0x6F55
+#define PB_EXT4_FID                         0x6F55
+#define PB_EXT5_FID                         0x6F4E
 #define PB_EXT6_FID                         0x6FC8
 #define PB_EXT7_FID                         0x6FCC
 #define PB_PBR_FID                          0x4F30
@@ -278,6 +265,8 @@ const TUint8 KMaxNoOfRecInOneEf = 254;
 #define UICC_TYPE3_FILE                     3
 
 
+const TIapInfo iapinfo = { UICC_ILLEGAL_FILE_ID, 0x00, 0x00, 0x00};
+
 // end UICC constants
 
 
@@ -304,9 +293,12 @@ enum TPhonebookType
 
 enum TTypeOfFileToBeRead
     {
+    EStartRead,
     EBasicEfRead,
     EExtensionRead,
-    EMailboxIdRead
+    EMailboxIdRead,
+    EFileInfoRead,
+    EBasicEfReadToGetUsedFileCount
     };
 
 // Struct data
@@ -326,10 +318,6 @@ class CMmPhoneBookStoreExtInterface;
 class CPhoneBookStoreEntry;
 class CStorageInfoData;
 class CMmUiccMessHandler;
-
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-    class CAlphaString;
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
 
 // CLASS DECLARATION
 /**
@@ -351,7 +339,8 @@ class CMmPhoneBookStoreOperationBase
         ~CMmPhoneBookStoreOperationBase();
 
         // Second phase constructor
-        static CMmPhoneBookStoreOperationBase* NewL(CMmUiccMessHandler* aUiccMessHandler);
+        static CMmPhoneBookStoreOperationBase* NewL(
+                           CMmUiccMessHandler* aUiccMessHandler);
         /**
         * Basic implementation to handling request if operation not found.
         *
@@ -371,50 +360,12 @@ class CMmPhoneBookStoreOperationBase
         virtual void CancelReq( TName& aPhoneBook );
 
         /**
-        * Prepares the operation (makes it ready to be launched).
-        *
-        * @param aIpc IPC request
-        * @param aDataPackage parameters to prepare request with
-        * @return TInt KErrNotReady on attempt to prepare prepared operation
-        */
-        virtual TInt PrepareReq( TInt aIpc, const CMmDataPackage* aDataPackage );
-
-        /**
-        * Checks if operation is ready to be launched.
-        * Base implementation returns EFalse
-        *
-        * @return TBool ETrue - operation is ready to be launched
-        */
-        virtual TBool IsPrepared() const;
-
-        /**
-        * Launches activated operation.
-        *
-        * @return TInt KErrNotReady on attempt to launch not prepared operation;
-        * or system-wide error code
-        */
-        virtual TInt LaunchReq();
-
-        /**
         * Completes the request.
         *
         * @param aErrorCode error code to be completed with
         * @return TInt KErrNone or KErrNotSupported if operation is not prepared
         */
         virtual TInt CompleteReq( TInt aErrorCode );
-
-        /**
-        * Basic implementation to handling response if operation not found.
-        *
-        * @param aIsiMessage not used
-        * @param aComplete not used
-        * @return KErrNotSupported.
-        */
-        virtual TInt HandleSimPbRespL(
-        const TIsiReceiveC& /*aIsiMessage*/, TBool& /*aComplete*/ )
-            {TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::HandleSimPbResp - Return KErrNotSupported");
-            return KErrNotSupported; };
-
 
         /**
         * Basic implementation to handling request if operation not found in UICC.
@@ -425,8 +376,13 @@ class CMmPhoneBookStoreOperationBase
         * @return KErrNotSupported.
         */
 
-        virtual TBool HandleUICCPbRespL( TInt /*aStatus*/, TUint8 /*aDetails*/, const TDesC8& /*aFileData*/, TInt /*aTransId*/)
-            {TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::HandleUICCPbRespL - Return KErrNotSupported");
+        virtual TBool HandleUICCPbRespL(
+                        TInt /*aStatus*/,
+                        TUint8 /*aDetails*/,
+                        const TDesC8& /*aFileData*/,
+                        TInt /*aTransId*/)
+            {
+            TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::HandleUICCPbRespL - Return KErrNotSupported");
             return ETrue;
             };
 
@@ -462,7 +418,10 @@ class CMmPhoneBookStoreOperationBase
         * @param aPBType
         * @return TUint8
         */
-        static TUint16 ConvertToPBfileId( const TName& aPBType, TUint16& aFileIdExt,TUint8 aCardType );
+        static TUint16 ConvertToPBfileId(
+                       const TName& aPBType,
+                       TUint16& aFileIdExt,
+                       TUint8 aCardType );
 
 
         /**
@@ -472,16 +431,7 @@ class CMmPhoneBookStoreOperationBase
         * @return TUint8
         */
         static TUint8 ConvertToConfArrayIndex( const TUint16 aFileId );
-        /**
-        * Give return value for the transactio id According to operation and Phoenbook type
-        *
-        * @param aPBType
-        * @param aOperation
-        * @return TUint8
-        */
-        static TUint8 GetTransId( const TName& aPBType, const TUint8 aOperation );
-
-
+        
         /**
         * Converts client phonebook to phonebook mask.
         *
@@ -497,7 +447,9 @@ class CMmPhoneBookStoreOperationBase
         * @param aPBType
         * @return TUint8
         */
-        void ConvertPBTypeToPbName(const TUint aPhonebookType, TName& aName );
+        void ConvertPBTypeToPbName(
+                      const TUint aPhonebookType,
+                      TName& aName );
 
         /**
         * Converts client phonebook to phonebook mask.
@@ -505,7 +457,9 @@ class CMmPhoneBookStoreOperationBase
         * @param aPBType
         * @return TUint8
         */
-        void ConvertToPBname( const TUint8 aTrans, TName& aName );
+        void ConvertToPBname(
+                     const TUint8 aTrans,
+                     TName& aName );
 
         /**
         * Gets PhoneBookName.
@@ -525,13 +479,6 @@ class CMmPhoneBookStoreOperationBase
             const TUint8 aPbMask );
 
         /**
-        * Handle number to convert in Ascii Format
-        * @param const TDesC8& aSource: Message to be converted in Ascii
-        * @param TDes16 aTarget : After conversion data to be staored in
-        */
-        //void ConvertToUcs2FromBCD(const TDesC8 &aSource, TDes16 &aTarget );
-
-        /**
         * Handle to Find the Empty Entry
         * @param const TDesC8& aFileData: Entry data to checked entry is empty or not
         * @return TInt: KErrNone or KErrNotFound
@@ -539,15 +486,15 @@ class CMmPhoneBookStoreOperationBase
         TInt EmptyEntryCheck( const TDesC8 &aFileData );
 
         /**
-        * Searches wanted file list from EFpbr  
+        * Searches wanted file list from EFpbr
         * @param aFileData: data of EFpbr record
         * @param aTag: Tag for file list to be search
         * @param aFileList: parameter where file list is inserted
         * @return TInt: KErrNone or KErrNotFound
         */
-        TInt FetchFileListFromPBR( 
-            const TDesC8 &aFileData, 
-            const TUint8 aTag, 
+        TInt FetchFileListFromPBR(
+            const TDesC8 &aFileData,
+            const TUint8 aTag,
             RArray <TPrimitiveTag>& aFileList );
 
     protected:
@@ -556,68 +503,9 @@ class CMmPhoneBookStoreOperationBase
 
     private:
 
-        /**
-        * Converts operation mask to IPC
-        *
-        * @param aDestination Operation mask
-        * @param aSource Client IPC
-        * @return None
-        */
-        void ConvertOperationToClientIPCType(
-            TInt& aDestination,
-            const TUint8 aSource );
-
-
         // ConstructL
 
         void ConstructL();
-        /**
-        * Collects all needed data together.
-        *
-        * @param aSbStartOffSet Offset
-        * @param aNumOfSubBlocks Number of subblocks
-        * @param aIsiMessage ISI message
-        * @param aEntry Phonebook entry
-        * @param aEmailFound Flag indicate if email found or not
-        * @param aAnrFound Flag indicate if anr found or not
-        * @param aSneFound Flag indicate if sne found or not
-        * @param aGrpFound Flag indicate if grp found or not
-        * @return None
-        */
-        void CollectAvailableDataL(
-            TUint& aSbStartOffSet,
-            TInt& aNumOfSubBlocks,
-            const TIsiReceiveC& aIsiMessage,
-            CPhoneBookStoreEntry& aEntry,
-            TBool& aEmailFound,
-            TBool& aAnrFound,
-            TBool& aSneFound
-#ifdef INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-            ,TBool& aGrpFound
-#endif // INTERNAL_RD_USIM_PHONEBOOK_GAS_AND_AAS
-            );
-
-        /**
-        * Construct a SIM_READ_FIELD_REQ message and send it through phonet.
-        *
-        * @param aTransId Transaction Id
-        * @return KErrNone / Error value from phonet
-        */
-        TInt SimReadFieldReq( TUint8 aTransId );
-
-        /**
-        * Breaks received SIM_READ_FIELD_RESP ISI message
-        *
-        * @param aIsiMessage Received ISI message
-        * @param aComplete Indicates if request can remove from
-        *        operationlist or not.
-        * @return None
-        */
-        void SimReadFieldRespL(
-            const TIsiReceiveC& aIsiMessage,
-            TBool& aComplete );
-
-
 
     public:     // Data
         // None
@@ -648,9 +536,6 @@ class CMmPhoneBookStoreOperationBase
 
         // Attribute to hold the information what index to be read
         TInt iIndexToRead;
-
-        // Is there any mailbox id
-        TBool iMailboxIdExist;
 
         // Attribute to store record length
         TInt iRecordLength;

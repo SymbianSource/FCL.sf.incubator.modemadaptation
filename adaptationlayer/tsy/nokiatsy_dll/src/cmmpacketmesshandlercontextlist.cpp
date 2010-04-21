@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -35,7 +35,17 @@
     //None
 
 // CONSTANTS
-    //None
+
+// A list for defined proxy ids ( see IscNokiaDefinitions.h )
+// Max number of supported contexts is limited to be 11
+// Get defined proxy ids
+const TUint8 KDefinedProxyIds[KMmMaxNumberOfContexts] = {
+    KMmPacketContextProxy1_DOS, KMmPacketContextProxy2_DOS,
+    KMmPacketContextProxy3_DOS, KMmPacketContextProxy4_DOS,
+    KMmPacketContextProxy5_DOS, KMmPacketContextProxy6_DOS,
+    KMmPacketContextProxy7_DOS, KMmPacketContextProxy8_DOS,
+    KMmPacketContextProxy9_DOS, KMmPacketContextProxy10_DOS,
+    KMmPacketContextProxy11_DOS };
 
 // MACROS
     //None
@@ -118,42 +128,9 @@ void CMmPacketContextMesshandlerList::InitAttributesAndLists()
     TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::InitAttributesAndLists");
 OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_INITATTRIBUTESANDLISTS, "CMmPacketContextMesshandlerList::InitAttributesAndLists" );
 
-    // A list for defined proxy ids ( see IscNokiaDefinitions.h )
-    // Max number of supported contexts is limited to be 11
-    // Get defined proxy ids
-    const TUint8 definedProxyIds[KMmMaxNumberOfContexts] = {
-        KMmPacketContextProxy1_DOS, KMmPacketContextProxy2_DOS,
-        KMmPacketContextProxy3_DOS, KMmPacketContextProxy4_DOS,
-        KMmPacketContextProxy5_DOS, KMmPacketContextProxy6_DOS,
-        KMmPacketContextProxy7_DOS, KMmPacketContextProxy8_DOS,
-        KMmPacketContextProxy9_DOS, KMmPacketContextProxy10_DOS,
-        KMmPacketContextProxy11_DOS };
-
     for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
-        iProxyIdList[i].iChannelId = definedProxyIds[i];
-
-        // Mark proxy id free
-        iProxyIdList[i].iIsFree = ETrue;
-
-        // Initialize context info list
-        iContextInfoArray[i].iContextId = GPDS_CID_VOID;
-
-        iContextInfoArray[i].iChannelId = KTUint8NotDefined;
-
-        iContextInfoArray[i].iContextName.Zero();
-        iContextInfoArray[i].iHostContextName.Zero();
-        iContextInfoArray[i].iPipeStatus = PN_PIPE_DISABLE;
-        iContextInfoArray[i].iPipeHandle = KInvalidPipeHandle;
-        iContextInfoArray[i].iCreateContextIdTransId = KTUint8NotDefined;
-        iContextInfoArray[i].iPipeCreateTransId = KTUint8NotDefined;
-        iContextInfoArray[i].iContextType = GPDS_CONT_TYPE_NORMAL ;
-        iContextInfoArray[i].iInitialiseStarted = EFalse;
-        iContextInfoArray[i].iContextConfigurationType = KTIntNotDefined;
-        iContextInfoArray[i].iActivationTraId = KTUint8NotDefined;
-        iContextInfoArray[i].iPipeResetTraId = KTUint8NotDefined;
-        iContextInfoArray[i].iDeleteTraId = KTUint8NotDefined;
-        iContextInfoArray[i].iChannelOpened = EFalse;
+        InitializeContextInfoList( i );
         }
 
     iNumberOfCreatedContexts = 0;
@@ -175,9 +152,12 @@ CMmPacketContextMesshandlerList::~CMmPacketContextMesshandlerList()
 
     TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::~CMmPacketContextMesshandlerList" );
 OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_CMMPACKETCONTEXTMESSHANDLERLIST, "CMmPacketContextMesshandlerList::~CMmPacketContextMesshandlerList" );
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
-        iContextInfoArray[i].iIscApi.Close();
+        if ( iContextInfoArray[i].iChannelOpened )
+            {
+            iContextInfoArray[i].iIscApi.Close();
+            }
         }
     }
 
@@ -207,30 +187,24 @@ OstTrace1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_ADDOBJECT, "CMmPacketCo
             // Find given proxy id from proxy id list
             for (  TInt i = 0; i < KMmMaxNumberOfContexts; i++  )
                 {
-                if ( ( aChannelId == iProxyIdList[i].iChannelId ) &&
-                     iProxyIdList[i].iIsFree )
+                if ( aChannelId == iContextInfoArray[i].iChannelId )
                     {
-                    iContextInfoArray[iNumberOfCreatedContexts].iChannelId =
+                    iContextInfoArray[i].iChannelId =
                         aChannelId;
-                    iContextInfoArray[iNumberOfCreatedContexts].iContextName =
+                    iContextInfoArray[i].iContextName =
                         aContextName;
-                    iContextInfoArray[iNumberOfCreatedContexts].iHostContextName =
+                    iContextInfoArray[i].iHostContextName =
                         aHostContextName;
-                    iContextInfoArray[iNumberOfCreatedContexts].iObjectId =
+                    iContextInfoArray[i].iObjectId =
                         aObjectId;
-                    // Set proxy id reserved
-                    iProxyIdList[i].iIsFree = EFalse;
                     // Increase number of created contexts
                     iNumberOfCreatedContexts++;
                     // proxy id found, break
                     i = KMmMaxNumberOfContexts;
-
                     ret = KErrNone;
                     }
-                // no else
                 }
             }
-        // no else
         }
     // no else
 
@@ -253,95 +227,18 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_REMOVEOBJECT, "CMmPa
     // Set ret to KErrArgument to check that context is in list
     TInt ret( KErrArgument );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         // Find aContext from context info list
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-            for ( TInt j = 0; j < KMmMaxNumberOfContexts; j++ )
-                {
-                if ( ( iContextInfoArray[i].iChannelId ==
-                        iProxyIdList[j].iChannelId ) &&
-                    ( EFalse == iProxyIdList[j].iIsFree ) )
-                    {
-
-                    TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::RemoveObject. Context Name: %S", &iContextInfoArray[i].iContextName );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::RemoveObject. Context Name: %S", &iContextInfoArray[i].iContextName );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_REMOVEOBJECT, "CMmPacketContextMesshandlerList::RemoveObject;Context Name=%S", iContextInfoArray[i].iContextName );
-                    // Release Proxy id
-                    iProxyIdList[j].iIsFree = ETrue;
-                    // Get index to last reserved cell in the list
-                    const TInt lastContext( iNumberOfCreatedContexts - 1 );
-                    // If not already last object
-                    if ( i < lastContext )
-                        {
-                        // Replace object to be remove by last object
-                        iContextInfoArray[i].iContextId =
-                            iContextInfoArray[lastContext].iContextId;
-                        iContextInfoArray[i].iChannelId =
-                            iContextInfoArray[lastContext].iChannelId;
-                        iContextInfoArray[i].iContextName =
-                            iContextInfoArray[lastContext].iContextName;
-                        iContextInfoArray[i].iHostContextName =
-                           iContextInfoArray[lastContext].iHostContextName;
-                        iContextInfoArray[i].iPipeStatus =
-                           iContextInfoArray[lastContext].iPipeStatus;
-                        iContextInfoArray[i].iPipeHandle =
-                           iContextInfoArray[lastContext].iPipeHandle;
-                        iContextInfoArray[i].iCreateContextIdTransId =
-                           iContextInfoArray[lastContext].iCreateContextIdTransId;
-                        iContextInfoArray[i].iPipeCreateTransId =
-                           iContextInfoArray[lastContext].iPipeCreateTransId;
-                        iContextInfoArray[i].iContextType =
-                           iContextInfoArray[lastContext].iContextType;
-                        iContextInfoArray[i].iInitialiseStarted =
-                           iContextInfoArray[lastContext].iInitialiseStarted;
-                        iContextInfoArray[i].iContextConfigurationType =
-                            iContextInfoArray[lastContext].iContextConfigurationType;
-                        iContextInfoArray[i].iActivationTraId =
-                            iContextInfoArray[lastContext].iActivationTraId;
-                        iContextInfoArray[i].iPipeResetTraId =
-                            iContextInfoArray[lastContext].iPipeResetTraId;
-                        iContextInfoArray[i].iDeleteTraId =
-                            iContextInfoArray[lastContext].iDeleteTraId;
-                        }
-                    // no else
 
-                    // Reset object information of the last object
-                    iContextInfoArray[lastContext].iChannelId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iContextName.Zero();
-                    iContextInfoArray[lastContext].iContextId = GPDS_CID_VOID;
-                    iContextInfoArray[lastContext].iHostContextName.Zero();
-                    iContextInfoArray[lastContext].iPipeStatus =
-                       PN_PIPE_DISABLE;
-                    iContextInfoArray[lastContext].iPipeHandle =
-                       KInvalidPipeHandle;
-                    iContextInfoArray[lastContext].iCreateContextIdTransId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iPipeCreateTransId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iContextType =
-                        GPDS_CONT_TYPE_NORMAL;
-                    iContextInfoArray[lastContext].iInitialiseStarted = EFalse;
-                    iContextInfoArray[lastContext].iContextConfigurationType =
-                        KTIntNotDefined;
-                    iContextInfoArray[lastContext].iActivationTraId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iPipeResetTraId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iDeleteTraId =
-                        KTUint8NotDefined;
-
-                    // Decrease number of created contexts
-                    iNumberOfCreatedContexts--;
-
-                    // Proxy id found, break
-                    j = KMmMaxNumberOfContexts;
-                    }
-                // no else
-                }
-            // aContext found, break
-            i = iNumberOfCreatedContexts;
+            // Reset object information
+            InitializeContextInfoList( i );
+            i = KMmMaxNumberOfContexts;
+            iNumberOfCreatedContexts--;
             }
         // no else
         }
@@ -364,38 +261,6 @@ OstTrace1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_NUMBEROFCONTEXTS, "CMmP
     }
 
 // -----------------------------------------------------------------------------
-// CMmPacketContextMesshandlerList::GenerateNewContextNameAndProxyId
-// Generates new proxy id.
-// -----------------------------------------------------------------------------
-//
-TInt CMmPacketContextMesshandlerList::GenerateProxyId(
-    TUint8& aProxyId )
-    {
-
-    TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::GenerateProxyId");
-OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GENERATEPROXYID, "CMmPacketContextMesshandlerList::GenerateProxyId" );
-
-    TInt ret( KErrOverflow );
-
-    // Find first free proxy id from the list
-    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
-        {
-        if ( iProxyIdList[i].iIsFree )
-            {
-            aProxyId = iProxyIdList[i].iChannelId;
-
-            // Proxy id selected, set ret to KErrNone
-            ret = KErrNone;
-            // Free proxy id found, break
-            i = KMmMaxNumberOfContexts;
-            }
-        // no else
-        }
-
-    return ret;
-    }
-
-// -----------------------------------------------------------------------------
 // CMmPacketContextMesshandlerList::SetContextId
 // Sets context id to the context info list.
 // -----------------------------------------------------------------------------
@@ -410,13 +275,12 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETCONTEXTID, "CMmPa
 
     TInt ret( KErrNotFound );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         // Find object from the list
         if ( aTransactionId == iContextInfoArray[i].iCreateContextIdTransId )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SetContextId. ContextName: %S", &iContextInfoArray[i].iContextName );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SetContextId. ContextName: %S", &iContextInfoArray[i].iContextName );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETCONTEXTID, "CMmPacketContextMesshandlerList::SetContextId;ContextName=%S", iContextInfoArray[i].iContextName );
             // Set context id to the context info list
             iContextInfoArray[i].iContextId = aContextId;
@@ -444,18 +308,18 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTNAMEBYCONT
 
     TInt ret( KErrArgument );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         // Find object from the list
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::GetContextNameByContextId. ContextName: %S", &iContextInfoArray[i].iContextName );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::GetContextNameByContextId. ContextName: %S", &iContextInfoArray[i].iContextName );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTNAMEBYCONTEXTID, "CMmPacketContextMesshandlerList::GetContextNameByContextId;ContextName=%S", iContextInfoArray[i].iContextName );
             // Set context name to aName
             aContextName = iContextInfoArray[i].iContextName;
             // Context id found, return KErrNone
             ret = KErrNone;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -478,12 +342,11 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_PIPEHANDLEBYCONTEXTNAME
     TUint8 pipeHandle( KInvalidPipeHandle );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( *aContextName == iContextInfoArray[i].iContextName )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::PipeHandleByContextName, PipeHandle: %d", iContextInfoArray[i].iPipeHandle );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::PipeHandleByContextName, PipeHandle: %d", iContextInfoArray[i].iPipeHandle );
 OstTrace1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_PIPEHANDLEBYCONTEXTNAME, "CMmPacketContextMesshandlerList::PipeHandleByContextName;PipeHandle=%d", iContextInfoArray[i].iPipeHandle );
             // Return object from the context info list
             pipeHandle = iContextInfoArray[i].iPipeHandle;
@@ -509,12 +372,11 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_PROXYIDBYCONTEXTNAME, "
     TUint8 proxyId( KTUint8NotDefined );
 
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( *aContextName == iContextInfoArray[i].iContextName )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ProxyIdByContextName, ProxyId: %d", iContextInfoArray[i].iChannelId );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ProxyIdByContextName, ProxyId: %d", iContextInfoArray[i].iChannelId );
 OstTrace1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_PROXYIDBYCONTEXTNAME, "CMmPacketContextMesshandlerList::ProxyIdByContextName;ProxyId=%d", iContextInfoArray[i].iChannelId );
 
             proxyId = iContextInfoArray[i].iChannelId;
@@ -534,14 +396,14 @@ TUint8 CMmPacketContextMesshandlerList::ProxyIdByPipeHandle(
 
     TUint8 proxyId( KTUint8NotDefined );
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aPipeHandle == iContextInfoArray[i].iPipeHandle )
             {
-            TFLOGSTRING3("TSY CMmPacketContextMesshandlerList::ProxyIdByPipeHandle found 0x%x for pipehandle 0x%x", proxyId, aPipeHandle );
-            OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_PROXYIDBYPIPEHANDLE, "CMmPacketContextMesshandlerList::ProxyIdByPipeHandle;proxyId=%hhx;aPipeHandle=%hhx", proxyId, aPipeHandle );
+TFLOGSTRING3("TSY CMmPacketContextMesshandlerList::ProxyIdByPipeHandle found 0x%x for pipehandle 0x%x", proxyId, aPipeHandle );
+OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_PROXYIDBYPIPEHANDLE, "CMmPacketContextMesshandlerList::ProxyIdByPipeHandle;proxyId=%hhx;aPipeHandle=%hhx", proxyId, aPipeHandle );
             proxyId = iContextInfoArray[i].iChannelId;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -561,7 +423,7 @@ TInt CMmPacketContextMesshandlerList::OpenChannel( TUint8 aChannelId )
     OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_OPENCHANNEL, "CMmPacketContextMesshandlerList::OpenChannel;aChannelId=%hhu", aChannelId );
     TInt ret( KErrNotReady );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++)
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++)
         {
         if ( aChannelId == iContextInfoArray[i].iChannelId )
             {
@@ -580,7 +442,7 @@ TInt CMmPacketContextMesshandlerList::OpenChannel( TUint8 aChannelId )
                 {
                 ret = KErrAlreadyExists;
                 }
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         }
 
@@ -598,7 +460,7 @@ TInt CMmPacketContextMesshandlerList::CloseChannel( TUint8 aChannelId )
     OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_CLOSECHANNEL, "CMmPacketContextMesshandlerList::CloseChannel;aChannelId=%hhu", aChannelId );
     TInt ret( KErrNotFound );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aChannelId == iContextInfoArray[i].iChannelId )
             {
@@ -606,7 +468,7 @@ TInt CMmPacketContextMesshandlerList::CloseChannel( TUint8 aChannelId )
             iContextInfoArray[i].iIscApi.Close();
             ret = KErrNone;
             iContextInfoArray[i].iChannelOpened = EFalse;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         }
 
@@ -628,18 +490,17 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_CONTEXTNAMEBYPROXYID
 
     TInt ret( KErrArgument );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aProxyId == iContextInfoArray[i].iChannelId )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ContextNameByProxyId. ContextName: %S", &iContextInfoArray[i].iContextName );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ContextNameByProxyId. ContextName: %S", &iContextInfoArray[i].iContextName );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_CONTEXTNAMEBYPROXYID, "CMmPacketContextMesshandlerList::ContextNameByProxyId;ContextName=%S", iContextInfoArray[i].iContextName );
             // Set context name to aName
             aContextName = iContextInfoArray[i].iContextName;
             // Context id found, return KErrNone
             ret = KErrNone;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -661,7 +522,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTTYPEBYNAME, "
     TUint8 ret( GPDS_CONT_TYPE_NORMAL );
 
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( *aContextName == iContextInfoArray[i].iContextName )
             {
@@ -672,9 +533,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTTYPEBYNAME, "
                  ret = GPDS_CONT_TYPE_SEC;
                 }
             // no else
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetContextTypeByName. ContextName: %S, ContextType: %d", &iContextInfoArray[i].iContextName, ret );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetContextTypeByName. ContextName: %S, ContextType: %d", &iContextInfoArray[i].iContextName, ret );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTTYPEBYNAME, "CMmPacketContextMesshandlerList::GetContextTypeByName;ContextName=%S;ContextType=%hhu", iContextInfoArray[i].iContextName, ret );
             }
         // no else
@@ -699,18 +558,16 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETCREATECONTEXTIDTRANS
     TInt ret( KErrNotFound );
 
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( *aContextName == iContextInfoArray[i].iContextName )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetCreateContextIdTransId. ContextName: %S, IdTransId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetCreateContextIdTransId. ContextName: %S, IdTransId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETCREATECONTEXTIDTRANSID, "CMmPacketContextMesshandlerList::SetCreateContextIdTransId;ContextName=%S;aTransactionId=%d", iContextInfoArray[i].iContextName, aTransactionId );
             // Return object from the context info list
             iContextInfoArray[i].iCreateContextIdTransId = aTransactionId;
             ret = KErrNone;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -734,18 +591,16 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETPIPECREATETRANSID, "
     TInt ret( KErrNotFound );
 
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( *aContextName == iContextInfoArray[i].iContextName )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetPipeCreateTransId. ContextName: %S, CreateTransId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetPipeCreateTransId. ContextName: %S, CreateTransId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETPIPECREATETRANSID, "CMmPacketContextMesshandlerList::SetPipeCreateTransId;ContextName=%S;aTransactionId=%hhu", iContextInfoArray[i].iContextName, aTransactionId );
             // Return object from the context info list
             iContextInfoArray[i].iPipeCreateTransId = aTransactionId;
             ret = KErrNone;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -769,18 +624,17 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETGPDSLLCONFIGURETR
     TInt ret( KErrNotFound );
 
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetGpdsLlConfigureTraId. ContextName: %S, L1ConfigureTransId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetGpdsLlConfigureTraId. ContextName: %S, L1ConfigureTransId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETGPDSLLCONFIGURETRAID, "CMmPacketContextMesshandlerList::SetGpdsLlConfigureTraId;ContextName=%S;aTransactionId=%hhu", iContextInfoArray[i].iContextName, aTransactionId );
 
             // Return object from the context info list
             iContextInfoArray[i].iGpdsLlConfigureTraId = aTransactionId;
             ret = KErrNone;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -804,18 +658,17 @@ OstTrace1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETREMOVEPIPETRAID, "CM
     TInt ret( KErrNotFound );
 
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aPipeHandle == iContextInfoArray[i].iPipeHandle )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetRemovePipeTraId. ContextName: %S, RemovePipeTraId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetRemovePipeTraId. ContextName: %S, RemovePipeTraId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
 OstTraceExt2( TRACE_NORMAL, DUP2_CMMPACKETCONTEXTMESSHANDLERLIST_SETREMOVEPIPETRAID, "CMmPacketContextMesshandlerList::SetRemovePipeTraId;ContextName=%S;aTransactionId=%hhu", iContextInfoArray[i].iContextName, aTransactionId );
 
             // Return object from the context info list
             iContextInfoArray[i].iRemovePipeTraId = aTransactionId;
             ret = KErrNone;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -839,18 +692,17 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETACTIVATIONTRAID, 
     TInt ret( KErrNotFound );
 
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetActivationTraId. ContextName: %S, ActivationTraId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetActivationTraId. ContextName: %S, ActivationTraId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETACTIVATIONTRAID, "CMmPacketContextMesshandlerList::SetActivationTraId;ContextName=%S;aTransactionId=%hhu", iContextInfoArray[i].iContextName, aTransactionId );
 
             // Return object from the context info list
             iContextInfoArray[i].iActivationTraId = aTransactionId;
             ret = KErrNone;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -873,7 +725,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETANDRESETACTIVATIO
 
     TUint8 transId( KTUint8NotDefined );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
@@ -881,8 +733,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETANDRESETACTIVATIO
             transId = iContextInfoArray[i].iActivationTraId;
             iContextInfoArray[i].iActivationTraId = KTUint8NotDefined;
 
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetAndResetActivationTraId. ContextName: %S, ActivationTraId: %d", &iContextInfoArray[i].iContextName, transId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetAndResetActivationTraId. ContextName: %S, ActivationTraId: %d", &iContextInfoArray[i].iContextName, transId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETANDRESETACTIVATIONTRAID, "CMmPacketContextMesshandlerList::GetAndResetActivationTraId;ContextName=%S;transId=%hhu", iContextInfoArray[i].iContextName, transId );
             }
         // no else
@@ -907,18 +758,16 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETDELETIONTRAID, "C
     TInt ret( KErrNotFound );
 
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetDeletionTraId. ContextName: %S, DeleteTraId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetDeletionTraId. ContextName: %S, DeleteTraId: %d", &iContextInfoArray[i].iContextName, aTransactionId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETDELETIONTRAID, "CMmPacketContextMesshandlerList::SetDeletionTraId;ContextName=%S;aTransactionId=%hhu", iContextInfoArray[i].iContextName, aTransactionId );
             // Return object from the context info list
             iContextInfoArray[i].iDeleteTraId= aTransactionId;
             ret = KErrNone;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -941,7 +790,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETANDRESETDELETIONT
 
     TUint8 transId( KTUint8NotDefined );
 
-     for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+     for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
@@ -949,8 +798,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETANDRESETDELETIONT
             transId = iContextInfoArray[i].iDeleteTraId;
             iContextInfoArray[i].iDeleteTraId = KTUint8NotDefined;
 
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetAndResetActivationTraId. ContextName: %S, DeleteTraId: %d", &iContextInfoArray[i].iContextName, transId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetAndResetActivationTraId. ContextName: %S, DeleteTraId: %d", &iContextInfoArray[i].iContextName, transId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETANDRESETDELETIONTRAID, "CMmPacketContextMesshandlerList::GetAndResetDeletionTraId;ContextName=%s;transId=%hhu", iContextInfoArray[i].iContextName, transId );
             }
         // no else
@@ -974,15 +822,13 @@ OstTrace1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_CREATECONTEXTIDTRANSIDB
     TUint8 transId( KTUint8NotDefined );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aPipeHandle == iContextInfoArray[i].iPipeHandle )
             {
             // Return object from the context info list
             transId = iContextInfoArray[i].iCreateContextIdTransId;
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::CreateContextIdTransIdByPipeHandle. ContextName: %S, CreateContextIdTransId: %d", &iContextInfoArray[i].iContextName, transId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::CreateContextIdTransIdByPipeHandle. ContextName: %S, CreateContextIdTransId: %d", &iContextInfoArray[i].iContextName, transId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_CREATECONTEXTIDTRANSIDBYPIPEHANDLE, "CMmPacketContextMesshandlerList::CreateContextIdTransIdByPipeHandle;ContextName=%S;transId=%hhu", iContextInfoArray[i].iContextName, transId );
             }
         // no else
@@ -1007,15 +853,14 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_CREATECONTEXTIDTRAID
     TUint8 transId( KTUint8NotDefined );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
             // Return object from the context info list
             transId = iContextInfoArray[i].iCreateContextIdTransId;
 
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::CreateContextIdTraIdByContextId. ContextName: %S, CreateContextIdTransId: %d", &iContextInfoArray[i].iContextName, transId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::CreateContextIdTraIdByContextId. ContextName: %S, CreateContextIdTransId: %d", &iContextInfoArray[i].iContextName, transId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_CREATECONTEXTIDTRAIDBYCONTEXTID, "CMmPacketContextMesshandlerList::CreateContextIdTraIdByContextId;ContextName=%S;transId=%hhu", iContextInfoArray[i].iContextName, transId );
             }
         // no else
@@ -1040,15 +885,13 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_PIPEHANDLEBYCONTEXTI
     TUint8 pipeHandle( KInvalidPipeHandle );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
             // Return object from the context info list
             pipeHandle = iContextInfoArray[i].iPipeHandle;
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::PipeHandleByContextId. ContextName: %S, PipeHandle: %d", &iContextInfoArray[i].iContextName, pipeHandle );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::PipeHandleByContextId. ContextName: %S, PipeHandle: %d", &iContextInfoArray[i].iContextName, pipeHandle );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_PIPEHANDLEBYCONTEXTID, "CMmPacketContextMesshandlerList::PipeHandleByContextId;ContextName=%S;pipeHandle=%hhu", iContextInfoArray[i].iContextName, pipeHandle );
             }
         // no else
@@ -1073,14 +916,12 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_PIPECREATETRANSIDOKB
     TInt ret( KErrNotFound );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aTransId == iContextInfoArray[i].iPipeCreateTransId )
             {
-
-            TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::PipeCreateTransIdOkByTransId. TransId Matched");
+TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::PipeCreateTransIdOkByTransId. TransId Matched");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_PIPECREATETRANSIDOKBYTRANSID, "CMmPacketContextMesshandlerList::PipeCreateTransIdOkByTransId, TransId Matched" );
-
             ret = KErrNone;
             }
         // no else
@@ -1104,14 +945,12 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_CREATECONTEXTIDTRAID
     TInt ret( KErrNotFound );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aTransId == iContextInfoArray[i].iCreateContextIdTransId )
             {
-
-            TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::CreateContextIdTraIdOK. TransId Matched");
+TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::CreateContextIdTraIdOK. TransId Matched");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_CREATECONTEXTIDTRAIDOK, "CMmPacketContextMesshandlerList::CreateContextIdTraIdOK, TransId Matched" );
-
             ret = KErrNone;
             }
         // no else
@@ -1135,16 +974,14 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GPDSLLCONFIGURETRAID
     TInt ret( KErrNotFound );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aTransId == iContextInfoArray[i].iGpdsLlConfigureTraId )
             {
-
-            TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::GpdsLlConfigureTraIdOK. TransId Matched");
+TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::GpdsLlConfigureTraIdOK. TransId Matched");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GPDSLLCONFIGURETRAIDOK, "CMmPacketContextMesshandlerList::GpdsLlConfigureTraIdOK, TransId Matched" );
-
             ret = KErrNone;
-            i= iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -1168,14 +1005,12 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETPIPEHANDLE, "CMmP
     TInt ret( KErrNotFound );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aTransactionId == iContextInfoArray[i].iPipeCreateTransId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetPipeHandle. ContextName: %S, PipeHandle: %d", &iContextInfoArray[i].iContextName, aPipeHandle );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetPipeHandle. ContextName: %S, PipeHandle: %d", &iContextInfoArray[i].iContextName, aPipeHandle );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETPIPEHANDLE, "CMmPacketContextMesshandlerList::SetPipeHandle;ContextName=%S;aPipeHandle=%hhu", iContextInfoArray[i].iContextName, aPipeHandle );
-
             iContextInfoArray[i].iPipeHandle = aPipeHandle;
             ret = KErrNone;
             }
@@ -1201,14 +1036,12 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETPIPESTATUS, "CMmP
     TBool ret( EFalse );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aPipeHandle == iContextInfoArray[i].iPipeHandle )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetPipeStatus. ContextName: %S, PipeStatus: %d", &iContextInfoArray[i].iContextName, aPipeStatus );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetPipeStatus. ContextName: %S, PipeStatus: %d", &iContextInfoArray[i].iContextName, aPipeStatus );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETPIPESTATUS, "CMmPacketContextMesshandlerList::SetPipeStatus;ContextName=%S;aPipeStatus=%d", iContextInfoArray[i].iContextName, aPipeStatus );
-
             iContextInfoArray[i].iPipeStatus = aPipeStatus ;
             ret = ETrue;
             }
@@ -1233,14 +1066,12 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETPIPESTATUS, "CMmP
     TInt pipeStatus( PN_PIPE_DISABLE );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
             pipeStatus = iContextInfoArray[i].iPipeStatus;
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetPipeStatus. ContextName: %S, PipeStatus: %d", &iContextInfoArray[i].iContextName, pipeStatus );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetPipeStatus. ContextName: %S, PipeStatus: %d", &iContextInfoArray[i].iContextName, pipeStatus );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETPIPESTATUS, "CMmPacketContextMesshandlerList::GetPipeStatus;ContextName=%S;pipeStatus=%d", iContextInfoArray[i].iContextName, pipeStatus );
             }
         // no else
@@ -1264,12 +1095,11 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTIDBYCONTEXTNA
     TUint contextId( GPDS_CID_VOID );
 
     // Find name from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( *aContextName == iContextInfoArray[i].iContextName )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetContextIdByContextName. ContextName: %S, ContextId: %d", &iContextInfoArray[i].iContextName, iContextInfoArray[i].iContextId );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetContextIdByContextName. ContextName: %S, ContextId: %d", &iContextInfoArray[i].iContextName, iContextInfoArray[i].iContextId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTIDBYCONTEXTNAME, "CMmPacketContextMesshandlerList::GetContextIdByContextName;ContextName=%S;contextId=%d", iContextInfoArray[i].iContextName, iContextInfoArray[i].iContextId );
 
             // Name found, return object
@@ -1297,13 +1127,11 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETHOSTCIDNAME, "CMmPac
     hostName.Zero();
 
     // Find name from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( *aContextName == iContextInfoArray[i].iContextName )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetHostCidName. ContextName: %S, HostContextName: %S", &iContextInfoArray[i].iContextName, &iContextInfoArray[i].iHostContextName );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetHostCidName. ContextName: %S, HostContextName: %S", &iContextInfoArray[i].iContextName, &iContextInfoArray[i].iHostContextName );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETHOSTCIDNAME, "CMmPacketContextMesshandlerList::GetHostCidName;ContextName=%S;HostContextName=%S", iContextInfoArray[i].iContextName, iContextInfoArray[i].iHostContextName );
             // Name found
             hostName.Copy( iContextInfoArray[i].iHostContextName );
@@ -1329,17 +1157,15 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_REMOVECONTEXTID, "CM
     TInt ret( KErrNotFound );
 
     // Find name from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::RemoveContextId. ContextName: %S, ContextId: %d", &iContextInfoArray[i].iContextName, aContextId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::RemoveContextId. ContextName: %S, ContextId: %d", &iContextInfoArray[i].iContextName, aContextId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_REMOVECONTEXTID, "CMmPacketContextMesshandlerList::RemoveContextId;ContextName=%S;aContextId=%hhu", iContextInfoArray[i].iContextName, aContextId );
             // Name found
             iContextInfoArray[i].iContextId = GPDS_CID_VOID;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             ret = KErrNone;
             }
         // no else
@@ -1350,8 +1176,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_REMOVECONTEXTID
         {
         if( aContextId == iDialUpContextId )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::RemoveContextId. Dial-Up Context, ContextId: %d", aContextId );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::RemoveContextId. Dial-Up Context, ContextId: %d", aContextId );
 OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETCONTEXTMESSHANDLERLIST_REMOVECONTEXTID, "CMmPacketContextMesshandlerList::RemoveContextId;Dial-Up Context, ContextId=%hhu", aContextId );
             iDialUpContextId = GPDS_CID_VOID;
             iDialUpContextName.Zero();
@@ -1361,8 +1186,7 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETCONTEXTMESSHANDLERLIST_REMOVECONTEXTID
 
         if( aContextId == iSecondaryDialUpContextId )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::RemoveContextId. Secondary Dial-Up Context, ContextId: %d", aContextId );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::RemoveContextId. Secondary Dial-Up Context, ContextId: %d", aContextId );
 OstTraceExt1( TRACE_NORMAL, DUP3_CMMPACKETCONTEXTMESSHANDLERLIST_REMOVECONTEXTID, "CMmPacketContextMesshandlerList::RemoveContextId;Secondary Dial-Up Context, ContextId=%hhu", aContextId );
             iSecondaryDialUpContextId = GPDS_CID_VOID;
             iSecondaryDialUpContextName.Zero();
@@ -1390,18 +1214,17 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_RESETPIPEHANDLEANDST
     TInt ret( KErrNotFound );
 
     // Find name from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aPipeHandle == iContextInfoArray[i].iPipeHandle )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ResetPipeHandleAndStatus. ContextName: %S", &iContextInfoArray[i].iContextName );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ResetPipeHandleAndStatus. ContextName: %S", &iContextInfoArray[i].iContextName );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_RESETPIPEHANDLEANDSTATUS, "CMmPacketContextMesshandlerList::ResetPipeHandleAndStatus;ContextName=%S", iContextInfoArray[i].iContextName );
 
             // Pipe found
             iContextInfoArray[i].iPipeHandle = KInvalidPipeHandle;
             iContextInfoArray[i].iPipeStatus = PN_PIPE_DISABLE;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             ret = KErrNone;
             }
         // no else
@@ -1426,13 +1249,11 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETINITIALISEMEMBER,
     TBool ret( EFalse );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetInitialiseMember. ContextName: %S, InitialiseStarted: %d", &iContextInfoArray[i].iContextName, aFlag );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetInitialiseMember. ContextName: %S, InitialiseStarted: %d", &iContextInfoArray[i].iContextName, aFlag );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETINITIALISEMEMBER, "CMmPacketContextMesshandlerList::SetInitialiseMember;ContextName=%S;aFlag=%hhu", iContextInfoArray[i].iContextName, aFlag );
             // Return object from the context info list
             iContextInfoArray[i].iInitialiseStarted = aFlag;
@@ -1459,14 +1280,12 @@ OstTrace1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETINITIALISEMEMBER, "C
     TBool ret( EFalse );
 
     // Find name from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aPipeHandle == iContextInfoArray[i].iPipeHandle )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetInitialiseMember. ContextName: %S, InitialiseStarted: %d", &iContextInfoArray[i].iContextName, iContextInfoArray[i].iInitialiseStarted );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetInitialiseMember. ContextName: %S, InitialiseStarted: %d", &iContextInfoArray[i].iContextName, iContextInfoArray[i].iInitialiseStarted );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETINITIALISEMEMBER, "CMmPacketContextMesshandlerList::GetInitialiseMember;ContextName=%S;InitialiseStarted=%hhu", iContextInfoArray[i].iContextName, iContextInfoArray[i].iInitialiseStarted );
-
             ret = iContextInfoArray[i].iInitialiseStarted;
             }
         // no else
@@ -1490,12 +1309,11 @@ OstTrace1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_CONTEXTIDBYPIPEHANDLE, 
     TUint8 contextId( GPDS_CID_VOID );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aPipeHandle == iContextInfoArray[i].iPipeHandle )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ContextIdByPipeHandle. ContextId: %d", iContextInfoArray[i].iContextId );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ContextIdByPipeHandle. ContextId: %d", iContextInfoArray[i].iContextId );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_CONTEXTIDBYPIPEHANDLE, "CMmPacketContextMesshandlerList::ContextIdByPipeHandle;ContextId=%hhu", iContextInfoArray[i].iContextId );
 
             // Return object from the context info list
@@ -1524,12 +1342,11 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETCONTEXTCONFIGURAT
     TBool ret( EFalse );
 
      // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetContextConfigurationType. ContextName: %S, ConfigType: %d", &iContextInfoArray[i].iContextName, aConfigType );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetContextConfigurationType. ContextName: %S, ConfigType: %d", &iContextInfoArray[i].iContextName, aConfigType );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETCONTEXTCONFIGURATIONTYPE, "CMmPacketContextMesshandlerList::SetContextConfigurationType;ContextName=%S;aConfigType=%d", iContextInfoArray[i].iContextName, aConfigType );
 
             // Return object from the context info list
@@ -1557,15 +1374,13 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTCONFIGURAT
     TInt ret( KTIntNotDefined );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
             // Return object from the context info list
             ret = iContextInfoArray[i].iContextConfigurationType;
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetContextConfigurationType. ContextName: %S, ConfigType: %d", &iContextInfoArray[i].iContextName, ret );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetContextConfigurationType. ContextName: %S, ConfigType: %d", &iContextInfoArray[i].iContextName, ret );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTCONFIGURATIONTYPE, "CMmPacketContextMesshandlerList::GetContextConfigurationType;ContextName=%S;ret=%d", iContextInfoArray[i].iContextName, ret );
             }
         // no else
@@ -1592,20 +1407,16 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETCONTEXTMESSHANDLERLIST_SAVECONFIG, "CMmPa
     TInt ret( KErrArgument );
 
      // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SaveConfig. ContextName: %S, ContextId: %d", &iContextInfoArray[i].iContextName, aContextId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SaveConfig. ContextName: %S, ContextId: %d", &iContextInfoArray[i].iContextName, aContextId );
 OstTraceExt2( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SAVECONFIG, "CMmPacketContextMesshandlerList::SaveConfig;ContextName=%S;aContextId=%hhu", iContextInfoArray[i].iContextName, aContextId );
             // Return object from the context info list
             if( TPacketDataConfigBase::KConfigGPRS == aConfigurationType )
                 {
-
-                TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SaveConfig. ConfigType: %d", aConfigurationType );
-
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SaveConfig. ConfigType: %d", aConfigurationType );
 OstTrace1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SAVECONFIG, "CMmPacketContextMesshandlerList::SaveConfig;aConfigurationType=%d", aConfigurationType );
                 iContextInfoArray[i].iConfig = *aConfig;
                 iContextInfoArray[i].iContextConfigurationType =
@@ -1616,9 +1427,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SAVECONFIG, "CMmPa
             else if( TPacketDataConfigBase::KConfigRel99Rel4 ==
                 aConfigurationType )
                 {
-
-                TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SaveConfig. ConfigType: %d", aConfigurationType );
-
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SaveConfig. ConfigType: %d", aConfigurationType );
 OstTrace1( TRACE_NORMAL, DUP2_CMMPACKETCONTEXTMESSHANDLERLIST_SAVECONFIG, "CMmPacketContextMesshandlerList::SaveConfig;aConfigurationType=%d", aConfigurationType );
                 iContextInfoArray[i].iConfig99 =
                     *aConfig99;
@@ -1628,7 +1437,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMPACKETCONTEXTMESSHANDLERLIST_SAVECONFIG, "CMmPa
                 }
             // no else
 
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -1653,30 +1462,24 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETCONFIG, "CMmPacketCo
     config = NULL;
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetConfig. ContextName: %S, ContextId: %d", &iContextInfoArray[i].iContextName, aContextId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetConfig. ContextName: %S, ContextId: %d", &iContextInfoArray[i].iContextName, aContextId );
 OstTraceExt2( TRACE_NORMAL, DUP3_CMMPACKETCONTEXTMESSHANDLERLIST_GETCONFIG, "CMmPacketContextMesshandlerList::GetConfig;ContextName=%S;aContextId=%hhu", iContextInfoArray[i].iContextName, aContextId );
             // Return object from the context info list
             if( TPacketDataConfigBase::KConfigGPRS == aConfigurationType )
                 {
-
-                TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::GetConfig. ConfigType: %d", aConfigurationType );
-
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::GetConfig. ConfigType: %d", aConfigurationType );
 OstTrace1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETCONFIG, "CMmPacketContextMesshandlerList::GetConfig;aConfigurationType=%d", aConfigurationType );
                 // Return object from the context info list
                 config = &( iContextInfoArray[i].iConfig );
                 }
-
             else if( TPacketDataConfigBase::KConfigRel99Rel4 ==
                 aConfigurationType )
                 {
-
-                TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::GetConfig. ConfigType: %d", aConfigurationType );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::GetConfig. ConfigType: %d", aConfigurationType );
 OstTrace1( TRACE_NORMAL, DUP2_CMMPACKETCONTEXTMESSHANDLERLIST_GETCONFIG, "CMmPacketContextMesshandlerList::GetConfig;aConfigurationType=%d", aConfigurationType );
                 // Return object from the context info list
                 config = &( iContextInfoArray[i].iConfig99 );
@@ -1705,17 +1508,15 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETPIPERESETTRAID, "
     TInt ret( KErrNotFound );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetPipeResetTraId. ContextName: %S, PipeResetTraId: %d", &iContextInfoArray[i].iContextName, aTransId );
-
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::SetPipeResetTraId. ContextName: %S, PipeResetTraId: %d", &iContextInfoArray[i].iContextName, aTransId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETPIPERESETTRAID, "CMmPacketContextMesshandlerList::SetPipeResetTraId;ContextName=%S;aTransId=%hhu", iContextInfoArray[i].iContextName, aTransId );
             // Return object from the context info list
             iContextInfoArray[i].iPipeResetTraId = aTransId;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             ret = KErrNone;
             }
         // no else
@@ -1739,16 +1540,14 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_CHECKANDRESETPIPERES
     TInt ret( KErrNotFound );
 
     // Find context pipehandle from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aTransId == iContextInfoArray[i].iPipeResetTraId )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::CheckAndResetPipeResetTraId. ContextName: %S", &iContextInfoArray[i].iContextName );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::CheckAndResetPipeResetTraId. ContextName: %S", &iContextInfoArray[i].iContextName );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_CHECKANDRESETPIPERESETTRAID, "CMmPacketContextMesshandlerList::CheckAndResetPipeResetTraId;ContextName=%S", iContextInfoArray[i].iContextName );
-
             ret = KErrNone;
-            i = iNumberOfCreatedContexts;
+            i = KMmMaxNumberOfContexts;
             iContextInfoArray[i].iPipeResetTraId = KTUint8NotDefined;
             }
         // no else
@@ -1772,14 +1571,12 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_PROXYIDBYCONTEXTID, 
     TUint channelId( KTUint8NotDefined );
 
     // Find context proxyId from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::ProxyIdByContextId. ContextName: %S, ChannelId: %d", &iContextInfoArray[i].iContextName, iContextInfoArray[i].iChannelId );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::ProxyIdByContextId. ContextName: %S, ChannelId: %d", &iContextInfoArray[i].iContextName, iContextInfoArray[i].iChannelId );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_PROXYIDBYCONTEXTID, "CMmPacketContextMesshandlerList::ProxyIdByContextId;ContextName=%S;ChannelId=%hhu", iContextInfoArray[i].iContextName, iContextInfoArray[i].iChannelId );
-
             channelId = iContextInfoArray[i].iChannelId;
             }
         // no else
@@ -1827,7 +1624,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETDIALUPCONTEXTID
 TUint8 CMmPacketContextMesshandlerList::GetDialUpContextId()
     {
 
-    TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::GetDialUpContextId");
+TFLOGSTRING("TSY: CMmPacketContextMesshandlerList::GetDialUpContextId");
 OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETDIALUPCONTEXTID, "CMmPacketContextMesshandlerList::GetDialUpContextId" );
 
     return iDialUpContextId;
@@ -1923,101 +1720,19 @@ void CMmPacketContextMesshandlerList::RemoveObjectByName(
 OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_REMOVEOBJECTBYNAME, "CMmPacketContextMesshandlerList::RemoveObjectByName" );
 
     // Set ret to KErrArgument to check that context is in list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         // Find aContext from context info list
         if ( *aContextName == iContextInfoArray[i].iContextName )
             {
-
-            for ( TInt j = 0; j < KMmMaxNumberOfContexts; j++ )
-                {
-
-                if ( ( iContextInfoArray[i].iChannelId ==
-                     iProxyIdList[j].iChannelId ) && ( EFalse ==
-                     iProxyIdList[j].iIsFree ) )
-                    {
-
-                    TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::RemoveObjectByName. Context Name: %S", &iContextInfoArray[i].iContextName );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::RemoveObjectByName. Context Name: %S", &iContextInfoArray[i].iContextName );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_REMOVEOBJECTBYNAME, "CMmPacketContextMesshandlerList::RemoveObjectByName;ContextName=%S", iContextInfoArray[i].iContextName );
-                    // Release Proxy id
-                    iProxyIdList[j].iIsFree = ETrue;
 
-                    // Get index to last reserved cell in the list
-                    const TInt lastContext( iNumberOfCreatedContexts - 1 );
-
-                    // If not already last object
-                    if ( i < lastContext )
-                        {
-                        // Replace object to be remove by last object
-                        iContextInfoArray[i].iContextId =
-                            iContextInfoArray[lastContext].iContextId;
-
-                        iContextInfoArray[i].iChannelId =
-                            iContextInfoArray[lastContext].iChannelId;
-
-                        iContextInfoArray[i].iContextName =
-                            iContextInfoArray[lastContext].iContextName;
-
-                        iContextInfoArray[i].iHostContextName =
-                           iContextInfoArray[lastContext].iHostContextName;
-                        iContextInfoArray[i].iPipeStatus =
-                           iContextInfoArray[lastContext].iPipeStatus;
-                        iContextInfoArray[i].iPipeHandle =
-                           iContextInfoArray[lastContext].iPipeHandle;
-                        iContextInfoArray[i].iCreateContextIdTransId =
-                           iContextInfoArray[lastContext].iCreateContextIdTransId;
-                        iContextInfoArray[i].iPipeCreateTransId =
-                           iContextInfoArray[lastContext].iPipeCreateTransId;
-                        iContextInfoArray[i].iContextType =
-                           iContextInfoArray[lastContext].iContextType;
-                        iContextInfoArray[i].iInitialiseStarted =
-                           iContextInfoArray[lastContext].iInitialiseStarted;
-                        iContextInfoArray[i].iContextConfigurationType =
-                            iContextInfoArray[lastContext].iContextConfigurationType;
-                        iContextInfoArray[i].iActivationTraId =
-                            iContextInfoArray[lastContext].iActivationTraId;
-                        iContextInfoArray[i].iPipeResetTraId =
-                            iContextInfoArray[lastContext].iPipeResetTraId;
-                        iContextInfoArray[i].iDeleteTraId =
-                            iContextInfoArray[lastContext].iDeleteTraId;
-                        }
-                    // no else
-
-                    // Reset object information of the last object
-                    iContextInfoArray[lastContext].iChannelId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iContextName.Zero();
-                    iContextInfoArray[lastContext].iContextId = GPDS_CID_VOID;
-                    iContextInfoArray[lastContext].iHostContextName.Zero();
-                    iContextInfoArray[lastContext].iPipeStatus =
-                       PN_PIPE_DISABLE;
-                    iContextInfoArray[lastContext].iPipeHandle =
-                       KInvalidPipeHandle;
-                    iContextInfoArray[lastContext].iCreateContextIdTransId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iPipeCreateTransId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iContextType =
-                        GPDS_CONT_TYPE_NORMAL;
-                    iContextInfoArray[lastContext].iInitialiseStarted = EFalse;
-                    iContextInfoArray[lastContext].iContextConfigurationType =
-                        KTIntNotDefined;
-                    iContextInfoArray[lastContext].iActivationTraId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iPipeResetTraId =
-                        KTUint8NotDefined;
-                    iContextInfoArray[lastContext].iDeleteTraId =
-                        KTUint8NotDefined;
-                    // Decrease number of created contexts
-                    iNumberOfCreatedContexts--;
-                    // Proxy id found, break
-                    j = KMmMaxNumberOfContexts;
-                    }
-                // no else
-                }
-
-            // aContext found, break
-            i = iNumberOfCreatedContexts;
+            // Reset object information
+            InitializeContextInfoList( i );
+            // Decrease number of created contexts
+            iNumberOfCreatedContexts--;
+            i = KMmMaxNumberOfContexts;
             }
         // no else
         }
@@ -2037,15 +1752,13 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETDNSADDRESSINFOTOCONT
 
     TInt ret( KErrNotFound );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         // Find aContext from context info list
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SetDNSAddressInfoToContextInfo. ContextId: %d", aContextId );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SetDNSAddressInfoToContextInfo. ContextId: %d", aContextId );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETDNSADDRESSINFOTOCONTEXTINFO, "CMmPacketContextMesshandlerList::SetDNSAddressInfoToContextInfo;aContextId=%hhu", aContextId );
-
             iContextInfoArray[i].iAddDNSAddress = ETrue;
             ret = KErrNone;
             }
@@ -2069,15 +1782,13 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETDNSADDRESSINFOTOCONT
 
     TBool addDNSAddress( EFalse );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         // Find aContext from context info list
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetDNSAddressInfoToContextInfo. ContextId: %d, AddDNSAddress: %d", aContextId, iContextInfoArray[i].iAddDNSAddress );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetDNSAddressInfoToContextInfo. ContextId: %d, AddDNSAddress: %d", aContextId, iContextInfoArray[i].iAddDNSAddress );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETDNSADDRESSINFOTOCONTEXTINFO, "CMmPacketContextMesshandlerList::GetDNSAddressInfoToContextInfo;aContextId=%hhu;AddDNSAddress=%hhu", aContextId, iContextInfoArray[i].iAddDNSAddress );
-
             addDNSAddress = iContextInfoArray[i].iAddDNSAddress;
             }
         // no else
@@ -2100,15 +1811,13 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_SETPCSCFADDRESSINFOTOCO
 
     TInt ret( KErrNotFound );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         // Find aContext from context info list
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SetPCSCFAddressInfoToContextInfo. ContextId: %d", aContextId );
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::SetPCSCFAddressInfoToContextInfo. ContextId: %d", aContextId );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_SETPCSCFADDRESSINFOTOCONTEXTINFO, "CMmPacketContextMesshandlerList::SetPCSCFAddressInfoToContextInfo;aContextId=%hhu", aContextId );
-
             iContextInfoArray[i].iAddPCSCFAddress = ETrue;
             ret = KErrNone;
             }
@@ -2132,15 +1841,13 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETPCSCFADDRESSINFOTOCO
 
     TBool addPCSCFAddress( EFalse );
 
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         // Find aContext from context info list
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
-
-            TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetPCSCFAddressInfoToContextInfo. ContextId: %d, AddPCSCFAddress: %d", aContextId, iContextInfoArray[i].iAddPCSCFAddress );
+TFLOGSTRING3("TSY: CMmPacketContextMesshandlerList::GetPCSCFAddressInfoToContextInfo. ContextId: %d, AddPCSCFAddress: %d", aContextId, iContextInfoArray[i].iAddPCSCFAddress );
 OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETPCSCFADDRESSINFOTOCONTEXTINFO, "CMmPacketContextMesshandlerList::GetPCSCFAddressInfoToContextInfo;aContextId=%hhu;AddPCSCFAddress=%hhu", aContextId, iContextInfoArray[i].iAddPCSCFAddress );
-
             addPCSCFAddress = iContextInfoArray[i].iAddPCSCFAddress;
             }
         // no else
@@ -2163,18 +1870,15 @@ OstTrace1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_CONTEXTIDBYLISTINDEX, "
 
     TUint8 contextId( GPDS_CID_VOID );
 
-    if ( aListIndex < iNumberOfCreatedContexts )
+    if ( aListIndex < KMmMaxNumberOfContexts )
         {
         // Return context id from the context info list
         contextId = iContextInfoArray[aListIndex].iContextId;
-
-        TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ContextIdByListIndex. ContextId: %d", contextId );
-
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::ContextIdByListIndex. ContextId: %d", contextId );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_CONTEXTIDBYLISTINDEX, "CMmPacketContextMesshandlerList::ContextIdByListIndex;contextId=%hhu", contextId );
         }
     // no else
 
-    // Valid values to return are, 0x00, 0x01, 0xFF = GPDS_CID_VOID
     return contextId;
     }
 
@@ -2193,7 +1897,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTTYPEBYID, 
     TUint8 ret( GPDS_CONT_TYPE_NORMAL );
 
     // Find context id from context info list
-    for ( TInt i = 0; i < iNumberOfCreatedContexts; i++ )
+    for ( TInt i = 0; i < KMmMaxNumberOfContexts; i++ )
         {
         if ( aContextId == iContextInfoArray[i].iContextId )
             {
@@ -2203,15 +1907,46 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTTYPEBYID, 
                  ret = GPDS_CONT_TYPE_SEC;
                 }
             // no else
-
-            TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::GetContextTypeById, ContextType: %d", ret );
-
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::GetContextTypeById, ContextType: %d", ret );
 OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTTYPEBYID, "CMmPacketContextMesshandlerList::GetContextTypeById;ContextType=%hhu", ret );
             }
         // no else
         }
 
     return ret;
+    }
+
+// -----------------------------------------------------------------------------
+// CMmPacketContextMesshandlerList::InitializeContextInfoList
+// This function initializes context info
+// -----------------------------------------------------------------------------
+//
+void CMmPacketContextMesshandlerList::InitializeContextInfoList(
+    const TUint8 aContextId )
+    {
+
+TFLOGSTRING2("TSY: CMmPacketContextMesshandlerList::InitializeContextInfoList, ContextId: %d", aContextId );
+//OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLERLIST_GETCONTEXTTYPEBYID, "CMmPacketContextMesshandlerList::GetContextTypeById;aContextId=%hhu", aContextId );
+
+
+    iContextInfoArray[aContextId].iContextId = GPDS_CID_VOID;
+
+    iContextInfoArray[aContextId].iChannelId = KDefinedProxyIds[aContextId];
+
+    iContextInfoArray[aContextId].iContextName.Zero();
+    iContextInfoArray[aContextId].iHostContextName.Zero();
+    iContextInfoArray[aContextId].iPipeStatus = PN_PIPE_DISABLE;
+    iContextInfoArray[aContextId].iPipeHandle = KInvalidPipeHandle;
+    iContextInfoArray[aContextId].iCreateContextIdTransId = KTUint8NotDefined;
+    iContextInfoArray[aContextId].iPipeCreateTransId = KTUint8NotDefined;
+    iContextInfoArray[aContextId].iContextType = GPDS_CONT_TYPE_NORMAL ;
+    iContextInfoArray[aContextId].iInitialiseStarted = EFalse;
+    iContextInfoArray[aContextId].iContextConfigurationType = KTIntNotDefined;
+    iContextInfoArray[aContextId].iActivationTraId = KTUint8NotDefined;
+    iContextInfoArray[aContextId].iPipeResetTraId = KTUint8NotDefined;
+    iContextInfoArray[aContextId].iDeleteTraId = KTUint8NotDefined;
+    iContextInfoArray[aContextId].iChannelOpened = EFalse;
+
     }
 
 // ========================== OTHER EXPORTED FUNCTIONS =========================

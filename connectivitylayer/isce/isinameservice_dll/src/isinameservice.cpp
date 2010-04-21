@@ -166,8 +166,8 @@ void DISINameService::Receive( const TDesC8& aMessage )
             msgPtr[ISI_HEADER_OFFSET_RECEIVEROBJECT] = (TUint8) (phonetAddress & 0xFF);
             TDes8* messagePtr = reinterpret_cast<TDes8*>( const_cast<TDesC8*>(&aMessage) );
 
-            C_TRACE( ( _T( "<-DISINameService message to recDev: %d" ),msgPtr[ISI_HEADER_OFFSET_RECEIVERDEVICE]  ) );
-            C_TRACE( ( _T( "<-DISINameService message to recObj: %d" ),msgPtr[ISI_HEADER_OFFSET_RECEIVEROBJECT]  ) );
+            C_TRACE( ( _T( "<-DISINameService message to recDev: 0x%x" ),msgPtr[ISI_HEADER_OFFSET_RECEIVERDEVICE]  ) );
+            C_TRACE( ( _T( "<-DISINameService message to recObj: 0x%x" ),msgPtr[ISI_HEADER_OFFSET_RECEIVEROBJECT]  ) );
 
             //send data to router for handling
             iRouter->Send( *messagePtr, iObjId);

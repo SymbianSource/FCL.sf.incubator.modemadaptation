@@ -23,9 +23,9 @@
 #include <pn_const.h>
 #ifndef NCP_COMMON_BRIDGE_FAMILY       
 #include <nsisi.h>
-#endif
 #include <pipeisi.h>
 #include <pipe_sharedisi.h>
+#endif
 #include <tisi.h>
 #include <at_modemisi.h>
 #include "cmodemathandler.h"
@@ -97,6 +97,7 @@ CModemAtHandler::CModemAtHandler( CModemAtSrv& aServer )
     iReceivedMessage( NULL ),
     iPepObjId(0),
     iPipeController(NULL),
+    iLastTransactionId( 0 ),
     iDisconnected( EFalse ),
     iModemAtExistInCmt( EFalse )
     {
@@ -193,7 +194,7 @@ void CModemAtHandler::RunL()
             } //if( receiveMessageBuffer->Length() > ISI_HEADER_OFFSET_MESSAGEID )
         else 
             {
-            C_TRACE(_L("ISI essage is too short"));
+            C_TRACE(_L("ISI message is too short"));
             TRACE_ASSERT_ALWAYS;
             }
         
@@ -217,14 +218,7 @@ void CModemAtHandler::ConstructL()
     
     iIscApi = new ( ELeave ) RIscApi;
     C_TRACE(_L("RIscApi created"));
-
-    //used with intermediate data ind
-    //can be removed, when AT_MODEM_INTERMEDIATE_DATA_IND supports transactionid 
-    for( TInt i = 0 ; i < KMaxDteIdCount ; i++) 
-        {
-        iLastTransactionId[i]=0;
-        }
-    
+   
 #ifndef __WINSCW__
       OpenChannelL();
 #ifndef NCP_COMMON_BRIDGE_FAMILY
@@ -245,12 +239,12 @@ TInt CModemAtHandler::SendATCommand(const TUint8 aDteId,
 
     TInt err = KErrNone;
     // aMessageType contains normal AT-cmd (0) or Nvram-query (1)
-    TUint transactionId= (aPluginType << KTransactionIdBitsShift) | aMessageType;
-    //used with intermediate data ind
-    //can be removed, when AT_MODEM_INTERMEDIATE_DATA_IND supports transactionid        
-    iLastTransactionId[aDteId] = transactionId;  //messages are routed to correct plugin by transaction id
+    TUint transactionId = ( aPluginType << KTransactionIdBitsShift ) | aMessageType;
+    // used with intermediate data ind
+    // can be removed, when AT_MODEM_INTERMEDIATE_DATA_IND supports transactionid        
+    iLastTransactionId = transactionId;  //messages are routed to correct plugin by transaction id
     C_TRACE((_L("transaction id %d, plugintype %d, aMessageType %d"), transactionId, aPluginType, aMessageType));
-    C_TRACE((_L("iLastTransctionId[%d] = %d "),aDteId,iLastTransactionId[aDteId]));
+    C_TRACE((_L("iLastTransctionId = %d "), iLastTransactionId ));
 
     #ifdef __WINSCW__
     iDteId = aDteId;
@@ -348,8 +342,6 @@ void CModemAtHandler::OpenChannelL()
     events.Append( AT_MODEM_UNSOLICITED_DATA_IND );  
     events.Append( PN_AT_MODEM );
     events.Append( AT_MODEM_DATA_REDIRECT_IND );  
-    events.Append( PN_PIPE );
-    events.Append( PNS_PEP_STATUS_IND );
 
 #ifndef NCP_COMMON_BRIDGE_FAMILY       
     //name add ind
@@ -357,9 +349,13 @@ void CModemAtHandler::OpenChannelL()
     events.Append( PNS_NAME_ADD_IND );  
     events.Append( PN_NAMESERVICE );
     events.Append( PNS_NAME_REMOVE_IND );
+    events.Append( PN_PIPE );
+    events.Append( PNS_PEP_STATUS_IND );
 #else
     events.Append( 0 );
     events.Append( 0 );  
+    events.Append( 0 );
+    events.Append( 0 );
     events.Append( 0 );
     events.Append( 0 );
 #endif
@@ -380,7 +376,7 @@ void CModemAtHandler::HandleATResponse( const TIsiReceiveC& aMessage )
     {
     C_TRACE (( _T("CModemAtHandler::HandleATResponse()") ));
     
-    TInt dteId = aMessage.Get8bit( ISI_HEADER_SIZE+ AT_MODEM_CMD_RESP_OFFSET_DTEID ) ;
+    TUint8 dteId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_CMD_RESP_OFFSET_DTEID ) ;
     TUint transactionId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_CMD_RESP_OFFSET_TID );
     TUint8 command = transactionId & KCommandBits; //normal AT-cmd or Nvram-query
     TInt length = aMessage.Get16bit( ISI_HEADER_SIZE+AT_MODEM_CMD_RESP_OFFSET_LENGTH );
@@ -415,7 +411,7 @@ void CModemAtHandler::HandleATResponse( )
 #endif
 
     
-TInt CModemAtHandler::Connect(const TUint8 aDteId)
+TInt CModemAtHandler::Connect( const TUint8 aDteId )
     {
     C_TRACE (( _T("CModemAtHandler::Connect()") ));
 
@@ -425,37 +421,37 @@ TInt CModemAtHandler::Connect(const TUint8 aDteId)
         TRACE_ASSERT_ALWAYS;
         return KErrNotFound;
         }
-
-    C_TRACE((_L("Connecting with dteid:%d "), aDteId));
     SetDisconnected( EFalse );
-    
-    #ifdef __WINSCW__ //emulate, modem is connected
-    iServer.BroadcastModemConnected( aDteId, KErrNone );
-    iDteId = aDteId;
-    return KErrNone;
-    #endif
-#ifndef NCP_COMMON_BRIDGE_FAMILY
-    iPipeController->LinkDteIdToPipe( aDteId );
-#endif
-    TInt size = ISI_HEADER_SIZE + SIZE_AT_MODEM_CONNECT_REQ;
-    
-    HBufC8* message = HBufC8::New( size );
-    TRACE_ASSERT( message );
-    TPtr8 messageptr = message->Des();
-    TIsiSend isimessage( messageptr, size );
-    isimessage.Set8bit(ISI_HEADER_OFFSET_RESOURCEID, PN_AT_MODEM); 
-    isimessage.Set8bit(ISI_HEADER_SIZE + AT_MODEM_CONNECT_REQ_OFFSET_TID, KDefaultTId);
-    isimessage.Set8bit(ISI_HEADER_SIZE + AT_MODEM_CONNECT_REQ_OFFSET_MESSAGEID, AT_MODEM_CONNECT_REQ);
-    isimessage.Set8bit(ISI_HEADER_SIZE + AT_MODEM_CONNECT_REQ_OFFSET_DTEID, aDteId);
-    isimessage.Set8bit(ISI_HEADER_SIZE + AT_MODEM_CONNECT_REQ_OFFSET_FILLERBYTE1, KFiller);
-    isimessage.Complete();
 
-    DUMP_MESSAGE( messageptr );
-    TInt err = iIscApi->Send( messageptr );
-    TRACE_ASSERT( err == KErrNone );
-    delete message;
-    message = NULL;
-    return err;
+#ifdef __WINSCW__
+    return KErrNone;
+#endif
+
+    TInt err( KErrNone );
+	TUint8 pipeHandle( KInvalidPipeHandle );
+
+#ifndef NCP_COMMON_BRIDGE_FAMILY
+    pipeHandle = iPipeController->GetPipeHandle();
+#endif
+
+    if( pipeHandle == KInvalidPipeHandle )
+        {
+        C_TRACE(( _L("Connecting with dteId %d. (RComm was not used before connecting the plug-ins)."), aDteId ));
+        err = SendAtModemConnectReq( aDteId );
+        }
+    else
+        {
+        C_TRACE(( _L("Connecting with pipehandle %d."), pipeHandle ));
+        err = SendAtModemConnectReq( pipeHandle );
+        }
+   
+   if( err != KErrNone )
+       {
+       TRACE_ASSERT_ALWAYS;
+       return KErrNotFound;
+       }
+
+    return KErrNone;
     }
 
 void CModemAtHandler::SetDisconnected( TBool aIsDisconnected )
@@ -518,35 +514,35 @@ TInt CModemAtHandler::Disconnect( const TUint8 aDteId )
 void CModemAtHandler::HandleModemConnectResp( const TIsiReceiveC& aMessage )
     {
     C_TRACE (( _T("CModemAtHandler::HandleModemConnectResp()") ));
-    TInt dteId= aMessage.Get8bit(ISI_HEADER_SIZE+ AT_MODEM_CONNECT_RESP_OFFSET_DTEID);
-    TInt status = aMessage.Get8bit(ISI_HEADER_SIZE+ AT_MODEM_CONNECT_RESP_OFFSET_RESULT);
+    TUint8 dteId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_CONNECT_RESP_OFFSET_DTEID );
+    TInt status = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_CONNECT_RESP_OFFSET_RESULT );
     TInt err = KErrGeneral;
     if( status == AT_MODEM_RESULT_OK )
         {
         C_TRACE(_L("Connected ok, AT_MODEM_RESULT_OK received"));
         err = KErrNone;
-        }   
-    else 
+        }
+    else
         {
-        C_TRACE((_L("Connection failed, AT_MODEM_RESULT_ERROR received (%d)"),status));
+        C_TRACE((_L("Connection failed, AT_MODEM_RESULT_ERROR received (%d)"), status));
         TRACE_ASSERT_ALWAYS;
         }
 
-    iServer.BroadcastModemConnected( dteId, err );
+    iServer.SetDteIdAndConnect( dteId, err );
     }
 
 
 void CModemAtHandler::HandleSignalInd( const TIsiReceiveC& aMessage )
     {
     C_TRACE (( _T("CModemAtHandler::HandleSignalInd()") ));
-    TInt dteId = aMessage.Get8bit(ISI_HEADER_SIZE+ AT_MODEM_SIGNAL_IND_OFFSET_DTEID);
+    TUint8 dteId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_SIGNAL_IND_OFFSET_DTEID );
     iServer.HandleSignalInd( dteId );
     }
 
 void CModemAtHandler::HandleUnsolicitedData( const TIsiReceiveC& aMessage )
     {
     C_TRACE (( _T("CModemAtHandler::HandleUnsolicitedData()") ));
-    TInt dteId = aMessage.Get8bit( ISI_HEADER_SIZE+ AT_MODEM_UNSOLICITED_DATA_IND_OFFSET_LENGTH );
+    TUint8 dteId = aMessage.Get8bit( ISI_HEADER_SIZE+ AT_MODEM_UNSOLICITED_DATA_IND_OFFSET_LENGTH );
     TInt length = aMessage.Get16bit( ISI_HEADER_SIZE+AT_MODEM_UNSOLICITED_DATA_IND_OFFSET_LENGTH );
     
     iServer.HandleUnsolicitedData( dteId,
@@ -558,14 +554,18 @@ void CModemAtHandler::HandleUnsolicitedData( const TIsiReceiveC& aMessage )
 void CModemAtHandler::HandleIntermediateDataInd( const TIsiReceiveC& aMessage )
     {
     C_TRACE (( _T("CModemAtHandler::HandleIntermediateDataInd()") ));
-    TInt dteId = aMessage.Get8bit( ISI_HEADER_SIZE+ AT_MODEM_INTERMEDIATE_DATA_IND_OFFSET_DTEID );
-    TInt length= aMessage.Get16bit( ISI_HEADER_SIZE+AT_MODEM_INTERMEDIATE_DATA_IND_OFFSET_LENGTH );
+    TUint8 dteId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_INTERMEDIATE_DATA_IND_OFFSET_DTEID );
+    TInt length = aMessage.Get16bit( ISI_HEADER_SIZE + AT_MODEM_INTERMEDIATE_DATA_IND_OFFSET_LENGTH );
      
-    TUint transactionId = aMessage.Get8bit( ISI_HEADER_SIZE+ AT_MODEM_CMD_RESP_OFFSET_TID );
-    transactionId = iLastTransactionId[ dteId ];
-    TUint8 command = transactionId & KCommandBits;
+    TUint transactionId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_CMD_RESP_OFFSET_TID );
+    
+    C_TRACE((_L("transactionId from %d"), transactionId));
+    transactionId = iLastTransactionId;
+    C_TRACE((_L("transactionId after setting it to iLastTransactionId: %d"), transactionId));
+    
+    TUint8 command = transactionId & KCommandBits; //normal AT-cmd or Nvram-query
     TUint8 pluginType = transactionId >> KTransactionIdBitsShift;
-    C_TRACE((_L("dteid %d iLastrid[dteid] = %d trid %d"), dteId, iLastTransactionId[dteId], transactionId));
+    C_TRACE((_L("dteId %d, command %d (AT=0,NVRAM=1), pluginType = %d (atext=0,common=1)"), dteId, command, pluginType));
     
     iServer.HandleIntermediateDataInd( dteId,
       (TATPluginInterface) pluginType,
@@ -579,8 +579,8 @@ void CModemAtHandler::HandleRedirectInd( const TIsiReceiveC& aMessage )
     {
     C_TRACE (( _T("CModemAtHandler::HandleRedirectInd()") ));
   
-    TInt dteId = aMessage.Get8bit( ISI_HEADER_SIZE+  AT_MODEM_DATA_REDIRECT_IND_OFFSET_DTEID );
-    TInt newSecondDevId = aMessage.Get8bit( ISI_HEADER_SIZE +  AT_MODEM_DATA_REDIRECT_IND_OFFSET_DEVICEID );
+    TUint8 dteId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_DATA_REDIRECT_IND_OFFSET_DTEID );
+    TInt newSecondDevId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_DATA_REDIRECT_IND_OFFSET_DEVICEID );
     TInt newSecondObjId = aMessage.Get16bit( ISI_HEADER_SIZE + AT_MODEM_DATA_REDIRECT_IND_OFFSET_SERVERID );
 #ifndef NCP_COMMON_BRIDGE_FAMILY
     iPipeController->RedirectPipe( dteId, newSecondDevId, newSecondObjId ); 
@@ -619,7 +619,7 @@ void CModemAtHandler::SendAtModemDataRedirectResultReq( const TUint8 aDteId, con
 void CModemAtHandler::HandleRedirectResultResp(const TIsiReceiveC& aMessage)
     {
     C_TRACE (( _T("CModemAtHandler::HandleRedirectResultResp()") ));
-    TInt dteId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_DATA_REDIRECT_RESULT_RESP_OFFSET_DTEID );
+    TUint8 dteId = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_DATA_REDIRECT_RESULT_RESP_OFFSET_DTEID );
     TInt error = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_DATA_REDIRECT_RESULT_RESP_OFFSET_RESULT );
     C_TRACE((_L("CModemAtHandler::HandleRedirectResultResp() dte %d"), dteId));
     
@@ -634,19 +634,19 @@ void CModemAtHandler::HandleRedirectResultResp(const TIsiReceiveC& aMessage)
         }
     
     }
-void CModemAtHandler::HandleCommandModeChange( TInt aDteId, TCommandMode aMode )
+void CModemAtHandler::HandleCommandModeChange( TCommandMode aMode )
     {
-    C_TRACE(( _T("CModemAtHandler::HandleCommandModeChange() aDteId: %d aMode: %d"),aDteId, (TInt) aMode ));
-    iServer.HandleCommandModeChange( aDteId, aMode );
+    C_TRACE(( _T("CModemAtHandler::HandleCommandModeChange() aMode: %d"), (TInt) aMode ));
+    iServer.HandleCommandModeChange( aMode );
     }
 
 TInt CModemAtHandler::SendEscapeSignalDetection( const TUint8 aDteId )
     {
     C_TRACE((_T("CModemAtHandler::SendEscapeSignalDetection(%d)"), aDteId));
-    #ifdef __WINSCW__
+#ifdef __WINSCW__
     iDteId = aDteId;
     return KErrNone;
-    #endif
+#endif
   
     TInt error( KErrGeneral );  
     TUint msgSize( ISI_HEADER_SIZE + SIZE_AT_MODEM_SIGNAL_DETECTED_REQ );
@@ -671,7 +671,7 @@ TInt CModemAtHandler::SendEscapeSignalDetection( const TUint8 aDteId )
       isimessage.Set8bit( msgSize + AT_MODEM_SB_SIGNAL_DETECTED_OFFSET_FILLERBYTE1, 0x00 );
       isimessage.Complete();
       error = iIscApi->Send(messageptr);
-        C_TRACE((_L("escape send result %d"), error ));
+      C_TRACE((_L("escape send result %d"), error ));
       delete message;
       message = NULL;
       }
@@ -687,8 +687,7 @@ TInt CModemAtHandler::SendEscapeSignalDetection( const TUint8 aDteId )
 void CModemAtHandler::HandleSignalDetectedResp( const TIsiReceiveC& aMessage )
     {
     C_TRACE (( _T("CModemAtHandler::HandleSignalDetectedResp() escape sequence detect response received from cellmo") ));
-    TInt dteId( aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_SIGNAL_DETECTED_RESP_OFFSET_DTEID ) );
-    TRACE_ASSERT( dteId < KMaxDteIdCount );
+    TUint8 dteId( aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_SIGNAL_DETECTED_RESP_OFFSET_DTEID ) );
     TInt result = aMessage.Get8bit( ISI_HEADER_SIZE + AT_MODEM_SIGNAL_DETECTED_RESP_OFFSET_RESULT );
     C_TRACE((_L("CModemAtHandler::HandleSignalDetectedResp() dteId %d"), dteId));
     TRACE_ASSERT( result == AT_MODEM_RESULT_OK );
@@ -698,5 +697,28 @@ void CModemAtHandler::SetModemAtExistsInCmt( TBool aModemAtExistsInCmt )
     {
     C_TRACE((_T("CModemAtHandler::SetModemAtExistsInCmt(%d)"), (TInt)aModemAtExistsInCmt));
     iModemAtExistInCmt = aModemAtExistsInCmt;
+    }
+
+TInt CModemAtHandler::SendAtModemConnectReq( const TUint8 aDteId )
+    {
+    C_TRACE (( _T("CModemAtHandler::SendAtModemConnectReq()") ));
+    TInt size = ISI_HEADER_SIZE + SIZE_AT_MODEM_CONNECT_REQ;
+    HBufC8* message = HBufC8::New( size );
+    TRACE_ASSERT( message );
+    TPtr8 messageptr = message->Des();
+    TIsiSend isimessage( messageptr, size );
+    isimessage.Set8bit(ISI_HEADER_OFFSET_RESOURCEID, PN_AT_MODEM); 
+    isimessage.Set8bit(ISI_HEADER_SIZE + AT_MODEM_CONNECT_REQ_OFFSET_TID, KDefaultTId);
+    isimessage.Set8bit(ISI_HEADER_SIZE + AT_MODEM_CONNECT_REQ_OFFSET_MESSAGEID, AT_MODEM_CONNECT_REQ);
+    isimessage.Set8bit(ISI_HEADER_SIZE + AT_MODEM_CONNECT_REQ_OFFSET_DTEID, aDteId);
+    isimessage.Set8bit(ISI_HEADER_SIZE + AT_MODEM_CONNECT_REQ_OFFSET_FILLERBYTE1, KFiller);
+    isimessage.Complete();
+    DUMP_MESSAGE( messageptr );
+    TInt err = iIscApi->Send( messageptr );
+    TRACE_ASSERT( err == KErrNone );
+    delete message;
+    message = NULL;
+    C_TRACE (( _T("CModemAtHandler::SendAtModemConnectReq()<< returned: %d"), err ));
+    return err;
     }
 

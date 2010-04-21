@@ -752,22 +752,6 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
 
 
         /**
-        * Sends a NET_RAT_REQ isi-message to phonet
-        * @since Series60_ver 2.6
-        * @param aTransId Transaction ID
-        * @retrun TInt: Phonet sender status
-        */
-        TInt NetRatReq( TUint8 aTransId );
-
-        /*
-        * Breaks a NET_RAT_RESP ISI-message
-        * @since Series60_ver 3.0
-        * @param aIsiMessage Net rat resp ISI message
-        * Return value: none
-        */
-        void NetRatResp( const TIsiReceiveC& aIsiMessage );
-
-        /**
         * Send a response to SMS server after a SMS resource Indication received from
         * SMS sever.
         * This response tells whether the SMS can be sent or not.
@@ -806,9 +790,9 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         /**
         * Stores Network service status to an internal structure
         * @param aIsiMessage NetCellInfoInd or NetCellInfoGetResp
-        * @return none
+        * @return TInt: Success value
         */
-        void StoreNetServiceStatus( const TIsiReceiveC& aIsiMessage );
+        TInt StoreNetServiceStatus( const TIsiReceiveC& aIsiMessage );
 
         /**
         * Getter for location information

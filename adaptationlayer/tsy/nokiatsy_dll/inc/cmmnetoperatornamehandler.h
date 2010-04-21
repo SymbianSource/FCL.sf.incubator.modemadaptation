@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -36,6 +36,8 @@ const TUint8 KOnsNameMaxLength = 0x19;
 const TUint8 KDisplayTagLength = 30;
 // Operator code BCD string length.
 const TUint8 KBCDLength = 3;
+// Max buffer length for Operator name.
+const TInt KMaxLengthOfOperatorName = 124;
 
 // MACROS
     //None
@@ -270,7 +272,7 @@ class CMmNetOperatorNameHandler : public CBase, public MUiccOperationBase
 
         /**
         * Checks one OPL rule record against received Operator Code
-        * in BCD format and LAC value.
+        * and LAC value.
         * @param aIndex is OPL record index.
         * @param aOperCode is Operator Code in BCD format.
         * @param aLAC is Location Area Code.
@@ -280,17 +282,6 @@ class CMmNetOperatorNameHandler : public CBase, public MUiccOperationBase
             TUint8 aIndex,
             const TDesC8& aOperCode,
             TUint aLac );
-
-        /**
-        * Check BCD char against rule to find out is that matching
-        * with OPL list.
-        * @param aOperCodeChar is character from one BCD byte.
-        * @param aPlmnListChar is character from OPL list BCD byte.
-        * @return success/failure value.
-        */
-        TInt BCDCharChecker(
-             TUint8 aOperCodeChar,
-             TUint8 aPlmnListChar );
 
         /**
         * Copy EONS Long and Short names if exist.
@@ -489,6 +480,11 @@ class CMmNetOperatorNameHandler : public CBase, public MUiccOperationBase
 
         // Buffer for Operator Name String (ONS name).
         TBuf<KOnsNameMaxLength> iOperatorNameString;
+
+        // Buffers for custom EONS and NITZ names.
+        TBuf<KMaxLengthOfOperatorName> iCustomNitzLongNameString;
+        TBuf<KMaxLengthOfOperatorName> iCustomNitzShortNameString;
+        TBuf<KMaxLengthOfOperatorName> iCustomEonsNameString;
 
         // Operator PLMN list available.
         TBool iOplListAvailable;

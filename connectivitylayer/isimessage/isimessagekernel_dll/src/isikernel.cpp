@@ -561,7 +561,7 @@ EXPORT_C TDes8& TIsiKernelSend::Complete
     COMPONENT_TRACE( ( _T ( "TIsiKernelSend::Complete, length: 0x%x, calcfinallength: 0x%x" ), length, calcFinalLength ) );
     OstTraceExt2( TRACE_NORMAL, DUP1_TISIKERNELSEND_COMPLETE, "TIsiKernelSend::Complete;length=%hu;calcFinalLength=%hu", length, calcFinalLength );
     
-    #if defined( __WINS__ ) || defined( __WINSCW__ )
+    #if defined( __WINS__ ) || defined( __WINSCW__ ) || defined(ISI_LENGTH_BIG_ENDIAN)
         {
         if( iFinalLength == 0 )    // TIsiKernelSend alternative constructor used
             {               

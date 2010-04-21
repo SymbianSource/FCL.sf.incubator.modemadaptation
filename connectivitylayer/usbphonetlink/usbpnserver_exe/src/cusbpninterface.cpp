@@ -129,7 +129,6 @@ CUsbPnInterface::~CUsbPnInterface()
         {
         delete iIsaReceiver;
         }
-    iIscApi.Close();
 
     if( iInitialised )
         {
@@ -140,6 +139,8 @@ CUsbPnInterface::~CUsbPnInterface()
         {
         delete iAlt;
         }
+
+    iIscApi.Close();
 
     OstTrace0( TRACE_NORMAL, CUSBPNINTERFACE_CUSBPNINTERFACE_DESTRUCTOR_EXIT, "CUsbPnInterface::~CUsbPnInterface - return" );
     C_TRACE( ( _T( "CUsbPnInterface::~CUsbPnInterface() - return" ) ) );

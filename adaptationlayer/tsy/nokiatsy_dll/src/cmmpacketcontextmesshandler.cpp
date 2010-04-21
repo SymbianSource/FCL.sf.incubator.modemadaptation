@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -14,8 +14,6 @@
 * Description:
 *
 */
-
-
 
 // INCLUDES
 #include <in_sock.h>
@@ -55,6 +53,8 @@
     //None
 
 // CONSTANTS
+// Offset to subblock length in EIsiSubBlockTypeId8Len8 subblock
+const TUint KSubblockTypeId8Len8LengthOffset = 1;
 
 // MACROS
     //None
@@ -1078,31 +1078,39 @@ OstTraceExt2( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_GPDSCONTEXTACTIVATEREQ, 
             ( GPDS_PDP_TYPE_IPV4 == aPdpType ||
                 GPDS_PDP_TYPE_IPV6 == aPdpType ) )
             {
-            // Set the pdp address info
-            TBuf8<KMaxLengthOfGdpsActivateReqSB> pdpAddressInfo;
-            pdpAddressInfo.Zero();
-            TIsiSubBlock gpdsPdpAddressInfoSb (
-                pdpAddressInfo,
-                GPDS_PDP_ADDRESS_INFO,
-                EIsiSubBlockTypeId8Len8 );
+            TBuf8<KIpv6AddressLen> gpdsAddress;
+            ret = CMmStaticUtility::ConvertIPAddressFromClient(
+                aPdpAddress, gpdsAddress );
+            if ( KErrNone == ret )
+                {
+                TBuf8<KMaxLengthOfGdpsActivateReqSB> pdpAddressInfo;
+                pdpAddressInfo.Zero();
+                TIsiSubBlock gpdsPdpAddressInfoSb (
+                    pdpAddressInfo,
+                    GPDS_PDP_ADDRESS_INFO,
+                    EIsiSubBlockTypeId8Len8 );
+                pdpAddressInfo.Append( KGpdsPadding );
+                pdpAddressInfo.Append( gpdsAddress.Length() );
+                pdpAddressInfo.Append( gpdsAddress );
 
-            pdpAddressInfo.Append( KGpdsPadding );
-            pdpAddressInfo.Append( aPdpAddress.Length() ); //lenght should always
-                                                           //be 4 or 16
-            pdpAddressInfo.Append( aPdpAddress );
-
-            TUint8 subBlockCount( 1 );
-            gpdsActivateReq.Append( subBlockCount );
-            gpdsActivateReq.Append( gpdsPdpAddressInfoSb.CompleteSubBlock() );
+                TUint8 subBlockCount( 1 );
+                gpdsActivateReq.Append( subBlockCount );
+                gpdsActivateReq.Append( gpdsPdpAddressInfoSb.CompleteSubBlock() );
+                }
             }
         else
             {
             gpdsActivateReq.Append( 0 ); //sub block count
             }
 
-        // Send Isi message via Phonet
-        ret = iPhoNetSender->Send( PN_GPDS,
-            aTransactionId, GPDS_CONTEXT_ACTIVATE_REQ, gpdsActivateReq );
+        if ( KErrNone == ret )
+            {
+            // Send Isi message via Phonet
+            ret = iPhoNetSender->Send( PN_GPDS,
+                aTransactionId, GPDS_CONTEXT_ACTIVATE_REQ, gpdsActivateReq );
+            }
+        // no else
+
         }
     // no else
 
@@ -1991,6 +1999,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_GPDSCONTEXTMODIFYIND, "C
 TInt CMmPacketContextMessHandler::GpdsContextDeactivateReq(
     const CMmDataPackage& aDataPackage )
     {
+    TInt ret( KErrNone );
     TInfoName* contextName = NULL;
     aDataPackage.UnPackData( &contextName );
     TUint8 contextId( iContextList->GetContextIdByContextName( contextName ) );
@@ -2001,18 +2010,26 @@ TInt CMmPacketContextMessHandler::GpdsContextDeactivateReq(
         }
     // no else
 
-    TUint8 transactionId( GenerateTraId( contextId ) );
-
-    TFLOGSTRING3("TSY: CMmPacketContextMessHandler::GpdsContextDeactivateReq. TransId: %d ContextId: %d", transactionId, contextId );
+    if ( GPDS_CID_VOID != contextId )
+        {
+        TUint8 transactionId( GenerateTraId( contextId ) );
+TFLOGSTRING3("TSY: CMmPacketContextMessHandler::GpdsContextDeactivateReq. TransId: %d ContextId: %d", transactionId, contextId );
 OstTraceExt2( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_GPDSCONTEXTDEACTIVATEREQ, "CMmPacketContextMessHandler::GpdsContextDeactivateReq;transactionId=%hhu;contextId=%hhu", transactionId, contextId );
+        // Set the message data that consists of one parameter
+        TBuf8<KMessageDataBufSize1> messageData;
+        messageData.Append( contextId );
 
-    // Set the message data that consists of one parameter
-    TBuf8<KMessageDataBufSize1> messageData;
-    messageData.Append( contextId );
-
-    // Send Isi message via Phonet
-    return iPhoNetSender->Send( PN_GPDS,
-        transactionId, GPDS_CONTEXT_DEACTIVATE_REQ, messageData );
+        // Send Isi message via Phonet
+        ret = iPhoNetSender->Send( PN_GPDS,
+            transactionId, GPDS_CONTEXT_DEACTIVATE_REQ, messageData );
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmPacketContextMessHandler::GpdsContextDeactivateReq. Context ID not found, return KErrNotFound" );
+OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLER_GPDSCONTEXTDEACTIVATEREQ, "CMmPacketContextMessHandler::GpdsContextDeactivateReq. Context ID not found, return KErrNotFound" );
+        ret = KErrNotFound;
+        }
+    return ret;
     }
 
 // -----------------------------------------------------------------------------
@@ -3285,7 +3302,7 @@ TInt CMmPacketContextMessHandler::InitialiseContext(
     TFLOGSTRING( "TSY: CMmPacketContextMessHandler::InitialiseContext");
 OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_INITIALISECONTEXT, "CMmPacketContextMessHandler::InitialiseContext" );
 
-    TUint8 channelId( KTUint8NotDefined );
+    TInt channelId( KTUint8NotDefined );
     TInfoName* contextName = NULL;
     TInfoName* hostCidName = NULL;
     TInt ret( KErrNone );
@@ -3304,7 +3321,14 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_INITIALISECONTEXT, "CMmPack
 
     if( KErrNone == ret )
         {
-        ret = iContextList->GenerateProxyId( channelId );
+        if ( contextName )
+            {
+            channelId = getProxyId( *contextName );
+            }
+        else
+            {
+            ret = KErrNotFound;
+            }
 
         if( KErrNone == ret )
             {
@@ -3951,30 +3975,29 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketConte
     TUint8 contextId( iContextList->
         GetContextIdByContextName( contextName ) );
 
-    iContextList->SetInitialiseMember( contextId, ETrue );
-
     // Check that the mode given in aConfig is GPRS
     if ( TPacketDataConfigBase::KConfigGPRS == config->ExtensionId() )
         {
         if ( GPDS_CID_VOID != contextId )
             {
-
-            TFLOGSTRING("TSY: CMmPacketContextMessHandler::SetConfig -> Rel97");
+TFLOGSTRING("TSY: CMmPacketContextMessHandler::SetConfig -> Rel97");
 OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL -> Rel97" );
 
-            iContextList->SetContextConfigurationType(
-                contextId, TPacketDataConfigBase::KConfigGPRS );
+            iContextList->SetInitialiseMember( contextId, ETrue );
 
             RPacketContext::TContextConfigGPRS& configGPRS =
                 *reinterpret_cast<RPacketContext::TContextConfigGPRS*>(
                     config );
 
-            TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iPrimaryDns:%S", &configGPRS.iProtocolConfigOption.iDnsAddresses.iPrimaryDns );
+TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig IP.Length() = %d", configGPRS.iPdpAddress.Length());
+TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iPrimaryDns.Length() = %d", configGPRS.iProtocolConfigOption.iDnsAddresses.iPrimaryDns.Length() );
+TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iSecondaryDns.Length() = %d", configGPRS.iProtocolConfigOption.iDnsAddresses.iSecondaryDns.Length());
+OstTrace1( TRACE_NORMAL, DUP10_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;configGPRS.iPdpAddress.Length()=%d", configGPRS.iPdpAddress.Length() );
+OstTrace1( TRACE_NORMAL, DUP11_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;configGPRS.iProtocolConfigOption.iDnsAddresses.iPrimaryDns.Length()=%d", configGPRS.iProtocolConfigOption.iDnsAddresses.iPrimaryDns.Length() );
+OstTrace1( TRACE_NORMAL, DUP12_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;configGPRS.iProtocolConfigOption.iDnsAddresses.iSecondaryDns.Length()=%d", configGPRS.iProtocolConfigOption.iDnsAddresses.iSecondaryDns.Length() );
 
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;iPrimaryDns=%s", configGPRS.iProtocolConfigOption.iDnsAddresses.iPrimaryDns );
-            TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iSecondaryDns:%S", &configGPRS.iProtocolConfigOption.iDnsAddresses.iSecondaryDns);
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;iSecondaryDns=%s", configGPRS.iProtocolConfigOption.iDnsAddresses.iSecondaryDns );
-
+            iContextList->SetContextConfigurationType(
+                contextId, TPacketDataConfigBase::KConfigGPRS );
             // save authentication data
             ret = iContextList->SaveConfig(
                 contextId,
@@ -4103,7 +4126,6 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPac
             ret = KErrNotReady;
             }
         }
-
     else if ( TPacketDataConfigBase::KConfigRel99Rel4 == config->ExtensionId()
         || TPacketDataConfigBase::KConfigRel5 == config->ExtensionId() )
         {
@@ -4111,24 +4133,29 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPac
             {
             if ( TPacketDataConfigBase::KConfigRel5 == config->ExtensionId() )
                 {
-
-                TFLOGSTRING("TSY: CMmPacketContextMessHandler::SetConfig -> R5");
+TFLOGSTRING("TSY: CMmPacketContextMessHandler::SetConfig -> R5");
 OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL -> R5" );
                 }
             else
                 {
-
-                TFLOGSTRING("TSY: CMmPacketContextMessHandler::SetConfig -> R99");
+TFLOGSTRING("TSY: CMmPacketContextMessHandler::SetConfig -> R99");
 OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL -> R99" );
                 }
-
-            iContextList->SetContextConfigurationType(
-                contextId, TPacketDataConfigBase::KConfigRel99Rel4 );
 
             RPacketContext::TContextConfigR99_R4& configR99_R4 =
                 *reinterpret_cast<RPacketContext::TContextConfigR99_R4*>(
                     config );
 
+TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iMiscBuffer:%S", &configR99_R4.iProtocolConfigOption.iMiscBuffer );
+TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig IP.Length() = %d", configR99_R4.iPdpAddress.Length());
+TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iPrimaryDns.Length() = %d", configR99_R4.iProtocolConfigOption.iDnsAddresses.iPrimaryDns.Length() );
+TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iSecondaryDns.Length() = %d", configR99_R4.iProtocolConfigOption.iDnsAddresses.iSecondaryDns.Length());
+OstTrace1( TRACE_NORMAL, DUP6_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;configGPRS.iPdpAddress.Length()=%d", configR99_R4.iPdpAddress.Length() );
+OstTrace1( TRACE_NORMAL, DUP7_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;configGPRS.iProtocolConfigOption.iDnsAddresses.iPrimaryDns.Length()=%d", configR99_R4.iProtocolConfigOption.iDnsAddresses.iPrimaryDns.Length() );
+OstTrace1( TRACE_NORMAL, DUP8_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;configGPRS.iProtocolConfigOption.iDnsAddresses.iSecondaryDns.Length()=%d", configR99_R4.iProtocolConfigOption.iDnsAddresses.iSecondaryDns.Length() );
+
+            iContextList->SetContextConfigurationType(
+                contextId, TPacketDataConfigBase::KConfigRel99Rel4 );
             // save authentication data
             // No need to save REL5 type-> more complexity later as there is no
             // own class for Rel5 Config.
@@ -4136,13 +4163,6 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacket
                 TPacketDataConfigBase::KConfigRel99Rel4,
                 NULL,
                 &configR99_R4 );
-
-            TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iMiscBuffer:%S", &configR99_R4.iProtocolConfigOption.iMiscBuffer );
-OstTraceExt1( TRACE_NORMAL, DUP6_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;iMiscBuffer=%s", configR99_R4.iProtocolConfigOption.iMiscBuffer );
-            TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iPrimaryDns:%S", &configR99_R4.iProtocolConfigOption.iDnsAddresses.iPrimaryDns );
-OstTraceExt1( TRACE_NORMAL, DUP7_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;iPrimaryDns=%s", configR99_R4.iProtocolConfigOption.iDnsAddresses.iPrimaryDns );
-            TFLOGSTRING2("TSY: CMmPacketContextMessHandler::SetConfig iSecondaryDns:%S",&configR99_R4.iProtocolConfigOption.iDnsAddresses.iSecondaryDns );
-OstTraceExt1( TRACE_NORMAL, DUP8_CMMPACKETCONTEXTMESSHANDLER_SETCONFIGL, "CMmPacketContextMessHandler::SetConfigL;iSecondaryDns=%s", configR99_R4.iProtocolConfigOption.iDnsAddresses.iSecondaryDns );
 
             // Config saved succesfully
             if ( KErrNone == ret )
@@ -4915,7 +4935,14 @@ OstTrace1( TRACE_NORMAL, DUP4_CMMPACKETCONTEXTMESSHANDLER_ALLOWINCOMINGCALLACTIV
                 iDeactivateContextList->Reset();
                 delete iDeactivateContextList;
                 iDeactivateContextList = NULL;
-                CallModemResourceReqDenied();
+
+                // detailed cause values.
+                // see 3GPP TS 24.008 V5.16.0 spec
+                _LIT8(KDetailedCause, "\xc0\x95\x82\x02");
+                CallModemResourceReqDenied(
+                    CALL_MODEM_CAUSE_TYPE_CLIENT,
+                    CALL_MODEM_CAUSE_RELEASE_BY_USER, 
+                    KDetailedCause );
                 }
             //no else
             }
@@ -5644,8 +5671,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCEINDL, "CMm
     TUint sbStartOffset( 0 );
     //Default, 0 is unused value
     TUint resourceId( 0 );
-    // Default, emergency call mode not possible in MT call
-    TUint8 callMode( CALL_MODEM_MODE_EMERGENCY );
+    TBool callModeFound( EFalse );
     // Make a copy of received message. Allocate heap memory.
     // Can leave if out of mem.
     iResourceControlMsg = HBufC8::NewL( aIsiMessage.GetBuffer().Length() );
@@ -5674,35 +5700,56 @@ OstTrace0( TRACE_NORMAL, DUP9_CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCEINDL,
         EIsiSubBlockTypeId8Len8,
         sbStartOffset ) )
         {
-        callMode = aIsiMessage.Get8bit(
-            sbStartOffset + CALL_MODEM_SB_MODE_OFFSET_MODE );
+        callModeFound = ETrue;
         }
     // check request
-    if ( ( CALL_MODEM_RES_ID_MT_INIT == resourceId ) &&
-         ( CALL_MODEM_ID_NONE != callId ) &&
-         ( CALL_MODEM_MODE_SPEECH == callMode ||
-           CALL_MODEM_MODE_ALS_LINE_2 == callMode ||
-           CALL_MODEM_MODE_MULTIMEDIA == callMode ) )
+    if( CALL_MODEM_RES_ID_MT_INIT == resourceId )
         {
-        // if DCM drive mode flag is enabled
-        if ( iDriveModeFlag )
+        if( CALL_MODEM_ID_NONE != callId && callModeFound )
             {
+            // if DCM drive mode flag is enabled
+            if ( iDriveModeFlag )
+                {
 TFLOGSTRING( "TSY: CMmPacketContextMessHandler::CallModemResourceIndL - DCM Drive Mode enabled" );
 OstTrace0( TRACE_NORMAL, DUP8_CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCEINDL, "CMmPacketContextMessHandler::CallModemResourceIndL - DCM Drive Mode enabled" );
 
-            // Complete DCM specific functionality
-            // Drive mode rejects automatically incoming calls
-            CompleteDCMdrivemodeFunctionalityL();
-            CallModemResourceReqDenied();
-            }
-        else
-            {
+                // Complete DCM specific functionality
+                // Drive mode rejects automatically incoming calls
+                CompleteDCMdrivemodeFunctionalityL();
+
+                // detailed cause values.
+                // see 3GPP TS 24.008 V5.16.0 spec
+                _LIT8(KDetailedCause, "\xc0\x95\x82\x02");
+                CallModemResourceReqDenied(
+                    CALL_MODEM_CAUSE_TYPE_CLIENT,
+                    CALL_MODEM_CAUSE_RELEASE_BY_USER, 
+                    KDetailedCause );
+                }
+            else
+                {
 TFLOGSTRING( "TSY: CMmPacketContextMessHandler::CallModemResourceIndL - Allow incoming call activation" );
 OstTrace0( TRACE_NORMAL, DUP6_CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCEINDL, "CMmPacketContextMessHandler::CallModemResourceIndL - Allow incoming call activation" );
 
-            // allow incoming call activation
-            iCallModemResourceCallId = callId;
-            AllowIncomingCallActivationL();
+                // allow incoming call activation
+                iCallModemResourceCallId = callId;
+                AllowIncomingCallActivationL();
+                }
+            }
+        else
+            {
+TFLOGSTRING( "TSY: CMmPacketContextMessHandler::CallModemResourceIndL - Call mode missing, resource is denied" );
+OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCEINDL, "CMmPacketContextMessHandler::CallModemResourceIndL - Call mode missing, resource is denied" );
+
+            // detailed cause values.
+            // see 3GPP TS 24.008 V5.16.0 spec
+            // in this case we need to return detailed cause as
+            // 0xE0 (coding standard GSM PLMN, location user)
+            // 0xD8 (cause 88)
+            _LIT8(KDetailedCause, "\xe0\xd8");
+            CallModemResourceReqDenied(
+                CALL_MODEM_CAUSE_TYPE_NETWORK, 
+                CALL_MODEM_NW_CAUSE_INCOMPATIBLE_DEST,
+                KDetailedCause );
             }
         }
     else
@@ -5841,8 +5888,11 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCERE
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void CMmPacketContextMessHandler::CallModemResourceReqDenied()
-   {
+void CMmPacketContextMessHandler::CallModemResourceReqDenied(
+    const TUint8 aCauseType,
+    const TUint8 aCause,
+    const TDesC8& aDetailedCause )
+    {
 TFLOGSTRING("TSY: CMmPacketContextMessHandler::CallModemResourceReqDenied");
 OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCEREQDENIED, "CMmPacketContextMessHandler::CallModemResourceReqDenied" );
 
@@ -5866,10 +5916,49 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCEREQDENIED,
     callModemResourceDenied.Set8bit(
         ISI_HEADER_SIZE + CALL_MODEM_RESOURCE_REQ_OFFSET_CALLID, callId );
 
-    TInt aCurrentMsgOffset(
+    TInt currentMsgOffset(
         ISI_HEADER_SIZE + SIZE_CALL_MODEM_RESOURCE_REQ );
 
     TUint8 numOfSbInMessage( 0 );
+    TUint subblockOffset( 0 );
+
+    // CALL_MODEM_SB_RESOURCE (same as in indication)
+    if ( KErrNone == isimessage.FindSubBlockOffsetById(
+        ISI_HEADER_SIZE + SIZE_CALL_MODEM_RESOURCE_IND,
+        CALL_MODEM_SB_RESOURCE,
+        EIsiSubBlockTypeId8Len8,
+        subblockOffset ) )
+        {
+        TUint subblockLength( isimessage.Get8bit(
+            subblockOffset + KSubblockTypeId8Len8LengthOffset ) );
+
+        callModemResourceDenied.CopyData(
+            currentMsgOffset, 
+            isimessage.GetData(
+                subblockOffset, 
+                subblockLength ) );
+        numOfSbInMessage++;
+        currentMsgOffset += subblockLength;
+        }
+
+    // CALL_MODEM_SB_RESOURCE_SEQ_ID  (same as in indication)
+    if ( KErrNone == isimessage.FindSubBlockOffsetById(
+        ISI_HEADER_SIZE + SIZE_CALL_MODEM_RESOURCE_IND,
+        CALL_MODEM_SB_RESOURCE_SEQ_ID,
+        EIsiSubBlockTypeId8Len8,
+        subblockOffset ) )
+        {
+        TUint subblockLength( isimessage.Get8bit(
+            subblockOffset + KSubblockTypeId8Len8LengthOffset ) );
+
+        callModemResourceDenied.CopyData(
+            currentMsgOffset, 
+            isimessage.GetData(
+                subblockOffset, 
+                subblockLength ) );
+        numOfSbInMessage++;
+        currentMsgOffset += subblockLength;
+        }
 
     // buffer for CALL_MODEM_SB_RESOURCE_STATUS subblock
     TBuf8<CALL_MODEM_SB_RESOURCE_STATUS> resourceStatus;
@@ -5884,10 +5973,10 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCEREQDENIED,
     resourceStatus.Append( KCallPadding );
 
     callModemResourceDenied.CopyData(
-        aCurrentMsgOffset, resourceStatusSb.CompleteSubBlock() );
+        currentMsgOffset, resourceStatusSb.CompleteSubBlock() );
     // Set new offset and increase subblock count
-    aCurrentMsgOffset =
-        aCurrentMsgOffset + resourceStatus.Length();
+    currentMsgOffset =
+        currentMsgOffset + resourceStatus.Length();
     // increase subblock count
     numOfSbInMessage++;
 
@@ -5903,14 +5992,14 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCERE
         CALL_MODEM_SB_CAUSE,
         EIsiSubBlockTypeId8Len8 );
     // cause type + cause
-    modemSbCause.Append( CALL_MODEM_CAUSE_TYPE_CLIENT );
-    modemSbCause.Append( CALL_MODEM_CAUSE_RELEASE_BY_USER );
+    modemSbCause.Append( aCauseType );
+    modemSbCause.Append( aCause );
 
     callModemResourceDenied.CopyData(
-        aCurrentMsgOffset, modemSbCauseSb.CompleteSubBlock() );
+        currentMsgOffset, modemSbCauseSb.CompleteSubBlock() );
     // Set new offset and increase subblock count
-    aCurrentMsgOffset =
-        aCurrentMsgOffset + modemSbCause.Length();
+    currentMsgOffset =
+        currentMsgOffset + modemSbCause.Length();
     // increase subblock count
     numOfSbInMessage++;
 
@@ -5925,19 +6014,15 @@ OstTraceExt1( TRACE_NORMAL, DUP4_CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCERE
         detailedCause,
         CALL_MODEM_SB_DETAILED_CAUSE,
         EIsiSubBlockTypeId8Len8 );
-    // cause length + cause values ( 4 ) + filler
-    detailedCause.Append( KDiagnosticsOctet2 );
-    detailedCause.Append( KDiagnosticsOctet3 );
-    detailedCause.Append( KDiagnosticsOctet4 );
-    detailedCause.Append( KDiagnosticsOctet5 );
-    detailedCause.Append( KDiagnosticsOctet6 );
-    detailedCause.Append( KCallPadding );
+    // cause length + cause values
+    detailedCause.Append( aDetailedCause.Length() );
+    detailedCause.Append( aDetailedCause );
 
     callModemResourceDenied.CopyData(
-        aCurrentMsgOffset, detailedCauseSb.CompleteSubBlock() );
+        currentMsgOffset, detailedCauseSb.CompleteSubBlock() );
     // Set new offset and increase subblock count
-    aCurrentMsgOffset =
-        aCurrentMsgOffset + detailedCause.Length();
+    currentMsgOffset =
+        currentMsgOffset + detailedCause.Length();
     // increase subblock count
     numOfSbInMessage++;
 
@@ -5955,7 +6040,6 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMPACKETCONTEXTMESSHANDLER_CALLMODEMRESOURCERE
     // Delete iResourceControlMsg
     delete iResourceControlMsg;
     iResourceControlMsg = NULL;
-
     }
 
 // -----------------------------------------------------------------------------
@@ -6057,6 +6141,32 @@ OstTrace0( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_COMPLETEDCMDRIVEMODEFUNCTIO
         &callData,
         result );
 
+    }
+
+// -----------------------------------------------------------------------------
+// CMmPacketContextMessHandler::getProxyId
+// This method interpretes channel ID from context name.
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt CMmPacketContextMessHandler::getProxyId(const TInfoName& contextName)
+    {
+    _LIT(KUnderscore, "_");
+    TInt channelId ;
+    TInt pos = contextName.Find( KUnderscore );
+    if ( pos != KErrNotFound )
+        {
+        TLex(contextName.Mid(pos+1)).Val(channelId);
+TFLOGSTRING2("TSY: CMmPacketContextMessHandler::getProxyId channelId = %d", channelId );
+OstTrace1( TRACE_NORMAL, CMMPACKETCONTEXTMESSHANDLER_GETPROXYID, "CMmPacketContextMessHandler::getProxyId;channelId=%d", channelId );
+        }
+    else
+        {
+TFLOGSTRING("TSY: CMmPacketContextMessHandler::getProxyId channelId NOT FOUND !!!" );
+OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETCONTEXTMESSHANDLER_GETPROXYID, "CMmPacketContextMessHandler::getProxyId: channelId NOT FOUND !!!" );
+        // FAIL, this should never happen..
+        }
+    return channelId;
     }
 
 // ========================== OTHER EXPORTED FUNCTIONS =========================

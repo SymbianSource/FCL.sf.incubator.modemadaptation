@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -532,8 +532,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMDATAPORTHANDLER_LOANDIALUPPORT, "CMmDataPort
 TInt CMmDataPortHandler::RecoverDataPort(
     const CCallDataPackage* aCallDataPackage )
     {
-
-    TFLOGSTRING("TSY: CMmDataPortHandler::RecoverDataPort");
+TFLOGSTRING("TSY: CMmDataPortHandler::RecoverDataPort");
 OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort" );
 
     TInt ret( KErrNone );
@@ -544,39 +543,33 @@ OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler
     if ( commPort && ECommsDataportOpened <= iCommsStatus )
         {
 
-        TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - Client returning control: %S", &commPort->iPort );
+TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - Client returning control: %S", &commPort->iPort );
 OstTraceExt1( TRACE_NORMAL, DUP2_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;Client returning control=%S", commPort->iPort );
         // Check if port 0 has been loaned
         if ( iDP0LoanedToClient && commPort->iPort == KDataPortPort0 )
             {
             iDP0LoanedToClient = EFalse;
-
-            TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
-
+            // noone needs remaining data in buffers
+            ret = iDataPort.ResetBuffers();
+TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
 OstTraceExt1( TRACE_NORMAL, DUP3_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
             }
         else if ( iDP1LoanedToClient && commPort->iPort == KDataPortPort1 )
             {
             iDP1LoanedToClient = EFalse;
-
-            TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
-
+TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
 OstTraceExt1( TRACE_NORMAL, DUP4_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
             }
         else if ( iDP4LoanedToClient && commPort->iPort == KDataPortPort4 )
             {
             iDP4LoanedToClient = EFalse;
-
-            TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
-
+TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
 OstTraceExt1( TRACE_NORMAL, DUP5_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
             }
         else if ( iDP5LoanedToClient && commPort->iPort == KDataPortPort5 )
             {
             iDP5LoanedToClient = EFalse;
-
-            TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
-
+TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
 OstTraceExt1( TRACE_NORMAL, DUP6_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
             }
         else

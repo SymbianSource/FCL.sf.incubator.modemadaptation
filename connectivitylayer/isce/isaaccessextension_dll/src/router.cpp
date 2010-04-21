@@ -256,16 +256,19 @@ EXPORT_C void DRouter::Close(
             iChannelTable[ aChannelId ].iChannel = NULL;
             iChannelTable[ aChannelId ].iWaitingChannel = NULL;
             iChannelTable[ aChannelId ].iType = ENormalOpen;
-            const TInt indicationCancelOrderSize( 2 );
-            TDes8& cancelOrder = AllocateBlock( indicationCancelOrderSize );
-            cancelOrder.Append( 0x00 );
-            cancelOrder.Append( 0x00 );
-            // Order internally, so no return values above ::Close { 0x00, 0x00 } 8-bit cancel indication.
-            TInt error( OrderIndication( cancelOrder, aChannelId, EFalse ) );
-            C_TRACE( ( _T( "DRouter::Close open->close indication order returned %d 0x%x" ), error, aChannelId ) );
-            OstTraceExt2( TRACE_NORMAL, DROUTER_CLOSE, "DRouter::Close open->close indication order returned;error=%d;aChannelId=%x", error, aChannelId );
-            ASSERT_RESET_ALWAYS( KErrNone == error, EIADIndicationOrderFailed | static_cast<TUint8>( ( aChannelId << KChannelNumberShift ) ) );
-            DeAllocateBlock( cancelOrder );
+            if( iConnectionStatus == EIADConnectionOk )
+                {
+                const TInt indicationCancelOrderSize( 2 );
+                TDes8& cancelOrder = AllocateBlock( indicationCancelOrderSize );
+                cancelOrder.Append( 0x00 );
+                cancelOrder.Append( 0x00 );
+                // Order internally, so no return values above ::Close { 0x00, 0x00 } 8-bit cancel indication.
+                TInt error( OrderIndication( cancelOrder, aChannelId, EFalse ) );
+                C_TRACE( ( _T( "DRouter::Close open->close indication order returned %d 0x%x" ), error, aChannelId ) );
+                OstTraceExt2( TRACE_NORMAL, DROUTER_CLOSE, "DRouter::Close open->close indication order returned;error=%d;aChannelId=%x", error, aChannelId );
+                ASSERT_RESET_ALWAYS( KErrNone == error, EIADIndicationOrderFailed | static_cast<TUint8>( ( aChannelId << KChannelNumberShift ) ) );
+                DeAllocateBlock( cancelOrder );
+                }
 #if (NCP_COMMON_SOS_VERSION_SUPPORT >= SOS_VERSION_95)
             }
         else
@@ -275,6 +278,7 @@ EXPORT_C void DRouter::Close(
             iChannelTable[ aChannelId ].iType = ENormalOpen;
             iChannelTable[ aChannelId ].iChannel = iChannelTable[ aChannelId ].iWaitingChannel;
             iChannelTable[ aChannelId ].iWaitingChannel = NULL;
+            // TODO: When pipe functionality working, call PipeLoanReturned
             }
 #endif
         }
@@ -649,6 +653,12 @@ EXPORT_C TInt DRouter::SendMessage(
                 iNameService->Receive( aMessage );
                 C_TRACE( ( _T( "DRouter::SendMessage sending to NAMESERVICE<" ) ) );
                 }
+            else if ( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN ||
+                      msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_PC )
+                {
+                C_TRACE( ( _T( "DRouter::SendMessage to 0x%x" ), msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] ) );
+                this->MessageReceived( aMessage );
+                }
             else // Normal way
                 {
                 // The IST shall deallocate the block when it's approriate to do.
@@ -664,7 +674,10 @@ EXPORT_C TInt DRouter::SendMessage(
         OstTraceExt2( TRACE_NORMAL, DUP1_DROUTER_SENDMESSAGE, "DRouter::SendMessage;aCh=%hx;error=%d", aCh, error );
         // Deallocate the block.
         TRACE_ASSERT_INFO( 0, (TUint8)aCh<<KChannelNumberShift | (TUint8)error );
-        this->DeAllocateBlock( aMessage );
+        if ( error != KErrNotReady ) // No deallocation if no connection
+            {
+            this->DeAllocateBlock( aMessage );
+            }
         // TODO: who should NULL the block? IST or IAD
         }
     C_TRACE( ( _T( "DRouter::SendMessage 0x%x %d %d <-" ), &aMessage, aCh, error ) );
@@ -1274,14 +1287,19 @@ void DRouter::SetSenderInfo(
     TUint8* msgBlockPtr = const_cast<TUint8*>( aMessage.Ptr() );
     ASSERT_RESET_ALWAYS( aMessage.Length() > ISI_HEADER_OFFSET_MEDIA, EIADOverTheLimits | EIADFaultIdentifier10 << KFaultIdentifierShift  );
     if ( aCh == EIADNokiaUsbPhonetLink )
- 	      {
+        {
         msgBlockPtr[ ISI_HEADER_OFFSET_MEDIA ] = PN_MEDIA_SOS;
-        SET_RECEIVER_DEV( msgBlockPtr, OTHER_DEVICE_1 );
+        C_TRACE( ( _T( "DRouter::SetSenderInfo 0x%x 0x%x 0x%x" ), aMessage.Ptr()[0], msgBlockPtr[ ISI_HEADER_OFFSET_MEDIA ], PN_MEDIA_SOS ) );
+        if( GET_RECEIVER_DEV( msgBlockPtr ) != PN_DEV_OWN)
+      	    {
+      	    C_TRACE( ( _T( "DRouter::SetSenderInfo to OTHER_DEVICE_1" ) ) );
+            SET_RECEIVER_DEV( msgBlockPtr, OTHER_DEVICE_1 );
+            }  
         }
     else{
         SET_SENDER_OBJ( msgBlockPtr, aCh );    
         C_TRACE( ( _T( "DRouter::SetSenderInfo receiver device %d" ), msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] ) );
-        if( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN )
+        if( msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_OWN || msgBlockPtr[ ISI_HEADER_OFFSET_RECEIVERDEVICE ] == PN_DEV_PC )
             {
             C_TRACE( ( _T( "DRouter::SetSenderInfo message to APE from APE" ) ) );
             SET_SENDER_DEV( msgBlockPtr, PN_DEV_OWN );
@@ -1384,8 +1402,7 @@ TUint8 DRouter::MapMediaToLinkId(
 //From objectapi
 EXPORT_C MISIObjectRouterIf* MISIObjectRouterIf::Connect( const TInt32 aUID, TUint8& aObjId, MISIRouterObjectIf* aCallback )
     {
-    C_TRACE( ( _T( "MISIObjectRouterIf::Connect  %d 0x%x 0x%x>" ), aUID, aObjId, aCallback ) );
-    Kern::Printf( "IADRouter::Connect" );
+    C_TRACE( ( _T( "MISIObjectRouterIf::Connect %d 0x%x 0x%x>" ), aUID, aObjId, aCallback ) );
     //Connect( aUID, aObjId, aCallback );
     if( aUID == KNameServiceUID )
         {
@@ -1411,7 +1428,6 @@ EXPORT_C MISIObjectRouterIf* MISIObjectRouterIf::Connect( const TInt32 aUID, TUi
 TInt DRouter::Send( TDes8& aMessage, const TUint8 aObjId )
     {
   	C_TRACE( ( _T( "DRouter::Send objectapi 0x%x 0x%x>" ), &aMessage, aObjId ) );
-    Kern::Printf( "IADRouter::Send" );
     if( aObjId == PN_OBJ_EVENT_MULTICAST ) //from communicationmanager
         {
         // Don't put to mainrxqueue

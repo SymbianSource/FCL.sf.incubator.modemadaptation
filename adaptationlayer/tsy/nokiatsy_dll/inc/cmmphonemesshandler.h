@@ -227,11 +227,18 @@ class CMmPhoneMessHandler:
 
         /**
         * Class attributes are created in ConstructL
-        * @param CMmMessageRouter* aMessageRouter: pointer to message
-        *  router object
-        * @return void : None
+        * @param aMessageRouter Pointer to message router object
+        * @param aPhoNetSender Pointer to phonet sender object
+        * @param aSupplServMessHandler Pointer to supplementaty services
+        * message handler object
+        * @param aUiccMessHandler Pointer to uicc message handler object
+        * @return void None
         */
-        void ConstructL( CMmMessageRouter* aMessageRouter );
+        void ConstructL(
+            CMmMessageRouter* aMessageRouter,
+            CMmPhoNetSender* aPhoNetSender,
+            CMmSupplServMessHandler* aSupplServMessHandler,
+            CMmUiccMessHandler* aUiccMessHandler );
 
         /**
         * Read request for EFest
@@ -241,24 +248,24 @@ class CMmPhoneMessHandler:
 
         /**
         * Handles response for EFest reading in case of getting
-        * ACL status       
+        * ACL status
         * @param aStatus status of the operation
         * @param aFileData content of the EFest
         * @return none
         */
-        void UiccGetAclStatusReadEfEstResp( 
-            TInt aStatus, 
+        void UiccGetAclStatusReadEfEstResp(
+            TInt aStatus,
             const TDesC8& aFileData );
 
         /**
         * Handles response for EFest reading in case of setting
-        * ACL status       
+        * ACL status
         * @param aStatus status of the operation
         * @param aFileData content of the EFest
         * @return none
         */
-        void UiccSetAclStatusReadEfEstResp( 
-            TInt aStatus, 
+        void UiccSetAclStatusReadEfEstResp(
+            TInt aStatus,
             const TDesC8& aFileData );
 
         /**
@@ -270,7 +277,7 @@ class CMmPhoneMessHandler:
 
         /**
         * Handles response for EFest writing in case of setting
-        * ACL status       
+        * ACL status
         * @param aStatus status of the operation
         * @return none
         */
@@ -284,13 +291,13 @@ class CMmPhoneMessHandler:
         TInt UiccReadAclReq();
 
         /**
-        * Handles response for EFacl reading 
+        * Handles response for EFacl reading
         * @param aStatus status of the operation
         * @param aFileData content of the EFacl
         * @return none
         */
         void UiccReadAclResp(
-            TInt aStatus, 
+            TInt aStatus,
             const TDesC8& aFileData );
 
         /**
@@ -344,6 +351,27 @@ class CMmPhoneMessHandler:
         * @return TUint16 Total legtn of ACL.
         */
         TUint16 ACLLength( CDesC8ArrayFlat* aApnList ) const;
+
+        /**
+        * Set parameters for UICC_APPL_CMD_REQ message and call UICC message
+        * handler's function to create and send the message
+        * @param aTrId Transaction ID
+        * @param aServiceType Service type
+        * @param aDataAmount Amount of data to be read/write
+        * @param aDataOffset Offset where data reading/writing starts
+        * @param aFileId Elemantary file ID
+        * @param aFileIdSfi Elemantary file SFI
+        * @param aFileData File data in case of writing
+        * @return Error code
+        */
+        TInt UiccApplCmdReq(
+            const TUiccTrId aTrId,
+            const TUint8 aServiceType,
+            const TUint16 aDataAmount,
+            const TUint16 aDataOffset,
+            const TUint16 aFileId,
+            const TUint8 aFileIdSfi,
+            const TDesC8& aFileData = KNullDesC8 );
 
     private:
 

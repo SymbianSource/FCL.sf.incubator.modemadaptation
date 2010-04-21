@@ -60,18 +60,6 @@ public:
     void SignalIndReceived( );
 
     /**
-     * Returns DteId of current session
-     *  @return DteID 
-     */    
-    TUint8 GetDteId();
-
-    /**
-      *  Sets DteID for this session
-      *  @param aDteId DteId
-      */    
-    void SetDteId( const TUint8 aDteId );
-
-    /**
       * Returns name of current session  
       * @return Session name 
       */    
@@ -154,10 +142,11 @@ private:
     RMessage2 iCommandModeReq;
 
     TVersion iVersion;
-    TUint8 iDteId;
     HBufC8* iClientName;
     TATPluginInterface iPluginType;
     TPtr8 iClientNamePtr;
     };
 
 #endif  // CMODEMATSESSION_H
+
+
