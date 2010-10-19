@@ -45,14 +45,21 @@ const TUint8 KExtraInfoShift( 24 );
     #else
         #define C_TRACE(a) 
     #endif // COMPONENT_TRACE_FLAG
+    #if defined COMPONENT_TRACE_FLAG_EXTEND
+        #define E_TRACE(a) __TRACE_PRINTF(a)
+    #else
+        #define E_TRACE(a) 
+    #endif // COMPONENT_TRACE_FLAG_EXTEND
 #else
     #define C_TRACE(a)
+    #define E_TRACE(a)
 #endif // _DEBUG
 
 // Resets are made both in UDEB and UREL (traces only in udeb)
 #define ASSERT_RESET_ALWAYS(a,b) if(!(a)) { __TRACE_PRINTF(("Assertion failed: file=" __FILE__ ", line=%d, compiled="__DATE__" "__TIME__, __LINE__)); Kern::Fault( "ISICommunicationManager:", b ); }
 #define TRACE_ASSERT(a) if (!(a)) __TRACE_PRINTF(("Assertion failed: file=" __FILE__ ", line=%d, compiled=" __DATE__" "__TIME__, __LINE__ ))
 #define TRACE_ASSERT_INFO(a, b) if (!(a)) __TRACE_PRINTF(("Assertion failed: file=" __FILE__ ", line=%d, extra info 0x%08x, compiled=" __DATE__" "__TIME__, __LINE__, b ));
+#define TRACE_ASSERT_ALWAYS { __TRACE_PRINTF(("Assertion failed: file=" __FILE__ ", line=%d, compiled="__DATE__" "__TIME__, __LINE__));  }
 
 #endif // __ISICOMMUNICATIONMANAGERTRACE_H__
 

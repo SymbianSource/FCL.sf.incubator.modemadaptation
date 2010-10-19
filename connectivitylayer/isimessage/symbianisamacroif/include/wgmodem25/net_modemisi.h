@@ -24,7 +24,7 @@
 #define _SYMBIAN_ISI_NET_MODEMISI_H_
 
 #define MODEM_NETWORK_SELECT_SERVER_ISI_VERSION_Z	 16
-#define MODEM_NETWORK_SELECT_SERVER_ISI_VERSION_Y	 9
+#define MODEM_NETWORK_SELECT_SERVER_ISI_VERSION_Y	 12
 
 
 //CONSTANTS
@@ -40,6 +40,8 @@
 #define NET_INDEX_NOT_USED                                	0x00                                                 	
 #define NET_SCRAMBLING_CODE_UNDEFINED                     	0xFFFF                                            	
 #define NET_ECID_TA_UNDEFINED                             	0xFF                                              	
+#define NET_NO_RSSI_INDICATED                             	0x00                                                 	
+#define NET_ALL_RSSI_INDICATED                            	0xFF                                              	
 
 
 //TABLES
@@ -110,6 +112,9 @@
 #define NET_SELECT_MODE_AUTOMATIC                         	0x02                                                 	
 #define NET_SELECT_MODE_USER_RESELECTION                  	0x03                                                 	
 #define NET_SELECT_MODE_NO_SELECTION                      	0x04                                                 	
+#define NET_SELECT_MODE_POWER_ON_AUTOMATIC                	0x05                                                 	
+#define NET_SELECT_MODE_POWER_ON_MANUAL                   	0x06                                                 	
+#define NET_SELECT_MODE_POWER_ON_NO_SELECTION             	0x07                                                 	
 
 //ConstantTable for NET_MODEM_NETWORK_STATUS
 #define NET_OPER_STATUS_UNKNOWN                           	0x00                                                 	
@@ -332,6 +337,10 @@
 //ConstantTable for NET_UTRAN_RADIO_STATE
 #define NET_UTRAN_RADIO_IDLE                              	0x00                                                 	
 #define NET_UTRAN_RADIO_CELL_DCH                          	0x01                                                 	
+
+//ConstantTable for NET_SIGNAL_LEVEL_TYPE_TBL
+#define PERCENT                                           	0x00                                                 	
+#define DBM                                               	0x01                                                 	
 
 
 //STRUCTURES
@@ -773,6 +782,19 @@
 //NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
 
 
+//Definition for NET_RSSI_CONF_INFO
+#define NET_RSSI_CONF_INFO                                	0x54                                              	
+#define NET_RSSI_CONF_INFO_OFFSET_SUBBLOCKID              	0 //size 1 byte(s)
+#define NET_RSSI_CONF_INFO_OFFSET_SUBBLOCKLENGTH          	1 //size 1 byte(s)
+#define NET_RSSI_CONF_INFO_OFFSET_NETSIGNALLEVELTYPE      	2 //size 1 byte(s)
+#define NET_RSSI_CONF_INFO_OFFSET_HYSTERESISDOWN          	3 //size 1 byte(s)
+#define NET_RSSI_CONF_INFO_OFFSET_HYSTERESISUP            	4 //size 1 byte(s)
+#define NET_RSSI_CONF_INFO_OFFSET_LOWLIMIT                	5 //size 1 byte(s)
+#define NET_RSSI_CONF_INFO_OFFSET_UPLIMIT                 	6 //size 1 byte(s)
+#define NET_RSSI_CONF_INFO_OFFSET_FILLERBYTE1             	7 //size 1 byte(s)
+#define SIZE_NET_RSSI_CONF_INFO                           	8
+
+
 //MESSAGES
 
 
@@ -1151,5 +1173,23 @@
 #define NET_SOR_RESP_OFFSET_SUCCESSCODE                   	2 //size 1 byte(s)
 #define NET_SOR_RESP_OFFSET_FILLERBYTE1                   	3 //size 1 byte(s)
 #define SIZE_NET_SOR_RESP                                 	4
+
+
+//Definition for NET_RSSI_CONF_REQ
+#define NET_RSSI_CONF_REQ                                 	0x46                                              	
+#define NET_RSSI_CONF_REQ_OFFSET_TRANSID                  	0 //size 1 byte(s)
+#define NET_RSSI_CONF_REQ_OFFSET_MESSAGEID                	1 //size 1 byte(s)
+#define NET_RSSI_CONF_REQ_OFFSET_NBROFSEGMENTS            	2 //size 1 byte(s)
+#define NET_RSSI_CONF_REQ_OFFSET_SUBBLOCKCOUNT            	3 //size 1 byte(s)
+#define SIZE_NET_RSSI_CONF_REQ                            	4
+
+
+//Definition for NET_RSSI_CONF_RESP
+#define NET_RSSI_CONF_RESP                                	0x47                                              	
+#define NET_RSSI_CONF_RESP_OFFSET_TRANSID                 	0 //size 1 byte(s)
+#define NET_RSSI_CONF_RESP_OFFSET_MESSAGEID               	1 //size 1 byte(s)
+#define NET_RSSI_CONF_RESP_OFFSET_SUCCESSCODE             	2 //size 1 byte(s)
+#define NET_RSSI_CONF_RESP_OFFSET_FILLERBYTE1             	3 //size 1 byte(s)
+#define SIZE_NET_RSSI_CONF_RESP                           	4
 
 #endif

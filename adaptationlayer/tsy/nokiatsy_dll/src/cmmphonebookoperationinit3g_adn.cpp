@@ -70,7 +70,7 @@ CMmPhoneBookOperationInit3G_adn::CMmPhoneBookOperationInit3G_adn
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::CMmPhoneBookOperationInit3G_adn");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CMMPHONEBOOKOPERATIONINIT3G_ADN, "CMmPhoneBookOperationInit3G_adn::CMmPhoneBookOperationInit3G_adn" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_CMMPHONEBOOKOPERATIONINIT3G_ADN_TD, "CMmPhoneBookOperationInit3G_adn::CMmPhoneBookOperationInit3G_adn" );
     }
 
 // -----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ CMmPhoneBookOperationInit3G_adn::~CMmPhoneBookOperationInit3G_adn
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::CMmPhoneBookOperationInit3G_adn");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_CMMPHONEBOOKOPERATIONINIT3G_ADN, "CMmPhoneBookOperationInit3G_adn::~CMmPhoneBookOperationInit3G_adn" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_CMMPHONEBOOKOPERATIONINIT3G_ADN_TD, "CMmPhoneBookOperationInit3G_adn::~CMmPhoneBookOperationInit3G_adn" );
     }
 
 // -----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ CMmPhoneBookOperationInit3G_adn* CMmPhoneBookOperationInit3G_adn::NewL
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::NewL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_NEWL, "CMmPhoneBookOperationInit3G_adn::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_NEWL_TD, "CMmPhoneBookOperationInit3G_adn::NewL" );
 
 
     TName phonebookTypeName;
@@ -154,7 +154,7 @@ void CMmPhoneBookOperationInit3G_adn::ConstructL
     )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::ConstructL" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CONSTRUCTL, "CMmPhoneBookOperationInit3G_adn::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_CONSTRUCTL_TD, "CMmPhoneBookOperationInit3G_adn::ConstructL" );
 
     iPBStoreInfoData = new( ELeave ) CStorageInfoData();
 
@@ -177,7 +177,7 @@ TInt CMmPhoneBookOperationInit3G_adn::UICCCreateReq
     )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::UICCCreateReq" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCCREATEREQ, "CMmPhoneBookOperationInit3G_adn::UICCCreateReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCCREATEREQ_TD, "CMmPhoneBookOperationInit3G_adn::UICCCreateReq" );
 
     TInt ret( KErrNotSupported );
 
@@ -211,7 +211,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCCREATEREQ, "CMmPhon
             {
             // Nothing to do here
 TFLOGSTRING2( "TSY: CMmPhoneBookOperationInit3G_adn::UICCCreateReq - Unknown IPC: %d", aIpc );
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCCREATEREQ, "CMmPhoneBookOperationInit3G_adn::UICCCreateReq;Unknown IPC =%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCCREATEREQ_TD, "CMmPhoneBookOperationInit3G_adn::UICCCreateReq;Unknown IPC =%d", aIpc );
             break;
             }
         } // switch-case ends
@@ -227,7 +227,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCCREATEREQ, "CM
 TInt CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN( TUint8 aTransId)
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCINITIALIZEREQ3GADN, "CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCINITIALIZEREQ3GADN_TD, "CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN" );
 
     TInt ret(KErrNone);
     TInt appFileID( APPL_FILE_ID );
@@ -250,7 +250,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCINITIALIZEREQ3GADN,
             // Send Request to UICC Server to Read file Info of PBR file
             // No. of records in PBR file
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN - File Info Read Request for EF-PBR " );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCINITIALIZEREQ3GADN, "CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN - File Info Read Request for EF-PBR" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_UICCINITIALIZEREQ3GADN_TD, "CMmPhoneBookOperationInit3G_adn::UICCInitializeReq3GADN - File Info Read Request for EF-PBR" );
 
             cmdParams.fileId = PB_PBR_FID;
             cmdParams.serviceType = iServiceType;
@@ -308,7 +308,7 @@ TInt CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile(
     const TUint8 aFileType )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE, "CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE_TD, "CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile" );
 
     TInt ret( KErrNone );
     TUint16 fileFID ( 0 );
@@ -319,7 +319,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE,
         case UICC_TYPE1_FILE:
             {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile - Create req for Type 1 File " );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE, "CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile - Create req for Type 1 File  " );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE_TD, "CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile - Create req for Type 1 File  " );
 
             fileFID = iType1FileArray[iCurrentArrayCounter].tagFID;
             fileSFI = iType1FileArray[iCurrentArrayCounter].tagSFI;
@@ -328,7 +328,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPE
         case UICC_TYPE2_FILE:
             {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile - Create req for Type 2 File  " );
-OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE, "CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile - Create req for Type 2 File " );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE_TD, "CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile - Create req for Type 2 File " );
 
             fileFID = iType2FileArray[iCurrentArrayCounter].tagFID;
             fileSFI = iType2FileArray[iCurrentArrayCounter].tagSFI;
@@ -337,7 +337,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPE
         case UICC_TYPE3_FILE:
             {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile - Create req for Type 3 File  " );
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE, "CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile - Create req for Type 3 File " );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONINIT3G_ADN_CREATEREQFETCHTYPEFILE_TD, "CMmPhoneBookOperationInit3G_adn::CreateReqFetchTypeFile - Create req for Type 3 File " );
             fileFID = iType3FileArray[iCurrentArrayCounter].tagFID;
             fileSFI = iType3FileArray[iCurrentArrayCounter].tagSFI;
             break;
@@ -379,7 +379,7 @@ TBool CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL
     if ( iInternalInit )
         {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. Internal Init->Break");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. Internal Init-> Break" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. Internal Init-> Break" );
 
         iIniPhase = EPBIniPhase_Unknown;
 
@@ -396,7 +396,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL,
         case EPBInitPhase_3GADN_Type3:
             {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. USIM ADN PhoneBook Init" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. USIM ADN Phonebook init" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. USIM ADN Phonebook init" );
             ret = HandleUICCPbResp3GADN( aFileData, aStatus, aTransId );
             break;
             }
@@ -406,7 +406,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL, "CMm
         case EPBInitPhaseMSISDN:
             {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit::HandleUICCPbRespL. Other PhoneBook Init" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. Other Phonebook Init" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbRespL. Other Phonebook Init" );
             // For all other phoenbook handling is same as 2g Phonebook
             ret = HandlePBRespL( aFileData, aStatus, aTransId );
             break;
@@ -454,7 +454,7 @@ TInt CMmPhoneBookOperationInit3G_adn::HandleUICCPbResp3GADN
     TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::HandleUICCPbResp3GADN");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESP3GADN, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbResp3GADN" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLEUICCPBRESP3GADN_TD, "CMmPhoneBookOperationInit3G_adn::HandleUICCPbResp3GADN" );
 
     TInt ret( KErrNone );
 
@@ -578,7 +578,7 @@ void CMmPhoneBookOperationInit3G_adn::HandleType1FileResp(
     TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::HandleType1FileResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP, "CMmPhoneBookOperationInit3G_adn::HandleType1FileResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE1FILERESP_TD, "CMmPhoneBookOperationInit3G_adn::HandleType1FileResp" );
 
     TInt ret( KErrNone );
     TInt recordLength( 0 );
@@ -827,7 +827,7 @@ void CMmPhoneBookOperationInit3G_adn::HandleType2FileResp(
     TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::HandleType2FileResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP, "CMmPhoneBookOperationInit3G_adn::HandleType2FileResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE2FILERESP_TD, "CMmPhoneBookOperationInit3G_adn::HandleType2FileResp" );
 
     TInt ret(KErrNone);
     TInt recordLength( 0 );
@@ -969,7 +969,7 @@ void CMmPhoneBookOperationInit3G_adn::HandleType3FileResp(
     TInt aStatus)
     {
     TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::HandleType3FileResp" );
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE3FILERESP, "CMmPhoneBookOperationInit3G_adn::HandleType3FileResp" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_HANDLETYPE3FILERESP_TD, "CMmPhoneBookOperationInit3G_adn::HandleType3FileResp" );
 
     TInt ret( KErrNone );
     TInt recordLength( 0 );
@@ -1074,7 +1074,7 @@ void CMmPhoneBookOperationInit3G_adn::HandleType3FileResp(
 TInt CMmPhoneBookOperationInit3G_adn::CheckForFileId()
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit3G_adn::CheckForFileId");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORFILEID, "CMmPhoneBookOperationInit3G_adn::CheckForFileId" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORFILEID_TD, "CMmPhoneBookOperationInit3G_adn::CheckForFileId" );
 
     TInt ret( KErrNone );
 
@@ -1186,7 +1186,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORFILEID, "CMmPho
 TInt CMmPhoneBookOperationInit3G_adn::CheckForNoOfRecords( TInt aNoOfRecord )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::CheckForNoOfRecords" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORNOOFRECORDS, "CMmPhoneBookOperationInit3G_adn::CheckForNoOfRecords" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORNOOFRECORDS_TD, "CMmPhoneBookOperationInit3G_adn::CheckForNoOfRecords" );
 
     TInt ret( KErrNone );
 
@@ -1212,7 +1212,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORNOOFRECORDS, "C
 TInt CMmPhoneBookOperationInit3G_adn::CheckForSameType1AndType2Files()
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::CheckForSameType1AndType2Files" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORSAMETYPE1ANDTYPE2FILES, "CMmPhoneBookOperationInit3G_adn::CheckForSameType1AndType2Files" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKFORSAMETYPE1ANDTYPE2FILES_TD, "CMmPhoneBookOperationInit3G_adn::CheckForSameType1AndType2Files" );
 
     TInt ret( KErrNone );
 
@@ -1252,7 +1252,7 @@ TInt CMmPhoneBookOperationInit3G_adn::CheckRecordSizeForFixedLength(
     TInt aRecordLength)
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationInit3G_adn::CheckRecordSizeForFixedLength" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKRECORDSIZEFORFIXEDLENGTH, "CMmPhoneBookOperationInit3G_adn::CheckRecordSizeForFixedLength" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT3G_ADN_CHECKRECORDSIZEFORFIXEDLENGTH_TD, "CMmPhoneBookOperationInit3G_adn::CheckRecordSizeForFixedLength" );
 
     TInt ret( KErrNone );
 

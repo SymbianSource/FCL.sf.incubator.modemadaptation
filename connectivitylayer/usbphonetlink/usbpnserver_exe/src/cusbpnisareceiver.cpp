@@ -140,7 +140,7 @@ void CUsbPnIsaReceiver::DoCancel( )
 //
 void CUsbPnIsaReceiver::RunL( )
     {
-    OstTrace1( TRACE_API, CUSBPNISARECEIVER_RUNL_ENTRY, "CUsbPnIsaReceiver::RunL;iStatus=%d", iStatus.Int() );
+    OstTrace1( TRACE_BORDER, CUSBPNISARECEIVER_RUNL_ENTRY, "CUsbPnIsaReceiver::RunL;iStatus=%d", iStatus.Int() );
     A_TRACE( ( _T( "CUsbPnIsaReceiver::RunL() iStatus:%d" ), iStatus.Int() ) );
 
     User::LeaveIfError(iStatus.Int());
@@ -152,7 +152,7 @@ void CUsbPnIsaReceiver::RunL( )
     if( (iRecvPtr[ISI_HEADER_OFFSET_RESOURCEID] == PN_MEDIA_CONTROL) &&
             (iRecvPtr[ISI_HEADER_OFFSET_MESSAGEID] == PNS_MEDIA_SPECIFIC_RESP) )
         {
-        OstTrace0( TRACE_API, CUSBPNISARECEIVER_RUNL, "CUsbPnIsaReceiver::RunL - Media specific resp" );
+        OstTrace0( TRACE_BORDER, CUSBPNISARECEIVER_RUNL, "CUsbPnIsaReceiver::RunL - Media specific resp" );
         A_TRACE( ( _T( "CUsbPnIsaReceiver::RunL - Media specific resp" )));
         iPacket->ReleaseL();
         ReceivingNextPacket();
@@ -171,14 +171,14 @@ void CUsbPnIsaReceiver::RunL( )
         // PC phonet connection not open
         else
             {
-            OstTrace0( TRACE_API, CUSBPNISARECEIVER_RUNL_DUP2, "CUsbPnIsaReceiver::RunL - Discarding" );
+            OstTrace0( TRACE_BORDER, CUSBPNISARECEIVER_RUNL_DUP2, "CUsbPnIsaReceiver::RunL - Discarding" );
             A_TRACE( ( _T( "CUsbPnIsaReceiver::RunL - Discarding" )));
             iPacket->ReleaseL();
             ReceivingNextPacket();
             }
         }
 
-    OstTrace0( TRACE_API, CUSBPNISARECEIVER_RUNL_EXIT, "CUsbPnIsaReceiver::RunL - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNISARECEIVER_RUNL_EXIT, "CUsbPnIsaReceiver::RunL - return void" );
     A_TRACE( ( _T( "CUsbPnIsaReceiver::RunL() - return void" ) ) );
     }
 
@@ -192,10 +192,10 @@ void CUsbPnIsaReceiver::ReceivingNextPacket()
     C_TRACE( ( _T( "CUsbPnIsaReceiver::ReceivingNextPacket()" ) ) );
     iRecvPtr.Set( iPacket->Buffer().Des() );
     iIscApi.Receive( iStatus, iRecvPtr, iNeededLength );
-    OstTrace0( TRACE_DETAILED, CUSBPNISARECEIVER_RECEIVINGNEXTPACKET_DUP1, "CUsbPnIsaReceiver::ReceivingNextPacket - receiving new" );
+    OstTrace0( TRACE_INTERNALS, CUSBPNISARECEIVER_RECEIVINGNEXTPACKET_DUP1, "CUsbPnIsaReceiver::ReceivingNextPacket - receiving new" );
     E_TRACE((_T("CUsbPnIsaReceiver::ReceivingNextPacket - Receiving new")));
     SetActive();
-    OstTrace0( TRACE_API, CUSBPNISARECEIVER_RECEIVINGNEXTPACKET_EXIT, "CUsbPnIsaReceiver::ReceivingNextPacket - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNISARECEIVER_RECEIVINGNEXTPACKET_EXIT, "CUsbPnIsaReceiver::ReceivingNextPacket - return void" );
     A_TRACE( ( _T( "CUsbPnIsaReceiver::ReceivingNextPacket() - return void" ) ) );
     }
 
@@ -205,14 +205,14 @@ void CUsbPnIsaReceiver::ReceivingNextPacket()
 //
 TInt CUsbPnIsaReceiver::RunError( TInt aError )
     {
-    OstTrace1( TRACE_API, CUSBPNISARECEIVER_RUNERROR_ENTRY, "CUsbPnIsaReceiver::RunError;aError=%d", aError );
+    OstTrace1( TRACE_BORDER, CUSBPNISARECEIVER_RUNERROR_ENTRY, "CUsbPnIsaReceiver::RunError;aError=%d", aError );
     A_TRACE( ( _T( "CUsbPnIsaReceiver::RunError( aError:%d )" ), aError ) );
 
     switch( aError )
         {
         case KErrNoMemory:
             {
-            OstTrace0( TRACE_DETAILED, CUSBPNISARECEIVER_RUNERROR, "CUsbPnIsaReceiver::RunError - Release packet buffer and alloc bigger for temporary use" );
+            OstTrace0( TRACE_INTERNALS, CUSBPNISARECEIVER_RUNERROR, "CUsbPnIsaReceiver::RunError - Release packet buffer and alloc bigger for temporary use" );
             E_TRACE( ( _T( "CUsbPnIsaReceiver::RunError - Release packet buffer and alloc bigger for temporary use" )));
             aError = KErrNone;
             TRAP( aError, iPacket->ReallocBufferL( iNeededLength ) );
@@ -224,7 +224,7 @@ TInt CUsbPnIsaReceiver::RunError( TInt aError )
             }
         case KErrOverflow:
             {
-            OstTrace0( TRACE_DETAILED, CUSBPNISARECEIVER_RUNERROR_DUP2, "CUsbPnIsaReceiver::RunError - Release ISC buffer." );
+            OstTrace0( TRACE_INTERNALS, CUSBPNISARECEIVER_RUNERROR_DUP2, "CUsbPnIsaReceiver::RunError - Release ISC buffer." );
             E_TRACE( ( _T( "CUsbPnIsaReceiver::RunError - Release ISC buffer." )));
             iIscApi.ResetBuffers(); // Connection was probably down, so the old messages are not needed
             break;
@@ -297,14 +297,14 @@ void CUsbPnIsaReceiver::ConstructMessage()
     OstTrace0( TRACE_NORMAL, CUSBPNISARECEIVER_CONSTRUCTMESSAGE_ENTRY, "CUsbPnIsaReceiver::ConstructMessage" );
     C_TRACE( ( _T( "CUsbPnIsaReceiver::ConstructMessage()" ) ) );
 
-    OstTrace1( TRACE_DETAILED, CUSBPNISARECEIVER_CONSTRUCTMESSAGE, "CUsbPnIsaReceiver::ConstructMessage - Convert endianness;iRecvPtr.Length()=%d", iRecvPtr.Length() );
+    OstTrace1( TRACE_INTERNALS, CUSBPNISARECEIVER_CONSTRUCTMESSAGE, "CUsbPnIsaReceiver::ConstructMessage - Convert endianness;iRecvPtr.Length()=%d", iRecvPtr.Length() );
     E_TRACE( ( _T( "CUsbPnIsaReceiver::ConstructMessage() - Convert endianness - iRecvPtr.Length():%d" ), iRecvPtr.Length() ) );
-#ifdef ISI_LENGTH_LITTLE_ENDIAN
+#ifndef ISI_LENGTH_BIG_ENDIAN
     TUint8 lsb(iRecvPtr[ISI_HEADER_OFFSET_LENGTH]);
     TUint8 msb(iRecvPtr[ISI_HEADER_OFFSET_LENGTH +1]);
     iRecvPtr[ISI_HEADER_OFFSET_LENGTH] = msb;
     iRecvPtr[ISI_HEADER_OFFSET_LENGTH +1] = lsb;
-#endif // ISI_LENGTH_LITTLE_ENDIAN
+#endif // ISI_LENGTH_BIG_ENDIAN
     OstTrace0( TRACE_NORMAL, CUSBPNISARECEIVER_CONSTRUCTMESSAGE_EXIT, "CUsbPnIsaReceiver::ConstructMessage - return void" );
     C_TRACE( ( _T( "CUsbPnIsaReceiver::ConstructMessage() - return void" ) ) );
     }

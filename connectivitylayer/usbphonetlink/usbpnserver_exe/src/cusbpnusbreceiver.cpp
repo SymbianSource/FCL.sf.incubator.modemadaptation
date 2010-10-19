@@ -154,7 +154,7 @@ void CUsbPnUsbReceiver::DoCancel( )
 //
 void CUsbPnUsbReceiver::RunL( )
     {
-    OstTrace1( TRACE_API, CUSBPNUSBRECEIVER_RUNL_ENTRY, "CUsbPnUsbReceiver::RunL;iStatus:%d", iStatus.Int() );
+    OstTrace1( TRACE_BORDER, CUSBPNUSBRECEIVER_RUNL_ENTRY, "CUsbPnUsbReceiver::RunL;iStatus:%d", iStatus.Int() );
     A_TRACE( ( _T( "CUsbPnUsbReceiver::RunL() iStatus:%d" ), iStatus.Int() ) );
 
     User::LeaveIfError( iStatus.Int() );
@@ -168,7 +168,7 @@ void CUsbPnUsbReceiver::RunL( )
         Receive( ETrue );
         }
 
-    OstTrace0( TRACE_API, CUSBPNUSBRECEIVER_RUNL_EXIT, "CUsbPnUsbReceiver::RunL - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNUSBRECEIVER_RUNL_EXIT, "CUsbPnUsbReceiver::RunL - return void" );
     A_TRACE( ( _T( "CUsbPnUsbReceiver::RunL() - return void" ) ) );
     }
 
@@ -177,10 +177,10 @@ void CUsbPnUsbReceiver::RunL( )
 // -----------------------------------------------------------------------------
 void CUsbPnUsbReceiver::SetMessageComplete( const TBool aMsgComplete )
     {
-    OstTrace1( TRACE_API, CUSBPNUSBRECEIVER_SETMESSAGECOMPLETE_ENTRY, "CUsbPnUsbReceiver::SetMessageComplete;aMsgComplete:%d", aMsgComplete );
+    OstTrace1( TRACE_BORDER, CUSBPNUSBRECEIVER_SETMESSAGECOMPLETE_ENTRY, "CUsbPnUsbReceiver::SetMessageComplete;aMsgComplete:%d", aMsgComplete );
     A_TRACE( ( _T( "CUsbPnUsbReceiver::SetMessageComplete() aMsgComplete:%d" ), aMsgComplete ) );
     iMessageComplete = aMsgComplete;
-    OstTrace0( TRACE_API, CUSBPNUSBRECEIVER_SETMESSAGECOMPLETE_EXIT, "CUsbPnUsbReceiver::SetMessageComplete - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNUSBRECEIVER_SETMESSAGECOMPLETE_EXIT, "CUsbPnUsbReceiver::SetMessageComplete - return void" );
     A_TRACE( ( _T( "CUsbPnUsbReceiver::SetMessageComplete() - return void" ) ) );
     }
 
@@ -189,10 +189,10 @@ void CUsbPnUsbReceiver::SetMessageComplete( const TBool aMsgComplete )
 // -----------------------------------------------------------------------------
 void CUsbPnUsbReceiver::SetByteCount( const TUint aByteCount )
     {
-    OstTrace1( TRACE_API, CUSBPNUSBRECEIVER_SETBYTECOUNT_ENTRY, "CUsbPnUsbReceiver::SetByteCount;aByteCount:%d", aByteCount );
+    OstTrace1( TRACE_BORDER, CUSBPNUSBRECEIVER_SETBYTECOUNT_ENTRY, "CUsbPnUsbReceiver::SetByteCount;aByteCount:%d", aByteCount );
     A_TRACE( ( _T( "CUsbPnUsbReceiver::SetByteCount() aByteCount:%d" ), aByteCount ) );
     iByteCount = aByteCount;
-    OstTrace0( TRACE_API, CUSBPNUSBRECEIVER_SETBYTECOUNT_EXIT, "CUsbPnUsbReceiver::SetByteCount - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNUSBRECEIVER_SETBYTECOUNT_EXIT, "CUsbPnUsbReceiver::SetByteCount - return void" );
     A_TRACE( ( _T( "CUsbPnUsbReceiver::SetByteCount() - return void" ) ) );
     }
 
@@ -202,10 +202,10 @@ void CUsbPnUsbReceiver::SetByteCount( const TUint aByteCount )
 // -----------------------------------------------------------------------------
 void CUsbPnUsbReceiver::SetMessageLength( const TUint aMessageLength )
     {
-    OstTrace1( TRACE_API, CUSBPNUSBRECEIVER_SetMessageLength_ENTRY, "CUsbPnUsbReceiver::SetMessageLength;aMessageLength:%d", aMessageLength );
+    OstTrace1( TRACE_BORDER, CUSBPNUSBRECEIVER_SetMessageLength_ENTRY, "CUsbPnUsbReceiver::SetMessageLength;aMessageLength:%d", aMessageLength );
     A_TRACE( ( _T( "CUsbPnUsbReceiver::SetMessageLength() aMessageLength:%d" ), aMessageLength ) );
     iMessageLength = aMessageLength;
-    OstTrace0( TRACE_API, CUSBPNUSBRECEIVER_SetMessageLength_EXIT, "CUsbPnUsbReceiver::SetMessageLength - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNUSBRECEIVER_SetMessageLength_EXIT, "CUsbPnUsbReceiver::SetMessageLength - return void" );
     A_TRACE( ( _T( "CUsbPnUsbReceiver::SetMessageLength() - return void" ) ) );
     }
 
@@ -215,7 +215,7 @@ void CUsbPnUsbReceiver::SetMessageLength( const TUint aMessageLength )
 //
 TInt CUsbPnUsbReceiver::RunError( TInt aError )
     {
-    OstTrace1( TRACE_API, CUSBPNUSBRECEIVER_RUNERROR_ENTRY, "CUsbPnUsbReceiver::RunError;aError=%d", aError );
+    OstTrace1( TRACE_BORDER, CUSBPNUSBRECEIVER_RUNERROR_ENTRY, "CUsbPnUsbReceiver::RunError;aError=%d", aError );
     A_TRACE( ( _T( "CUsbPnUsbReceiver::RunError(aError:%d)" ), aError ) );
 
     switch( aError )
@@ -324,7 +324,7 @@ void CUsbPnUsbReceiver::ConstructMessageL()
     C_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage()" ) ) );
 
     TUint packetLength( iPacket->Buffer().Length() );
-    OstTrace1( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL, "CUsbPnUsbReceiver::ConstructMessageL;packetLength=%d", packetLength );
+    OstTrace1( TRACE_INTERNALS, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL, "CUsbPnUsbReceiver::ConstructMessageL;packetLength=%d", packetLength );
     E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - packetLength:%d" ), packetLength ) );
 
     // New message
@@ -335,18 +335,18 @@ void CUsbPnUsbReceiver::ConstructMessageL()
 
         iMessageLength = ( lsb | ( msb<<8 ) );
 
-        OstTrace1( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP1, "CUsbPnUsbReceiver::ConstructMessageL;iMessageLength=%d", iMessageLength );
+        OstTrace1( TRACE_INTERNALS, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP1, "CUsbPnUsbReceiver::ConstructMessageL;iMessageLength=%d", iMessageLength );
         E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - iMessageLength:%d" ), iMessageLength ) );
         if( iMessageLength >= 4 )
             {
             iByteCount = packetLength;
 
-            OstTrace1( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP2, "CUsbPnUsbReceiver::ConstructMessageLNew message;Received:%d", iByteCount );
+            OstTrace1( TRACE_INTERNALS, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP2, "CUsbPnUsbReceiver::ConstructMessageLNew message;Received:%d", iByteCount );
             E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - New message. Received:%d"), iByteCount));
 
             if( ( PN_HEADER_SIZE + iMessageLength ) > packetLength )
                 {
-                OstTrace0( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP3, "CUsbPnUsbReceiver::ConstructMessageL - partial message. Receive more" );
+                OstTrace0( TRACE_INTERNALS, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP3, "CUsbPnUsbReceiver::ConstructMessageL - partial message. Receive more" );
                 E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - partial message. Receive more")));
 
                 iStorage = HBufC8::NewL( iMessageLength + PN_HEADER_SIZE );
@@ -360,7 +360,7 @@ void CUsbPnUsbReceiver::ConstructMessageL()
     else
         {
         iByteCount = iByteCount + packetLength;
-        OstTrace1( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP4, "CUsbPnUsbReceiver::ConstructMessageL - Append to previous part;iByteCount:%d", iByteCount );
+        OstTrace1( TRACE_INTERNALS, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP4, "CUsbPnUsbReceiver::ConstructMessageL - Append to previous part;iByteCount:%d", iByteCount );
         E_TRACE((_T("CUsbPnUsbReceiver::ConstructMessage - Append to previous part. iByteCount:%d"), iByteCount));
         TPtr8 tmp( iStorage->Des() );
         tmp.Append( iPacket->Buffer() );
@@ -369,12 +369,12 @@ void CUsbPnUsbReceiver::ConstructMessageL()
     // message ready to be sent
     if( iByteCount == ( iMessageLength + PN_HEADER_SIZE ) )
         {
-        OstTrace0( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP5, "CUsbPnUsbReceiver::ConstructMessageL - message complete" );
+        OstTrace0( TRACE_INTERNALS, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP5, "CUsbPnUsbReceiver::ConstructMessageL - message complete" );
         E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - message complete")));
 
         if( iByteCount > KPnPacketSize )
             {
-            OstTrace0( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP6, "CUsbPnUsbReceiver::ConstructMessageL - realloc for whole message" );
+            OstTrace0( TRACE_INTERNALS, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP6, "CUsbPnUsbReceiver::ConstructMessageL - realloc for whole message" );
             E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - realloc for whole message")));
             iPacket->ReallocBufferL( iMessageLength + PN_HEADER_SIZE );
             iRecvPtr.Set( iPacket->Buffer().Des() );
@@ -383,7 +383,7 @@ void CUsbPnUsbReceiver::ConstructMessageL()
             iStorage = NULL;
             }
 
-#ifdef ISI_LENGTH_LITTLE_ENDIAN
+#ifndef ISI_LENGTH_BIG_ENDIAN
         // Converts the endianess of message length
         TUint8 tmp4(iRecvPtr[ISI_HEADER_OFFSET_LENGTH]);
         TUint8 tmp5(iRecvPtr[ISI_HEADER_OFFSET_LENGTH +1]);
@@ -396,7 +396,7 @@ void CUsbPnUsbReceiver::ConstructMessageL()
         if( (iRecvPtr[ISI_HEADER_OFFSET_RESOURCEID] == PN_EPOC_TEST) &&
             (iRecvPtr[ISI_HEADER_OFFSET_MESSAGEID] == TS_SOS_FILE_WRITE_REQ ) )
             {
-            OstTrace0( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP7, "CUsbPnUsbReceiver::ConstructMessageL - Message to APE Test Server" );
+            OstTrace0( TRACE_INTERNALS, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP7, "CUsbPnUsbReceiver::ConstructMessageL - Message to APE Test Server" );
             E_TRACE( ( _T( "CUsbPnUsbReceiver::ConstructMessage - Message to APE Test Server")));
 
             iRecvPtr[ISI_HEADER_OFFSET_RECEIVERDEVICE] = PN_DEV_SOS;
@@ -412,7 +412,7 @@ void CUsbPnUsbReceiver::ConstructMessageL()
         iPacket->ReleaseL();
         iRecvPtr.Set( iPacket->Buffer().Des() );
         iLdd.ReadUntilShort( iStatus, EEndpoint2, iRecvPtr );
-        OstTrace0( TRACE_DETAILED, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP8, "CUsbPnUsbReceiver::ConstructMessageL - Receiving" );
+        OstTrace0( TRACE_INTERNALS, CUSBPNUSBRECEIVER_CONSTRUCTMESSAGEL_DUP8, "CUsbPnUsbReceiver::ConstructMessageL - Receiving" );
         E_TRACE((_T("CUsbPnUsbReceiver::ConstructMessage - Receiving")));
         SetActive();
         }

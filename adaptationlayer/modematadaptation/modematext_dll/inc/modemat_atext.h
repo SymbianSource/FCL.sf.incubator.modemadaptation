@@ -23,6 +23,7 @@
 #include "rmodematcontroller.h"
 
 const TInt KNameLength(256);
+const TUint8 KMaxSmsBufferSize = 161;
 
 NONSHARABLE_CLASS(CModemATExt) : public CATExtPluginBase, public MAtControllerObserver
   	{
@@ -222,10 +223,24 @@ private:
     //Constructor
     void ConstructL();
 
-	//Returns AT command by index
+    //Returns AT command by index
     TPtrC8 GetAtCommand( TInt aNumber );
 
-    
+     /**
+     * Buffers data in editor mode
+     * @param aCmd data to be buffered
+     * @param aReply reply data for upper layers is copied to this paramerer
+     */
+    void AddDataToBuffer( const TDesC8& aCmd, RBuf8& aReply );
+
+     /**
+     * Sends data in editor mode
+     * @param aReply reply data for upper layers is copied to this paramerer
+     * @param aReplyNeeded reply is needed if the buffer has not been exceeded
+     * @param aCancel cancel the message by sending esc to modem
+     */
+    void SendSmsBuffer( RBuf8& aReply, TBool aReplyNeeded, TBool aCancel );
+
 private:    // Data
     
     RModemAtController iRModemAt;
@@ -237,6 +252,9 @@ private:    // Data
     RBuf8* iReply;
     TBool iReplyNeeded;
     HBufC8* iCommandBuf;
+    TBool iIsTextInputMode;
+    TBuf8<KMaxSmsBufferSize> iSmsBuffer;
+    TBool iDiscardNextReply;
     };
 
 #endif      //MODEMAT_ATEXT_IMPL_H

@@ -67,7 +67,7 @@ CDataPortWriter* CDataPortWriter::NewL(
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::NewL");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_NEWL, "CDataPortWriter::NewL" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_NEWL_TD, "CDataPortWriter::NewL" );
 
     CDataPortWriter* writer = new ( ELeave ) CDataPortWriter();
     CleanupStack::PushL( writer );
@@ -94,7 +94,7 @@ CDataPortWriter::CDataPortWriter()
     {
     //None
     TFLOGSTRING("TSY: CDataPortWriter::CDataPortWriter");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_CDATAPORTWRITER, "CDataPortWriter::CDataPortWriter" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_CDATAPORTWRITER_TD, "CDataPortWriter::CDataPortWriter" );
 
     }
 
@@ -107,7 +107,7 @@ void CDataPortWriter::ConstructL()
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::ConstructL");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_CONSTRUCTL, "CDataPortWriter::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_CONSTRUCTL_TD, "CDataPortWriter::ConstructL" );
 
     // initialisation of menber variables
     iWriteCompleted = ETrue;
@@ -127,7 +127,7 @@ CDataPortWriter::~CDataPortWriter()
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::~CDataPortWriter");
-OstTrace0( TRACE_NORMAL, DUP1_CDATAPORTWRITER_CDATAPORTWRITER, "CDataPortWriter::~CDataPortWriter" );
+OstTrace0( TRACE_NORMAL,  DUP1_CDATAPORTWRITER_CDATAPORTWRITER_TD, "CDataPortWriter::~CDataPortWriter" );
 
     Cancel();
 
@@ -156,7 +156,7 @@ void CDataPortWriter::Init()
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::Init Modem initialisation");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_INIT, "CDataPortWriter::Init" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_INIT_TD, "CDataPortWriter::Init" );
 
     // Initalise modem
     TBuf8<KDataBufLength> ATString;
@@ -181,7 +181,7 @@ void CDataPortWriter::AppendCommandL(
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::AppendCommandL");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_APPENDCOMMANDL, "CDataPortWriter::AppendCommandL" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_APPENDCOMMANDL_TD, "CDataPortWriter::AppendCommandL" );
 
     iAtCommandBuffer->AppendL( aCommand );
     }
@@ -196,7 +196,7 @@ CArrayFixFlat<TUint>* CDataPortWriter::GetAtBuffer()
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::GetAtBuffer");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_GETATBUFFER, "CDataPortWriter::GetAtBuffer" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_GETATBUFFER_TD, "CDataPortWriter::GetAtBuffer" );
 
     return iAtCommandBuffer;
     }
@@ -213,7 +213,7 @@ void CDataPortWriter::Write(
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::Write");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_WRITE, "CDataPortWriter::Write" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_WRITE_TD, "CDataPortWriter::Write" );
 
     // We are writing data so set the flag to ETrue.
     iContinueWrite = ETrue;
@@ -232,7 +232,7 @@ OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_WRITE, "CDataPortWriter::Write" );
 
     TFLOGSTRING2("TSY: CDataPortWriter::Write - Stored into FIFO buffer: %S", &data16bit );
 
-OstTraceExt1( TRACE_NORMAL, DUP1_CDATAPORTWRITER_WRITE, "CDataPortWriter::Write;Stored into FIFO buffer=%S", data16bit );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CDATAPORTWRITER_WRITE_TD, "CDataPortWriter::Write;Stored into FIFO buffer=%S", data16bit );
 #endif // TF_LOGGING_ENABLED
 
     HBufC8* tmp = NULL;
@@ -282,7 +282,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CDATAPORTWRITER_WRITE, "CDataPortWriter::Write;
 
             TFLOGSTRING2("TSY: CDataPortWriter::Write - From FIFO buffer: %S", &data16bit);
 
-OstTraceExt1( TRACE_NORMAL, DUP2_CDATAPORTWRITER_WRITE, "CDataPortWriter::Write;From FIFO buffer=%S", data16bit );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CDATAPORTWRITER_WRITE_TD, "CDataPortWriter::Write;From FIFO buffer=%S", data16bit );
 #endif // TF_LOGGING_ENABLED
 
             if ( !IsActive() )
@@ -319,7 +319,7 @@ void CDataPortWriter::RunL()
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::RunL");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_RUNL, "CDataPortWriter::RunL" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_RUNL_TD, "CDataPortWriter::RunL" );
 
 #ifdef TF_LOGGING_ENABLED
 
@@ -327,7 +327,7 @@ OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_RUNL, "CDataPortWriter::RunL" );
     data16bit.AppendNum( iStatus.Int() );
 
     TFLOGSTRING2("TSY: CDataPortWriter::RunL - iStatus: %S", &data16bit);
-OstTrace1( TRACE_NORMAL, DUP2_CDATAPORTWRITER_RUNL, "CDataPortWriter::RunL;iStatus: %d", iStatus.Int() );
+OstTrace1( TRACE_NORMAL,  DUP2_CDATAPORTWRITER_RUNL_TD, "CDataPortWriter::RunL;iStatus: %d", iStatus.Int() );
 #endif // TF_LOGGING_ENABLED
 
     if ( KRequestPending != iStatus.Int() )
@@ -352,7 +352,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CDATAPORTWRITER_RUNL, "CDataPortWriter::RunL;iStat
                 }
 
             TFLOGSTRING2("TSY: CDataPortWriter::RunL - AT command deleted from FIFO buffer: %S", &data16bit);
-OstTraceExt1( TRACE_NORMAL, DUP1_CDATAPORTWRITER_RUNL, "CDataPortWriter::RunL;AT command deleted from FIFO buffer=%S", data16bit );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CDATAPORTWRITER_RUNL_TD, "CDataPortWriter::RunL;AT command deleted from FIFO buffer=%S", data16bit );
 #endif // TF_LOGGING_ENABLED
 
             if ( iWriteBuffer->At( 0 ) )
@@ -385,7 +385,7 @@ TInt CDataPortWriter::RunError(
     {
 
     TFLOGSTRING2("TSY: CDataPortWriter::RunError %d", aError);
-OstTrace1( TRACE_NORMAL, CDATAPORTWRITER_RUNERROR, "CDataPortWriter::RunError;aError=%d", aError );
+OstTrace1( TRACE_NORMAL,  CDATAPORTWRITER_RUNERROR_TD, "CDataPortWriter::RunError;aError=%d", aError );
 
     // Line object completes client requests in case of an error.
     iDataPortHandler->HandleDataPortError( aError );
@@ -426,7 +426,7 @@ void CDataPortWriter::WriteNextL()
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::WriteNextL - Write next command from FIFO");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_WRITENEXTL, "CDataPortWriter::WriteNextL, Write next command from FIFO" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_WRITENEXTL_TD, "CDataPortWriter::WriteNextL, Write next command from FIFO" );
 
     if ( !IsActive() )
         {
@@ -464,7 +464,7 @@ OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_WRITENEXTL, "CDataPortWriter::WriteNext
 
             TFLOGSTRING2("TSY: CDataPortWriter::WriteNextL - AT command: %S", &data16bit);
 
-OstTraceExt1( TRACE_NORMAL, DUP1_CDATAPORTWRITER_WRITENEXTL, "CDataPortWriter::WriteNextL;AT command=%S", data16bit );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CDATAPORTWRITER_WRITENEXTL_TD, "CDataPortWriter::WriteNextL;AT command=%S", data16bit );
 #endif //TF_LOGGING_ENABLED
 
             // Set active as write is pending
@@ -489,7 +489,7 @@ void CDataPortWriter::DoCancel()
     {
 
     TFLOGSTRING("CDataPortWriter::DoCancel");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_DOCANCEL, "CDataPortWriter::DoCancel" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_DOCANCEL_TD, "CDataPortWriter::DoCancel" );
 
     // Stop writing into DP
     iContinueWrite = EFalse;
@@ -507,7 +507,7 @@ void CDataPortWriter::BlockWrite()
     {
 
     TFLOGSTRING("TSY: CDataPortWriter::BlockWrite - Blocking writes to DP");
-OstTrace0( TRACE_NORMAL, CDATAPORTWRITER_BLOCKWRITE, "CDataPortWriter::BlockWrite" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTWRITER_BLOCKWRITE_TD, "CDataPortWriter::BlockWrite" );
 
     // Stop writing into DP until DP reader has flushed RX buffer
     iContinueWrite = EFalse;
@@ -527,7 +527,7 @@ CDataPortReader* CDataPortReader::NewL(
     {
 
     TFLOGSTRING("TSY: CDataPortReader::NewL");
-OstTrace0( TRACE_NORMAL, CDATAPORTREADER_NEWL, "CDataPortReader::NewL" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTREADER_NEWL_TD, "CDataPortReader::NewL" );
 
     CDataPortReader* reader = new ( ELeave ) CDataPortReader();
     CleanupStack::PushL( reader );
@@ -554,7 +554,7 @@ CDataPortReader::CDataPortReader()
     {
 
     TFLOGSTRING("TSY: CDataPortReader::CDataPortReader");
-OstTrace0( TRACE_NORMAL, CDATAPORTREADER_CDATAPORTREADER, "CDataPortReader::CDataPortReader" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTREADER_CDATAPORTREADER_TD, "CDataPortReader::CDataPortReader" );
 
     // initialisation of meneber variables
     iModemInitComplete = EFalse;
@@ -571,7 +571,7 @@ CDataPortReader::~CDataPortReader()
     {
 
     TFLOGSTRING("TSY: CDataPortReader::~CDataPortReader");
-OstTrace0( TRACE_NORMAL, DUP1_CDATAPORTREADER_CDATAPORTREADER, "CDataPortReader::~CDataPortReader" );
+OstTrace0( TRACE_NORMAL,  DUP1_CDATAPORTREADER_CDATAPORTREADER_TD, "CDataPortReader::~CDataPortReader" );
 
     Cancel();
     }
@@ -586,7 +586,7 @@ void CDataPortReader::DoCancel()
     {
 
     TFLOGSTRING("CDataPortReader::DoCancel");
-OstTrace0( TRACE_NORMAL, CDATAPORTREADER_DOCANCEL, "CDataPortReader::DoCancel" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTREADER_DOCANCEL_TD, "CDataPortReader::DoCancel" );
 
     // Stop reading from DP
     iContinueRead = EFalse;
@@ -603,7 +603,7 @@ void CDataPortReader::Read()
     {
 
     TFLOGSTRING("TSY: CDataPortReader::Read Start reading");
-OstTrace0( TRACE_NORMAL, CDATAPORTREADER_READ, "CDataPortReader::Read" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTREADER_READ_TD, "CDataPortReader::Read" );
 
     iContinueRead = ETrue;
     // If already active, don't make a new request
@@ -627,7 +627,7 @@ void CDataPortReader::ReadAll()
     {
 
     TFLOGSTRING("TSY: CDataPortReader::ReadAll - Read all data from DP");
-OstTrace0( TRACE_NORMAL, CDATAPORTREADER_READALL, "CDataPortReader::ReadAll, Read all data from DP" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTREADER_READALL_TD, "CDataPortReader::ReadAll, Read all data from DP" );
 
     iContinueRead = ETrue;
 
@@ -641,7 +641,7 @@ OstTrace0( TRACE_NORMAL, CDATAPORTREADER_READALL, "CDataPortReader::ReadAll, Rea
 
 TFLOGSTRING2("TSY: CDataPortReader::ReadAll - Data remaining: %d",
               dataLen );
-OstTrace1( TRACE_NORMAL, DUP1_CDATAPORTREADER_READALL, "CDataPortReader::ReadAll;Data remaining=%d", dataLen );
+OstTrace1( TRACE_NORMAL,  DUP1_CDATAPORTREADER_READALL_TD, "CDataPortReader::ReadAll;Data remaining=%d", dataLen );
         // Block DP writer, so that it does not generate more
         // responses from modem. Continue when RX buffer is empty.
         iDataPortWriter->BlockWrite();
@@ -652,7 +652,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CDATAPORTREADER_READALL, "CDataPortReader::ReadAll
             {
 
             TFLOGSTRING("TSY: CDataPortReader::ReadAll - Starting to read remaining data (flushing)");
-OstTrace0( TRACE_NORMAL, DUP2_CDATAPORTREADER_READALL, "CDataPortReader::ReadAll, Starting to read remaining data (flushing)" );
+OstTrace0( TRACE_NORMAL,  DUP2_CDATAPORTREADER_READALL_TD, "CDataPortReader::ReadAll, Starting to read remaining data (flushing)" );
 
             iResp.SetLength( 0 );
             iDataPort.Read( iStatus, iResp );
@@ -662,14 +662,14 @@ OstTrace0( TRACE_NORMAL, DUP2_CDATAPORTREADER_READALL, "CDataPortReader::ReadAll
             {
 
             TFLOGSTRING("TSY: CDataPortReader::ReadAll - Read still pending!");
-OstTrace0( TRACE_NORMAL, DUP3_CDATAPORTREADER_READALL, "CDataPortReader::ReadAll, Read still pending!" );
+OstTrace0( TRACE_NORMAL,  DUP3_CDATAPORTREADER_READALL_TD, "CDataPortReader::ReadAll, Read still pending!" );
             }
         }
     else
         {
 
         TFLOGSTRING("TSY: CDataPortReader::ReadAll - Init going or no data in RX");
-OstTrace0( TRACE_NORMAL, DUP4_CDATAPORTREADER_READALL, "CDataPortReader::ReadAll, Init going or no data in RX" );
+OstTrace0( TRACE_NORMAL,  DUP4_CDATAPORTREADER_READALL_TD, "CDataPortReader::ReadAll, Init going or no data in RX" );
         if ( 0 >= dataLen )
             {
             // Set read all complete flag to true, there is no data waiting
@@ -682,7 +682,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CDATAPORTREADER_READALL, "CDataPortReader::ReadAll
             {
 
             TFLOGSTRING("TSY: CDataPortReader::ReadAll - Start normal reading");
-OstTrace0( TRACE_NORMAL, DUP5_CDATAPORTREADER_READALL, "CDataPortReader::ReadAll, Start normal reading" );
+OstTrace0( TRACE_NORMAL,  DUP5_CDATAPORTREADER_READALL_TD, "CDataPortReader::ReadAll, Start normal reading" );
 
             iResp.SetLength( 0 );
             iDataPort.Read( iStatus, iResp );
@@ -702,7 +702,7 @@ void CDataPortReader::ReadCancel()
     {
 
     TFLOGSTRING("TSY: CDataPortReader::ReadCancel");
-OstTrace0( TRACE_NORMAL, CDATAPORTREADER_READCANCEL, "CDataPortReader::ReadCancel" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTREADER_READCANCEL_TD, "CDataPortReader::ReadCancel" );
 
     // Stop reading from DP
     iContinueRead = EFalse;
@@ -719,7 +719,7 @@ void CDataPortReader::ModemInitComplete()
     {
 
     TFLOGSTRING("TSY: CDataPortReader::ModemInitComplete");
-OstTrace0( TRACE_NORMAL, CDATAPORTREADER_MODEMINITCOMPLETE, "CDataPortReader::ModemInitComplete" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTREADER_MODEMINITCOMPLETE_TD, "CDataPortReader::ModemInitComplete" );
 
     iModemInitComplete = ETrue;
     }
@@ -734,7 +734,7 @@ void CDataPortReader::RunL()
     {
 
     TFLOGSTRING("TSY: CDataPortReader::RunL");
-OstTrace0( TRACE_NORMAL, CDATAPORTREADER_RUNL, "CDataPortReader::RunL" );
+OstTrace0( TRACE_NORMAL,  CDATAPORTREADER_RUNL_TD, "CDataPortReader::RunL" );
 
 #ifdef TF_LOGGING_ENABLED
 
@@ -742,7 +742,7 @@ OstTrace0( TRACE_NORMAL, CDATAPORTREADER_RUNL, "CDataPortReader::RunL" );
     data16bit.AppendNum( iStatus.Int() );
 
     TFLOGSTRING2("TSY: CDataPortReader::RunL - iStatus:%S", &data16bit);
-OstTrace1( TRACE_NORMAL, DUP1_CDATAPORTREADER_RUNL, "CDataPortReader::RunL;iStatus=%d", iStatus.Int() );
+OstTrace1( TRACE_NORMAL,  DUP1_CDATAPORTREADER_RUNL_TD, "CDataPortReader::RunL;iStatus=%d", iStatus.Int() );
 #endif // TF_LOGGING_ENABLED
 
     // KErrNone and KErrCancel are ok, others mean real error
@@ -764,7 +764,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CDATAPORTREADER_RUNL, "CDataPortReader::RunL;iStat
             }
         const TDesC16 help = data16bit;
         TFLOGSTRING2("TSY: CDataPortReader::Read Data: %S", &data16bit);
-OstTraceExt1( TRACE_NORMAL, DUP2_CDATAPORTREADER_RUNL, "CDataPortReader::RunL;data16bit=%S", help );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CDATAPORTREADER_RUNL_TD, "CDataPortReader::RunL;data16bit=%S", help );
 #endif // TF_LOGGING_ENABLED
 
         // If flushing the dataport and modem from last connection,
@@ -787,13 +787,13 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CDATAPORTREADER_RUNL, "CDataPortReader::RunL;da
 
                 TFLOGSTRING2("TSY: CDataPortReader::RunL - Data remaining: %d", dataLen );
 
-OstTrace1( TRACE_NORMAL, DUP3_CDATAPORTREADER_RUNL, "CDataPortReader::RunL;Data remaining=%d", dataLen );
+OstTrace1( TRACE_NORMAL,  DUP3_CDATAPORTREADER_RUNL_TD, "CDataPortReader::RunL;Data remaining=%d", dataLen );
                 }
             else
                 {
 
                 TFLOGSTRING("TSY: CDataPortReader::RunL - RX buffer empty, normal read continuing");
-OstTrace0( TRACE_NORMAL, DUP4_CDATAPORTREADER_RUNL, "CDataPortReader::RunL, RX buffer empty, normal read continuing" );
+OstTrace0( TRACE_NORMAL,  DUP4_CDATAPORTREADER_RUNL_TD, "CDataPortReader::RunL, RX buffer empty, normal read continuing" );
 
                 iReaAllComplete = ETrue;
                 // Request next write from iDataPortWriter
@@ -837,7 +837,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CDATAPORTREADER_RUNL, "CDataPortReader::RunL, RX b
                     {
 
                     TFLOGSTRING("TSY: CDataPortReader::RunL - Cancel reading");
-OstTrace0( TRACE_NORMAL, DUP5_CDATAPORTREADER_RUNL, "CDataPortReader::RunL, Cancel reading" );
+OstTrace0( TRACE_NORMAL,  DUP5_CDATAPORTREADER_RUNL_TD, "CDataPortReader::RunL, Cancel reading" );
 
                     iDataPort.ReadCancel();
                     }
@@ -845,7 +845,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CDATAPORTREADER_RUNL, "CDataPortReader::RunL, Canc
                     {
 
                     TFLOGSTRING("TSY: CDataPortReader::RunL - Continue reading");
-OstTrace0( TRACE_NORMAL, DUP6_CDATAPORTREADER_RUNL, "CDataPortReader::RunL, Continue reading" );
+OstTrace0( TRACE_NORMAL,  DUP6_CDATAPORTREADER_RUNL_TD, "CDataPortReader::RunL, Continue reading" );
                     // Make the reader read again...
                     iStatus = KRequestPending;
                     iDataPort.Read( iStatus, iResp );
@@ -856,7 +856,7 @@ OstTrace0( TRACE_NORMAL, DUP6_CDATAPORTREADER_RUNL, "CDataPortReader::RunL, Cont
                 {
 
                 TFLOGSTRING("TSY: CDataPortReader::RunL - Continue reading");
-OstTrace0( TRACE_NORMAL, DUP7_CDATAPORTREADER_RUNL, "CDataPortReader::RunL, Continue reading" );
+OstTrace0( TRACE_NORMAL,  DUP7_CDATAPORTREADER_RUNL_TD, "CDataPortReader::RunL, Continue reading" );
                 // Make the reader read again...
                 iStatus = KRequestPending;
                 iDataPort.Read( iStatus, iResp );
@@ -870,7 +870,7 @@ OstTrace0( TRACE_NORMAL, DUP7_CDATAPORTREADER_RUNL, "CDataPortReader::RunL, Cont
         {
 
         TFLOGSTRING("TSY: CDataPortReader::RunL - Dataport used by other client");
-OstTrace0( TRACE_NORMAL, DUP8_CDATAPORTREADER_RUNL, "CDataPortReader::RunL, Dataport used by other client" );
+OstTrace0( TRACE_NORMAL,  DUP8_CDATAPORTREADER_RUNL_TD, "CDataPortReader::RunL, Dataport used by other client" );
         }
     // These will make the next call object creation fail in
     // CMmLineTsy::OpenNewObjectL as we can't handle these errors in TSY.
@@ -891,7 +891,7 @@ TInt CDataPortReader::RunError(
     {
 
     TFLOGSTRING2("TSY: CDataPortReader::RunError %d", aError);
-OstTrace1( TRACE_NORMAL, CDATAPORTREADER_RUNERROR, "CDataPortReader::RunError;aError=%d", aError );
+OstTrace1( TRACE_NORMAL,  CDATAPORTREADER_RUNERROR_TD, "CDataPortReader::RunError;aError=%d", aError );
 
     iDataPortHandler->HandleDataPortError( aError );
 

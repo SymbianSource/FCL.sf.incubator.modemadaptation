@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -39,7 +39,7 @@
 #include <infoisi.h>
 #include <tisi.h>
 #include <gpdsisi.h>
-//#include <permisi.h> To be done in CPS
+//#include <permisi.h> 
 #include <uiccisi.h>
 
 #include "OstTraceDefinitions.h"
@@ -163,23 +163,23 @@ static void TFLOG_PRINT_ISIMESSAGE( const TDesC8& aBuf )
                 ( ( i + 1 ) == length ) ) // All bytes collected and traced.
                 {
                 firstTime = EFalse;
-OstTraceExt1( TRACE_NORMAL, DUP6__TFLOG_PRINT_ISIMESSAGE, "TSY:Queued NET message: [ %s]", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP6__TFLOG_PRINT_ISIMESSAGE_TD, "TSY:Queued NET message: [ %s]", trace_msg );
                 trace_msg.SetLength( 0 );
                 }
             else if ( firstTime ) // 1st line of the trace.
                 {
                 firstTime = EFalse;
-OstTraceExt1( TRACE_NORMAL, DUP7__TFLOG_PRINT_ISIMESSAGE, "TSY:Queued NET message: [ %s", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP7__TFLOG_PRINT_ISIMESSAGE_TD, "TSY:Queued NET message: [ %s", trace_msg );
                 trace_msg.SetLength( 0 );
                 }
             else if ( ( i + 1 ) == length ) // The last line.
                 {
-OstTraceExt1( TRACE_NORMAL, DUP8__TFLOG_PRINT_ISIMESSAGE, "TSY:Queued NET message:   %s]", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP8__TFLOG_PRINT_ISIMESSAGE_TD, "TSY:Queued NET message:   %s]", trace_msg );
                 trace_msg.SetLength( 0 );
                 }
             else // just print bytes.
                 {
-OstTraceExt1( TRACE_NORMAL, DUP9__TFLOG_PRINT_ISIMESSAGE, "TSY:Queued NET message:   %s", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP9__TFLOG_PRINT_ISIMESSAGE_TD, "TSY:Queued NET message:   %s", trace_msg );
                 trace_msg.SetLength( 0 );
                 }
             counter = 0;
@@ -212,31 +212,31 @@ static TInt CalculateNetworkInformationSbStartOffset(
     TInt ret( KErrNone );
 
     TFLOGSTRING("TSY: CalculateNetworkInformationSbStartOffset");
-    OstTrace0( TRACE_NORMAL, _CALCULATENETWORKINFORMATIONSBSTARTOFFSET, "CalculateNetworkInformationSbStartOffset" );
+    OstTrace0( TRACE_NORMAL,  _CALCULATENETWORKINFORMATIONSBSTARTOFFSET_TD, "CalculateNetworkInformationSbStartOffset" );
 
     TUint8 messageId = aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID );
     if ( NET_MODEM_REG_STATUS_IND == messageId )
         {
         TFLOGSTRING("TSY: CalculateNetworkInformationSbStartOffset; NET_REG_STATUS_IND");
-        OstTrace0( TRACE_NORMAL, DUP1__CALCULATENETWORKINFORMATIONSBSTARTOFFSET, "CalculateNetworkInformationSbStartOffset; NET_REG_STATUS_IND" );
+        OstTrace0( TRACE_NORMAL,  DUP1__CALCULATENETWORKINFORMATIONSBSTARTOFFSET_TD, "CalculateNetworkInformationSbStartOffset; NET_REG_STATUS_IND" );
         aSbStartOffset = SIZE_NET_MODEM_REG_STATUS_IND;
         }
     else if ( NET_MODEM_REG_STATUS_GET_RESP == messageId )
         {
         TFLOGSTRING("TSY: CalculateNetworkInformationSbStartOffset; NET_REG_STATUS_GET_RESP");
-        OstTrace0( TRACE_NORMAL, DUP2__CALCULATENETWORKINFORMATIONSBSTARTOFFSET, "CalculateNetworkInformationSbStartOffset; NET_REG_STATUS_GET_RESP" );
+        OstTrace0( TRACE_NORMAL,  DUP2__CALCULATENETWORKINFORMATIONSBSTARTOFFSET_TD, "CalculateNetworkInformationSbStartOffset; NET_REG_STATUS_GET_RESP" );
         aSbStartOffset = SIZE_NET_MODEM_REG_STATUS_GET_RESP;
         }
     else if ( NET_SET_RESP == messageId )
         {
         TFLOGSTRING("TSY: CalculateNetworkInformationSbStartOffset; NET_SET_RESP");
-        OstTrace0( TRACE_NORMAL, DUP3__CALCULATENETWORKINFORMATIONSBSTARTOFFSET, "CalculateNetworkInformationSbStartOffset; NET_SET_RESP" );
+        OstTrace0( TRACE_NORMAL,  DUP3__CALCULATENETWORKINFORMATIONSBSTARTOFFSET_TD, "CalculateNetworkInformationSbStartOffset; NET_SET_RESP" );
         aSbStartOffset = SIZE_NET_SET_RESP;
         }
     else
         {
         TFLOGSTRING2("TSY: CalculateNetworkInformationSbStartOffset;unknown messageId=%x", messageId);
-        OstTrace1( TRACE_NORMAL, DUP4__CALCULATENETWORKINFORMATIONSBSTARTOFFSET, "CalculateNetworkInformationSbStartOffset;unknown messageId=%x", messageId );
+        OstTrace1( TRACE_NORMAL,  DUP4__CALCULATENETWORKINFORMATIONSBSTARTOFFSET_TD, "CalculateNetworkInformationSbStartOffset;unknown messageId=%x", messageId );
         ret = KErrNotSupported;
         }
 
@@ -253,7 +253,7 @@ static TInt CalculateNetworkInformationSbStartOffset(
 CMmNetMessHandler::CMmNetMessHandler()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::CMmNetMessHandler() - Start");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_CMMNETMESSHANDLER, "CMmNetMessHandler::CMmNetMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_CMMNETMESSHANDLER_TD, "CMmNetMessHandler::CMmNetMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ CMmNetMessHandler* CMmNetMessHandler::NewL
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NewL");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NEWL, "CMmNetMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NEWL_TD, "CMmNetMessHandler::NewL" );
 
     CMmNetMessHandler* netMessHandler = new ( ELeave ) CMmNetMessHandler();
 
@@ -317,7 +317,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NEWL, "CMmNetMessHandler::NewL" );
     aPhoNetReceiver->RegisterL(
         netMessHandler,
         PN_PERMANENT_DATA,
-        PERM_PM_RECORD_READ_RESP ); To be done in CPS */
+        PERM_PM_RECORD_READ_RESP );  */
 
     CleanupStack::Pop( netMessHandler );
 
@@ -332,7 +332,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NEWL, "CMmNetMessHandler::NewL" );
 void CMmNetMessHandler::ConstructL()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::ConstructL()");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_CONSTRUCTL, "CMmNetMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_CONSTRUCTL_TD, "CMmNetMessHandler::ConstructL" );
 
     iNetOperatorNameHandler = CMmNetOperatorNameHandler::NewL(
         this,
@@ -374,7 +374,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_CONSTRUCTL, "CMmNetMessHandler::Const
 CMmNetMessHandler::~CMmNetMessHandler()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::~CMmNetMessHandler() - End");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_CMMNETMESSHANDLER, "CMmNetMessHandler::~CMmNetMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_CMMNETMESSHANDLER_TD, "CMmNetMessHandler::~CMmNetMessHandler" );
 
     delete iNetOperatorNameHandler;
 
@@ -404,7 +404,7 @@ TInt CMmNetMessHandler::ProcessUiccMsg(
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY: CMmNetMessHandler::ProcessUiccMsg, transaction ID: %d, status: %d", aTraId, aStatus );
-OstTraceExt2( TRACE_NORMAL, CMMNETMESSHANDLER_PROCESSUICCMSG, "CMmNetMessHandler::ProcessUiccMsg;aTraId=%d;aStatus=%d", aTraId, aStatus );
+OstTraceExt2( TRACE_NORMAL,  CMMNETMESSHANDLER_PROCESSUICCMSG_TD, "CMmNetMessHandler::ProcessUiccMsg;aTraId=%d;aStatus=%d", aTraId, aStatus );
 
     TInt ret( KErrNone );
 
@@ -428,7 +428,7 @@ OstTraceExt2( TRACE_NORMAL, CMMNETMESSHANDLER_PROCESSUICCMSG, "CMmNetMessHandler
         default:
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::ProcessUiccMsg - unknown transaction ID" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_PROCESSUICCMSG, "CMmNetMessHandler::ProcessUiccMsg - - unknown transaction ID" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_PROCESSUICCMSG_TD, "CMmNetMessHandler::ProcessUiccMsg - - unknown transaction ID" );
             break;
             }
         }
@@ -447,7 +447,7 @@ TInt CMmNetMessHandler::ExtFuncL
         )
     {
 TFLOGSTRING2("TSY: CMmNetMessHandler::ExtFuncL - Ipc: %d", aIpc);
-OstTrace1( TRACE_NORMAL, CMMNETMESSHANDLER_EXTFUNCL, "CMmNetMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMNETMESSHANDLER_EXTFUNCL_TD, "CMmNetMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     //*************************************************************//
     // NOTE:
@@ -526,7 +526,7 @@ OstTrace1( TRACE_NORMAL, CMMNETMESSHANDLER_EXTFUNCL, "CMmNetMessHandler::ExtFunc
         default:
             {
 TFLOGSTRING2("TSY: CMmNetMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_EXTFUNCL, "CMmNetMessHandler::ExtFuncL;Unknown IPC=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_EXTFUNCL_TD, "CMmNetMessHandler::ExtFuncL;Unknown IPC=%d", aIpc );
             ret = KErrNotSupported;
             break;
             }
@@ -545,14 +545,14 @@ void CMmNetMessHandler::ReceiveMessageL
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::ReceiveMessageL");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessHandler::ReceiveMessageL" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmNetMessHandler::ReceiveMessageL" );
 
     // Resource and message id
     TInt resource( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_RESOURCEID ) );
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
 TFLOGSTRING3("TSY: CMmNetMessHandler::ReceiveMessageL - MessageId:%d. Resource: %d", messageId, resource);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessHandler::ReceiveMessageL;messageId=%d;resource=%d", messageId, resource );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmNetMessHandler::ReceiveMessageL;messageId=%d;resource=%d", messageId, resource );
 
     // Transaction id.
     TUint8 transactId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
@@ -636,7 +636,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessH
                     {
                     // No appropriate handler methods for ISI-message found.
 TFLOGSTRING("TSY: CMmNetMessHandler::ReceiveMessageL - no handler for the NETWORK message id");
-OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessHandler::ReceiveMessageL - no handler for the NETWORK message id" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmNetMessHandler::ReceiveMessageL - no handler for the NETWORK message id" );
                     // Server not known
                     break;
                     }
@@ -680,7 +680,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessHand
                     {
                     // No appropriate handler methods for ISI-message found.
 TFLOGSTRING("TSY: CMmNetMessHandler::ReceiveMessageL - no handler for the INFO message id");
-OstTrace0( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessHandler::ReceiveMessageL - no handler for the INFO message id" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMNETMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmNetMessHandler::ReceiveMessageL - no handler for the INFO message id" );
                     break;
                     }
                 }
@@ -712,16 +712,16 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessHand
                     {
                     // No appropriate handler methods for ISI-message found.
 TFLOGSTRING("TSY: CMmNetMessHandler::ReceiveMessageL - no handler for the PERMANENT_DATA message id");
-OstTrace0( TRACE_NORMAL, DUP5_CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessHandler::ReceiveMessageL - no handler for the PERMANENT_DATA message id" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMNETMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmNetMessHandler::ReceiveMessageL - no handler for the PERMANENT_DATA message id" );
                     break;
                     }
                 }
             break;
-            } To be done in CPS */
+            }  */
         default:
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::ReceiveMessageL - Switch resource case default");
-OstTrace0( TRACE_NORMAL, DUP6_CMMNETMESSHANDLER_RECEIVEMESSAGEL, "CMmNetMessHandler::ReceiveMessageL - Switch resource case default" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMNETMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmNetMessHandler::ReceiveMessageL - Switch resource case default" );
             break; // Server not known
             }
         } // End switch ( resource )
@@ -742,12 +742,13 @@ void CMmNetMessHandler::NetModemRegStatusInd
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetModemRegStatusInd");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNetMessHandler::NetModemRegStatusInd" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETMODEMREGSTATUSIND_TD, "CMmNetMessHandler::NetModemRegStatusInd" );
 
     // Assistant for packaging.
     CMmDataPackage dataPackage;
 
-    RMobilePhone::TMobilePhoneNetworkInfoV5 networkInfo;
+    RMobilePhone::TMobilePhoneNetworkInfoV5 iNetworkInfoHelper =
+        RMobilePhone::TMobilePhoneNetworkInfoV5();
     RMobilePhone::TMobilePhoneLocationAreaV1 locationArea;
 
     // Buffer for Operator code, length is 3.
@@ -762,7 +763,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNetMessHand
     TUint sbStartOffSet( 0 );
 
     // Network mode received via NET_RAT_IND/NET_RAT_RESP.
-    networkInfo.iMode = iNetworkMode;
+    iNetworkInfoHelper.iMode = iNetworkMode;
         // look for subblock offset to get operator info from
     TInt returnValue( FindOperatorInfoSubBlock(
         aIsiMessage,
@@ -781,13 +782,13 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNetMessHand
         // Area information is known.
         locationArea.iAreaKnown = ETrue;
         // Set status to current.
-        networkInfo.iStatus = RMobilePhone::ENetworkStatusCurrent;
+        iNetworkInfoHelper.iStatus = RMobilePhone::ENetworkStatusCurrent;
         // Band info is cdma specific.
-        networkInfo.iBandInfo = RMobilePhone::EBandUnknown;
+        iNetworkInfoHelper.iBandInfo = RMobilePhone::EBandUnknown;
         // Sid is cdma specific, set it to default value.
-        networkInfo.iCdmaSID.Zero();
+        iNetworkInfoHelper.iCdmaSID.Zero();
         // Analog SID is cdma specific, set it to default value.
-        networkInfo.iAnalogSID.Zero();
+        iNetworkInfoHelper.iAnalogSID.Zero();
         // Get the operator code. Size is 3 bytes.
         operatorCode = aIsiMessage.GetData(
             sbStartOffSet + NET_MODEM_CURRENT_CELL_INFO_OFFSET_OPERATORCODE,
@@ -795,11 +796,11 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNetMessHand
             // Map the operator and country code to symbian values
             MapOperatorAndCountryCode(
                 operatorCode,
-                networkInfo.iNetworkId,
-                networkInfo.iCountryCode );
+                iNetworkInfoHelper.iNetworkId,
+                iNetworkInfoHelper.iCountryCode );
 
         // Access technology received via NET_RAT_IND/NET_RAT_RESP.
-        networkInfo.iAccess = iNetworkAccess;
+        iNetworkInfoHelper.iAccess = iNetworkAccess;
 
         // Network type.
         networkType = aIsiMessage.Get8bit(
@@ -813,12 +814,12 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNetMessHand
 
         // HSDPA availability indicator.
         // If TRUE then the cell supports HSDPA.
-        networkInfo.iHsdpaAvailableIndicator = aIsiMessage.Get8bit(
+        iNetworkInfoHelper.iHsdpaAvailableIndicator = aIsiMessage.Get8bit(
             sbStartOffSet +
             NET_MODEM_CURRENT_CELL_INFO_OFFSET_HSDPAAVAILABLEINCELL );
 
-TFLOGSTRING2("TSY: CMmNetMessHandler::NetModemRegStatusInd, HSDPA Available Indicator = %d.", networkInfo.iHsdpaAvailableIndicator);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNetMessHandler::NetModemRegStatusInd, HSDPA Available Indicator=%hhu", networkInfo.iHsdpaAvailableIndicator );
+TFLOGSTRING2("TSY: CMmNetMessHandler::NetModemRegStatusInd, HSDPA Available Indicator = %d.", iNetworkInfoHelper.iHsdpaAvailableIndicator);
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND_TD, "CMmNetMessHandler::NetModemRegStatusInd, HSDPA Available Indicator=%hhu", iNetworkInfoHelper.iHsdpaAvailableIndicator );
 
 // This is done for SUB 403-7200: NokiaTSY: HSUPA Cell Indicator for S60 (S60 3.2.2 / S_CPR8.1).
 // This can be removed when actual implementation for HSUPA Cell Indicator is done.
@@ -838,10 +839,10 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNet
 
         if ( hsdpaAvailableIndicator || hsupaAvailableIndicator )
             {
-            networkInfo.iHsdpaAvailableIndicator = ETrue;
+            iNetworkInfoHelper.iHsdpaAvailableIndicator = ETrue;
 
-TFLOGSTRING2("TSY: CMmNetMessHandler::NetModemRegStatusInd, HSDPA Available Indicator (HSDPA or HSUPA available) = %d.", networkInfo.iHsdpaAvailableIndicator);
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNetMessHandler::NetModemRegStatusInd, HSDPA Available Indicator (HSDPA or HSUPA available)=%hhu", networkInfo.iHsdpaAvailableIndicator );
+TFLOGSTRING2("TSY: CMmNetMessHandler::NetModemRegStatusInd, HSDPA Available Indicator (HSDPA or HSUPA available) = %d.", iNetworkInfoHelper.iHsdpaAvailableIndicator);
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND_TD, "CMmNetMessHandler::NetModemRegStatusInd, HSDPA Available Indicator (HSDPA or HSUPA available)=%hhu", iNetworkInfoHelper.iHsdpaAvailableIndicator );
             }
 #endif // defined ( CASW_HSXPA_INDICATOR_SUPPORTED ) || defined ( INTERNAL_TESTING_CASW_HSXPA_INDICATOR_SUPPORT )
         }
@@ -863,7 +864,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNet
         MapNWAndRegStatus(
             registrationStatus,
             regStatus,
-            networkInfo.iStatus );
+            iNetworkInfoHelper.iStatus );
 
         // Get network selection mode. Will be handled after CAUSE EXTENSION
         // handling.
@@ -893,7 +894,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNet
             }
 
         // Pack the data for sending to the manager.
-        dataPackage.PackData( &regStatus, &networkInfo.iStatus );
+        dataPackage.PackData( &regStatus, &iNetworkInfoHelper.iStatus );
         // Inform the manager that the network selection mode has changed.
         iMessageRouter->Complete(
             EMobilePhoneNotifyNetworkRegistrationStatusChange,
@@ -931,7 +932,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNet
                 networkType,
                 operatorCode,
                 locationArea,
-                networkInfo );
+                iNetworkInfoHelper );
             }
         else
             {
@@ -956,7 +957,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETMODEMREGSTATUSIND, "CMmNet
             // operator names.
             CompleteMobilePhoneNotifyCurrentNetworkChange(
                 locationArea,
-                networkInfo );
+                iNetworkInfoHelper );
             }
         }
     else
@@ -981,7 +982,7 @@ TInt CMmNetMessHandler::NetModemRegStatusGetReq
         ) const
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetModemRegStatusGetReq");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETMODEMREGSTATUSGETREQ, "CMmNetMessHandler::NetModemRegStatusGetReq" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETMODEMREGSTATUSGETREQ_TD, "CMmNetMessHandler::NetModemRegStatusGetReq" );
 
     // Data buffer length is 2
     TBuf8<2> data;
@@ -1007,7 +1008,7 @@ TInt CMmNetMessHandler::NetModemAvailableGetReq
         ) const
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetModemAvailableGetReq");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETMODEMAVAILABLEGETREQ, "CMmNetMessHandler::NetModemAvailableGetReq" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETMODEMAVAILABLEGETREQ_TD, "CMmNetMessHandler::NetModemAvailableGetReq" );
 
     // Append data for ISI message. Has room for mode, num of subBlocks
     // and NET_MODEM_GSM_BAND_INFO sb.
@@ -1049,7 +1050,7 @@ void CMmNetMessHandler::NetModemAvailableGetRespL
         ) const
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetModemAvailableGetRespL");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL, "CMmNetMessHandler::NetModemAvailableGetRespL" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL_TD, "CMmNetMessHandler::NetModemAvailableGetRespL" );
 
     // Check the success of the operation.
     TUint8 successCode( aIsiMessage.Get8bit(
@@ -1062,7 +1063,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL, "CMmNetMes
     if ( 0 < nbOfSubBlocks && NET_CAUSE_OK == successCode )
         {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetModemAvailableGetRespL - Success case");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL, "CMmNetMessHandler::NetModemAvailableGetRespL - Success case" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL_TD, "CMmNetMessHandler::NetModemAvailableGetRespL - Success case" );
 
         // Handle NET_MODEM_AVAILABLE_GET_RESP ISI-message success case.
         iNetOperatorNameHandler->HandleManualSearchSuccessCaseL( aIsiMessage );
@@ -1070,7 +1071,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL, "CMmN
     else
         {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetModemAvailableGetRespL - Error case");
-OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL, "CMmNetMessHandler::NetModemAvailableGetRespL - Error case" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL_TD, "CMmNetMessHandler::NetModemAvailableGetRespL - Error case" );
 
         TInt epocError( KErrGeneral );
 
@@ -1078,7 +1079,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL, "CMmN
             NET_CAUSE_REQUEST_INTERRUPTED == successCode )
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetModemAvailableGetRespL - Error case - MT call during network search");
-OstTrace0( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL, "CMmNetMessHandler::NetModemAvailableGetRespL - Error case - MT call during network search" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL_TD, "CMmNetMessHandler::NetModemAvailableGetRespL - Error case - MT call during network search" );
             // In case of MT call during network search, NET server can
             // interrupt network search before client has chance to cancel
             // the search request. Thus in this case we need to convert the
@@ -1090,7 +1091,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL, "CMmN
         else
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetModemAvailableGetRespL - Error case - Cancel or Other error");
-OstTrace0( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL, "CMmNetMessHandler::NetModemAvailableGetRespL - Error case - Cancel or Other error" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMNETMESSHANDLER_NETMODEMAVAILABLEGETRESPL_TD, "CMmNetMessHandler::NetModemAvailableGetRespL - Error case - Cancel or Other error" );
             // If some other error or cancel is called, then complete
             // with mapped error code.
             epocError = CMmStaticUtility::CSCauseToEpocError(
@@ -1118,7 +1119,7 @@ TInt CMmNetMessHandler::NetAvailableCancelReq
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetAvailableCancelReq");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETAVAILABLECANCELREQ, "CMmNetMessHandler::NetAvailableCancelReq" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETAVAILABLECANCELREQ_TD, "CMmNetMessHandler::NetAvailableCancelReq" );
 
     // Set the network search flag to ETrue.
     iSearchNetworkCancelIssued = ETrue;
@@ -1148,7 +1149,7 @@ void CMmNetMessHandler::NetAvailableCancelResp
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetAvailableCancelResp");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETAVAILABLECANCELRESP, "CMmNetMessHandler::NetAvailableCancelResp" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETAVAILABLECANCELRESP_TD, "CMmNetMessHandler::NetAvailableCancelResp" );
 
     // Get success code
     TUint8 successCode( aIsiMessage.Get8bit(
@@ -1189,10 +1190,10 @@ TInt CMmNetMessHandler::NetSetReq
     TUint8 networkSelectionMode( NET_SELECT_MODE_NO_SELECTION );
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetSetReq -- Manual NW selection(T/F): %d", aIsManual);
-OstTrace1( TRACE_NORMAL, CMMNETMESSHANDLER_NETSETREQ, "CMmNetMessHandler::NetSetReq;aIsManual=%d", aIsManual );
+OstTrace1( TRACE_NORMAL,  CMMNETMESSHANDLER_NETSETREQ_TD, "CMmNetMessHandler::NetSetReq;aIsManual=%d", aIsManual );
 
 TFLOGSTRING3("TSY: CMmNetMessHandler::NetSetReq -- MNC: %S MCC: %S", &aMnc, &aMcc);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_NETSETREQ, "CMmNetMessHandler::NetSetReq;aMnc=%S;aMcc=%S", aMnc, aMcc );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_NETSETREQ_TD, "CMmNetMessHandler::NetSetReq;aMnc=%S;aMcc=%S", aMnc, aMcc );
 
     // If NW selection mode is changed from manual to automatic
     if ( NET_SELECT_MODE_MANUAL == iSelectionMethod
@@ -1212,7 +1213,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_NETSETREQ, "CMmNetMessHandler
         }
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetSetReq -- NW Selection Mode: %d", networkSelectionMode);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_NETSETREQ, "CMmNetMessHandler::NetSetReq;networkSelectionMode=%hhu", networkSelectionMode );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_NETSETREQ_TD, "CMmNetMessHandler::NetSetReq;networkSelectionMode=%hhu", networkSelectionMode );
 
     // Append data for ISI message.
     // Has room for registered in another protocol, num of subBlocks,
@@ -1240,7 +1241,7 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_NETSETREQ, "CMmNetMessHandler
     if ( NET_SELECT_MODE_USER_RESELECTION != networkSelectionMode )
         {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetSetReq -- Adding NET_MODEM_GSM_OPERATOR_INFO SubBlock");
-OstTrace0( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETSETREQ, "CMmNetMessHandler::NetSetReq, Adding NET_MODEM_GSM_OPERATOR_INFO SubBlock" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_NETSETREQ_TD, "CMmNetMessHandler::NetSetReq, Adding NET_MODEM_GSM_OPERATOR_INFO SubBlock" );
         // We add NET_MODEM_GSM_OPERATOR_INFO subblock to ISI.
         // The information about the Band is not send trough MM ETEL Api, thus
         // the value is set to unknown
@@ -1262,7 +1263,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETSETREQ, "CMmNetMessHandler::N
         }
 
 TFLOGSTRING("TSY: CMmNetMessHandler::NetSetReq -- Adding NET_OPERATOR_INFO_COMMON SubBlock");
-OstTrace0( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_NETSETREQ, "CMmNetMessHandler::NetSetReq, Adding NET_OPERATOR_INFO_COMMON SubBlock" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMNETMESSHANDLER_NETSETREQ_TD, "CMmNetMessHandler::NetSetReq, Adding NET_OPERATOR_INFO_COMMON SubBlock" );
 
     // Data buffer for net operator info common sb.
     TBuf8<SIZE_NET_OPERATOR_INFO_COMMON> operatorInfoCommonBuf;
@@ -1293,7 +1294,7 @@ TInt CMmNetMessHandler::NetSetCancelReq
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetSetCancelReq");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETSETCANCELREQ, "CMmNetMessHandler::NetSetCancelReq" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETSETCANCELREQ_TD, "CMmNetMessHandler::NetSetCancelReq" );
 
     // Set the network select flag to ETrue.
     // This flag is checked in NetSetCancelResp.
@@ -1325,7 +1326,7 @@ void CMmNetMessHandler::NetSetCancelResp
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetSetCancelResp");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETSETCANCELRESP, "CMmNetMessHandler::NetSetCancelResp" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETSETCANCELRESP_TD, "CMmNetMessHandler::NetSetCancelResp" );
 
     // Get success code
     TUint8 successCode( aIsiMessage.Get8bit(
@@ -1355,7 +1356,7 @@ void CMmNetMessHandler::NetRatInd
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRatInd");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETRATIND, "CMmNetMessHandler::NetRatInd" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETRATIND_TD, "CMmNetMessHandler::NetRatInd" );
 
     // Call NetRatResp to do the common job
     NetRatResp( aIsiMessage );
@@ -1373,7 +1374,7 @@ TInt CMmNetMessHandler::NetRatReq
         ) const
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRatReq");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETRATREQ, "CMmNetMessHandler::NetRatReq" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETRATREQ_TD, "CMmNetMessHandler::NetRatReq" );
 
     // Message data size is 1
     TBuf8<1> data;
@@ -1402,7 +1403,7 @@ void CMmNetMessHandler::NetRatResp
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRatResp");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETRATRESP, "CMmNetMessHandler::NetRatResp" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETRATRESP_TD, "CMmNetMessHandler::NetRatResp" );
     TUint sbStartOffSet( 0 );
 
     // NET_RAT_INFO sub block
@@ -1426,7 +1427,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETRATRESP, "CMmNetMessHandler::NetRa
                 iNetworkMode = RMobilePhone::ENetworkModeGsm;
                 iNetworkAccess = RMobilePhone::ENetworkAccessGsm;
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRatResp - network mode GSM");
-OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_NETRATRESP, "CMmNetMessHandler::NetRatResp - network mode GSM" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_NETRATRESP_TD, "CMmNetMessHandler::NetRatResp - network mode GSM" );
                 break;
                 }
             case NET_UMTS_RAT:
@@ -1434,13 +1435,13 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_NETRATRESP, "CMmNetMessHandler::
                 iNetworkMode = RMobilePhone::ENetworkModeWcdma;
                 iNetworkAccess = RMobilePhone::ENetworkAccessUtran;
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRatResp - network mode UMTS");
-OstTrace0( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETRATRESP, "CMmNetMessHandler::NetRatResp - network mode UMTS" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_NETRATRESP_TD, "CMmNetMessHandler::NetRatResp - network mode UMTS" );
                 break;
                 }
             default:
                 {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRatResp. default network mode");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_NETRATRESP, "CMmNetMessHandler::NetRatResp, default network mode" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_NETRATRESP_TD, "CMmNetMessHandler::NetRatResp, default network mode" );
                 iNetworkMode = RMobilePhone::ENetworkModeUnknown;
                 iNetworkAccess = RMobilePhone::ENetworkAccessUnknown;
                 break;
@@ -1472,7 +1473,7 @@ TInt CMmNetMessHandler::NetNetworkSelectModeSetReq
         ) const
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetNetworkSelectModeSetReq");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETNETWORKSELECTMODESETREQ, "CMmNetMessHandler::NetNetworkSelectModeSetReq" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETNETWORKSELECTMODESETREQ_TD, "CMmNetMessHandler::NetNetworkSelectModeSetReq" );
 
     TInt ret( KErrNone );
 
@@ -1526,7 +1527,7 @@ void CMmNetMessHandler::NetNetworkSelectModeSetResp
         ) const
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetNetworkSelectModeSetResp");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETNETWORKSELECTMODESETRESP, "CMmNetMessHandler::NetNetworkSelectModeSetResp" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETNETWORKSELECTMODESETRESP_TD, "CMmNetMessHandler::NetNetworkSelectModeSetResp" );
 
     // Get success code
     TUint8 successCode( aIsiMessage.Get8bit(
@@ -1552,7 +1553,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETNETWORKSELECTMODESETRESP, "CMmNetM
 TInt CMmNetMessHandler::NetRssiGetReq() const
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRssiGetReq");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETRSSIGETREQ, "CMmNetMessHandler::NetRssiGetReq" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETRSSIGETREQ_TD, "CMmNetMessHandler::NetRssiGetReq" );
 
     // Data buffer length is 2 (message size minus transId, msgId)
     TBuf8< SIZE_NET_RSSI_GET_REQ - 2 > reqData;
@@ -1580,7 +1581,7 @@ void CMmNetMessHandler::NetRssiGetResp
         ISI_HEADER_SIZE + NET_RSSI_GET_RESP_OFFSET_SUCCESSCODE ) );
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRssiGetResp, successcode=%d", successCode);
-OstTraceExt1( TRACE_NORMAL, CMMNETMESSHANDLER_NETRSSIGETRESP, "CMmNetMessHandler::NetRssiGetResp;successCode=%hhu", successCode );
+OstTraceExt1( TRACE_NORMAL,  CMMNETMESSHANDLER_NETRSSIGETRESP_TD, "CMmNetMessHandler::NetRssiGetResp;successCode=%hhu", successCode );
 
     if ( NET_CAUSE_OK == successCode )
         {
@@ -1617,7 +1618,7 @@ void CMmNetMessHandler::NetRssiInd
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRssiInd");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETRSSIIND, "CMmNetMessHandler::NetRssiInd" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETRSSIIND_TD, "CMmNetMessHandler::NetRssiInd" );
 
     // Note: the unsigned value gathered from the ISI is percentages
     TUint8 bars( aIsiMessage.Get8bit(
@@ -1658,7 +1659,7 @@ void CMmNetMessHandler::HandleRssi
     TInt32 rssiInDbm( aRSSIIsi );
 
 TFLOGSTRING3("TSY: CMmNetMessHandler::HandleRssi -- signalBars=%d rssiInDbm=%d", signalBars, aRSSIIsi);
-OstTraceExt2( TRACE_NORMAL, CMMNETMESSHANDLER_HANDLERSSI, "CMmNetMessHandler::HandleRssi;signalBars=%hhd;rssiInDbm=%hhu", signalBars, aRSSIIsi );
+OstTraceExt2( TRACE_NORMAL,  CMMNETMESSHANDLER_HANDLERSSI_TD, "CMmNetMessHandler::HandleRssi;signalBars=%hhd;rssiInDbm=%hhu", signalBars, aRSSIIsi );
 
     CMmDataPackage dataPackage;
     dataPackage.PackData( &signalBars, &rssiInDbm );
@@ -1681,7 +1682,7 @@ void CMmNetMessHandler::NetTimeInd
         ) const
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetTimeInd");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETTIMEIND, "CMmNetMessHandler::NetTimeInd" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETTIMEIND_TD, "CMmNetMessHandler::NetTimeInd" );
 
     TUint sbStartOffSet( 0 );
 
@@ -1730,7 +1731,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETTIMEIND, "CMmNetMessHandler::NetTi
         totalYear = KNitzYearOffset + year;
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetTimeInd year: %d", totalYear );
-OstTrace1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_NETTIMEIND, "CMmNetMessHandler::NetTimeInd;NetTimeInd year=%d", totalYear );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_NETTIMEIND_TD, "CMmNetMessHandler::NetTimeInd;NetTimeInd year=%d", totalYear );
 
         // NITZ information
         RMobilePhone::TMobilePhoneNITZ timeDate;
@@ -1806,7 +1807,7 @@ void CMmNetMessHandler::MapNWAndRegStatus
         )
     {
 TFLOGSTRING2("TSY: CMmNetMessHandler::MapNWAndRegStatus. ISARegistrationStatus:%d", aISARegistrationStatus);
-OstTrace1( TRACE_NORMAL, CMMNETMESSHANDLER_MAPNWANDREGSTATUS, "CMmNetMessHandler::MapNWAndRegStatus;aRegStatus=%d", aRegStatus );
+OstTrace1( TRACE_NORMAL,  CMMNETMESSHANDLER_MAPNWANDREGSTATUS_TD, "CMmNetMessHandler::MapNWAndRegStatus;aRegStatus=%d", aRegStatus );
 
      switch ( aISARegistrationStatus )
         {
@@ -1860,7 +1861,7 @@ OstTrace1( TRACE_NORMAL, CMMNETMESSHANDLER_MAPNWANDREGSTATUS, "CMmNetMessHandler
         default:
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::MapNWAndRegStatus. default registration status");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_MAPNWANDREGSTATUS, "CMmNetMessHandler::MapNWAndRegStatus, default registration status" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_MAPNWANDREGSTATUS_TD, "CMmNetMessHandler::MapNWAndRegStatus, default registration status" );
             aNWStatus = RMobilePhone::ENetworkStatusUnknown;
             aRegStatus = RMobilePhone::ERegistrationUnknown;
             break;
@@ -1881,7 +1882,7 @@ void CMmNetMessHandler::MapNWSelectionMode
         )
     {
 TFLOGSTRING2("TSY: CMmNetMessHandler::MapNWSelectionMode. ISA selectionmode:%d", aISASelectionMode);
-OstTraceExt1( TRACE_NORMAL, CMMNETMESSHANDLER_MAPNWSELECTIONMODE, "CMmNetMessHandler::MapNWSelectionMode;aISASelectionMode=%hhu", aISASelectionMode );
+OstTraceExt1( TRACE_NORMAL,  CMMNETMESSHANDLER_MAPNWSELECTIONMODE_TD, "CMmNetMessHandler::MapNWSelectionMode;aISASelectionMode=%hhu", aISASelectionMode );
 
     if ( NET_SELECT_MODE_AUTOMATIC == aISASelectionMode )
         {
@@ -1917,7 +1918,7 @@ TBool CMmNetMessHandler::MapOperatorAndCountryCode
     {
     TFLOGSTRING2("TSY: CMmNetMessHandler::MapOperatorAndCountryCode - MNCLenght: %d",
         aMNCLength);
-OstTrace1( TRACE_NORMAL, CMMNETMESSHANDLER_MAPOPERATORANDCOUNTRYCODE, "CMmNetMessHandler::MapOperatorAndCountryCode;aMNCLength=%d", aMNCLength );
+OstTrace1( TRACE_NORMAL,  CMMNETMESSHANDLER_MAPOPERATORANDCOUNTRYCODE_TD, "CMmNetMessHandler::MapOperatorAndCountryCode;aMNCLength=%d", aMNCLength );
 
     // Country code mapping
     TUint16 mcc1( 0 );
@@ -2003,7 +2004,7 @@ void CMmNetMessHandler::MapNwStatus
         )
     {
 TFLOGSTRING2("TSY: CMmNetMessHandler::MapNwStatus. ISANetworkStatus:%d", aISANetworkStatus);
-OstTraceExt1( TRACE_NORMAL, CMMNETMESSHANDLER_MAPNWSTATUS, "CMmNetMessHandler::MapNwStatus;aISANetworkStatus=%hhu", aISANetworkStatus );
+OstTraceExt1( TRACE_NORMAL,  CMMNETMESSHANDLER_MAPNWSTATUS_TD, "CMmNetMessHandler::MapNwStatus;aISANetworkStatus=%hhu", aISANetworkStatus );
 
      switch ( aISANetworkStatus )
         {
@@ -2030,7 +2031,7 @@ OstTraceExt1( TRACE_NORMAL, CMMNETMESSHANDLER_MAPNWSTATUS, "CMmNetMessHandler::M
         default:
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::MapNwStatus. mapped default network status");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_MAPNWSTATUS, "CMmNetMessHandler::MapNwStatus, mapped default network status" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_MAPNWSTATUS_TD, "CMmNetMessHandler::MapNwStatus, mapped default network status" );
             aNWStatus = RMobilePhone::ENetworkStatusUnknown;
             break;
             }
@@ -2057,7 +2058,7 @@ void CMmNetMessHandler::NetCipheringInd
         ISI_HEADER_SIZE + NET_CIPHERING_IND_OFFSET_CIPHERINGSTATUS ) );
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetCipheringInd. CipheringStatus:%d", cipheringStatus);
-OstTraceExt1( TRACE_NORMAL, CMMNETMESSHANDLER_NETCIPHERINGIND, "CMmNetMessHandler::NetCipheringInd;cipheringStatus=%hhu", cipheringStatus );
+OstTraceExt1( TRACE_NORMAL,  CMMNETMESSHANDLER_NETCIPHERINGIND_TD, "CMmNetMessHandler::NetCipheringInd;cipheringStatus=%hhu", cipheringStatus );
 
     switch( cipheringStatus )
         {
@@ -2076,7 +2077,7 @@ OstTraceExt1( TRACE_NORMAL, CMMNETMESSHANDLER_NETCIPHERINGIND, "CMmNetMessHandle
         default:
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetCipheringInd. no ciphering status");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_NETCIPHERINGIND, "CMmNetMessHandler::NetCipheringInd, no ciphering status" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_NETCIPHERINGIND_TD, "CMmNetMessHandler::NetCipheringInd, no ciphering status" );
             break;
             }
         }
@@ -2110,7 +2111,7 @@ void CMmNetMessHandler::NetRadioInfoInd
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRadioInfoInd");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd" );
 
     TBool oldCell_DCH = iCell_DCH;
 
@@ -2130,7 +2131,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::
 
         // iCell_DCH is true if and only if UTRAN radio state is Cell_DCH
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRadioInfoInd, UTRAN radio state=%d.", radioState);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd;UTRAN radioState=%hhu", radioState );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd;UTRAN radioState=%hhu", radioState );
 
         iCell_DCH = ( ( NET_UTRAN_RADIO_CELL_DCH == radioState ) ?
             ETrue : EFalse );
@@ -2138,14 +2139,14 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessH
     else
         {
 TFLOGSTRING("TSY: CMmNetMessHandler::NetRadioInfoInd, no UTRAN radio state info.");
-OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd, no UTRAN radio state info" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd, no UTRAN radio state info" );
         iCell_DCH = EFalse;
         }
 
     // State changed?
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRadioInfoInd, iCell_DCH = %d.", iCell_DCH);
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRadioInfoInd, oldCell_DCH = %d.", oldCell_DCH);
-OstTrace1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd;oldCell_DCH=%d", oldCell_DCH );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd;oldCell_DCH=%d", oldCell_DCH );
 
     if ( iCell_DCH != oldCell_DCH )
         {
@@ -2159,11 +2160,11 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHand
             location.iCellId = iLastLocInfo.iCellId;
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRadioInfoInd, location.iAreaKnown = %d.", location.iAreaKnown);
-OstTrace1( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd;location.iAreaKnown=%d", location.iAreaKnown );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd;location.iAreaKnown=%d", location.iAreaKnown );
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRadioInfoInd, location.iLocationAreaCode = %d.", location.iLocationAreaCode);
-OstTrace1( TRACE_NORMAL, DUP5_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd;location.iLocationAreaCode=%d", location.iLocationAreaCode );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd;location.iLocationAreaCode=%d", location.iLocationAreaCode );
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRadioInfoInd, location.iCellId = %d.", location.iCellId );
-OstTrace1( TRACE_NORMAL, DUP6_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd;location.iCellId=%d", location.iCellId );
+OstTrace1( TRACE_NORMAL,  DUP6_CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd;location.iCellId=%d", location.iCellId );
 
             CMmDataPackage dataPackage;
             dataPackage.PackData( &iLastNWInfo, &location );
@@ -2188,11 +2189,11 @@ OstTrace1( TRACE_NORMAL, DUP6_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHand
         }
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRadioInfoInd, iLastLocInfo.iAreaKnown = %d.", iLastLocInfo.iAreaKnown);
-OstTrace1( TRACE_NORMAL, DUP7_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd;iLastLocInfo.iAreaKnown=%d", iLastLocInfo.iAreaKnown );
+OstTrace1( TRACE_NORMAL,  DUP7_CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd;iLastLocInfo.iAreaKnown=%d", iLastLocInfo.iAreaKnown );
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRadioInfoInd, iLastLocInfo.iLocationAreaCode = %d.", iLastLocInfo.iLocationAreaCode);
-OstTrace1( TRACE_NORMAL, DUP8_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd;iLastLocInfo.iLocationAreaCode=%d", iLastLocInfo.iLocationAreaCode );
+OstTrace1( TRACE_NORMAL,  DUP8_CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd;iLastLocInfo.iLocationAreaCode=%d", iLastLocInfo.iLocationAreaCode );
 TFLOGSTRING2("TSY: CMmNetMessHandler::NetRadioInfoInd, iLastLocInfo.iCellId = %d.", iLastLocInfo.iCellId);
-OstTrace1( TRACE_NORMAL, DUP9_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHandler::NetRadioInfoInd;iLastLocInfo.iCellId=%d", iLastLocInfo.iCellId );
+OstTrace1( TRACE_NORMAL,  DUP9_CMMNETMESSHANDLER_NETRADIOINFOIND_TD, "CMmNetMessHandler::NetRadioInfoInd;iLastLocInfo.iCellId=%d", iLastLocInfo.iCellId );
     }
 
 // -----------------------------------------------------------------------------
@@ -2203,7 +2204,7 @@ OstTrace1( TRACE_NORMAL, DUP9_CMMNETMESSHANDLER_NETRADIOINFOIND, "CMmNetMessHand
 TInt CMmNetMessHandler::UiccReadCiReq()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::UiccReadCiReq");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_UICCREADCIREQ, "CMmNetMessHandler::UiccReadCiReq" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_UICCREADCIREQ_TD, "CMmNetMessHandler::UiccReadCiReq" );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccReadTransparent params;
@@ -2234,7 +2235,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_UICCREADCIREQ, "CMmNetMessHandler::Ui
 void CMmNetMessHandler::UiccReadCiResp( TInt aStatus, const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::UiccReadCiResp");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_UICCREADCIRESP, "CMmNetMessHandler::UiccReadCiResp" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_UICCREADCIRESP_TD, "CMmNetMessHandler::UiccReadCiResp" );
 
     // Initialize ret value
     TInt ret( KErrNone );
@@ -2272,7 +2273,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_UICCREADCIRESP, "CMmNetMessHandler::U
 TInt CMmNetMessHandler::UiccCsReadReq()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::UiccCsReadReq");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_UICCCSREADREQ, "CMmNetMessHandler::UiccCsReadReq" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_UICCCSREADREQ_TD, "CMmNetMessHandler::UiccCsReadReq" );
 
     // At first we try to read EHPLMN, SIM file '6FD9'
     // When response is received and if EHPLMN is not supported
@@ -2307,10 +2308,10 @@ void CMmNetMessHandler::UiccCsReadEhpmlnResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::UiccCsReadEhpmlnResp");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_UICCCSREADEHPMLNRESP, "CMmNetMessHandler::UiccCsReadEhpmlnResp" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_UICCCSREADEHPMLNRESP_TD, "CMmNetMessHandler::UiccCsReadEhpmlnResp" );
 
     // If status was OK, EHPLMN was supported
-    if ( KErrNone ==  aStatus )
+    if ( UICC_STATUS_OK ==  aStatus )
         {
         iHplmn = aFileData;
         }
@@ -2349,9 +2350,9 @@ void CMmNetMessHandler::UiccCsReadHpmlnResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::UiccCsReadHpmlnResp");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_UICCCSREADHPMLNRESP, "CMmNetMessHandler::UiccCsReadHpmlnResp" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_UICCCSREADHPMLNRESP_TD, "CMmNetMessHandler::UiccCsReadHpmlnResp" );
 
-    if ( KErrNone ==  aStatus )
+    if ( UICC_STATUS_OK ==  aStatus )
         {
         TUint8 tempByte( 0 );
         // Coding of HPMLN is defined in TS 24.008
@@ -2386,7 +2387,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_UICCCSREADHPMLNRESP, "CMmNetMessHandl
 void CMmNetMessHandler::SetSimNetworkInfo()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::SetSimNetworkInfo");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_SETSIMNETWORKINFO, "CMmNetMessHandler::SetSimNetworkInfo" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_SETSIMNETWORKINFO_TD, "CMmNetMessHandler::SetSimNetworkInfo" );
 
     // iHomeInfo is declared in cmmnetmesshandler.h (class private parameter
     // to store the network information during the operator name is requested.
@@ -2426,9 +2427,9 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_SETSIMNETWORKINFO, "CMmNetMessHandler
         iHomeInfo.iNetworkId );
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::SetSimNetworkInfo - CountryCode: %S", &iHomeInfo.iCountryCode);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_SETSIMNETWORKINFO, "CMmNetMessHandler::SetSimNetworkInfo - CountryCode=%S", iHomeInfo.iCountryCode );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_SETSIMNETWORKINFO_TD, "CMmNetMessHandler::SetSimNetworkInfo - CountryCode=%S", iHomeInfo.iCountryCode );
 TFLOGSTRING2("TSY: CMmNetMessHandler::SetSimNetworkInfo - NetworkId: %S", &iHomeInfo.iNetworkId);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_SETSIMNETWORKINFO, "CMmNetMessHandler::SetSimNetworkInfo - NetworkId=%S", iHomeInfo.iNetworkId );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_SETSIMNETWORKINFO_TD, "CMmNetMessHandler::SetSimNetworkInfo - NetworkId=%S", iHomeInfo.iNetworkId );
 
     // Buffer for Display tag.
     TBuf<KDisplayTagLength> alphaTag;
@@ -2440,7 +2441,7 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_SETSIMNETWORKINFO, "CMmNetMes
         alphaTag );
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::SetSimNetworkInfo - Name: %S", &alphaTag);
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_SETSIMNETWORKINFO, "CMmNetMessHandler::SetSimNetworkInfo - Name=%S", alphaTag );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_SETSIMNETWORKINFO_TD, "CMmNetMessHandler::SetSimNetworkInfo - Name=%S", alphaTag );
 
     // Copy hard coded name to iDisplayTag. Long and short names not handled
     // in this case and they will left empty.
@@ -2463,7 +2464,7 @@ void CMmNetMessHandler::HandleError
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::HandleError");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_HANDLEERROR, "CMmNetMessHandler::HandleError" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_HANDLEERROR_TD, "CMmNetMessHandler::HandleError" );
     }
 
 // -----------------------------------------------------------------------------
@@ -2474,7 +2475,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_HANDLEERROR, "CMmNetMessHandler::Hand
 TBool CMmNetMessHandler::GetImsPinVerifyStatus()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::GetImsPinVerifyStatus");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_GETIMSPINVERIFYSTATUS, "CMmNetMessHandler::GetImsPinVerifyStatus" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_GETIMSPINVERIFYSTATUS_TD, "CMmNetMessHandler::GetImsPinVerifyStatus" );
 
     return iImsPinVerifyRequired;
     }
@@ -2490,7 +2491,7 @@ void CMmNetMessHandler::GpdsRadioActivityInd
         )
     {
 TFLOGSTRING2("TSY: CMmNetMessHandler::GpdsRadioActivityInd, NetworkMode = %d.", iNetworkMode);
-OstTrace1( TRACE_NORMAL, CMMNETMESSHANDLER_GPDSRADIOACTIVITYIND, "CMmNetMessHandler::GpdsRadioActivityInd;iNetworkMode=%d", iNetworkMode );
+OstTrace1( TRACE_NORMAL,  CMMNETMESSHANDLER_GPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::GpdsRadioActivityInd;iNetworkMode=%d", iNetworkMode );
 
     // Should be ignored in 3G (information not valid).
     if ( RMobilePhone::ENetworkModeGsm == iNetworkMode )
@@ -2500,7 +2501,7 @@ OstTrace1( TRACE_NORMAL, CMMNETMESSHANDLER_GPDSRADIOACTIVITYIND, "CMmNetMessHand
         // iPacketTransfer is true if and only
         // if radio activity state is GPDS_RADIO_ON
 TFLOGSTRING2("TSY: CMmNetMessHandler::GpdsRadioActivityInd, radio activity state=%d.", radioActivityStatus);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_GPDSRADIOACTIVITYIND, "CMmNetMessHandler::GpdsRadioActivityInd;radio activity state=%hhu", radioActivityStatus );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_GPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::GpdsRadioActivityInd;radio activity state=%hhu", radioActivityStatus );
 
         TBool newPacketTransfer = ( ( GPDS_RADIO_ON == radioActivityStatus ) ?
             ETrue : EFalse );
@@ -2537,7 +2538,7 @@ void CMmNetMessHandler::GpdsContextDeactivateInd
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::GpdsContextDeactivateInd");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_GPDSCONTEXTDEACTIVATEIND, "CMmNetMessHandler::GpdsContextDeactivateInd" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_GPDSCONTEXTDEACTIVATEIND_TD, "CMmNetMessHandler::GpdsContextDeactivateInd" );
     // GPDS_RADIO_ACTIVITY_IND / RADIO_OFF is not received when
     // last context is closed => iPacketTransfer remains to ETrue
     // => simulate GPDS_RADIO_OFF from GPDS_CONTEXT_DEACTIVATE_IND.
@@ -2566,9 +2567,9 @@ void CMmNetMessHandler::CompleteGpdsRadioActivityInd
     {
     // State changed?
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteGpdsRadioActivityInd, NEW transfer status = %d.", aNewPacketTrancferStatus);
-OstTrace1( TRACE_NORMAL, CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;NEW transfer status=%d", aNewPacketTrancferStatus );
+OstTrace1( TRACE_NORMAL,  CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;NEW transfer status=%d", aNewPacketTrancferStatus );
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteGpdsRadioActivityInd, OLD transfer status = %d.", iPacketTransfer);
-OstTrace1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;OLD transfer status=%d", iPacketTransfer );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;OLD transfer status=%d", iPacketTransfer );
 
     if ( iPacketTransfer != aNewPacketTrancferStatus )
         {
@@ -2585,11 +2586,11 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "C
             location.iCellId = iLastLocInfo.iCellId;
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteGpdsRadioActivityInd, location.iAreaKnown = %d.", location.iAreaKnown);
-OstTrace1( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;location.iAreaKnown=%d", location.iAreaKnown );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;location.iAreaKnown=%d", location.iAreaKnown );
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteGpdsRadioActivityInd, location.iLocationAreaCode = %d.", location.iLocationAreaCode);
-OstTrace1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;location.iLocationAreaCode=%d", location.iLocationAreaCode );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;location.iLocationAreaCode=%d", location.iLocationAreaCode );
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteGpdsRadioActivityInd, location.iCellId = %d.", location.iCellId);
-OstTrace1( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;location.iCellId=%d", location.iCellId );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;location.iCellId=%d", location.iCellId );
 
             CMmDataPackage dataPackage;
             dataPackage.PackData( &iLastNWInfo, &location );
@@ -2613,11 +2614,11 @@ OstTrace1( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "C
     // No else
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteGpdsRadioActivityInd, iLastLocInfo.iAreaKnown = %d.", iLastLocInfo.iAreaKnown);
-OstTrace1( TRACE_NORMAL, DUP5_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;iLastLocInfo.iAreaKnown=%d", iLastLocInfo.iAreaKnown );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;iLastLocInfo.iAreaKnown=%d", iLastLocInfo.iAreaKnown );
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteGpdsRadioActivityInd, iLastLocInfo.iLocationAreaCode = %d.", iLastLocInfo.iLocationAreaCode);
-OstTrace1( TRACE_NORMAL, DUP6_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;iLastLocInfo.iLocationAreaCode=%d", iLastLocInfo.iLocationAreaCode );
+OstTrace1( TRACE_NORMAL,  DUP6_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;iLastLocInfo.iLocationAreaCode=%d", iLastLocInfo.iLocationAreaCode );
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteGpdsRadioActivityInd, iLastLocInfo.iCellId = %d.", iLastLocInfo.iCellId);
-OstTrace1( TRACE_NORMAL, DUP7_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;iLastLocInfo.iCellId=%d", iLastLocInfo.iCellId );
+OstTrace1( TRACE_NORMAL,  DUP7_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND_TD, "CMmNetMessHandler::CompleteGpdsRadioActivityInd;iLastLocInfo.iCellId=%d", iLastLocInfo.iCellId );
     }
 
 // -----------------------------------------------------------------------------
@@ -2628,14 +2629,14 @@ OstTrace1( TRACE_NORMAL, DUP7_CMMNETMESSHANDLER_COMPLETEGPDSRADIOACTIVITYIND, "C
 void CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_COMPLETEMOBILEPHONEGETHOMENETWORK, "CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_COMPLETEMOBILEPHONEGETHOMENETWORK_TD, "CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork" );
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork - Operator display tag: %S", &iHomeInfo.iDisplayTag);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_COMPLETEMOBILEPHONEGETHOMENETWORK, "CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork;Operator display tag=%S", iHomeInfo.iDisplayTag );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_COMPLETEMOBILEPHONEGETHOMENETWORK_TD, "CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork;Operator display tag=%S", iHomeInfo.iDisplayTag );
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork - Operator short name: %S", &iHomeInfo.iShortName);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_COMPLETEMOBILEPHONEGETHOMENETWORK, "CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork;Operator short name=%S", iHomeInfo.iShortName );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_COMPLETEMOBILEPHONEGETHOMENETWORK_TD, "CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork;Operator short name=%S", iHomeInfo.iShortName );
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork - Operator long name: %S", &iHomeInfo.iLongName);
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_COMPLETEMOBILEPHONEGETHOMENETWORK, "CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork;Operator long name=%S", iHomeInfo.iLongName );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_COMPLETEMOBILEPHONEGETHOMENETWORK_TD, "CMmNetMessHandler::CompleteMobilePhoneGetHomeNetwork;Operator long name=%S", iHomeInfo.iLongName );
 
     // Pack the data
     CMmDataPackage package;
@@ -2664,7 +2665,7 @@ TInt CMmNetMessHandler::FindOperatorInfoSubBlock(
     TUint sbStartOffSet( 0 );
 
     TFLOGSTRING("TSY: CMmNetMessHandler::FindOperatorInfoSubBlock");
-    OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_FINDOPERATORINFOSUBBLOCK, "CMmNetMessHandler::FindOperatorInfoSubBlock" );
+    OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_FINDOPERATORINFOSUBBLOCK_TD, "CMmNetMessHandler::FindOperatorInfoSubBlock" );
 
     TInt ret( CalculateNetworkInformationSbStartOffset(
         aIsiMessage, sbStartOffSet ) );
@@ -2679,7 +2680,7 @@ TInt CMmNetMessHandler::FindOperatorInfoSubBlock(
             sbStartOffSet );
         if ( KErrNone != ret )
             { // look for NET_MODEM_GSM_REG_INFO subblock
-            OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_FINDOPERATORINFOSUBBLOCK, "CMmNetMessHandler::FindOperatorInfoSubBlock - NET_MODEM_CURRENT_CELL_INFO NOT FOUND" );
+            OstTrace0( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_FINDOPERATORINFOSUBBLOCK_TD, "CMmNetMessHandler::FindOperatorInfoSubBlock - NET_MODEM_CURRENT_CELL_INFO NOT FOUND" );
             TFLOGSTRING("TSY: CMmNetMessHandler::FindOperatorInfoSubBlock - NET_MODEM_CURRENT_CELL_INFO NOT FOUND");
             ret = aIsiMessage.FindSubBlockOffsetById(
                 ISI_HEADER_SIZE + sbStartOffSet,
@@ -2693,7 +2694,7 @@ TInt CMmNetMessHandler::FindOperatorInfoSubBlock(
             }
         else
             {
-            OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_FINDOPERATORINFOSUBBLOCK, "CMmNetMessHandler::FindOperatorInfoSubBlock - NOTHING FOUND!" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_FINDOPERATORINFOSUBBLOCK_TD, "CMmNetMessHandler::FindOperatorInfoSubBlock - NOTHING FOUND!" );
             TFLOGSTRING("TSY: CMmNetMessHandler::FindOperatorInfoSubBlock - NOTHING FOUND!");
             }
         }
@@ -2715,7 +2716,7 @@ TInt CMmNetMessHandler::ExtractNetworkRegistrationStatus(
     ) const
     {
     TFLOGSTRING("TSY: CMmNetMessHandler::ExtractNetworkRegistrationStatus");
-    OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS, "CMmNetMessHandler::ExtractNetworkRegistrationStatus" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS_TD, "CMmNetMessHandler::ExtractNetworkRegistrationStatus" );
     TUint sbStartOffSet( 0 );
 
     TInt ret( CalculateNetworkInformationSbStartOffset(
@@ -2735,7 +2736,7 @@ TInt CMmNetMessHandler::ExtractNetworkRegistrationStatus(
         aRegistrationStatus = aIsiMessage.Get8bit( sbStartOffSet +
              NET_MODEM_REG_INFO_COMMON_OFFSET_REGISTRATIONSTATUS );
         TFLOGSTRING2("TSY: CMmNetMessHandler::ExtractNetworkRegistrationStatus;registrationStatus=%d", aRegistrationStatus);
-        OstTraceExt1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS, "CMmNetMessHandler::ExtractNetworkRegistrationStatus;registrationStatus=%hhu", aRegistrationStatus );
+        OstTraceExt1( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS_TD, "CMmNetMessHandler::ExtractNetworkRegistrationStatus;registrationStatus=%hhu", aRegistrationStatus );
         // patch registration status if this is SIM-card
         if ( 0 < iHplmn.Length() )
             {
@@ -2745,20 +2746,20 @@ TInt CMmNetMessHandler::ExtractNetworkRegistrationStatus(
                  )
                 {
                 TFLOGSTRING("TSY: CMmNetMessHandler::ExtractNetworkRegistrationStatus; NET_REG_STATUS_ROAM --> NET_REG_STATUS_HOME");
-                OstTrace0( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS, "CMmNetMessHandler::ExtractNetworkRegistrationStatus; NET_REG_STATUS_ROAM --> NET_REG_STATUS_HOME" );
+                OstTrace0( TRACE_NORMAL,  DUP4_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS_TD, "CMmNetMessHandler::ExtractNetworkRegistrationStatus; NET_REG_STATUS_ROAM --> NET_REG_STATUS_HOME" );
                 aRegistrationStatus = NET_REG_STATUS_HOME;
                 }
             }
         else
             {
             TFLOGSTRING("TSY: CMmNetMessHandler::ExtractNetworkRegistrationStatus; cant patch, HPLMN is empty");
-            OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS, "CMmNetMessHandler::ExtractNetworkRegistrationStatus - cant patch, HPLMN is empty" );
+            OstTrace0( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS_TD, "CMmNetMessHandler::ExtractNetworkRegistrationStatus - cant patch, HPLMN is empty" );
             }
         }
     else
         {
         TFLOGSTRING("TSY: CMmNetMessHandler::ExtractNetworkRegistrationStatus; NET_MODEM_REG_INFO_COMMON not found");
-        OstTrace0( TRACE_NORMAL, DUP5_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS, "CMmNetMessHandler::ExtractNetworkRegistrationStatus; NET_MODEM_REG_INFO_COMMON not found" );
+        OstTrace0( TRACE_NORMAL,  DUP5_CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS_TD, "CMmNetMessHandler::ExtractNetworkRegistrationStatus; NET_MODEM_REG_INFO_COMMON not found" );
         }
     return ret;
     }
@@ -2776,7 +2777,7 @@ void CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE_TD, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange" );
 
     // Assistant for packaging.
     CMmDataPackage dataPackage;
@@ -2800,9 +2801,9 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWO
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - location.iAreaKnown = %d", location.iAreaKnown);
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - location.iLocationAreaCode = %d", location.iLocationAreaCode);
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - location.iCellId = %d", location.iCellId);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - location.iAreaKnown=%hhu", location.iAreaKnown );
-OstTrace1( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - location.iLocationAreaCode=%u", location.iLocationAreaCode );
-OstTrace1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - location.iCellId=%u", location.iCellId );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE_TD, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - location.iAreaKnown=%hhu", location.iAreaKnown );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE_TD, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - location.iLocationAreaCode=%u", location.iLocationAreaCode );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE_TD, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - location.iCellId=%u", location.iCellId );
 
         dataPackage.PackData( &iLastNWInfo, &location );
         }
@@ -2811,9 +2812,9 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENT
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - iLastLocInfo.iAreaKnown = %d", iLastLocInfo.iAreaKnown);
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - iLastLocInfo.iLocationAreaCode = %d", iLastLocInfo.iLocationAreaCode);
 TFLOGSTRING2("TSY: CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - iLastLocInfo.iCellId = %d", iLastLocInfo.iCellId);
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - iLastLocInfo.iAreaKnown=%hhu", iLastLocInfo.iAreaKnown );
-OstTrace1( TRACE_NORMAL, DUP5_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - iLastLocInfo.iLocationAreaCode=%u", iLastLocInfo.iLocationAreaCode );
-OstTrace1( TRACE_NORMAL, DUP7_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - iLastLocInfo.iCellId=%u", iLastLocInfo.iCellId );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE_TD, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - iLastLocInfo.iAreaKnown=%hhu", iLastLocInfo.iAreaKnown );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE_TD, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - iLastLocInfo.iLocationAreaCode=%u", iLastLocInfo.iLocationAreaCode );
+OstTrace1( TRACE_NORMAL,  DUP7_CMMNETMESSHANDLER_COMPLETEMOBILEPHONENOTIFYCURRENTNETWORKCHANGE_TD, "CMmNetMessHandler::CompleteMobilePhoneNotifyCurrentNetworkChange - iLastLocInfo.iCellId=%u", iLastLocInfo.iCellId );
 
         // Pack the data for sending to the manager.
         dataPackage.PackData( &iLastNWInfo, &iLastLocInfo );
@@ -2845,7 +2846,7 @@ void CMmNetMessHandler::QueueNetModemRegStatusMessagesL
         )
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::QueueNetModemRegStatusMessagesL");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_QUEUENETMODEMREGSTATUSMESSAGESL, "CMmNetMessHandler::QueueNetModemRegStatusMessagesL" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_QUEUENETMODEMREGSTATUSMESSAGESL_TD, "CMmNetMessHandler::QueueNetModemRegStatusMessagesL" );
 
     // Make a copy of received message. Allocate heap memory.
     // Can leave if out of mem.
@@ -2879,7 +2880,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_QUEUENETMODEMREGSTATUSMESSAGESL, "CMm
 void CMmNetMessHandler::StartHandlingNetModemRegStatusMessages()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::StartHandlingNetModemRegStatusMessages");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES_TD, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages" );
 
     // Continue handling if there is messages in queue
     // and handling not already ongoing.
@@ -2887,7 +2888,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGE
         && 0 < iNetMessageQueue.Count() )
         {
 TFLOGSTRING("TSY: CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - Start handling next queued message");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - Start handling next queued message" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES_TD, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - Start handling next queued message" );
 
         // Set flag ON as message handling start.
         iNetMessageHandlingOngoing = ETrue;
@@ -2913,9 +2914,9 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSME
         if ( NET_MODEM_REG_STATUS_IND == messageId )
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_IND");
-OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_IND" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES_TD, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_IND" );
 
-            // destroy previous ind and store current NET_MODEM_REG_STATUS_IND 
+            // destroy previous ind and store current NET_MODEM_REG_STATUS_IND
             // for later use
             delete iLastNetModemRegStatusInd;
             iLastNetModemRegStatusInd = tempHBuf;
@@ -2926,7 +2927,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSME
         else if ( NET_MODEM_REG_STATUS_GET_RESP == messageId )
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_GET_RESP");
-OstTrace0( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_GET_RESP" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES_TD, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_GET_RESP" );
 
             // Get the success code.
             TUint8 successCode( isimessage.Get8bit(
@@ -2949,7 +2950,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSME
                     successCode ) );
 
 TFLOGSTRING2("TSY: CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_GET_RESP - Error value: %d", error);
-OstTrace1( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_GET_RESP - Error value=%d", error );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES_TD, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_MODEM_REG_STATUS_GET_RESP - Error value=%d", error );
 
                 // Initialize default return values to ECustomGetOperatorNameIPC
                 // complete.
@@ -2980,7 +2981,7 @@ OstTrace1( TRACE_NORMAL, DUP4_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSME
         else if ( NET_SET_RESP == messageId )
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_SET_RESP");
-OstTrace0( TRACE_NORMAL, DUP5_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_SET_RESP" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES_TD, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_SET_RESP" );
 
             // Check if the NW selection was done ok.
             TUint8 successCode( isimessage.Get8bit(
@@ -3017,7 +3018,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSME
             else
                 {
 TFLOGSTRING2("TSY: CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_SET_RESP - Error cause value: %d", successCode);
-OstTraceExt1( TRACE_NORMAL, DUP6_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_SET_RESP - Error cause value=%hhu", successCode );
+OstTraceExt1( TRACE_NORMAL,  DUP6_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATUSMESSAGES_TD, "CMmNetMessHandler::StartHandlingNetModemRegStatusMessages - NET_SET_RESP - Error cause value=%hhu", successCode );
 
                 // SuccessCode is not ok, check also for GSM specific error code.
 
@@ -3085,7 +3086,7 @@ OstTraceExt1( TRACE_NORMAL, DUP6_CMMNETMESSHANDLER_STARTHANDLINGNETMODEMREGSTATU
 void CMmNetMessHandler::ContinueHandlingNetModemRegStatusMessages()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::ContinueHandlingNetModemRegStatusMessages - Continue handling queued messages");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_CONTINUEHANDLINGNETMODEMREGSTATUSMESSAGES, "CMmNetMessHandler::ContinueHandlingNetModemRegStatusMessages - Continue handling queued messages" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_CONTINUEHANDLINGNETMODEMREGSTATUSMESSAGES_TD, "CMmNetMessHandler::ContinueHandlingNetModemRegStatusMessages - Continue handling queued messages" );
 
     // Message handling done.
     // Reset flag to OFF as message handling is finished.
@@ -3104,7 +3105,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_CONTINUEHANDLINGNETMODEMREGSTATUSMESS
 void CMmNetMessHandler::InitializeOnsAndOplReading()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::InitializeOnsAndOplReading");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_INITIALIZEONSANDOPLREADING, "CMmNetMessHandler::InitializeOnsAndOplReading" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_INITIALIZEONSANDOPLREADING_TD, "CMmNetMessHandler::InitializeOnsAndOplReading" );
 
     // Set iNetMessageHandlingOngoing flag to ETrue.
     iNetMessageHandlingOngoing = ETrue;
@@ -3124,7 +3125,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_INITIALIZEONSANDOPLREADING, "CMmNetMe
 CMmMessageRouter* CMmNetMessHandler::GetMessageRouter()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::GetMessageRouter");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_GETMESSAGEROUTER, "CMmNetMessHandler::GetMessageRouter" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_GETMESSAGEROUTER_TD, "CMmNetMessHandler::GetMessageRouter" );
     return iMessageRouter;
     }
 
@@ -3136,7 +3137,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_GETMESSAGEROUTER, "CMmNetMessHandler:
 CMmPhoNetSender* CMmNetMessHandler::GetPhoNetSender()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::GetPhoNetSender");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_GETPHONETSENDER, "CMmNetMessHandler::GetPhoNetSender" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_GETPHONETSENDER_TD, "CMmNetMessHandler::GetPhoNetSender" );
     return iPhoNetSender;
     }
 
@@ -3151,7 +3152,7 @@ TInt CMmNetMessHandler::ExtractNetworkRegistrationStatus(
     TUint8& aRegistrationStatus
     ) const
     {
-    OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS, "CMmNetMessHandler::ExtractNetworkRegistrationStatus" );
+    OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_EXTRACTNETWORKREGISTRATIONSTATUS_TD, "CMmNetMessHandler::ExtractNetworkRegistrationStatus" );
     TFLOGSTRING("TSY: CMmNetMessHandler::ExtractNetworkRegistrationStatus");
 
     TUint sbStartOffSet( 0 );
@@ -3190,7 +3191,7 @@ TInt CMmNetMessHandler::ExtractNetworkRegistrationStatus(
 CMmNetOperatorNameHandler* CMmNetMessHandler::GetNetOperatorNameHandler()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::GetNetOperatorNameHandler");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_GETNETOPERATORNAMEHANDLER, "CMmNetMessHandler::GetNetOperatorNameHandler" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_GETNETOPERATORNAMEHANDLER_TD, "CMmNetMessHandler::GetNetOperatorNameHandler" );
     return iNetOperatorNameHandler;
     }
 
@@ -3203,7 +3204,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_GETNETOPERATORNAMEHANDLER, "CMmNetMes
 void CMmNetMessHandler::HandleLastNetModemRegStatusInd()
     {
 TFLOGSTRING("TSY: CMmNetMessHandler::HandleLastNetModemRegStatusInd");
-OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_HANDLELASTNETMODEMREGSTATUSIND, "CMmNetMessHandler::HandleLastNetModemRegStatusInd" );
+OstTrace0( TRACE_NORMAL,  CMMNETMESSHANDLER_HANDLELASTNETMODEMREGSTATUSIND_TD, "CMmNetMessHandler::HandleLastNetModemRegStatusInd" );
 
     TBool handlingNeeded( ETrue );
     if( iNetMessageQueue.Count() )
@@ -3222,7 +3223,7 @@ OstTrace0( TRACE_NORMAL, CMMNETMESSHANDLER_HANDLELASTNETMODEMREGSTATUSIND, "CMmN
                 NET_MODEM_REG_STATUS_GET_RESP == messageId )
                 {
 TFLOGSTRING("TSY: CMmNetMessHandler::HandleLastNetModemRegStatusInd: Similar messages already in queue, no need to handle last received ind");
-OstTrace0( TRACE_NORMAL, DUP1_CMMNETMESSHANDLER_HANDLELASTNETMODEMREGSTATUSIND, "CMmNetMessHandler::HandleLastNetModemRegStatusInd:: Similar messages already in queue, no need to handle last received ind" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMNETMESSHANDLER_HANDLELASTNETMODEMREGSTATUSIND_TD, "CMmNetMessHandler::HandleLastNetModemRegStatusInd:: Similar messages already in queue, no need to handle last received ind" );
                 handlingNeeded = EFalse;
                 break;
                 }
@@ -3253,7 +3254,7 @@ CDelayTimer* CDelayTimer::NewL(
     CMmNetMessHandler* aNetMessHandler )
     {
 TFLOGSTRING("TSY: CDelayTimer::NewL");
-OstTrace0( TRACE_NORMAL, CDELAYTIMER_NEWL, "CDelayTimer::NewL" );
+OstTrace0( TRACE_NORMAL,  CDELAYTIMER_NEWL_TD, "CDelayTimer::NewL" );
 
     CDelayTimer* self = new( ELeave ) CDelayTimer();
 
@@ -3275,7 +3276,7 @@ OstTrace0( TRACE_NORMAL, CDELAYTIMER_NEWL, "CDelayTimer::NewL" );
 CDelayTimer::CDelayTimer() : CTimer( CActive::EPriorityStandard )
     {
 TFLOGSTRING("TSY: CDelayTimer::CDelayTimer");
-OstTrace0( TRACE_NORMAL, CDELAYTIMER_CDELAYTIMER, "CDelayTimer::CDelayTimer" );
+OstTrace0( TRACE_NORMAL,  CDELAYTIMER_CDELAYTIMER_TD, "CDelayTimer::CDelayTimer" );
     }
 
 // -----------------------------------------------------------------------------
@@ -3286,7 +3287,7 @@ OstTrace0( TRACE_NORMAL, CDELAYTIMER_CDELAYTIMER, "CDelayTimer::CDelayTimer" );
 void CDelayTimer::ConstructL()
     {
 TFLOGSTRING("TSY: CDelayTimer::ConstructL");
-OstTrace0( TRACE_NORMAL, CDELAYTIMER_CONSTRUCTL, "CDelayTimer::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CDELAYTIMER_CONSTRUCTL_TD, "CDelayTimer::ConstructL" );
 
     iNewPacketTransferState = ETrue;
 
@@ -3302,7 +3303,7 @@ OstTrace0( TRACE_NORMAL, CDELAYTIMER_CONSTRUCTL, "CDelayTimer::ConstructL" );
 CDelayTimer::~CDelayTimer()
     {
 TFLOGSTRING("TSY: CDelayTimer::~CDelayTimer");
-OstTrace0( TRACE_NORMAL, DUP1_CDELAYTIMER_CDELAYTIMER, "CDelayTimer::~CDelayTimer" );
+OstTrace0( TRACE_NORMAL,  DUP1_CDELAYTIMER_CDELAYTIMER_TD, "CDelayTimer::~CDelayTimer" );
     Cancel();
     }
 
@@ -3317,7 +3318,7 @@ void CDelayTimer::StartDelayTimer(
     if ( iNewPacketTransferState != aNewPacketTransferState )
         {
 TFLOGSTRING("TSY: CDelayTimer::StartDelayTimer, Restart.");
-OstTrace0( TRACE_NORMAL, CDELAYTIMER_STARTDELAYTIMER, "CDelayTimer::StartDelayTimer,Restart" );
+OstTrace0( TRACE_NORMAL,  CDELAYTIMER_STARTDELAYTIMER_TD, "CDelayTimer::StartDelayTimer,Restart" );
         Cancel();
         iNewPacketTransferState = aNewPacketTransferState;
         After( aTimeOut );
@@ -3333,7 +3334,7 @@ OstTrace0( TRACE_NORMAL, CDELAYTIMER_STARTDELAYTIMER, "CDelayTimer::StartDelayTi
 void CDelayTimer::RunL()
     {
 TFLOGSTRING2("TSY: CDelayTimer::RunL, status = %d.", iStatus.Int());
-OstTrace1( TRACE_NORMAL, CDELAYTIMER_RUNL, "CDelayTimer::RunL;iStatus.Int=%d", iStatus.Int() );
+OstTrace1( TRACE_NORMAL,  CDELAYTIMER_RUNL_TD, "CDelayTimer::RunL;iStatus.Int=%d", iStatus.Int() );
 
     // Timer request has completed, so notify the timer's owner
     if ( iStatus == KErrNone )
@@ -3354,7 +3355,7 @@ OstTrace1( TRACE_NORMAL, CDELAYTIMER_RUNL, "CDelayTimer::RunL;iStatus.Int=%d", i
 void CDelayTimer::DoCancel()
     {
 TFLOGSTRING("TSY: CDelayTimer::DoCancel");
-OstTrace0( TRACE_NORMAL, CDELAYTIMER_DOCANCEL, "CDelayTimer::DoCancel" );
+OstTrace0( TRACE_NORMAL,  CDELAYTIMER_DOCANCEL_TD, "CDelayTimer::DoCancel" );
 
     CTimer::DoCancel();
 

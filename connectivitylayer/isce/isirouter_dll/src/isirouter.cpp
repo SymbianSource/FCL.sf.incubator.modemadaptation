@@ -17,20 +17,24 @@
 
 
 #include <kernel.h>               // For Kern
+#include <pn_const.h>             // For PN_OBJ_ROUTING_REQ
+#include <phonetisi.h>            // For ISI_HEADER_OFFSET_...
 #include "isirouter.h"            // For DISIRouter
 #include "isiroutertrace.h"       // For C_TRACE, ASSERT_RESET.. and fault codes
 #include "isidevice.h"            // For DLogicalDevice
 #include "isihelpers.h"           // For SET_SENDER_DEV...
-#include "misirouterchannelif.h"  // For MISIRouterChannelIf
+//#include "misirouterobjectif.h"  // For MISIRouterObjectIf
 #include "isithreadcontainer.h"   // For DISIThreadContainer
 #include "isicltransceiver.h"     // For DISICLTransceiver
 #include "misirouterobjectif.h"
 
-#define PN_DEV_OWN 0x6C //TODO take from real location in future
-
-const TInt KDfcPriority( 5 );
 const TUint32 KCommunicationManagerUID( 0x2002B3D0 );
 const TUint32 KNameServiceUID( 0x2002A5A1 );
+const TUint32 KIsiShRouterServiceUID( 0x20026FE7 );
+const TUint32 KIsiShPipeHandlerUID( 0x2002E6E2 );
+
+#define ROUTER_OBJECT_IDENTIFIER 0xFA // Only internally agreed inside isi router
+#define PIPEHANDLER_OBJECT_IDENTIFIER 0xFB // Only internally agreed inside isi router
 
 DISIRouter* DISIRouter::iSelfPtr = NULL;
 
@@ -45,62 +49,99 @@ enum TISIRouterFaults
     EISIRouterNULLPtr,
     EISIRouterNULLPtr1,
     EISIRouterNULLPtr2,
+    EISIRouterNULLPtr3,
     EISIRouterNULLThreadPointer,
+    EISIRouterRouterServiceNULLPtr,
+    EISiShPipeHandlerNULLPtr,
+    EISIRouterCommunicationManagerNULLPtr,
+    EISIRouterNameServiceNULLPtr,
+    EISIWrongObjectApiClient,
     };
 
+const TInt KDfcPriority( 5 );
 
+// #define WITHOUT_WRAPPERS_IN_USE //  to be defined on when wrappers are not used anymore
+#ifndef WITHOUT_WRAPPERS_IN_USE
+#include <iscnokiadefinitions.h> // Only allowed to include when wrappers are used
+const TUint16 KFirstUserChannel( EIscNokiaUpdateApplication );
+const TUint16 KLastKernelChannel( EIscNokiaLastKernelChannel );
+#endif
 
 void DISIRouter::Connect(
         const TInt32 aUID,
         TUint8& aObjId, 
-        MISIRouterChannelIf* aCallback
+        MISIRouterObjectIf* aCallback
         )
     {
-   	C_TRACE( ( _T( "DISIRouter::Connect %d 0x%x 0x%x>" ), aUID, aObjId, aCallback ) );
+    C_TRACE( ( _T( "DISIRouter::Connect 0x%x 0x%x 0x%x 0x%x>" ), aUID, aObjId, aCallback, this ) );
     ASSERT_RESET_ALWAYS( aCallback, ( EISIRouterNULLPtr | EDISIRouterTraceId << KClassIdentifierShift ) );
     TISIClient* tmp = new TISIClient();
     ASSERT_RESET_ALWAYS( tmp, ( EISIRouterMemAllocFailure | EDISIRouterTraceId << KClassIdentifierShift ) );
-    tmp->iUID     = aUID;
+    tmp->iUID = aUID;
     tmp->iChannel = aCallback;
-    
-    TUint8 staticObjId = ReceiveStaticObjId( aUID );
+    TUint8 staticObjId = ReserveStaticObjId( aUID );
     NKern::FMWait( iClientTableFastMutex );
-    CheckUIDUniqueness( aUID );
-    if( !staticObjId )
+    TBool reserved = CheckUIDUniqueness( aUID );
+#ifndef WITHOUT_WRAPPERS_IN_USE
+    if( reserved )
         {
-        tmp->iObjId = ReserveNewDynamicObjId();
-        ASSERT_RESET_ALWAYS( tmp->iObjId, ( EISIRouterNULLObjId | EDISIRouterTraceId << KClassIdentifierShift ) );
+        NKern::FMSignal( iClientTableFastMutex );
+        aObjId = 0xEE;
         }
     else
         {
-        tmp->iObjId = staticObjId;
+#endif //WITHOUT_WRAPPERS_IN_USE
+        if( KNotInitializedId == staticObjId )
+            {
+            tmp->iObjId = ReserveNewDynamicObjId();
+            ASSERT_RESET_ALWAYS( tmp->iObjId, ( EISIRouterNULLObjId | EDISIRouterTraceId << KClassIdentifierShift ) );
+            }
+        else
+            {
+            tmp->iObjId = staticObjId;//  check that dynamic allocation don't return statically reserved object identifiers
+            }
+        iClientTable[ tmp->iObjId ] = tmp;
+        NKern::FMSignal( iClientTableFastMutex );
+        aObjId = tmp->iObjId;
+#ifndef WITHOUT_WRAPPERS_IN_USE
         }
-    iClientTable[ tmp->iObjId ] = tmp;
-    NKern::FMSignal( iClientTableFastMutex );
-    aObjId = tmp->iObjId;
-    C_TRACE( ( _T( "DISIRouter::Connect %d 0x%x 0x%x<" ), aUID, aObjId, aCallback ) );
+#endif
+    C_TRACE( ( _T( "DISIRouter::Connect 0x%x 0x%x 0x%x<" ), aUID, aObjId, aCallback ) );
     }
 
-void DISIRouter::CheckUIDUniqueness( const TInt32 aUID )
+TBool DISIRouter::CheckUIDUniqueness( const TInt32 aUID )
     {
+    TBool ret(EFalse);
     // No tracing with mutex
-    for( TInt i( KFirstAllowedObjId ); i < KMaxAmountOfObjId; i++ )
+    for( TInt i( 0 ); i < KMaxAmountOfObjId; i++ )
         {
-  	    if( iClientTable[ i ]  && ( iClientTable[ i ]->iUID == aUID ) )
-    	      {
-    	      ASSERT_RESET_ALWAYS( 0, ( EISIRouterNotUniqueUID | EDISIRouterTraceId << KClassIdentifierShift ) );
-    	      }
+        if( iClientTable[ i ]  && ( iClientTable[ i ]->iUID == aUID ) )
+            {
+#ifndef WITHOUT_WRAPPERS_IN_USE
+            if( aUID <= KLastKernelChannel )
+                {
+                ret = ETrue;
+                }
+            else
+                {
+#endif //WITHOUT_WRAPPERS_IN_USE
+                ASSERT_RESET_ALWAYS( 0, ( EISIRouterNotUniqueUID | EDISIRouterTraceId << KClassIdentifierShift ) );
+#ifndef WITHOUT_WRAPPERS_IN_USE
+                }
+#endif //WITHOUT_WRAPPERS_IN_USE
+            }
         }
+    return ret;
     }
 
-TUint8 DISIRouter::ReceiveStaticObjId( const TInt32 aUID )
+TUint8 DISIRouter::ReserveStaticObjId( const TInt32 aUID )
     {
-    C_TRACE( ( _T( "DISIRouter::ReceiveStaticObjId 0x%x 0x%x>" ), aUID ) );
+    C_TRACE( ( _T( "DISIRouter::ReserveStaticObjId 0x%x 0x%x>" ), aUID ) );
     for( TUint8 i = 0; i < iStaticObjIdTable.Count(); i++ )
         {
         if( iStaticObjIdTable[ i ]->iUID == aUID )
             {
-            C_TRACE( ( _T( "DISIRouter::ReceiveStaticObjId 0x%x 0x%x 0x%x<" ), aUID, iStaticObjIdTable[i]->iUID, iStaticObjIdTable[i]->iObjId ) );
+            C_TRACE( ( _T( "DISIRouter::ReserveStaticObjId 0x%x 0x%x 0x%x<" ), aUID, iStaticObjIdTable[i]->iUID, iStaticObjIdTable[i]->iObjId ) );
             return iStaticObjIdTable[i]->iObjId;
             }
         }
@@ -110,26 +151,32 @@ TUint8 DISIRouter::ReceiveStaticObjId( const TInt32 aUID )
 TUint8 DISIRouter::ReserveNewDynamicObjId()
     {
     // No tracing with mutex
-	  for( TInt i( KFirstAllowedObjId ); i < KMaxAmountOfObjId; i++ )
+#ifdef WITHOUT_WRAPPERS_IN_USE    
+    TUint8 firstAllowedObjId = KFirstAllowedObjId;
+#else
+    TUint8 firstAllowedObjId = KLastKernelChannel;
+#endif
+
+    for( TInt i(firstAllowedObjId); i < KMaxAmountOfObjId; i++ )
         {
-    	  if( !iClientTable[ i ] )
-    	      {
-    	      TBool reserved( EFalse );
-    	      for( TUint8 j = 0; j < iStaticObjIdTable.Count(); j++ )
-    	          {
-    	          if( j == iStaticObjIdTable[ j ]->iObjId )
-    	              {
-    	              reserved = ETrue;
-    	              break;
-    	              }
-    	          }
-    	      if( !reserved )
-    	          {
-    	          return i;
-    	          }
-    	      }
+        if( !iClientTable[ i ] )
+            {
+            TBool reserved( EFalse );
+            for( TUint8 j = 0; j < iStaticObjIdTable.Count(); j++ )
+                {
+                if( j == iStaticObjIdTable[ j ]->iObjId )
+                    {
+                    reserved = ETrue;
+                    break;
+                    }
+                }
+            if( !reserved )
+                {
+                return i;
+                }
+            }
         }
-	  return KNotInitializedId;
+    return KNotInitializedId;
     }
 
 void DISIRouter::Disconnect(
@@ -139,10 +186,11 @@ void DISIRouter::Disconnect(
     C_TRACE( ( _T( "DISIRouter::Disconnect 0x%x>" ), aObjId ) );
     TISIClient* tmp = iClientTable[ aObjId ];
     NKern::FMWait( iClientTableFastMutex );
- 	  iClientTable[ aObjId ] = NULL;
+    iClientTable[ aObjId ] = NULL;
     NKern::FMSignal( iClientTableFastMutex );
     //Must exist
     delete tmp;
+    tmp = NULL;
     C_TRACE( ( _T( "DISIRouter::Disconnect 0x%x<" ), aObjId ) );
     }
 
@@ -151,21 +199,19 @@ TDfcQue* DISIRouter::GetDfcThread(
         )
     {
     C_TRACE( ( _T( "DISIRouter::GetDfcThread<>" ) ) );  
-    Kern::Printf( "ISIRouter::GetDfcThread" );
-    return iClientThreadContainer->AllocateThread( aType );
+    return iShClientThreadContainer->AllocateThread( aType );
     }
 
 void DISIRouter::FreeDfcThread( TDfcQue* aThread )
     {
     C_TRACE( ( _T( "DISIRouter::FreeDfcThread 0x%x>" ), aThread ) );
-    Kern::Printf( "ISIRouter::FreeDfcThread" );
-    iClientThreadContainer->DeallocateThread( aThread );
+    iShClientThreadContainer->DeallocateThread( aThread );
     C_TRACE( ( _T( "DISIRouter::FreeDfcThread 0x%x<" ), aThread ) );
     }
 
-MISIChannelRouterIf* MISIChannelRouterIf::GetIf()
+EXPORT_C MISIObjectRouterIf* MISIObjectRouterIf::GetIf()
     {
-    C_TRACE( ( _T( "MISIChannelRouterIf::GetIf<>" ) ) );
+    C_TRACE( ( _T( "MISIObjectRouterIf::GetIf<>" ) ) );
     return DISIRouter::GetRouter();
     }
 
@@ -174,9 +220,9 @@ DISIRouter::DISIRouter(
         )
     {
     C_TRACE( ( _T( "DISIRouter::DISIRouter>" ) ) );
-    iClientThreadContainer = new DISIThreadContainer();
-    ASSERT_RESET_ALWAYS( iClientThreadContainer, ( EISIRouterMemAllocFailure1 | EDISIRouterTraceId << KClassIdentifierShift ) );
-    iInitThread = iClientThreadContainer->AllocateThread( MISIChannelRouterIf::EISIKernelMainThread );
+    iShClientThreadContainer = new DISIThreadContainer();
+    ASSERT_RESET_ALWAYS( iShClientThreadContainer, ( EISIRouterMemAllocFailure1 | EDISIRouterTraceId << KClassIdentifierShift ) );
+    iInitThread = iShClientThreadContainer->AllocateThread( MISIObjectRouterIf::EISIKernelMainThread );
     ASSERT_RESET_ALWAYS( iInitThread, ( EISIRouterNULLThreadPointer | EDISIRouterTraceId << KClassIdentifierShift ) );
     iInitializeDfc = new TDfc( InitializeDfc, this, iInitThread, KDfcPriority );
     ASSERT_RESET_ALWAYS( iInitializeDfc, ( EISIRouterMemAllocFailure2 | EDISIRouterTraceId << KClassIdentifierShift ) );
@@ -198,23 +244,52 @@ void DISIRouter::Initialize(
         // None
         )
     {
-    C_TRACE( ( _T( "DISIRouter::Initialize>" ) ) );
-    
-    iCLTransceiver = new DISICLTransceiver( this );
-    ASSERT_RESET_ALWAYS( iCLTransceiver, ( EISIRouterNULLPtr1 | EDISIRouterTraceId << KClassIdentifierShift ) ); //TODO error codes
+    C_TRACE( ( _T( "DISIRouter::Initialize> this: 0x%x" ), this ) );
+    iSelfPtr = this;
     iClientTableFastMutex = new NFastMutex();
     ASSERT_RESET_ALWAYS( iClientTableFastMutex, ( EISIRouterNULLPtr2 | EDISIRouterTraceId << KClassIdentifierShift ) );
-    
     for( TInt i( 0 ); i < KMaxAmountOfObjId; i++)
         {
         iClientTable[ i ] = NULL;
         }
+    //  comment improve hex or des
+    //  nameservice, communication manager, routerservice...
     //                                       UID  ObjId
-    iStaticObjIdTable.Append( new TStaticId( 123, 15 ) ); //NokiaTSY etc...
-    iStaticObjIdTable.Append( new TStaticId( 200, 34 ) );
+    iStaticObjIdTable.Append( new TStaticId( 123, 0x70 ) ); //  for testing ISI API
+    iStaticObjIdTable.Append( new TStaticId( 200, 0x71 ) ); //  for testing ISI API
+    iStaticObjIdTable.Append( new TStaticId( 201, 0x72 ) ); //  for testing ISI API
+    iStaticObjIdTable.Append( new TStaticId( 202, 0x73 ) ); //  for testing ISI API
+    //
+#ifndef WITHOUT_WRAPPERS_IN_USE
+    // Map all the kernel channels as they used to be
+    for( TInt id( KFirstUserChannel ); id < KLastKernelChannel; id++ )
+        {
+        if ( ( id != KNotInitializedId ) &&
+             ( id != PN_OBJ_EVENT_MULTICAST ) &&
+             ( id != PN_OBJ_EVENT_MULTICAST ) &&
+             ( id != ROUTER_OBJECT_IDENTIFIER ) &&
+             ( id != PIPEHANDLER_OBJECT_IDENTIFIER ) ) 
+            {        
+            iStaticObjIdTable.Append( new TStaticId( id, id ) );
+            }
+        else
+            {
+            iStaticObjIdTable.Append( new TStaticId( id, 0xEE ) );
+            }
+        }
+    // Map all the kernel channels as they used to be
+#endif // WITHOUT_WRAPPERS_IN_USE
+    // ? vaikutus iShClientThreadContainer->DeallocateThread( iInitThread );
+
+    iStaticObjIdTable.Append( new TStaticId( 0xD11BADA1, KNotInitializedId ) );// Make sure no one can get KNotInitializedId obj id
+    iStaticObjIdTable.Append( new TStaticId( KCommunicationManagerUID, PN_OBJ_EVENT_MULTICAST ) );
+    iStaticObjIdTable.Append( new TStaticId( KNameServiceUID, PN_OBJ_ROUTING_REQ ) );
+    iStaticObjIdTable.Append( new TStaticId( KIsiShRouterServiceUID, ROUTER_OBJECT_IDENTIFIER ) );
+    iStaticObjIdTable.Append( new TStaticId( KIsiShPipeHandlerUID, PIPEHANDLER_OBJECT_IDENTIFIER ) );
     
-    iSelfPtr = this;
-    iClientThreadContainer->DeallocateThread( iInitThread );
+    iShCLTransceiver = new DISICLTransceiver( *this, iInitThread );
+    ASSERT_RESET_ALWAYS( iShCLTransceiver, ( EISIRouterNULLPtr1 | EDISIRouterTraceId << KClassIdentifierShift ) ); 
+    
     C_TRACE( ( _T( "DISIRouter::Initialize<" ) ) );
     }
 
@@ -238,14 +313,13 @@ DISIRouter::~DISIRouter(
             iClientTable[ i ] = NULL;
             }
         }
-    // All must exist
-    iInitializeDfc->Cancel();
+    // All must exist otherways reseted.
     delete iInitializeDfc;
     iInitializeDfc = NULL;
-    delete iClientThreadContainer;
-    iClientThreadContainer = NULL;
-    delete iCLTransceiver;
-    iCLTransceiver = NULL;
+    delete iShClientThreadContainer;
+    iShClientThreadContainer = NULL;
+    delete iShCLTransceiver;
+    iShCLTransceiver = NULL;
     delete iClientTableFastMutex;
     iClientTableFastMutex = NULL;
     C_TRACE( ( _T( "DISIRouter::~DISIRouter<" ) ) );
@@ -257,17 +331,24 @@ TInt DISIRouter::Send(
         )
     {
     C_TRACE( ( _T( "DISIRouter::Send 0x%x 0x%x>" ), &aMessage, aObjId ) );
-    Kern::Printf( "ISIRouter::Send" );
 
-    if( ( aObjId != PN_OBJ_ROUTING_REQ ) 
-     && ( aObjId != PN_OBJ_EVENT_MULTICAST ) )
+    if( ( ( aObjId == EIscNokiaUsbPhonetLink ) && ( GET_SENDER_DEV( aMessage.Ptr() ) == PN_DEV_PC ) ) ||
+        ( aObjId == PN_OBJ_ROUTING_REQ ) || 
+        ( aObjId == PN_OBJ_EVENT_MULTICAST ) ||
+        ( aObjId == ROUTER_OBJECT_IDENTIFIER ) ||
+        ( aObjId == PIPEHANDLER_OBJECT_IDENTIFIER ) ) 
         {
-        TUint8* messageBlockPtr( const_cast<TUint8*>( aMessage.Ptr() ) );
+        // No need to update sender dev and obj id
+        C_TRACE( ( _T( "DISIRouter::Send message tx address not needed to updata 0x%x 0x%x>" ), aObjId, GET_SENDER_DEV( aMessage.Ptr() ) ) );
+        }
+    else
+        {
+        TUint8* messageBlockPtr( const_cast<TUint8*>( aMessage.Ptr() ) );        
         SET_SENDER_DEV( messageBlockPtr, PN_DEV_OWN );
         SET_SENDER_OBJ( messageBlockPtr, aObjId );
         }
-    TInt error = iCLTransceiver->RouteISIMessage( aMessage );
-    C_TRACE( ( _T( "DISIRouter::Send 0x%x %d 0x%x<" ), &aMessage, aObjId ) );
+    TInt error = iShCLTransceiver->RouteISIMessage( aMessage );
+    C_TRACE( ( _T( "DISIRouter::Send 0x%x 0x%x<" ), &aMessage, aObjId ) );
     return error;
     }
 
@@ -276,91 +357,42 @@ TBool DISIRouter::Receive( TDes8& aMessage, const TUint8 aObjId )
     C_TRACE( ( _T( "DISIRouter::Receive 0x%x 0x%x>" ), &aMessage, aObjId ) );
     TBool error( EFalse );
     TUint8* messageBlockPtr( const_cast<TUint8*>( aMessage.Ptr() ) ); 
-    switch( GET_RECEIVER_OBJ( aMessage ) )
+
+    NKern::FMWait( iClientTableFastMutex );
+    if( iClientTable[ aObjId ] )
         {
-        case PN_OBJ_ROUTING_REQ:
-            {
-            C_TRACE( ( _T( "DISIRouter msg to PN_OBJ_ROUTING_REQ: nameservice" ) ) );
-            //route with resource and nameservice
-            iNameService->Receive( aMessage );
-            C_TRACE( ( _T( "DRouter::HandleIsiMessage to NAMESERVICE<" ) ) );
-            error = ETrue;
-            break;
-            }
-        case PN_OBJ_EVENT_MULTICAST:
-            {
-            C_TRACE( ( _T( "DISIRouter msg to PN_OBJ_EVENT_MULTICAST: communication manager" ) ) );
-            iCommunicationManager->Receive( aMessage );
-            C_TRACE( ( _T( "DRouter::HandleIsiMessage to Communication Manager<" ) ) );
-            error = ETrue;
-            break;
-            }           
-        default:
-            {   //default regular channel
-             NKern::FMWait( iClientTableFastMutex );
-             if( iClientTable[ aObjId ] )
-                {
-                NKern::FMSignal( iClientTableFastMutex );
-                ( iClientTable[ aObjId ]->iChannel )->ReceiveMsg( aMessage ); //may not be safe, consider receive/delete sync
-                C_TRACE( ( _T( "DISIRouter::Receive ok 0x%x 0x%x>" ), &aMessage, aObjId ) );
-                error = ETrue;
-	              }
-	          else
-	              {
-                NKern::FMSignal( iClientTableFastMutex );
-                C_TRACE( ( _T( "DISIRouter::Receive failed 0x%x 0x%x<" ), &aMessage, aObjId ) );
-                error = EFalse;
-                }
-            break;    
-            }
-         }   
-     return error;
+        NKern::FMSignal( iClientTableFastMutex );
+        ( iClientTable[ aObjId ]->iChannel )->Receive( aMessage ); //may not be safe, consider receive/delete sync
+        C_TRACE( ( _T( "DISIRouter::Receive ok 0x%x 0x%x" ), &aMessage, aObjId ) );
+        error = ETrue;
+        }
+    else
+        {
+        NKern::FMSignal( iClientTableFastMutex );
+        C_TRACE( ( _T( "DISIRouter::Receive failed 0x%x 0x%x" ), &aMessage, aObjId ) );
+        error = EFalse;
+        }
+
+    C_TRACE( ( _T( "DISIRouter::Receive 0x%x 0x%x %d<" ), &aMessage, aObjId, error ) );
+    return error;
 
     }
 
 DECLARE_STANDARD_EXTENSION()
     {
-    Kern::Printf( "ISI Router extension>" );
+    Kern::Printf( "ISI Router kext>" );
     // Create a container extension
     DISIRouter* extension = new DISIRouter();
     TRACE_ASSERT( extension );
-    Kern::Printf( "ISI Router extension<" );
+    Kern::Printf( "ISI Router kext 0x%x<", extension );
     return extension ? KErrNone : KErrNoMemory;
     }
 
 DECLARE_EXTENSION_LDD()
     {
-    Kern::Printf( "ISI Router ldd>" );
+    Kern::Printf( "ISI Router kextldd>" );
     DLogicalDevice* device = new DISIDevice;
     TRACE_ASSERT( device );
-    Kern::Printf( "ISI Router ldd 0x%x<", device );
-    return( device );
+    Kern::Printf( "ISI Router kextldd 0x%x<", device );
+    return device;
     }
-
-//From objectapi
-EXPORT_C MISIObjectRouterIf* MISIObjectRouterIf::Connect( const TInt32 aUID, TUint8& aObjId, MISIRouterObjectIf* aCallback )
-    {
-    C_TRACE( ( _T( "MISIObjectRouterIf::Connect %d 0x%x 0x%x>" ), aUID, aObjId, aCallback ) );
-    
-    Kern::Printf( "ISIRouter::Connect" );
-    if( aUID == KNameServiceUID )
-        {
-        C_TRACE( ( _T( "MISIObjectRouterIf was nameservice" ) ) );
-        DISIRouter::iSelfPtr->iNameService = aCallback;
-        aObjId = PN_OBJ_ROUTING_REQ; // 0x00
-        }
-    else if( aUID == KCommunicationManagerUID )
-        {
-        C_TRACE( ( _T( "MISIObjectRouterIf was communicationmanager" ) ) );
-        DISIRouter::iSelfPtr->iCommunicationManager = aCallback;
-        aObjId = PN_OBJ_EVENT_MULTICAST; // 0x20
-        }
-    else
-        {
-        C_TRACE( ( _T( "MISIObjectRouterIf unknown object api client" ) ) );
-        }
-    MISIObjectRouterIf* tmp =  DISIRouter::iSelfPtr;
-    C_TRACE( ( _T( "MISIObjectRouterIf::Connect %d 0x%x 0x%x<" ), aUID, aObjId, aCallback ) );
-    return tmp;
-    }
-

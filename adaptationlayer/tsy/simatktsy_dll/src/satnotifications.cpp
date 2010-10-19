@@ -29,7 +29,6 @@
 #include <tisi.h>               // isi message
 #include <net_modemisi.h>       // net server
 #include <gssisi.h>             // gss server
-#include <atkisi.h>             // atk server
 #include <uiccisi.h>            // uicc server
 #include <satcs.h>
 #include "OstTraceDefinitions.h"
@@ -137,6 +136,9 @@ const TUint8 KLinkEstablishmentMask                 = 0x01;
 // Reconnection mode
 const TUint8 KReconnectionModeMask                  = 0x02;
 
+const TInt KECircularRepeatIndicator                = 0x01;
+const TInt KESequentalRepeatIndicator               = 0x03;
+
 
 // LOCAL FUNCTION PROTOTYPES
 
@@ -164,7 +166,7 @@ CSatNotificationsBase::CSatNotificationsBase
         iTransId( KZero ),
         iReqHandle( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFICATIONSBASE_CSATNOTIFICATIONSBASE, "CSatNotificationsBase::CSatNotificationsBase" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFICATIONSBASE_CSATNOTIFICATIONSBASE_TD, "CSatNotificationsBase::CSatNotificationsBase" );
     iCommandDetails.Zero();
 
     // Following results are accepted by all commands
@@ -181,7 +183,7 @@ CSatNotificationsBase::CSatNotificationsBase
 //
 CSatNotificationsBase::~CSatNotificationsBase()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFICATIONSBASE_CSATNOTIFICATIONSBASE, "CSatNotificationsBase::~CSatNotificationsBase" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFICATIONSBASE_CSATNOTIFICATIONSBASE_TD, "CSatNotificationsBase::~CSatNotificationsBase" );
     // None
     }
 
@@ -196,7 +198,7 @@ TInt CSatNotificationsBase::CancelNotification
         const TTsyReqHandle aReqHandle  // Request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFICATIONSBASE_CANCELNOTIFICATION, "CSatNotificationsBase::CancelNotification" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFICATIONSBASE_CANCELNOTIFICATION_TD, "CSatNotificationsBase::CancelNotification" );
     TFLOGSTRING("TSY: CSatNotificationsBase::CancelNotification");
 
     // Check that the handle is valid
@@ -226,7 +228,7 @@ TInt CSatNotificationsBase::TerminalResponse
         TDes8* /* aRsp */   // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFICATIONSBASE_TERMINALRESPONSE, "CSatNotificationsBase::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFICATIONSBASE_TERMINALRESPONSE_TD, "CSatNotificationsBase::TerminalResponse" );
     // Base class does not do anything
     return KErrNone;
     }
@@ -239,7 +241,7 @@ TInt CSatNotificationsBase::TerminalResponse
 //
 TDes8& CSatNotificationsBase::GetCmdDetails()
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFICATIONSBASE_GETCMDDETAILS, "CSatNotificationsBase::GetCmdDetails" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFICATIONSBASE_GETCMDDETAILS_TD, "CSatNotificationsBase::GetCmdDetails" );
     return iCommandDetails;
     }
 
@@ -252,7 +254,7 @@ TDes8& CSatNotificationsBase::GetCmdDetails()
 //
 TUint8 CSatNotificationsBase::GetTransactionId()
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFICATIONSBASE_GETTRANSACTIONID, "CSatNotificationsBase::GetTransactionId" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFICATIONSBASE_GETTRANSACTIONID_TD, "CSatNotificationsBase::GetTransactionId" );
     return iTransId;
     }
 
@@ -264,7 +266,7 @@ TUint8 CSatNotificationsBase::GetTransactionId()
 //
 TTsyReqHandle CSatNotificationsBase::TsyReqHandle()
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFICATIONSBASE_TSYREQHANDLE, "CSatNotificationsBase::TsyReqHandle" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFICATIONSBASE_TSYREQHANDLE_TD, "CSatNotificationsBase::TsyReqHandle" );
     return iReqHandle;
     }
 
@@ -279,7 +281,7 @@ void CSatNotificationsBase::CompleteRequest
         const TInt aError   // Possible error
         )
     {
-    OstTraceExt2( TRACE_NORMAL, CSATNOTIFICATIONSBASE_COMPLETEREQUEST, "CSatNotificationsBase::CompleteRequest, Handle: %d, Error: %d", (TInt)iReqHandle, aError );
+    OstTraceExt2( TRACE_NORMAL,  CSATNOTIFICATIONSBASE_COMPLETEREQUEST_TD, "CSatNotificationsBase::CompleteRequest, Handle: %d, Error: %d", (TInt)iReqHandle, aError );
     TFLOGSTRING3("CSatNotificationsBase::CompleteRequest. \n\t\t\t Handle:%d\n\t\t\t Error:%d",
                iReqHandle,
                aError);
@@ -287,7 +289,7 @@ void CSatNotificationsBase::CompleteRequest
     iReqHandle = NULL;
     iSatMessaging->ReqCompleted( tempReqHandle, aError );
     TFLOGSTRING("CSatNotificationsBase::CompleteRequest. Request is now completed");
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFICATIONSBASE_COMPLETEREQUEST, "CSatNotificationsBase::CompleteRequest. Request is now completed" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFICATIONSBASE_COMPLETEREQUEST_TD, "CSatNotificationsBase::CompleteRequest. Request is now completed" );
     }
 
 // -----------------------------------------------------------------------------
@@ -477,7 +479,7 @@ CSatNotifyDisplayText::CSatNotifyDisplayText
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iDisplayTextV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYDISPLAYTEXT_CSATNOTIFYDISPLAYTEXT, "CSatNotifyDisplayText::CSatNotifyDisplayText" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYDISPLAYTEXT_CSATNOTIFYDISPLAYTEXT_TD, "CSatNotifyDisplayText::CSatNotifyDisplayText" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -492,7 +494,7 @@ CSatNotifyDisplayText::CSatNotifyDisplayText
 //
 CSatNotifyDisplayText::~CSatNotifyDisplayText()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYDISPLAYTEXT_CSATNOTIFYDISPLAYTEXT, "CSatNotifyDisplayText::~CSatNotifyDisplayText" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYDISPLAYTEXT_CSATNOTIFYDISPLAYTEXT_TD, "CSatNotifyDisplayText::~CSatNotifyDisplayText" );
     // None
     }
 
@@ -505,7 +507,7 @@ CSatNotifyDisplayText::~CSatNotifyDisplayText()
 //
 void CSatNotifyDisplayText::MessageReceived( const TIsiReceiveC& aIsiMessage )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYDISPLAYTEXT_MESSAGERECEIVED, "CSatNotifyDisplayText::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYDISPLAYTEXT_MESSAGERECEIVED_TD, "CSatNotifyDisplayText::MessageReceived" );
     TFLOGSTRING("TSY: CSatNotifyDisplayText::MessageReceived");
     // Completion return value
     TInt ret( KErrNone );
@@ -526,7 +528,7 @@ void CSatNotifyDisplayText::MessageReceived( const TIsiReceiveC& aIsiMessage )
     if ( !iReqHandle )
         {
         TFLOGSTRING("TSY: CSatNotifyDisplayText::MessageReceived - Request Off");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYDISPLAYTEXT_MESSAGERECEIVED, "CSatNotifyDisplayText::MessageReceived - Request Off" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYDISPLAYTEXT_MESSAGERECEIVED_TD, "CSatNotifyDisplayText::MessageReceived - Request Off" );
 
         // Request not on, returning response immediately
         iSatMessHandler->DisplayTextTerminalResp(
@@ -642,7 +644,7 @@ void CSatNotifyDisplayText::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYDISPLAYTEXT_NOTIFY, "CSatNotifyDisplayText::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYDISPLAYTEXT_NOTIFY_TD, "CSatNotifyDisplayText::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifyDisplayText::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -662,7 +664,7 @@ TInt CSatNotifyDisplayText::TerminalResponse
         TDes8* aRsp     // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYDISPLAYTEXT_TERMINALRESPONSE, "CSatNotifyDisplayText::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYDISPLAYTEXT_TERMINALRESPONSE_TD, "CSatNotifyDisplayText::TerminalResponse" );
     TFLOGSTRING("CSatNotifyDisplayText::TerminalResponse");
     // Completion return value
     TInt   ret( KErrNone );
@@ -721,7 +723,7 @@ CSatNotifyGetInkey::CSatNotifyGetInkey
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iGetInkeyV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYGETINKEY_CSATNOTIFYGETINKEY, "CSatNotifyGetInkey::CSatNotifyGetInkey" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYGETINKEY_CSATNOTIFYGETINKEY_TD, "CSatNotifyGetInkey::CSatNotifyGetInkey" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -737,7 +739,7 @@ CSatNotifyGetInkey::CSatNotifyGetInkey
 //
 CSatNotifyGetInkey::~CSatNotifyGetInkey()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYGETINKEY_CSATNOTIFYGETINKEY, "CSatNotifyGetInkey::~CSatNotifyGetInkey" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYGETINKEY_CSATNOTIFYGETINKEY_TD, "CSatNotifyGetInkey::~CSatNotifyGetInkey" );
     // None
     }
 
@@ -753,7 +755,7 @@ void CSatNotifyGetInkey::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYGETINKEY_MESSAGERECEIVED, "CSatNotifyGetInkey::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYGETINKEY_MESSAGERECEIVED_TD, "CSatNotifyGetInkey::MessageReceived" );
     TFLOGSTRING( "TSY: CSatNotifyGetInkey::MessageReceived" );
 
     // Completion return value
@@ -892,7 +894,7 @@ void CSatNotifyGetInkey::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYGETINKEY_NOTIFY, "CSatNotifyGetInkey::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYGETINKEY_NOTIFY_TD, "CSatNotifyGetInkey::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2( "TSY: CSatNotifyGetInkey::Notify. Handle: %d", aReqHandle );
 
     iReqHandle = aReqHandle;
@@ -913,7 +915,7 @@ TInt CSatNotifyGetInkey::TerminalResponse
         TDes8* aRsp // Response packet from ETel
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYGETINKEY_TERMINALRESPONSE, "CSatNotifyGetInkey::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYGETINKEY_TERMINALRESPONSE_TD, "CSatNotifyGetInkey::TerminalResponse" );
     TFLOGSTRING("TSY: CSatNotifyGetInkey::TerminalResponse" );
 
     TInt ret( KErrNone );
@@ -1008,7 +1010,7 @@ CSatNotifyGetInput::CSatNotifyGetInput
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iGetInputV1Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYGETINPUT_CSATNOTIFYGETINPUT, "CSatNotifyGetInput::CSatNotifyGetInput" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYGETINPUT_CSATNOTIFYGETINPUT_TD, "CSatNotifyGetInput::CSatNotifyGetInput" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -1024,7 +1026,7 @@ CSatNotifyGetInput::CSatNotifyGetInput
 //
 CSatNotifyGetInput::~CSatNotifyGetInput()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYGETINPUT_CSATNOTIFYGETINPUT, "CSatNotifyGetInput::~CSatNotifyGetInput" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYGETINPUT_CSATNOTIFYGETINPUT_TD, "CSatNotifyGetInput::~CSatNotifyGetInput" );
     // None
     }
 
@@ -1040,7 +1042,7 @@ void CSatNotifyGetInput::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYGETINPUT_MESSAGERECEIVED, "CSatNotifyGetInput::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYGETINPUT_MESSAGERECEIVED_TD, "CSatNotifyGetInput::MessageReceived" );
     TFLOGSTRING("CSatNotifyGetInput::MessageReceived");
     TInt ret( KErrNone );
     // Get ber tlv
@@ -1151,7 +1153,7 @@ void CSatNotifyGetInput::MessageReceived
             ret = KErrCorrupt;
             }
         TFLOGSTRING2("TSY: GetInput, text: %S", &getInputV1.iText );
-        OstTraceExt1( TRACE_NORMAL, DUP1_CSATNOTIFYGETINPUT_MESSAGERECEIVED, "CSatNotifyGetInput::MessageReceived GetInput, text: %S", getInputV1.iText );
+        OstTraceExt1( TRACE_NORMAL,  DUP1_CSATNOTIFYGETINPUT_MESSAGERECEIVED_TD, "CSatNotifyGetInput::MessageReceived GetInput, text: %S", getInputV1.iText );
 
         // Response length expected
         CTlv responseLength;
@@ -1222,7 +1224,7 @@ void CSatNotifyGetInput::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYGETINPUT_NOTIFY, "CSatNotifyGetInput::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYGETINPUT_NOTIFY_TD, "CSatNotifyGetInput::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifyGetInput::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -1242,7 +1244,7 @@ TInt CSatNotifyGetInput::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYGETINPUT_TERMINALRESPONSE, "CSatNotifyGetInput::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYGETINPUT_TERMINALRESPONSE_TD, "CSatNotifyGetInput::TerminalResponse" );
     TFLOGSTRING("CSatNotifyGetInput::TerminalResponse");
     TInt ret( KErrNone );
     TUint8 additionalInfo( 0 );
@@ -1317,7 +1319,7 @@ CSatNotifyPlayTone::CSatNotifyPlayTone
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iPlayToneV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYPLAYTONE_CSATNOTIFYPLAYTONE, "CSatNotifyPlayTone::CSatNotifyPlayTone" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYPLAYTONE_CSATNOTIFYPLAYTONE_TD, "CSatNotifyPlayTone::CSatNotifyPlayTone" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -1331,7 +1333,7 @@ CSatNotifyPlayTone::CSatNotifyPlayTone
 //
 CSatNotifyPlayTone::~CSatNotifyPlayTone()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYPLAYTONE_CSATNOTIFYPLAYTONE, "CSatNotifyPlayTone::~CSatNotifyPlayTone" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYPLAYTONE_CSATNOTIFYPLAYTONE_TD, "CSatNotifyPlayTone::~CSatNotifyPlayTone" );
     // None
     }
 
@@ -1347,7 +1349,7 @@ void CSatNotifyPlayTone::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYPLAYTONE_MESSAGERECEIVED, "CSatNotifyPlayTone::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYPLAYTONE_MESSAGERECEIVED_TD, "CSatNotifyPlayTone::MessageReceived" );
     TFLOGSTRING("CSatNotifyPlayTone::MessageReceived");
     //get ber tlv
     CBerTlv berTlv;
@@ -1439,7 +1441,7 @@ void CSatNotifyPlayTone::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYPLAYTONE_NOTIFY, "CSatNotifyPlayTone::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYPLAYTONE_NOTIFY_TD, "CSatNotifyPlayTone::Notify Handle: %u", aReqHandle );
 
     TFLOGSTRING2("CSatNotifyPlayTone::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
@@ -1460,7 +1462,7 @@ TInt CSatNotifyPlayTone::TerminalResponse
         TDes8* aRsp     // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYPLAYTONE_TERMINALRESPONSE, "CSatNotifyPlayTone::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYPLAYTONE_TERMINALRESPONSE_TD, "CSatNotifyPlayTone::TerminalResponse" );
     TFLOGSTRING("CSatNotifyPlayTone::TerminalResponse");
     TInt ret( KErrNone );
     TUint8 additionalInfo( 0 );
@@ -1513,7 +1515,7 @@ CSatNotifyPollInterval::CSatNotifyPollInterval
         :
         CSatNotificationsBase( aSatMessHandler, aSatMessaging )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYPOLLINTERVAL_CSATNOTIFYPOLLINTERVAL, "CSatNotifyPollInterval::CSatNotifyPollInterval" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYPOLLINTERVAL_CSATNOTIFYPOLLINTERVAL_TD, "CSatNotifyPollInterval::CSatNotifyPollInterval" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KErrorRequiredValuesMissing;
@@ -1526,7 +1528,7 @@ CSatNotifyPollInterval::CSatNotifyPollInterval
 //
 CSatNotifyPollInterval::~CSatNotifyPollInterval()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYPOLLINTERVAL_CSATNOTIFYPOLLINTERVAL, "CSatNotifyPollInterval::~CSatNotifyPollInterval" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYPOLLINTERVAL_CSATNOTIFYPOLLINTERVAL_TD, "CSatNotifyPollInterval::~CSatNotifyPollInterval" );
     // None
     }
 
@@ -1542,7 +1544,7 @@ void CSatNotifyPollInterval::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYPOLLINTERVAL_MESSAGERECEIVED, "CSatNotifyPollInterval::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYPOLLINTERVAL_MESSAGERECEIVED_TD, "CSatNotifyPollInterval::MessageReceived" );
     TFLOGSTRING("CSatNotifyPollInterval::MessageReceived");
     //get ber tlv
     CBerTlv berTlv;
@@ -1603,7 +1605,7 @@ void CSatNotifyPollInterval::MessageReceived
                     {
                     returnValue = KErrNotFound;
                     TFLOGSTRING("TSY: CSatNotifyPollInterval::MessageReceived, Time unit did not match.");
-                    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYPOLLINTERVAL_MESSAGERECEIVED, "CSatNotifyPollInterval::MessageReceived, Time unit did not match." );
+                    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYPOLLINTERVAL_MESSAGERECEIVED_TD, "CSatNotifyPollInterval::MessageReceived, Time unit did not match." );
                     // Command data not understood
                     iSatMessHandler->PollIntervalTerminalResp( iTransId, iCommandDetails,
                     RSat::KCmdDataNotUnderstood, RSat::KNoSpecificMeProblem, 0);
@@ -1621,13 +1623,13 @@ void CSatNotifyPollInterval::MessageReceived
                 if ( iSatMessHandler->OldPollInterval() )
                     {
                     TFLOGSTRING("TSY: CSatNotifyPollInterval::MessageReceived MaxPolInterval");
-                    OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYPOLLINTERVAL_MESSAGERECEIVED, "CSatNotifyPollInterval::MessageReceived MaxPolInterval" );
+                    OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYPOLLINTERVAL_MESSAGERECEIVED_TD, "CSatNotifyPollInterval::MessageReceived MaxPolInterval" );
                     anIntervalInSeconds = KMaxPollInterval;
                     }
                 else
                     {
                     TFLOGSTRING("TSY: CSatNotifyPollInterval::MessageReceived, DefaultPollInterval");
-                    OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYPOLLINTERVAL_MESSAGERECEIVED, "CSatNotifyPollInterval::MessageReceived, DefaultPollInterval" );
+                    OstTrace0( TRACE_NORMAL,  DUP3_CSATNOTIFYPOLLINTERVAL_MESSAGERECEIVED_TD, "CSatNotifyPollInterval::MessageReceived, DefaultPollInterval" );
                     // Use SIM server's default value (0)
                     anIntervalInSeconds = KDefaultPollInterval;
                     }
@@ -1666,7 +1668,7 @@ void CSatNotifyPollInterval::Notify
         TDes8*              /*aDataPtr*/    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYPOLLINTERVAL_NOTIFY, "CSatNotifyPollInterval::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYPOLLINTERVAL_NOTIFY_TD, "CSatNotifyPollInterval::Notify" );
     // PollInterval is completely implemented by SimAtkTsy. Client
     // insn't notified about the command.
     }
@@ -1689,7 +1691,7 @@ CSatNotifySetUpMenu::CSatNotifySetUpMenu
         iSatIsiMsg( NULL ),
         iItemsNextIndicatorRemoved( EFalse )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPMENU_CSATNOTIFYSETUPMENU, "CSatNotifySetUpMenu::CSatNotifySetUpMenu" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPMENU_CSATNOTIFYSETUPMENU_TD, "CSatNotifySetUpMenu::CSatNotifySetUpMenu" );
     TFLOGSTRING("CSatNotifySetUpMenu::CSatNotifySetUpMenu");
     iToolKitName.Zero();
 
@@ -1706,7 +1708,7 @@ CSatNotifySetUpMenu::CSatNotifySetUpMenu
 //
 CSatNotifySetUpMenu::~CSatNotifySetUpMenu()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSETUPMENU_CSATNOTIFYSETUPMENU, "CSatNotifySetUpMenu::~CSatNotifySetUpMenu" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSETUPMENU_CSATNOTIFYSETUPMENU_TD, "CSatNotifySetUpMenu::~CSatNotifySetUpMenu" );
     TFLOGSTRING("CSatNotifySetUpMenu::~CSatNotifySetUpMenu");
     if ( iSatIsiMsg )
         {
@@ -1726,7 +1728,7 @@ void CSatNotifySetUpMenu::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPMENU_MESSAGERECEIVED, "CSatNotifySetUpMenu::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPMENU_MESSAGERECEIVED_TD, "CSatNotifySetUpMenu::MessageReceived" );
     TFLOGSTRING("TSY:CSatNotifySetUpMenu::MessageReceived");
     TInt ret( KErrNone );
     TInt returnValue( KErrNone );
@@ -1756,13 +1758,13 @@ void CSatNotifySetUpMenu::MessageReceived
         if ( iSatIsiMsg )
             {
             TFLOGSTRING("TSY:CSatNotifySetUpMenu::MessageReceived, pcmd saved");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSETUPMENU_MESSAGERECEIVED, "CSatNotifySetUpMenu::MessageReceived, pcmd saved" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSETUPMENU_MESSAGERECEIVED_TD, "CSatNotifySetUpMenu::MessageReceived, pcmd saved" );
             }
         else
             {
             TFLOGSTRING("TSY:CSatNotifySetUpMenu::MessageReceived, \
                 out of memory unable to buffer received cmd");
-            OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYSETUPMENU_MESSAGERECEIVED, "CSatNotifySetUpMenu::MessageReceived, out of memory unable to buffer received cmd" );
+            OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYSETUPMENU_MESSAGERECEIVED_TD, "CSatNotifySetUpMenu::MessageReceived, out of memory unable to buffer received cmd" );
             iSatMessHandler->SetUpMenuTerminalResp( iTransId,
                                                 iCommandDetails,
                                                 RSat::KMeUnableToProcessCmd,
@@ -1804,7 +1806,7 @@ void CSatNotifySetUpMenu::MessageReceived
         {
         TUint16 alphaIdLength = alphaIdentifier.GetLength();
         TFLOGSTRING2("TSY: Alpha ID length:%d", alphaIdLength );
-        OstTraceExt1( TRACE_NORMAL, DUP3_CSATNOTIFYSETUPMENU_MESSAGERECEIVED, "CSatNotifySetUpMenu::MessageReceived Alpha ID: %hu", alphaIdLength );
+        OstTraceExt1( TRACE_NORMAL,  DUP3_CSATNOTIFYSETUPMENU_MESSAGERECEIVED_TD, "CSatNotifySetUpMenu::MessageReceived Alpha ID: %hu", alphaIdLength );
         if ( alphaIdLength > RSat::KAlphaIdMaxSize )
             {
             // String too long
@@ -1821,13 +1823,13 @@ void CSatNotifySetUpMenu::MessageReceived
             iToolKitName.Copy( menu.iAlphaId.iAlphaId );
             TFLOGSTRING2("TSY: SetUpMenu iToolKitName:%S",
                   &iToolKitName );
-            OstTraceExt1( TRACE_NORMAL, DUP4_CSATNOTIFYSETUPMENU_MESSAGERECEIVED, "CSatNotifySetUpMenu::MessageReceived SetUpMenu iToolKitName: %S", iToolKitName );
+            OstTraceExt1( TRACE_NORMAL,  DUP4_CSATNOTIFYSETUPMENU_MESSAGERECEIVED_TD, "CSatNotifySetUpMenu::MessageReceived SetUpMenu iToolKitName: %S", iToolKitName );
             }
         else
             {
             TFLOGSTRING("TSY: CSatNotifySetUpMenu::MessageReceived,\
                 Wrong length of alpha id.");
-            OstTrace0( TRACE_NORMAL, DUP5_CSATNOTIFYSETUPMENU_MESSAGERECEIVED, "CSatNotifySetUpMenu::MessageReceived, Wrong length of alpha id." );
+            OstTrace0( TRACE_NORMAL,  DUP5_CSATNOTIFYSETUPMENU_MESSAGERECEIVED_TD, "CSatNotifySetUpMenu::MessageReceived, Wrong length of alpha id." );
             }
         // Alpha Id status
         if ( menu.iAlphaId.iAlphaId.Length() )
@@ -1882,7 +1884,7 @@ void CSatNotifySetUpMenu::MessageReceived
             {
             TFLOGSTRING("TSY: CSatNotifySetUpMenu::MessageReceived, \
                 Wrong return value of icon identifier list.");
-            OstTrace0( TRACE_NORMAL, DUP6_CSATNOTIFYSETUPMENU_MESSAGERECEIVED, "CSatNotifySetUpMenu::MessageReceived, Wrong return value of icon identifier list." );
+            OstTrace0( TRACE_NORMAL,  DUP6_CSATNOTIFYSETUPMENU_MESSAGERECEIVED_TD, "CSatNotifySetUpMenu::MessageReceived, Wrong return value of icon identifier list." );
             }
 
         //Items Data
@@ -1940,7 +1942,7 @@ void CSatNotifySetUpMenu::MessageReceived
                 // Suffle through all the menu items
                 stringLength = 0;
                 TFLOGSTRING2("TSY: item number:%d", i );
-                OstTraceExt1( TRACE_NORMAL, DUP7_CSATNOTIFYSETUPMENU_MESSAGERECEIVED, "CSatNotifySetUpMenu::MessageReceived Item number: %hhd", i );
+                OstTraceExt1( TRACE_NORMAL,  DUP7_CSATNOTIFYSETUPMENU_MESSAGERECEIVED_TD, "CSatNotifySetUpMenu::MessageReceived Item number: %hhd", i );
                 // Fill the newitem
                 newItem.iItemId = itemsData.GetShortInfo( ETLV_IdentifierOfItem );
                 stringLength = itemsData.GetLength();
@@ -1962,7 +1964,7 @@ void CSatNotifySetUpMenu::MessageReceived
                     }
                 TFLOGSTRING2("TSY: SetUpMenu newItem.iItemString:%S",
                     &newItem.iItemString );
-                OstTraceExt1( TRACE_NORMAL, DUP8_CSATNOTIFYSETUPMENU_MESSAGERECEIVED, "CSatNotifySetUpMenu::MessageReceived, newItem.iItemString: %S", newItem.iItemString );
+                OstTraceExt1( TRACE_NORMAL,  DUP8_CSATNOTIFYSETUPMENU_MESSAGERECEIVED_TD, "CSatNotifySetUpMenu::MessageReceived, newItem.iItemString: %S", newItem.iItemString );
                 // Adding the new menuitem
                 if( NULL != iconIdList.Size()  && ( i < iconIdList.Length() ) )
                     {
@@ -2050,7 +2052,7 @@ void CSatNotifySetUpMenu::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYSETUPMENU_NOTIFY, "CSatNotifySetUpMenu::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYSETUPMENU_NOTIFY_TD, "CSatNotifySetUpMenu::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifySetUpMenu::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     TInt ret( KErrNone );
@@ -2080,7 +2082,7 @@ TInt CSatNotifySetUpMenu::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPMENU_TERMINALRESPONSE, "CSatNotifySetUpMenu::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPMENU_TERMINALRESPONSE_TD, "CSatNotifySetUpMenu::TerminalResponse" );
     TFLOGSTRING("CSatNotifySetUpMenu::TerminalResponse");
     TInt ret( KErrNone );
     TUint8 additionalInfo( 0 );
@@ -2112,7 +2114,7 @@ TInt CSatNotifySetUpMenu::TerminalResponse
     if( RSat::KSuccess == rspV1.iGeneralResult && iItemsNextIndicatorRemoved )
         {
         TFLOGSTRING("CSatNotifySetUpMenu::TerminalResponseL, iItemsNextIndicatorRemoved");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSETUPMENU_TERMINALRESPONSE, "CSatNotifySetUpMenu::TerminalResponseL, iItemsNextIndicatorRemoved" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSETUPMENU_TERMINALRESPONSE_TD, "CSatNotifySetUpMenu::TerminalResponseL, iItemsNextIndicatorRemoved" );
         rspV1.iGeneralResult = RSat::KPartialComprehension;
         }
     iItemsNextIndicatorRemoved = EFalse;
@@ -2134,7 +2136,7 @@ TInt CSatNotifySetUpMenu::TerminalResponse
 //
 TDes16& CSatNotifySetUpMenu::SatApplicationName()
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPMENU_SATAPPLICATIONNAME, "CSatNotifySetUpMenu::SatApplicationName" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPMENU_SATAPPLICATIONNAME_TD, "CSatNotifySetUpMenu::SatApplicationName" );
     if ( 0x0 == iToolKitName.Length() )
         {
         // Default toolkit name
@@ -2160,7 +2162,7 @@ CSatNotifySelectItem::CSatNotifySelectItem
         iSelectItemV2Pckg( NULL ),
         iItemNextIndicatorRemoved( EFalse )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSELECTITEM_CSATNOTIFYSELECTITEM, "CSatNotifySelectItem::CSatNotifySelectItem" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSELECTITEM_CSATNOTIFYSELECTITEM_TD, "CSatNotifySelectItem::CSatNotifySelectItem" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -2176,7 +2178,7 @@ CSatNotifySelectItem::CSatNotifySelectItem
 //
 CSatNotifySelectItem::~CSatNotifySelectItem()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSELECTITEM_CSATNOTIFYSELECTITEM, "CSatNotifySelectItem::~CSatNotifySelectItem" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSELECTITEM_CSATNOTIFYSELECTITEM_TD, "CSatNotifySelectItem::~CSatNotifySelectItem" );
     // None
     }
 
@@ -2192,7 +2194,7 @@ void CSatNotifySelectItem::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSELECTITEM_MESSAGERECEIVED, "CSatNotifySelectItem::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSELECTITEM_MESSAGERECEIVED_TD, "CSatNotifySelectItem::MessageReceived" );
     TFLOGSTRING("CSatNotifySelectItem::MessageReceived");
     TInt ret( KErrNone );
     // Get ber tlv
@@ -2292,7 +2294,7 @@ void CSatNotifySelectItem::MessageReceived
             {
             TFLOGSTRING("TSY: CSatNotifySelectItem::MessageReceived, \
             Presentation type was not set.");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSELECTITEM_MESSAGERECEIVED, "CSatNotifySelectItem::MessageReceived, Presentation type was not set" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSELECTITEM_MESSAGERECEIVED_TD, "CSatNotifySelectItem::MessageReceived, Presentation type was not set" );
 
             selectItemV2.iPresentationType = RSat::ENotSpecified;
             }
@@ -2359,7 +2361,7 @@ void CSatNotifySelectItem::MessageReceived
             {
             TFLOGSTRING("TSY: CSatNotifySelectItem::MessageReceived, \
             Return value not valid.");
-            OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYSELECTITEM_MESSAGERECEIVED, "CSatNotifySelectItem::MessageReceived, Return value not valid." );
+            OstTrace0( TRACE_NORMAL,  DUP3_CSATNOTIFYSELECTITEM_MESSAGERECEIVED_TD, "CSatNotifySelectItem::MessageReceived, Return value not valid." );
 
             }
 
@@ -2513,7 +2515,7 @@ void CSatNotifySelectItem::MessageReceived
                     {
                     TFLOGSTRING("TSY: CSatNotifySelectItem::MessageReceived,\
                     Item with icon not valid.");
-                    OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYSELECTITEM_MESSAGERECEIVED, "CSatNotifySelectItem::MessageReceived, Item with icon not valid." );
+                    OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYSELECTITEM_MESSAGERECEIVED_TD, "CSatNotifySelectItem::MessageReceived, Item with icon not valid." );
                     }
                 }
             else
@@ -2570,7 +2572,7 @@ void CSatNotifySelectItem::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYSELECTITEM_NOTIFY, "CSatNotifySelectItem::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYSELECTITEM_NOTIFY_TD, "CSatNotifySelectItem::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifySelectItem::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -2590,7 +2592,7 @@ TInt CSatNotifySelectItem::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSELECTITEM_TERMINALRESPONSE, "CSatNotifySelectItem::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSELECTITEM_TERMINALRESPONSE_TD, "CSatNotifySelectItem::TerminalResponse" );
     TFLOGSTRING("CSatNotifySelectItem::TerminalResponse");
     TInt   ret( KErrNone );
     TUint8 additionalInfo( 0 );
@@ -2627,7 +2629,7 @@ TInt CSatNotifySelectItem::TerminalResponse
     if( RSat::KSuccess == rspV1.iGeneralResult && iItemNextIndicatorRemoved )
         {
         TFLOGSTRING("CSatNotifySelectItem::TerminalResponseL, iItemNextIndicatorRemoved");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSELECTITEM_TERMINALRESPONSE, "CSatNotifySelectItem::TerminalResponse, iItemNextIndicatorRemoved" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSELECTITEM_TERMINALRESPONSE_TD, "CSatNotifySelectItem::TerminalResponse, iItemNextIndicatorRemoved" );
 
         rspV1.iGeneralResult = RSat::KPartialComprehension;
         }
@@ -2659,7 +2661,7 @@ CSatNotifySendSm::CSatNotifySendSm
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iSendSmV1Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSM_CSATNOTIFYSENDSM, "CSatNotifySendSm::CSatNotifySendSm" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSM_CSATNOTIFYSENDSM_TD, "CSatNotifySendSm::CSatNotifySendSm" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -2675,7 +2677,7 @@ CSatNotifySendSm::CSatNotifySendSm
 //
 CSatNotifySendSm::~CSatNotifySendSm()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDSM_CSATNOTIFYSENDSM, "CSatNotifySendSm::~CSatNotifySendSm" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDSM_CSATNOTIFYSENDSM_TD, "CSatNotifySendSm::~CSatNotifySendSm" );
     // None
     }
 
@@ -2691,7 +2693,7 @@ void CSatNotifySendSm::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSM_MESSAGERECEIVED, "CSatNotifySendSm::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSM_MESSAGERECEIVED_TD, "CSatNotifySendSm::MessageReceived" );
     TFLOGSTRING("CSatNotifySendSm::MessageReceived");
     TInt ret( KErrNone );
     // Get ber tlv
@@ -2852,7 +2854,7 @@ void CSatNotifySendSm::MessageReceived
 
                         TFLOGSTRING2("TSY:SendSm, SCA number: %S",
                         &sendSmV1.iAddress.iTelNumber );
-                        OstTraceExt1( TRACE_NORMAL, DUP1_CSATNOTIFYSENDSM_MESSAGERECEIVED, "CSatNotifySendSm::MessageReceived SCA number: %S", sendSmV1.iAddress.iTelNumber );
+                        OstTraceExt1( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDSM_MESSAGERECEIVED_TD, "CSatNotifySendSm::MessageReceived SCA number: %S", sendSmV1.iAddress.iTelNumber );
                         }
                     else
                         {
@@ -2894,7 +2896,7 @@ void CSatNotifySendSm::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYSENDSM_NOTIFY, "CSatNotifySendSm::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYSENDSM_NOTIFY_TD, "CSatNotifySendSm::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifySendSm::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                 aReqHandle );
     iReqHandle = aReqHandle;
@@ -2914,7 +2916,7 @@ TInt CSatNotifySendSm::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSM_TERMINALRESPONSE, "CSatNotifySendSm::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSM_TERMINALRESPONSE_TD, "CSatNotifySendSm::TerminalResponse" );
     TFLOGSTRING("CSatNotifySendSm::TerminalResponse");
     TInt ret( KErrNone );
     TUint8 additionalInfo( 0 );
@@ -2966,7 +2968,7 @@ TUint8 CSatNotifySendSm::GetTpUdlIndex
     TPtrC8 aTpdu // Tpdu where to read TP-UDL or TP-CDL
     )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSM_GETTPUDLINDEX, "CSatNotifySendSm::GetTpUdlIndex" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSM_GETTPUDLINDEX_TD, "CSatNotifySendSm::GetTpUdlIndex" );
     TFLOGSTRING("CSatNotifySendSm::GetTpUdlIndex");
 
     // Position on TP-UDL/TP-CDL field in SMS TPDU
@@ -3048,7 +3050,7 @@ TUint8 CSatNotifySendSm::GetTpDcsIndex
         TPtrC8 aTpdu // Tpdu
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSM_GETTPDCSINDEX, "CSatNotifySendSm::GetTpDcsIndex" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSM_GETTPDCSINDEX_TD, "CSatNotifySendSm::GetTpDcsIndex" );
     TFLOGSTRING("CSatNotifySendSm::GetTpDcsIndex");
 
     // Position of TP-DCS field in SMS TPDU
@@ -3081,7 +3083,7 @@ TInt CSatNotifySendSm::CheckTpdu
         TPtrC8 aTpdu // TPDU
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSM_CHECKTPDU, "CSatNotifySendSm::CheckTpdu" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSM_CHECKTPDU_TD, "CSatNotifySendSm::CheckTpdu" );
     TFLOGSTRING("CSatNotifySendSm::CheckTpdu");
     TInt ret( KErrNone );
     TUint8 tpUdlPos( 0 ); // UDL position
@@ -3092,7 +3094,7 @@ TInt CSatNotifySendSm::CheckTpdu
     if ( KMinSmsTpduLength > lengthOfTPDU )
         {
         TFLOGSTRING("CSatNotifySendSm::CheckTpdu, error: invalid TPDU length");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDSM_CHECKTPDU, "CSatNotifySendSm::CheckTpdu, error: invalid TPDU length" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDSM_CHECKTPDU_TD, "CSatNotifySendSm::CheckTpdu, error: invalid TPDU length" );
         ret = KErrCorrupt;
         }
     else
@@ -3108,7 +3110,7 @@ TInt CSatNotifySendSm::CheckTpdu
         else
             {
             TFLOGSTRING("CSatNotifySendSm::CheckTpdu, error: invalid UDL index");
-            OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYSENDSM_CHECKTPDU, "CSatNotifySendSm::CheckTpdu, error: invalid UDL index" );
+            OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYSENDSM_CHECKTPDU_TD, "CSatNotifySendSm::CheckTpdu, error: invalid UDL index" );
             ret = KErrCorrupt;
             }
         }
@@ -3142,7 +3144,7 @@ TInt CSatNotifySendSm::CheckTpdu
                     {
                     // Message is over 160 bytes or invalid user data length
                     TFLOGSTRING("CSatNotifySendSm::CheckTpdu, error: invalid user data length");
-                    OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYSENDSM_CHECKTPDU, "CSatNotifySendSm::CheckTpdu, error: invalid user data length" );
+                    OstTrace0( TRACE_NORMAL,  DUP3_CSATNOTIFYSENDSM_CHECKTPDU_TD, "CSatNotifySendSm::CheckTpdu, error: invalid user data length" );
                     ret = KErrCorrupt;
                     }
                 }
@@ -3153,7 +3155,7 @@ TInt CSatNotifySendSm::CheckTpdu
                     {
                     // Message size is over the limit or invalid user data length
                     TFLOGSTRING("CSatNotifySendSm::CheckTpdu, error: invalid user data length");
-                    OstTrace0( TRACE_NORMAL, DUP4_CSATNOTIFYSENDSM_CHECKTPDU, "CSatNotifySendSm::CheckTpdu, error: invalid user data length" );
+                    OstTrace0( TRACE_NORMAL,  DUP4_CSATNOTIFYSENDSM_CHECKTPDU_TD, "CSatNotifySendSm::CheckTpdu, error: invalid user data length" );
                     ret = KErrCorrupt;
                     }
                 }
@@ -3163,7 +3165,7 @@ TInt CSatNotifySendSm::CheckTpdu
             if ( KSMSCommandMaxSize < tpUdl )
                 {
                 TFLOGSTRING("CSatNotifySendSm::CheckTpdu, error: user data length over maximum");
-                OstTrace0( TRACE_NORMAL, DUP5_CSATNOTIFYSENDSM_CHECKTPDU, "CSatNotifySendSm::CheckTpdu, error: user data length over maximum" );
+                OstTrace0( TRACE_NORMAL,  DUP5_CSATNOTIFYSENDSM_CHECKTPDU_TD, "CSatNotifySendSm::CheckTpdu, error: user data length over maximum" );
                 ret = KErrCorrupt;
                 }
             }
@@ -3183,7 +3185,7 @@ TInt CSatNotifySendSm::PackSms
         TTpdu& aSendSm // Where to store packed sms
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSM_PACKSMS, "CSatNotifySendSm::PackSms" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSM_PACKSMS_TD, "CSatNotifySendSm::PackSms" );
     TFLOGSTRING("CSatNotifySendSm::PackSms");
     TInt ret( KErrNone );
 
@@ -3366,7 +3368,7 @@ CSatNotifySendDtmf::CSatNotifySendDtmf
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iSendDtmfV1Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDDTMF_CSATNOTIFYSENDDTMF, "CSatNotifySendDtmf::CSatNotifySendDtmf" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDDTMF_CSATNOTIFYSENDDTMF_TD, "CSatNotifySendDtmf::CSatNotifySendDtmf" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -3380,7 +3382,7 @@ CSatNotifySendDtmf::CSatNotifySendDtmf
 //
 CSatNotifySendDtmf::~CSatNotifySendDtmf()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDDTMF_CSATNOTIFYSENDDTMF, "CSatNotifySendDtmf::~CSatNotifySendDtmf" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDDTMF_CSATNOTIFYSENDDTMF_TD, "CSatNotifySendDtmf::~CSatNotifySendDtmf" );
     // None
     }
 
@@ -3396,7 +3398,7 @@ void CSatNotifySendDtmf::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDDTMF_MESSAGERECEIVED, "CSatNotifySendDtmf::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDDTMF_MESSAGERECEIVED_TD, "CSatNotifySendDtmf::MessageReceived" );
     TFLOGSTRING("CSatNotifySendDtmf::MessageReceived");
     // get ber tlv
     CBerTlv berTlv;
@@ -3532,7 +3534,7 @@ void CSatNotifySendDtmf::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYSENDDTMF_NOTIFY, "CSatNotifySendDtmf::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYSENDDTMF_NOTIFY_TD, "CSatNotifySendDtmf::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifySendDtmf::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                 aReqHandle );
     iReqHandle = aReqHandle;
@@ -3552,7 +3554,7 @@ TInt CSatNotifySendDtmf::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDDTMF_TERMINALRESPONSE, "CSatNotifySendDtmf::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDDTMF_TERMINALRESPONSE_TD, "CSatNotifySendDtmf::TerminalResponse" );
     TFLOGSTRING("CSatNotifySendDtmf::TerminalResponse");
     TInt ret( KErrNone );
     TUint8 additionalInfo( 0 );
@@ -3606,7 +3608,7 @@ CSatNotifySendSs::CSatNotifySendSs
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iSendSsV1Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSS_CSATNOTIFYSENDSS, "CSatNotifySendSs::CSatNotifySendSs" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSS_CSATNOTIFYSENDSS_TD, "CSatNotifySendSs::CSatNotifySendSs" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -3624,7 +3626,7 @@ CSatNotifySendSs::CSatNotifySendSs
 //
 CSatNotifySendSs::~CSatNotifySendSs()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDSS_CSATNOTIFYSENDSS, "CSatNotifySendSs::~CSatNotifySendSs" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDSS_CSATNOTIFYSENDSS_TD, "CSatNotifySendSs::~CSatNotifySendSs" );
     // None
     }
 
@@ -3640,7 +3642,7 @@ void CSatNotifySendSs::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSS_MESSAGERECEIVED, "CSatNotifySendSs::MessageReceived" );
+    OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYSENDSS_MESSAGERECEIVED_TD, "CSatNotifySendSs::MessageReceived" );
     TFLOGSTRING("CSatNotifySendSs::MessageReceived");
     TInt ret( KErrNone );
     // Get ber tlv
@@ -3779,15 +3781,20 @@ void CSatNotifySendSs::MessageReceived
         if ( KErrNone == ret )
             {
             TFLOGSTRING("TSY: Inform NokiaTSY SS request being SAT originated, resource control needed");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDSS_MESSAGERECEIVED, "Inform NokiaTSY SS request being SAT originated, resource control needed" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDSS_MESSAGERECEIVED_TD, "Inform NokiaTSY SS request being SAT originated, resource control needed" );
 
             TBool resourceControlSuppress( EFalse );
             CMmDataPackage dataPackage;
             dataPackage.PackData( &resourceControlSuppress );
 
-            iSatMessaging->GetMessageRouter()->ExtFuncL(
+            TRAP( ret, ret = iSatMessaging->GetMessageRouter()->ExtFuncL(
                 ESatNotifySendSsPCmd,
-                &dataPackage );
+                &dataPackage ) );
+            if ( KErrNone != ret )
+                {
+TFLOGSTRING2("TSY: CSatNotifySendSs::MessageReceived: ExtFuncL for ESatNotifySendSsPCmd failed: %d", ret );
+OstTrace1( TRACE_NORMAL, DUP3_CSATNOTIFYSENDSS_MESSAGERECEIVED_TD, "CSatNotifySendSs::MessageReceived: ExtFuncL for ESatNotifySendSsPCmd failed: %d", ret );
+                }
             }
 #endif
         }
@@ -3806,7 +3813,7 @@ void CSatNotifySendSs::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYSENDSS_NOTIFY, "CSatNotifySendSs::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYSENDSS_NOTIFY_TD, "CSatNotifySendSs::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifySendSs::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                 aReqHandle );
     iReqHandle = aReqHandle;
@@ -3826,7 +3833,7 @@ TInt CSatNotifySendSs::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSS_TERMINALRESPONSE, "CSatNotifySendSs::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSS_TERMINALRESPONSE_TD, "CSatNotifySendSs::TerminalResponse" );
     TFLOGSTRING("CSatNotifySendSs::TerminalResponse");
 
     TInt ret( KErrNone );
@@ -3899,7 +3906,7 @@ void CSatNotifySendSs::CheckCallForwarding
         RSat::TSsString& aSsString      // where to store modified string
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSS_CHECKCALLFORWARDING, "CSatNotifySendSs::CheckCallForwarding" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSS_CHECKCALLFORWARDING_TD, "CSatNotifySendSs::CheckCallForwarding" );
     TFLOGSTRING("CSatNotifySendSs::CheckCallForwarding");
     _LIT8(KCFU,"*21*");    // Call forwarding unconditional (CFU)
     _LIT8(KCFB,"*67*");    // Call forwarding on Mobile Subscriber Busy(CFB)
@@ -3943,7 +3950,7 @@ TInt CSatNotifySendSs::CheckSsStringValidity
         TPtrC8 aSsString
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDSS_CHECKSSSTRINGVALIDITY, "CSatNotifySendSs::CheckSsStringValidity" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDSS_CHECKSSSTRINGVALIDITY_TD, "CSatNotifySendSs::CheckSsStringValidity" );
     TFLOGSTRING("CSatNotifySendSs::CheckSsStringValidity");
     TInt ret( KErrNone );
     if ( !aSsString.Length() )
@@ -3981,7 +3988,7 @@ CSatNotifySendUssd::CSatNotifySendUssd
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iSendUssdV1Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDUSSD_CSATNOTIFYSENDUSSD, "CSatNotifySendUssd::CSatNotifySendUssd" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDUSSD_CSATNOTIFYSENDUSSD_TD, "CSatNotifySendUssd::CSatNotifySendUssd" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -3999,7 +4006,7 @@ CSatNotifySendUssd::CSatNotifySendUssd
 //
 CSatNotifySendUssd::~CSatNotifySendUssd()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDUSSD_CSATNOTIFYSENDUSSD, "CSatNotifySendUssd::~CSatNotifySendUssd" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDUSSD_CSATNOTIFYSENDUSSD_TD, "CSatNotifySendUssd::~CSatNotifySendUssd" );
     // None
     }
 
@@ -4015,7 +4022,7 @@ void CSatNotifySendUssd::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDUSSD_MESSAGERECEIVED, "CSatNotifySendUssd::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDUSSD_MESSAGERECEIVED_TD, "CSatNotifySendUssd::MessageReceived" );
     TFLOGSTRING("TSY:CSatNotifySendUssd::MessageReceived");
     TInt ret( KErrNone );
     TInt returnValue( KErrNone );
@@ -4120,7 +4127,7 @@ void CSatNotifySendUssd::MessageReceived
                 // The Ussd text string is too long.
                 TFLOGSTRING("TSY:CSatNotifySendUssd::MessageReceived, \
                 USSD String too long");
-                OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDUSSD_MESSAGERECEIVED, "CSatNotifySendUssd::MessageReceived, USSD String too long" );
+                OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDUSSD_MESSAGERECEIVED_TD, "CSatNotifySendUssd::MessageReceived, USSD String too long" );
                 ret = KErrCorrupt;
                 TUint8 noCause( 0 );
                 TBuf<1>  emptyTextString;
@@ -4161,7 +4168,7 @@ void CSatNotifySendUssd::MessageReceived
                         {
                         TFLOGSTRING("TSY:CSatNotifySendUssd::MessageReceived, \
                         USSD DCS has a reserved value");
-                        OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYSENDUSSD_MESSAGERECEIVED, "CSatNotifySendUssd::MessageReceived, USSD DCS has a reserved value" );
+                        OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYSENDUSSD_MESSAGERECEIVED_TD, "CSatNotifySendUssd::MessageReceived, USSD DCS has a reserved value" );
                         // the DCS has a reserved value
                         ret = KErrCorrupt;
                         TUint8 noCause( 0 );
@@ -4182,7 +4189,7 @@ void CSatNotifySendUssd::MessageReceived
             {
             TFLOGSTRING("TSY:CSatNotifySendUssd::MessageReceived, \
             Mandatory field missing");
-            OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYSENDUSSD_MESSAGERECEIVED, "CSatNotifySendUssd::MessageReceived, Mandatory field missing" );
+            OstTrace0( TRACE_NORMAL,  DUP3_CSATNOTIFYSENDUSSD_MESSAGERECEIVED_TD, "CSatNotifySendUssd::MessageReceived, Mandatory field missing" );
             // Mandatory field missing
             ret = KErrCorrupt;
             TUint8 noCause( 0 );
@@ -4218,7 +4225,7 @@ void CSatNotifySendUssd::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYSENDUSSD_NOTIFY, "CSatNotifySendUssd::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYSENDUSSD_NOTIFY_TD, "CSatNotifySendUssd::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("TSY:CSatNotifySendUssd::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                 aReqHandle );
     iReqHandle = aReqHandle;
@@ -4238,7 +4245,7 @@ TInt CSatNotifySendUssd::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDUSSD_TERMINALRESPONSE, "CSatNotifySendUssd::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDUSSD_TERMINALRESPONSE_TD, "CSatNotifySendUssd::TerminalResponse" );
     TFLOGSTRING("TSY:CSatNotifySendUssd::TerminalResponse");
     TInt ret( KErrNone );
     RSat::TSendUssdRspV1Pckg* aRspPckg =
@@ -4264,7 +4271,7 @@ TInt CSatNotifySendUssd::TerminalResponse
             // No info
             TFLOGSTRING("TSY:CSatNotifySendUssd::TerminalResponse, \
             AdditionalInfoType set, but no additional info available");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDUSSD_TERMINALRESPONSE, "CSatNotifySendUssd::TerminalResponse, AdditionalInfoType set, but no additional info available" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDUSSD_TERMINALRESPONSE_TD, "CSatNotifySendUssd::TerminalResponse, AdditionalInfoType set, but no additional info available" );
             ret = KErrCorrupt;
             }
         else if ( RSat::KTextString == rspV1.iInfoType )
@@ -4277,7 +4284,7 @@ TInt CSatNotifySendUssd::TerminalResponse
             // sent by the network.
             TFLOGSTRING("TSY:CSatNotifySendUssd::TerminalResponse, \
             AdditionalInfoType set to TextString.");
-            OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYSENDUSSD_TERMINALRESPONSE, "CSatNotifySendUssd::TerminalResponse, AdditionalInfoType set to TextString." );
+            OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYSENDUSSD_TERMINALRESPONSE_TD, "CSatNotifySendUssd::TerminalResponse, AdditionalInfoType set to TextString." );
             }
         else
             {
@@ -4316,7 +4323,7 @@ CSatNotifySetUpCall::CSatNotifySetUpCall
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iSetUpCallV1Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPCALL_CSATNOTIFYSETUPCALL, "CSatNotifySetUpCall::CSatNotifySetUpCall" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPCALL_CSATNOTIFYSETUPCALL_TD, "CSatNotifySetUpCall::CSatNotifySetUpCall" );
     TFLOGSTRING( "TSY:CSatNotifySetUpCall::CSatNotifySetUpCall" );
     iCallConnectedEvent.Zero();
 
@@ -4339,7 +4346,7 @@ CSatNotifySetUpCall::CSatNotifySetUpCall
 //
 CSatNotifySetUpCall::~CSatNotifySetUpCall()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSETUPCALL_CSATNOTIFYSETUPCALL, "CSatNotifySetUpCall::~CSatNotifySetUpCall" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSETUPCALL_CSATNOTIFYSETUPCALL_TD, "CSatNotifySetUpCall::~CSatNotifySetUpCall" );
     // None
     }
 
@@ -4355,7 +4362,7 @@ void CSatNotifySetUpCall::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPCALL_MESSAGERECEIVED, "CSatNotifySetUpCall::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPCALL_MESSAGERECEIVED_TD, "CSatNotifySetUpCall::MessageReceived" );
     TFLOGSTRING("CSatNotifySetUpCall::MessageReceived");
     TInt ret( KErrNone );
     TInt returnValue( KErrNone );
@@ -4559,7 +4566,7 @@ void CSatNotifySetUpCall::MessageReceived
                 setUpCallV1.iAddress.iTelNumber.Copy( tempNumber );
                 TFLOGSTRING2("TSY: SetUpCall, TelNumber: %S",
                 &setUpCallV1.iAddress.iTelNumber );
-                OstTraceExt1( TRACE_NORMAL, DUP1_CSATNOTIFYSETUPCALL_MESSAGERECEIVED, "CSatNotifySetUpCall::MessageReceived TelNumber: %S", setUpCallV1.iAddress.iTelNumber );
+                OstTraceExt1( TRACE_NORMAL,  DUP1_CSATNOTIFYSETUPCALL_MESSAGERECEIVED_TD, "CSatNotifySetUpCall::MessageReceived TelNumber: %S", setUpCallV1.iAddress.iTelNumber );
                 }
             }
         else
@@ -4593,7 +4600,7 @@ void CSatNotifySetUpCall::MessageReceived
                 || subAddress.GetComprehensionRequired() )
                 {
                 TFLOGSTRING("TSY: SetUpCall, SubAddress is not supported!" );
-                OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYSETUPCALL_MESSAGERECEIVED, "SetUpCall, SubAddress is not supported!" );
+                OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYSETUPCALL_MESSAGERECEIVED_TD, "SetUpCall, SubAddress is not supported!" );
                 iSatMessHandler->SetUpCallTerminalResp( iTransId,
                                         iCommandDetails,
                                         RSat::KCmdBeyondMeCapabilities,
@@ -4629,7 +4636,7 @@ void CSatNotifySetUpCall::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPCALL_NOTIFY, "CSatNotifySetUpCall::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPCALL_NOTIFY_TD, "CSatNotifySetUpCall::Notify" );
     TFLOGSTRING("CSatNotifySetUpCall::Notify");
     iReqHandle = aReqHandle;
     iSetUpCallV1Pckg = static_cast< RSat::TSetUpCallV1Pckg* >( aDataPtr );
@@ -4648,7 +4655,7 @@ TInt CSatNotifySetUpCall::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPCALL_TERMINALRESPONSE, "CSatNotifySetUpCall::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPCALL_TERMINALRESPONSE_TD, "CSatNotifySetUpCall::TerminalResponse" );
     TFLOGSTRING("CSatNotifySetUpCall::TerminalResponse");
     TInt    ret( KErrNone );
     TUint8  additionalInfo( 0 );
@@ -4715,7 +4722,7 @@ void CSatNotifySetUpCall::StoreCallConnectedEvent
         const TDesC8& aEnvelope // envelope received from CSatEventDownload
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPCALL_STORECALLCONNECTEDEVENT, "CSatNotifySetUpCall::StoreCallConnectedEvent" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPCALL_STORECALLCONNECTEDEVENT_TD, "CSatNotifySetUpCall::StoreCallConnectedEvent" );
     // store it to the buffer
     iCallConnectedEvent = aEnvelope;
     }
@@ -4739,7 +4746,7 @@ CSatNotifyRefresh::CSatNotifyRefresh
         iReqHandleRefreshRequired( NULL ),
         iInternalCache( KZero )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYREFRESH_CSATNOTIFYREFRESH, "CSatNotifyRefresh::CSatNotifyRefresh" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYREFRESH_CSATNOTIFYREFRESH_TD, "CSatNotifyRefresh::CSatNotifyRefresh" );
     iFileList.Zero();
     iAid.Zero();
 
@@ -4756,7 +4763,7 @@ CSatNotifyRefresh::CSatNotifyRefresh
 //
 CSatNotifyRefresh::~CSatNotifyRefresh()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYREFRESH_CSATNOTIFYREFRESH, "CSatNotifyRefresh::~CSatNotifyRefresh" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYREFRESH_CSATNOTIFYREFRESH_TD, "CSatNotifyRefresh::~CSatNotifyRefresh" );
     // None
     }
 
@@ -4772,7 +4779,7 @@ void CSatNotifyRefresh::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived" );
     TFLOGSTRING("TSY: CSatNotifyRefresh::MessageReceived");
     // Get ber tlv
     CBerTlv berTlv;
@@ -4788,7 +4795,7 @@ void CSatNotifyRefresh::MessageReceived
         {
         TFLOGSTRING3("TSY: CSatNotifyRefresh::MessageReceived, iReqHandle:%d,\
         iReqHandleRefreshRequired:%d ", iReqHandle, iReqHandleRefreshRequired );
-        OstTraceExt2( TRACE_NORMAL, DUP1_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived iReqHandle: %u, iReqHandleRefreshRequired: %u", iReqHandle, iReqHandleRefreshRequired );
+        OstTraceExt2( TRACE_NORMAL,  DUP1_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived iReqHandle: %u, iReqHandleRefreshRequired: %u", iReqHandle, iReqHandleRefreshRequired );
 
         // Some of the request were not on, returning response immediately
         iSatMessHandler->RefreshTerminalResp(
@@ -4873,7 +4880,7 @@ void CSatNotifyRefresh::MessageReceived
             {
             TFLOGSTRING("TSY: CSatNotifyRefresh::MessageReceived, \
             Return value of file list TLV not valid.");
-            OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Return value of file list TLV not valid." );
+            OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Return value of file list TLV not valid." );
             }
         if ( KErrNone == ret )
             {
@@ -4884,7 +4891,7 @@ void CSatNotifyRefresh::MessageReceived
                     {
                     TFLOGSTRING("TSY: SAT, Refresh mode: Sim init and \
                     full file change notification");
-                    OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Refresh mode: Sim init and full file change notification" );
+                    OstTrace0( TRACE_NORMAL,  DUP3_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Refresh mode: Sim init and full file change notification" );
                     refreshV2.iType = RSat::ESimInitFullFileChangeNotification;
                     iInternalCache = KCacheEFSST + KCacheEFCBMID;
                     break;
@@ -4896,8 +4903,8 @@ void CSatNotifyRefresh::MessageReceived
                     TFLOGSTRING2("TSY: Number of files: %d",
                     refreshV2.iFileList.Length() );
 
-                    OstTrace0( TRACE_NORMAL, DUP4_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Refresh mode: File Change Notification" );
-                    OstTrace1( TRACE_NORMAL, DUP5_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Number of files: %d", refreshV2.iFileList.Length() );
+                    OstTrace0( TRACE_NORMAL,  DUP4_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Refresh mode: File Change Notification" );
+                    OstTrace1( TRACE_NORMAL,  DUP5_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Number of files: %d", refreshV2.iFileList.Length() );
 
                     refreshV2.iType = RSat::EFileChangeNotification;
                     if ( KErrNotFound !=
@@ -4923,8 +4930,8 @@ void CSatNotifyRefresh::MessageReceived
                     TFLOGSTRING2("TSY: Number of files: %d",
                     refreshV2.iFileList.Length() );
 
-                    OstTrace0( TRACE_NORMAL, DUP6_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Refresh mode: Sim init and file change notification" );
-                    OstTrace1( TRACE_NORMAL, DUP7_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Number of files: %d", refreshV2.iFileList.Length() );
+                    OstTrace0( TRACE_NORMAL,  DUP6_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Refresh mode: Sim init and file change notification" );
+                    OstTrace1( TRACE_NORMAL,  DUP7_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Number of files: %d", refreshV2.iFileList.Length() );
 
                     refreshV2.iType = RSat::ESimInitFileChangeNotification;
                     break;
@@ -4932,7 +4939,7 @@ void CSatNotifyRefresh::MessageReceived
                 case KSimInit:
                     {
                     TFLOGSTRING("TSY: SAT, Refresh mode: Sim init ");
-                    OstTrace0( TRACE_NORMAL, DUP8_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Refresh mode: Sim init" );
+                    OstTrace0( TRACE_NORMAL,  DUP8_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Refresh mode: Sim init" );
                     refreshV2.iType = RSat::ESimInit;
                     iInternalCache = KCacheEFSST + KCacheEFCBMID;
                     break;
@@ -4941,14 +4948,14 @@ void CSatNotifyRefresh::MessageReceived
                     {
                     refreshV2.iType = RSat::ESimReset;
                     TFLOGSTRING("TSY: SAT, Refresh mode: Reset");
-                    OstTrace0( TRACE_NORMAL, DUP9_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Refresh mode: Reset" );
+                    OstTrace0( TRACE_NORMAL,  DUP9_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Refresh mode: Reset" );
                     iInternalCache = KCacheEFSST + KCacheEFCBMID;
                     break;
                     }
                 case KUSIMApplicationReset:
                     {
                     TFLOGSTRING("TSY: SAT, Refresh mode: USIM Application Reset");
-                    OstTrace0( TRACE_NORMAL, DUP10_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Refresh mode: USIM Application Reset" );
+                    OstTrace0( TRACE_NORMAL,  DUP10_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Refresh mode: USIM Application Reset" );
                     refreshV2.iType = RSat::EUsimApplicationReset;
                     iInternalCache = KCacheEFSST + KCacheEFCBMID;
                     break;
@@ -4956,7 +4963,7 @@ void CSatNotifyRefresh::MessageReceived
                 case K3GSessionReset:
                     {
                     TFLOGSTRING("TSY: SAT, Refresh mode: 3G Session Reset");
-                    OstTrace0( TRACE_NORMAL, DUP11_CSATNOTIFYREFRESH_MESSAGERECEIVED, "CSatNotifyRefresh::MessageReceived, Refresh mode: 3G Session Reset" );
+                    OstTrace0( TRACE_NORMAL,  DUP11_CSATNOTIFYREFRESH_MESSAGERECEIVED_TD, "CSatNotifyRefresh::MessageReceived, Refresh mode: 3G Session Reset" );
                     refreshV2.iType = RSat::E3GSessionReset;
                     break;
                     }
@@ -5002,7 +5009,7 @@ void CSatNotifyRefresh::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYREFRESH_NOTIFY, "CSatNotifyRefresh::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYREFRESH_NOTIFY_TD, "CSatNotifyRefresh::Notify" );
     TFLOGSTRING("TSY: CSatNotifyRefresh::Notify");
     iReqHandle = aReqHandle;
     iRefreshV2Pckg = static_cast< RSat::TRefreshV2Pckg* >( aDataPtr );
@@ -5026,7 +5033,7 @@ void CSatNotifyRefresh::NotifyRefreshRequired
         TDes8*              aDataPtr     // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYREFRESH_NOTIFYREFRESHREQUIRED, "CSatNotifyRefresh::NotifyRefreshRequired" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYREFRESH_NOTIFYREFRESHREQUIRED_TD, "CSatNotifyRefresh::NotifyRefreshRequired" );
     TFLOGSTRING("TSY: CSatNotifyRefresh::NotifyRefreshRequired");
     iReqHandleRefreshRequired = aReqHandle;
     iRefreshRequiredV2Pckg = static_cast< RSat::TRefreshV2Pckg* >( aDataPtr );
@@ -5048,7 +5055,7 @@ TInt CSatNotifyRefresh::CancelRefreshRequiredNotification
         const TTsyReqHandle aReqHandle  // Request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYREFRESH_CANCELREFRESHREQUIREDNOTIFICATION, "CSatNotifyRefresh::CancelRefreshRequiredNotification" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYREFRESH_CANCELREFRESHREQUIREDNOTIFICATION_TD, "CSatNotifyRefresh::CancelRefreshRequiredNotification" );
     TFLOGSTRING("TSY: CSatNotifyRefresh::CancelRefreshRequiredNotification");
     // Check that the handle is valid
     if ( aReqHandle == iReqHandleRefreshRequired )
@@ -5076,7 +5083,7 @@ TInt CSatNotifyRefresh::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYREFRESH_TERMINALRESPONSE, "CSatNotifyRefresh::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYREFRESH_TERMINALRESPONSE_TD, "CSatNotifyRefresh::TerminalResponse" );
     TFLOGSTRING("TSY: CSatNotifyRefresh::TerminalResponse");
     RSat::TRefreshRspV1Pckg* aRspPckg =
             reinterpret_cast< RSat::TRefreshRspV1Pckg* >( aRsp );
@@ -5092,7 +5099,7 @@ TInt CSatNotifyRefresh::TerminalResponse
     if ( KSimReset == iCommandDetails[KCommandQualifier] )
         {
         TFLOGSTRING("TSY: CSatNotifyRefresh::TerminalResponse, Reset performed, send an empty TR");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYREFRESH_TERMINALRESPONSE, "CSatNotifyRefresh::TerminalResponse, Reset performed, send an empty TR" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYREFRESH_TERMINALRESPONSE_TD, "CSatNotifyRefresh::TerminalResponse, Reset performed, send an empty TR" );
         TBuf8<1> emptyDescriptor( KNullDesC8 );
         iSatMessHandler->UiccCatReqTerminalResponse(
             emptyDescriptor, emptyDescriptor, iTransId );
@@ -5100,7 +5107,7 @@ TInt CSatNotifyRefresh::TerminalResponse
     else
         {
         TFLOGSTRING("TSY: CSatNotifyRefresh::TerminalResponse, S60 has done the Refresh" );
-        OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYREFRESH_TERMINALRESPONSE, "CSatNotifyRefresh::TerminalResponse, S60 has done the Refresh" );
+        OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYREFRESH_TERMINALRESPONSE_TD, "CSatNotifyRefresh::TerminalResponse, S60 has done the Refresh" );
         // Send terminal response
         iSatMessHandler->RefreshTerminalResp(
                         iTransId,                        // Transaction id
@@ -5124,7 +5131,7 @@ TInt CSatNotifyRefresh::RefreshAllowed
         TDesC8* aDataPtr
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYREFRESH_REFRESHALLOWED, "CSatNotifyRefresh::RefreshAllowed" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYREFRESH_REFRESHALLOWED_TD, "CSatNotifyRefresh::RefreshAllowed" );
     TFLOGSTRING("TSY: CSatNotifyRefresh::RefreshAllowed ");
     RSat::TRefreshRspV1Pckg* aRspPckg =
             reinterpret_cast< RSat::TRefreshRspV1Pckg* >( aDataPtr );
@@ -5144,7 +5151,7 @@ TInt CSatNotifyRefresh::RefreshAllowed
         // Refresh not allowed by the client
         TFLOGSTRING("TSY: CSatNotifyRefresh::RefreshAllowed, refresh was not \
             allowed by the client");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYREFRESH_REFRESHALLOWED, "CSatNotifyRefresh::RefreshAllowed, refresh was not allowed by the client" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYREFRESH_REFRESHALLOWED_TD, "CSatNotifyRefresh::RefreshAllowed, refresh was not allowed by the client" );
         TUint8 additionalInfo( 0x00 );
         if ( RSat::KNoAdditionalInfo != rspV1.iInfoType )
             {
@@ -5170,7 +5177,7 @@ TUint8 CSatNotifyRefresh::Map3GppRefreshToUiccValues
         const TUint8 a3GppRefresh // 3GPP refresh level
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYREFRESH_MAP3GPPREFRESHTOUICCVALUES, "CSatNotifyRefresh::Map3GppRefreshToUiccValues" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYREFRESH_MAP3GPPREFRESHTOUICCVALUES_TD, "CSatNotifyRefresh::Map3GppRefreshToUiccValues" );
     TFLOGSTRING("TSY: CSatNotifyRefresh::Map3GppRefreshToUiccValues ");
 
     TUint8 serviceType( a3GppRefresh );
@@ -5230,7 +5237,7 @@ void CSatNotifyRefresh::CompleteRequest
         const TInt aError
         )
     {
-    OstTraceExt2( TRACE_NORMAL, CSATNOTIFYREFRESH_COMPLETEREQUEST, "CSatNotifyRefresh::CompleteRequest Handle: %d, Error: %d", (TInt)iReqHandle, aError );
+    OstTraceExt2( TRACE_NORMAL,  CSATNOTIFYREFRESH_COMPLETEREQUEST_TD, "CSatNotifyRefresh::CompleteRequest Handle: %d, Error: %d", (TInt)iReqHandle, aError );
     TFLOGSTRING3("CSatNotifyRefresh::CompleteRequest. \n\t\t\t Handle:%d\n\t\t\t Error:%d",
                iReqHandle,
                aError);
@@ -5238,7 +5245,7 @@ void CSatNotifyRefresh::CompleteRequest
     iReqHandle = NULL;
     iSatMessaging->ReqCompleted( tempReqHandle, aError );
     TFLOGSTRING("CSatNotifyRefresh::CompleteRequest. Request is now completed");
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYREFRESH_COMPLETEREQUEST, "CSatNotifyRefresh::CompleteRequest Request is now completed" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYREFRESH_COMPLETEREQUEST_TD, "CSatNotifyRefresh::CompleteRequest Request is now completed" );
 
     }
 
@@ -5250,7 +5257,7 @@ void CSatNotifyRefresh::CompleteRequest
 //
 TUint16 CSatNotifyRefresh::CachedFiles() const
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYREFRESH_CACHEDFILES, "CSatNotifyRefresh::CachedFiles" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYREFRESH_CACHEDFILES_TD, "CSatNotifyRefresh::CachedFiles" );
     return iInternalCache;
     }
 
@@ -5268,7 +5275,7 @@ CSatNotifySimSessionEnd::CSatNotifySimSessionEnd
         :
         CSatNotificationsBase( aSatMessHandler, aSatMessaging )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSIMSESSIONEND_CSATNOTIFYSIMSESSIONEND, "CSatNotifySimSessionEnd::CSatNotifySimSessionEnd" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSIMSESSIONEND_CSATNOTIFYSIMSESSIONEND_TD, "CSatNotifySimSessionEnd::CSatNotifySimSessionEnd" );
     }
 
 // -----------------------------------------------------------------------------
@@ -5278,7 +5285,7 @@ CSatNotifySimSessionEnd::CSatNotifySimSessionEnd
 //
 CSatNotifySimSessionEnd::~CSatNotifySimSessionEnd()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSIMSESSIONEND_CSATNOTIFYSIMSESSIONEND, "CSatNotifySimSessionEnd::~CSatNotifySimSessionEnd" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSIMSESSIONEND_CSATNOTIFYSIMSESSIONEND_TD, "CSatNotifySimSessionEnd::~CSatNotifySimSessionEnd" );
     // None
     }
 
@@ -5295,7 +5302,7 @@ void CSatNotifySimSessionEnd::MessageReceived
         const TIsiReceiveC& /*aIsiMessage*/ // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSIMSESSIONEND_MESSAGERECEIVED, "CSatNotifySimSessionEnd::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSIMSESSIONEND_MESSAGERECEIVED_TD, "CSatNotifySimSessionEnd::MessageReceived" );
     TFLOGSTRING("CSatNotifySimSessionEnd::MessageReceived");
     if ( iReqHandle ) // If request on
         {
@@ -5316,7 +5323,7 @@ void CSatNotifySimSessionEnd::Notify
         TDes8*           /* aDataPtr */     // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSIMSESSIONEND_NOTIFY, "CSatNotifySimSessionEnd::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSIMSESSIONEND_NOTIFY_TD, "CSatNotifySimSessionEnd::Notify" );
     TFLOGSTRING("CSatNotifySimSessionEnd::Notify");
     iReqHandle = aReqHandle;
     }
@@ -5337,7 +5344,7 @@ CSatNotifySetUpIdleModeText::CSatNotifySetUpIdleModeText
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iSetUpIdleModeTextV1Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPIDLEMODETEXT_CSATNOTIFYSETUPIDLEMODETEXT, "CSatNotifySetUpIdleModeText::CSatNotifySetUpIdleModeText" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPIDLEMODETEXT_CSATNOTIFYSETUPIDLEMODETEXT_TD, "CSatNotifySetUpIdleModeText::CSatNotifySetUpIdleModeText" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -5351,7 +5358,7 @@ CSatNotifySetUpIdleModeText::CSatNotifySetUpIdleModeText
 //
 CSatNotifySetUpIdleModeText::~CSatNotifySetUpIdleModeText()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSETUPIDLEMODETEXT_CSATNOTIFYSETUPIDLEMODETEXT, "CSatNotifySetUpIdleModeText::~CSatNotifySetUpIdleModeText" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSETUPIDLEMODETEXT_CSATNOTIFYSETUPIDLEMODETEXT_TD, "CSatNotifySetUpIdleModeText::~CSatNotifySetUpIdleModeText" );
     // None
     }
 
@@ -5367,7 +5374,7 @@ void CSatNotifySetUpIdleModeText::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPIDLEMODETEXT_MESSAGERECEIVED, "CSatNotifySetUpIdleModeText::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPIDLEMODETEXT_MESSAGERECEIVED_TD, "CSatNotifySetUpIdleModeText::MessageReceived" );
     TFLOGSTRING("CSatNotifySetUpIdleModeText::MessageReceived");
     TInt ret( KErrNone );
     TInt returnValue( KErrNone );
@@ -5422,7 +5429,7 @@ void CSatNotifySetUpIdleModeText::MessageReceived
             {
             TFLOGSTRING("CSatNotifySetUpIdleModeText::MessageReceived \
             No TLV text string found");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSETUPIDLEMODETEXT_MESSAGERECEIVED, "CSatNotifySetUpIdleModeText::MessageReceived No TLV text string found" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSETUPIDLEMODETEXT_MESSAGERECEIVED_TD, "CSatNotifySetUpIdleModeText::MessageReceived No TLV text string found" );
             iSatMessHandler->SetUpIdleModeTextTerminalResp(
                 iTransId,
                 iCommandDetails,
@@ -5450,7 +5457,7 @@ void CSatNotifySetUpIdleModeText::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPIDLEMODETEXT_NOTIFY, "CSatNotifySetUpIdleModeText::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPIDLEMODETEXT_NOTIFY_TD, "CSatNotifySetUpIdleModeText::Notify" );
     TFLOGSTRING("CSatNotifySetUpIdleModeText::Notify");
     iReqHandle = aReqHandle;
     iSetUpIdleModeTextV1Pckg =
@@ -5470,7 +5477,7 @@ TInt CSatNotifySetUpIdleModeText::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPIDLEMODETEXT_TERMINALRESPONSE, "CSatNotifySetUpIdleModeText::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPIDLEMODETEXT_TERMINALRESPONSE_TD, "CSatNotifySetUpIdleModeText::TerminalResponse" );
     TFLOGSTRING("CSatNotifySetUpIdleModeText::TerminalResponse");
     TInt   ret( KErrNone );
     TUint8 additionalInfo( 0 );
@@ -5521,7 +5528,7 @@ CSatNotifyCallControlRequest::CSatNotifyCallControlRequest
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iCallControlPckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYCALLCONTROLREQUEST_CSATNOTIFYCALLCONTROLREQUEST, "CSatNotifyCallControlRequest::CSatNotifyCallControlRequest" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYCALLCONTROLREQUEST_CSATNOTIFYCALLCONTROLREQUEST_TD, "CSatNotifyCallControlRequest::CSatNotifyCallControlRequest" );
     }
 
 // -----------------------------------------------------------------------------
@@ -5531,7 +5538,7 @@ CSatNotifyCallControlRequest::CSatNotifyCallControlRequest
 //
 CSatNotifyCallControlRequest::~CSatNotifyCallControlRequest()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYCALLCONTROLREQUEST_CSATNOTIFYCALLCONTROLREQUEST, "CSatNotifyCallControlRequest::~CSatNotifyCallControlRequest" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYCALLCONTROLREQUEST_CSATNOTIFYCALLCONTROLREQUEST_TD, "CSatNotifyCallControlRequest::~CSatNotifyCallControlRequest" );
     // None
     }
 
@@ -5547,7 +5554,7 @@ void CSatNotifyCallControlRequest::MessageReceived
         const TIsiReceiveC& /*aIsiMessage*/ // ISI  message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYCALLCONTROLREQUEST_MESSAGERECEIVED, "CSatNotifyCallControlRequest::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYCALLCONTROLREQUEST_MESSAGERECEIVED_TD, "CSatNotifyCallControlRequest::MessageReceived" );
     // In S60 phones, the call control request is received via an ISI
     // message coming from the ATK Guardian / Call server. That's why the body
     // of this method is empty, see the class CSatCC. The Etel Sat API is used
@@ -5569,7 +5576,7 @@ void CSatNotifyCallControlRequest::CompleteNotification
         RSat::TControlResult aResult
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATION, "CSatNotifyCallControlRequest::CompleteNotification" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATION_TD, "CSatNotifyCallControlRequest::CompleteNotification" );
     TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotification");
     //check that someone has requested this notifications
     if ( iReqHandle )
@@ -5612,7 +5619,7 @@ void CSatNotifyCallControlRequest::CompleteNotification
         const RSat::TControlResult aResult
         )
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATION, "CSatNotifyCallControlRequest::CompleteNotification" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATION_TD, "CSatNotifyCallControlRequest::CompleteNotification" );
     TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotification");
     // Check that someone has requested this notifications
     if ( iReqHandle )
@@ -5670,7 +5677,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
         TPtrC8 aEnvelopeResponse
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL" );
     TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL");
 #if ( NCP_COMMON_S60_VERSION_SUPPORT >= S60_VERSION_50 )
     // Check that someone has requested this notifications
@@ -5720,7 +5727,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                 {
                 TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL\
                     Not a valid call control result");
-                OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL Not a valid call control result" );
+                OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL Not a valid call control result" );
                 break;
                 }
             }
@@ -5739,7 +5746,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
             {
             TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                 Modified to SS");
-            OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL Modified to SS" );
+            OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL Modified to SS" );
             // This SS related
             RSat::TSsString tempSs;
             // Call utility function that maps received TON and NPI
@@ -5764,14 +5771,14 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                 tempSs.iSsString.Append( tempString );
                 TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                     SetSendSsDetails");
-                OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL SetSendSsDetails" );
+                OstTrace0( TRACE_NORMAL,  DUP3_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL SetSendSsDetails" );
                 // Set SS string to struct
                 callControl.SetSendSsDetails( tempSs );
-                if ( ATK_CHANGED == aCcResult )
+                if ( KChanged == aCcResult )
                     {
                     // Notify NokiaTSY that next SS request is SAT originated, because this is changed action made by SAT server
                     TFLOGSTRING("TSY: Inform NokiaTSY SS request being Call Control originated, no further call control actions needed");
-                    OstTrace0( TRACE_NORMAL, DUP4_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "Inform NokiaTSY SS request being Call Control originated, no further call control actions needed" );
+                    OstTrace0( TRACE_NORMAL,  DUP4_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "Inform NokiaTSY SS request being Call Control originated, no further call control actions needed" );
 
                     TBool resourceControlSuppress( ETrue );
                     CMmDataPackage dataPackage;
@@ -5793,7 +5800,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
             {
             TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                 Modified to USSD");
-            OstTrace0( TRACE_NORMAL, DUP5_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL Modified to USSD" );
+            OstTrace0( TRACE_NORMAL,  DUP5_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL Modified to USSD" );
             // This is USSD related
             RSat::TUssdString tempUssd;
             // Get the data coding scheme from the ISI msg
@@ -5808,7 +5815,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                     ussdTlv.GetData( ETLV_UssdString ) );
                 TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                     SetSendUssdDetails");
-                OstTrace0( TRACE_NORMAL, DUP6_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL SetSendUssdDetails" );
+                OstTrace0( TRACE_NORMAL,  DUP6_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL SetSendUssdDetails" );
                 callControl.SetSendUssdDetails( tempUssd );
                 }
             else
@@ -5821,7 +5828,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
             {
             TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                 Modified to Call");
-            OstTrace0( TRACE_NORMAL, DUP7_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL Modified to Call" );
+            OstTrace0( TRACE_NORMAL,  DUP7_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL Modified to Call" );
             // This must be call related response
             CTlv addressTlv;
 
@@ -5832,7 +5839,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                 {
                 TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                     Address found");
-                OstTrace0( TRACE_NORMAL, DUP8_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL Address found" );
+                OstTrace0( TRACE_NORMAL,  DUP8_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL Address found" );
 
                 // Call utility function that maps received TON and NPI to
                 // RSat values
@@ -5882,7 +5889,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                 {
                 TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                     bcc1 found");
-                OstTrace0( TRACE_NORMAL, DUP9_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL bcc1 found" );
+                OstTrace0( TRACE_NORMAL,  DUP9_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL bcc1 found" );
                 // BC length is the first byte in BC data
                 tempCallParams.iCcp1.Copy(
                     bcc1.GetData( ETLV_CapabilityConfigurationParameters ) );
@@ -5895,7 +5902,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                 {
                 TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                     subaddress found");
-                OstTrace0( TRACE_NORMAL, DUP10_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL subaddress found" );
+                OstTrace0( TRACE_NORMAL,  DUP10_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL subaddress found" );
                 tempCallParams.iSubAddress.Copy(
                     subAddress.GetData( ETLV_SubAddress ) );
                 }
@@ -5911,7 +5918,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                 {
                 TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                     bcc2 found");
-                OstTrace0( TRACE_NORMAL, DUP11_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL bcc2 found" );
+                OstTrace0( TRACE_NORMAL,  DUP11_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL bcc2 found" );
                 CTlv bcRepeat;
                 ret = response.TlvByTagValue(
                     &bcRepeat,
@@ -5920,13 +5927,13 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
                 if ( KErrNone == ret )
                     {
                     // If bcc2 present, BC repeat indicator is mandatory
-                    if ( ATK_CIRCULAR_REPEAT_INDICATOR ==
+                    if ( KECircularRepeatIndicator ==
                         bcRepeat.GetShortInfo( ETLV_BcRepeatIndicatorValues ) )
                         {
                         callControl.SetBCRepeatIndicator(
                             RSat::EBCAlternateMode );
                         }
-                    else if ( ATK_SEQUENTIAL_REPEAT_INDICATOR ==
+                    else if ( KESequentalRepeatIndicator ==
                         bcRepeat.GetShortInfo( ETLV_BcRepeatIndicatorValues ) )
                         {
                         callControl.SetBCRepeatIndicator(
@@ -5949,13 +5956,13 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
             // set call parameters
             TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                 SetCallSetUpDetails");
-            OstTrace0( TRACE_NORMAL, DUP12_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL SetCallSetUpDetails" );
+            OstTrace0( TRACE_NORMAL,  DUP12_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL SetCallSetUpDetails" );
             callControl.SetCallSetUpDetails( tempCallParams );
-            if ( ATK_CHANGED == aCcResult )
+            if ( KChanged == aCcResult )
                 {
                 // Notify NokiaTSY that next dial request is SAT originated, because this is changed action made by SAT server
                 TFLOGSTRING("TSY: CSatNotifyCallControlRequest::CompleteNotificationL: Notify NTSY next dial request is SAT-originated");
-                OstTrace0( TRACE_NORMAL, DUP16_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL: Notify NTSY next dial request is SAT-originated" );
+                OstTrace0( TRACE_NORMAL,  DUP16_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL: Notify NTSY next dial request is SAT-originated" );
                 TBool resourceControlSuppress( ETrue );
                 CMmDataPackage dataPackage;
                 dataPackage.PackData( &resourceControlSuppress );
@@ -5979,7 +5986,7 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
             {
             TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                 Alpha id found");
-            OstTrace0( TRACE_NORMAL, DUP13_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL Alpha id found" );
+            OstTrace0( TRACE_NORMAL,  DUP13_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL Alpha id found" );
             if ( alphaIdentifier.GetLength() )
                 {
                 // 8-bit string to 16-bit string
@@ -6004,18 +6011,18 @@ void CSatNotifyCallControlRequest::CompleteNotificationL
             {
             TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
                 Alpha ID not present");
-            OstTrace0( TRACE_NORMAL, DUP14_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL Alpha ID not present" );
+            OstTrace0( TRACE_NORMAL,  DUP14_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL Alpha ID not present" );
             tempAlphaId.iStatus = RSat::EAlphaIdNotPresent;
             tempValidity = RSat::ENoAlphaId;
             }
         // Set alpha id values
         TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
             SetAlphaId");
-        OstTrace0( TRACE_NORMAL, DUP15_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL, "CSatNotifyCallControlRequest::CompleteNotificationL SetAlphaId" );
+        OstTrace0( TRACE_NORMAL,  DUP15_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATIONL_TD, "CSatNotifyCallControlRequest::CompleteNotificationL SetAlphaId" );
         callControl.SetAlphaId( tempValidity, tempAlphaId );
         TFLOGSTRING("CSatNotifyCallControlRequest::CompleteNotificationL \
             SetCallParamOrigin");
-        OstTrace0( TRACE_NORMAL, DUP18_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATION, "CSatNotifyCallControlRequest::CompleteNotification SetCallParamOrigin" );
+        OstTrace0( TRACE_NORMAL,  DUP18_CSATNOTIFYCALLCONTROLREQUEST_COMPLETENOTIFICATION_TD, "CSatNotifyCallControlRequest::CompleteNotification SetCallParamOrigin" );
 
         CompleteRequest( KErrNone );
         }
@@ -6035,7 +6042,7 @@ void CSatNotifyCallControlRequest::Notify
         TDes8* aDataPtr
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYCALLCONTROLREQUEST_NOTIFY, "CSatNotifyCallControlRequest::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYCALLCONTROLREQUEST_NOTIFY_TD, "CSatNotifyCallControlRequest::Notify" );
     TFLOGSTRING("CSatNotifyCallControlRequest::Notify");
     iReqHandle = aReqHandle;
 
@@ -6058,7 +6065,7 @@ CSatNotifyLaunchBrowser::CSatNotifyLaunchBrowser
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iLaunchBrowserV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLAUNCHBROWSER_CSATNOTIFYLAUNCHBROWSER, "CSatNotifyLaunchBrowser::CSatNotifyLaunchBrowser" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLAUNCHBROWSER_CSATNOTIFYLAUNCHBROWSER_TD, "CSatNotifyLaunchBrowser::CSatNotifyLaunchBrowser" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -6073,7 +6080,7 @@ CSatNotifyLaunchBrowser::CSatNotifyLaunchBrowser
 //
 CSatNotifyLaunchBrowser::~CSatNotifyLaunchBrowser()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYLAUNCHBROWSER_CSATNOTIFYLAUNCHBROWSER, "CSatNotifyLaunchBrowser::~CSatNotifyLaunchBrowser" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYLAUNCHBROWSER_CSATNOTIFYLAUNCHBROWSER_TD, "CSatNotifyLaunchBrowser::~CSatNotifyLaunchBrowser" );
     // None
     }
 
@@ -6089,7 +6096,7 @@ void CSatNotifyLaunchBrowser::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLAUNCHBROWSER_MESSAGERECEIVED, "CSatNotifyLaunchBrowser::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLAUNCHBROWSER_MESSAGERECEIVED_TD, "CSatNotifyLaunchBrowser::MessageReceived" );
     TFLOGSTRING("CSatNotifyLaunchBrowser::MessageReceived");
     //get ber tlv
     CBerTlv berTlv;
@@ -6442,7 +6449,7 @@ void CSatNotifyLaunchBrowser::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYLAUNCHBROWSER_NOTIFY, "CSatNotifyLaunchBrowser::Notify Handle :%u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYLAUNCHBROWSER_NOTIFY_TD, "CSatNotifyLaunchBrowser::Notify Handle :%u", aReqHandle );
     TFLOGSTRING2("CSatNotifyLaunchBrowser::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -6462,7 +6469,7 @@ TInt CSatNotifyLaunchBrowser::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLAUNCHBROWSER_TERMINALRESPONSE, "CSatNotifyLaunchBrowser::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLAUNCHBROWSER_TERMINALRESPONSE_TD, "CSatNotifyLaunchBrowser::TerminalResponse" );
     TFLOGSTRING("CSatNotifyLaunchBrowser::TerminalResponse");
     TInt   ret( KErrNone );
     TUint8 additionalInfo( 0 );
@@ -6526,7 +6533,7 @@ CSatNotifySetUpEventList::CSatNotifySetUpEventList
         iCmdQualifier( KZero ),
         iEvents( KZero )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPEVENTLIST_CSATNOTIFYSETUPEVENTLIST, "CSatNotifySetUpEventList::CSatNotifySetUpEventList" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPEVENTLIST_CSATNOTIFYSETUPEVENTLIST_TD, "CSatNotifySetUpEventList::CSatNotifySetUpEventList" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KErrorRequiredValuesMissing;
@@ -6539,7 +6546,7 @@ CSatNotifySetUpEventList::CSatNotifySetUpEventList
 //
 CSatNotifySetUpEventList::~CSatNotifySetUpEventList()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSETUPEVENTLIST_CSATNOTIFYSETUPEVENTLIST, "CSatNotifySetUpEventList::~CSatNotifySetUpEventList" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSETUPEVENTLIST_CSATNOTIFYSETUPEVENTLIST_TD, "CSatNotifySetUpEventList::~CSatNotifySetUpEventList" );
     // None
     }
 
@@ -6555,7 +6562,7 @@ void CSatNotifySetUpEventList::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPEVENTLIST_MESSAGERECEIVED, "CSatNotifySetUpEventList::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPEVENTLIST_MESSAGERECEIVED_TD, "CSatNotifySetUpEventList::MessageReceived" );
     TFLOGSTRING("CSatNotifySetUpEventList::MessageReceived");
     TInt ret( KErrNone );
     TUint8 generalResult( RSat::KSuccess );
@@ -6681,7 +6688,7 @@ void CSatNotifySetUpEventList::MessageReceived
                         TFLOGSTRING("TSY: \
                         CSatNotifySetUpEventList::MessageReceived, \
                         Event not recognized or not supported.");
-                        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSETUPEVENTLIST_MESSAGERECEIVED, "CSatNotifySetUpEventList::MessageReceived, Event not recognized or not supported." );
+                        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSETUPEVENTLIST_MESSAGERECEIVED_TD, "CSatNotifySetUpEventList::MessageReceived, Event not recognized or not supported." );
                         }
                     }
                 }
@@ -6719,7 +6726,7 @@ void CSatNotifySetUpEventList::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYSETUPEVENTLIST_NOTIFY, "CSatNotifySetUpEventList::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYSETUPEVENTLIST_NOTIFY_TD, "CSatNotifySetUpEventList::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifySetUpEventList::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -6739,7 +6746,7 @@ TInt CSatNotifySetUpEventList::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSETUPEVENTLIST_TERMINALRESPONSE, "CSatNotifySetUpEventList::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSETUPEVENTLIST_TERMINALRESPONSE_TD, "CSatNotifySetUpEventList::TerminalResponse" );
     TFLOGSTRING("CSatNotifySetUpEventList::TerminalResponse");
     TInt   ret( KErrNone );
     TUint8 additionalInfo( 0 );
@@ -6794,7 +6801,7 @@ CSatNotifyPollingOff::CSatNotifyPollingOff
         :
         CSatNotificationsBase( aSatMessHandler, aSatMessaging )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYPOLLINGOFF_CSATNOTIFYPOLLINGOFF, "CSatNotifyPollingOff::CSatNotifyPollingOff" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYPOLLINGOFF_CSATNOTIFYPOLLINGOFF_TD, "CSatNotifyPollingOff::CSatNotifyPollingOff" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KErrorRequiredValuesMissing;
@@ -6807,7 +6814,7 @@ CSatNotifyPollingOff::CSatNotifyPollingOff
 //
 CSatNotifyPollingOff::~CSatNotifyPollingOff()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYPOLLINGOFF_CSATNOTIFYPOLLINGOFF, "CSatNotifyPollingOff::~CSatNotifyPollingOff" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYPOLLINGOFF_CSATNOTIFYPOLLINGOFF_TD, "CSatNotifyPollingOff::~CSatNotifyPollingOff" );
     // None
     }
 
@@ -6823,7 +6830,7 @@ void CSatNotifyPollingOff::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYPOLLINGOFF_MESSAGERECEIVED, "CSatNotifyPollingOff::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYPOLLINGOFF_MESSAGERECEIVED_TD, "CSatNotifyPollingOff::MessageReceived" );
     TFLOGSTRING("CSatNotifyPollingOff::MessageReceived");
     //get ber tlv
     CBerTlv berTlv;
@@ -6866,7 +6873,7 @@ void CSatNotifyPollingOff::Notify
         TDes8*              /*aDataPtr*/    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYPOLLINGOFF_NOTIFY, "CSatNotifyPollingOff::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYPOLLINGOFF_NOTIFY_TD, "CSatNotifyPollingOff::Notify" );
     // PollingOff is completely implemented by SimAtkTsy. Client
     // insn't notified about the command.
     }
@@ -6889,7 +6896,7 @@ CSatNotifyLocalInfo::CSatNotifyLocalInfo
         iLocalInfoIsOngoing( EFalse ),
         iLocalInfoAccTechOngoing( EFalse )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLOCALINFO_CSATNOTIFYLOCALINFO, "CSatNotifyLocalInfo::CSatNotifyLocalInfo" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLOCALINFO_CSATNOTIFYLOCALINFO_TD, "CSatNotifyLocalInfo::CSatNotifyLocalInfo" );
     TFLOGSTRING("CSatNotifyLocalInfo::CSatNotifyLocalInfo");
     // Initialize response structure
     iLocalInfoRspV3 = RSat::TLocalInfoRspV3();
@@ -6907,7 +6914,7 @@ CSatNotifyLocalInfo::CSatNotifyLocalInfo
 //
 CSatNotifyLocalInfo::~CSatNotifyLocalInfo()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYLOCALINFO_CSATNOTIFYLOCALINFO, "CSatNotifyLocalInfo::~CSatNotifyLocalInfo" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYLOCALINFO_CSATNOTIFYLOCALINFO_TD, "CSatNotifyLocalInfo::~CSatNotifyLocalInfo" );
     // None
     }
 
@@ -6923,7 +6930,7 @@ void CSatNotifyLocalInfo::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived" );
     TFLOGSTRING("CSatNotifyLocalInfo::MessageReceived");
     // Clear additional info
     iLocalInfoRspV3.iAdditionalInfo.Zero();
@@ -6942,7 +6949,7 @@ void CSatNotifyLocalInfo::MessageReceived
         case RSat::KProvideLocalInfo:
             {
             TFLOGSTRING("CSatNotifyLocalInfo:: request: LOCAL INFO");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::Messagereceived Request: LOCAL INFO" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::Messagereceived Request: LOCAL INFO" );
             iLocalInfoIsOngoing = ETrue;
 
             // Send a net cell info request to the net server.
@@ -6955,7 +6962,7 @@ void CSatNotifyLocalInfo::MessageReceived
         case RSat::KProvideLocalInfoImei:
             {
             TFLOGSTRING("CSatNotifyLocalInfo:: request: IMEI");
-            OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::Messagereceived Request: IMEI" );
+            OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::Messagereceived Request: IMEI" );
             // Check if IMEI is received
             if ( iSatMessHandler->ImeiAvailable() )
                 {
@@ -6975,7 +6982,7 @@ void CSatNotifyLocalInfo::MessageReceived
         case RSat::KProvideLocalInfoIMEISV:
             {
             TFLOGSTRING("TSY: CSatNotifyLocalInfo::MessageReceived Request: IMEISV");
-            OstTrace0( TRACE_NORMAL, DUP14_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived Request: IMEISV" );
+            OstTrace0( TRACE_NORMAL,  DUP14_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived Request: IMEISV" );
             // Check if IMEISV is received
             if ( iSatMessHandler->ImeiSvAvailable() )
                 {
@@ -7004,7 +7011,7 @@ void CSatNotifyLocalInfo::MessageReceived
                     iSatMessHandler->CurrentAccessTechnology() )
                     {
                     TFLOGSTRING("CSatNotifyLocalInfo:: request: UTRAN NMR");
-                    OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::Messagereceived UTRAN NMR" );
+                    OstTrace0( TRACE_NORMAL,  DUP3_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::Messagereceived UTRAN NMR" );
 
                     switch( utranMeasurement.GetShortInfo(
                                 ETLV_UtranMeasurementQualifier ) )
@@ -7013,7 +7020,7 @@ void CSatNotifyLocalInfo::MessageReceived
                             {
                             iLocalInfoIsOngoing = ETrue;
                             TFLOGSTRING("CSatNotifyLocalInfo::INTRA_FREQ_NMR");
-                            OstTrace0( TRACE_NORMAL, DUP4_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::Messagereceived INTRA_FREQ_NMR" );
+                            OstTrace0( TRACE_NORMAL,  DUP4_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::Messagereceived INTRA_FREQ_NMR" );
                             iSatMessHandler->NetNeighbourCellsReq(
                                             iSatMessaging->GetTransactionId(),
                                             NET_SIM_INTRA_FREQ_NMR );
@@ -7023,7 +7030,7 @@ void CSatNotifyLocalInfo::MessageReceived
                             {
                             iLocalInfoIsOngoing = ETrue;
                             TFLOGSTRING("CSatNotifyLocalInfo::INTER_FREQ_NMR");
-                            OstTrace0( TRACE_NORMAL, DUP5_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived INTER_FREQ_NMR" );
+                            OstTrace0( TRACE_NORMAL,  DUP5_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived INTER_FREQ_NMR" );
                             iSatMessHandler->NetNeighbourCellsReq(
                                             iSatMessaging->GetTransactionId(),
                                             NET_SIM_INTER_FREQ_NMR );
@@ -7033,7 +7040,7 @@ void CSatNotifyLocalInfo::MessageReceived
                             {
                             iLocalInfoIsOngoing = ETrue;
                             TFLOGSTRING("CSatNotifyLocalInfo::INTER_RAT_NMR");
-                            OstTrace0( TRACE_NORMAL, DUP6_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived INTER_RAT_NMR" );
+                            OstTrace0( TRACE_NORMAL,  DUP6_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived INTER_RAT_NMR" );
                             iSatMessHandler->NetNeighbourCellsReq(
                                             iSatMessaging->GetTransactionId(),
                                             NET_SIM_INTER_RAT_NMR );
@@ -7060,7 +7067,7 @@ void CSatNotifyLocalInfo::MessageReceived
             else
                 {
                 TFLOGSTRING("CSatNotifyLocalInfo:: request: NMR");
-                OstTrace0( TRACE_NORMAL, DUP7_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived Request: NMR" );
+                OstTrace0( TRACE_NORMAL,  DUP7_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived Request: NMR" );
                 iLocalInfoIsOngoing = ETrue;
                 // Request NET_SIM_NMR
                 iSatMessHandler->NetNeighbourCellsReq(
@@ -7073,7 +7080,7 @@ void CSatNotifyLocalInfo::MessageReceived
         case RSat::KProvideLocalInfoDateTimeTimeZone:
             {
             TFLOGSTRING("CSatNotifyLocalInfo:: request: DATE/TIME/TIMEZONE");
-            OstTrace0( TRACE_NORMAL, DUP8_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived Request: DATE/TIME/TIMEZONE" );
+            OstTrace0( TRACE_NORMAL,  DUP8_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived Request: DATE/TIME/TIMEZONE" );
             TTime time;
             TLocale locale;
             TDateTime dateTime;
@@ -7132,11 +7139,11 @@ void CSatNotifyLocalInfo::MessageReceived
         case RSat::KProvideLocalInfoLanguage:
             {
             TFLOGSTRING("CSatNotifyLocalInfo:: request: Language");
-            OstTrace0( TRACE_NORMAL, DUP9_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived Request: Language" );
+            OstTrace0( TRACE_NORMAL,  DUP9_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived Request: Language" );
             if( !iReqHandle )
                 {
                 TFLOGSTRING("CSatNotifyLocalInfo:: No reqHandle");
-                OstTrace0( TRACE_NORMAL, DUP10_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived No reqHandle" );
+                OstTrace0( TRACE_NORMAL,  DUP10_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived No reqHandle" );
 
                 iLocalInfoRspV3.iGeneralResult = RSat::KMeUnableToProcessCmd;
                 iLocalInfoRspV3.iAdditionalInfo.Append( RSat::KNoSpecificMeProblem );
@@ -7145,7 +7152,7 @@ void CSatNotifyLocalInfo::MessageReceived
             else
                 {
                 TFLOGSTRING("CSatNotifyLocalInfo:: reqHandle");
-                OstTrace0( TRACE_NORMAL, DUP11_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived reqHandle" );
+                OstTrace0( TRACE_NORMAL,  DUP11_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived reqHandle" );
                 // Fill the send sm structure
                 RSat::TLocalInfoV3& localInfoV3 = ( *iLocalInfoV3Pckg )();
                 // Get command details tlv
@@ -7164,7 +7171,7 @@ void CSatNotifyLocalInfo::MessageReceived
         case RSat::KProvideLocalInfoTimingAdv:
             {
             TFLOGSTRING("CSatNotifyLocalInfo:: request: TimingAdvance");
-            OstTrace0( TRACE_NORMAL, DUP12_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived Request: TimingAdvance" );
+            OstTrace0( TRACE_NORMAL,  DUP12_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived Request: TimingAdvance" );
             iLocalInfoIsOngoing = ETrue;
             //request GSS_CS_SERVICE_REQ
             iSatMessHandler->GssCsServiceReq(
@@ -7175,7 +7182,7 @@ void CSatNotifyLocalInfo::MessageReceived
         case RSat::KProvideLocalInfoAccTech:
             {
             TFLOGSTRING("CSatNotifyLocalInfo:: request: Access Technology");
-            OstTrace0( TRACE_NORMAL, DUP13_CSATNOTIFYLOCALINFO_MESSAGERECEIVED, "CSatNotifyLocalInfo::MessageReceived Request: Access Technology" );
+            OstTrace0( TRACE_NORMAL,  DUP13_CSATNOTIFYLOCALINFO_MESSAGERECEIVED_TD, "CSatNotifyLocalInfo::MessageReceived Request: Access Technology" );
             iLocalInfoIsOngoing = ETrue;
             iLocalInfoAccTechOngoing = ETrue;
 
@@ -7222,7 +7229,7 @@ void CSatNotifyLocalInfo::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYLOCALINFO_NOTIFY, "CSatNotifyLocalInfo::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYLOCALINFO_NOTIFY_TD, "CSatNotifyLocalInfo::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifyLocalInfo::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -7242,7 +7249,7 @@ TInt CSatNotifyLocalInfo::TerminalResponse
         TDes8* aRsp     // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLOCALINFO_TERMINALRESPONSE, "CSatNotifyLocalInfo::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLOCALINFO_TERMINALRESPONSE_TD, "CSatNotifyLocalInfo::TerminalResponse" );
     TFLOGSTRING("CSatNotifyLocalInfo::TerminalResponse");
     TInt ret( KErrNone );
     if ( aRsp )
@@ -7286,7 +7293,7 @@ TBool CSatNotifyLocalInfo::LocalInfoStatus
         TBool aClearStatus
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLOCALINFO_LOCALINFOSTATUS, "CSatNotifyLocalInfo::LocalInfoStatus" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLOCALINFO_LOCALINFOSTATUS_TD, "CSatNotifyLocalInfo::LocalInfoStatus" );
     TFLOGSTRING("CSatNotifyLocalInfo::LocalInfoStatus");
 
     if ( aClearStatus )
@@ -7309,7 +7316,7 @@ TBool CSatNotifyLocalInfo::LocalInfoAccTechStatus
         TBool aClearStatus
         )
     {
-OstTrace0( TRACE_NORMAL, CSATNOTIFYLOCALINFO_LOCALINFOACCTECHSTATUS, "CSatNotifyLocalInfo::LocalInfoAccTechStatus" );
+OstTrace0( TRACE_NORMAL,  CSATNOTIFYLOCALINFO_LOCALINFOACCTECHSTATUS_TD, "CSatNotifyLocalInfo::LocalInfoAccTechStatus" );
 TFLOGSTRING("CSatNotifyLocalInfo::LocalInfoAccTechStatus");
 
     if ( aClearStatus )
@@ -7335,7 +7342,7 @@ CSatNotifyTimerMgmt::CSatNotifyTimerMgmt
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iCmdQualifier( KZero )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYTIMERMGMT_CSATNOTIFYTIMERMGMT, "CSatNotifyTimerMgmt::CSatNotifyTimerMgmt" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYTIMERMGMT_CSATNOTIFYTIMERMGMT_TD, "CSatNotifyTimerMgmt::CSatNotifyTimerMgmt" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KContradictionWithTimerState
@@ -7349,7 +7356,7 @@ CSatNotifyTimerMgmt::CSatNotifyTimerMgmt
 //
 CSatNotifyTimerMgmt::~CSatNotifyTimerMgmt()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYTIMERMGMT_CSATNOTIFYTIMERMGMT, "CSatNotifyTimerMgmt::~CSatNotifyTimerMgmt" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYTIMERMGMT_CSATNOTIFYTIMERMGMT_TD, "CSatNotifyTimerMgmt::~CSatNotifyTimerMgmt" );
     // None
     }
 
@@ -7365,7 +7372,7 @@ void CSatNotifyTimerMgmt::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYTIMERMGMT_MESSAGERECEIVED, "CSatNotifyTimerMgmt::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYTIMERMGMT_MESSAGERECEIVED_TD, "CSatNotifyTimerMgmt::MessageReceived" );
     TFLOGSTRING("CSatNotifyTimerMgmt::MessageReceived");
     TInt ret( KErrNone );
     TInt returnValue( KErrNone );
@@ -7499,7 +7506,7 @@ void CSatNotifyTimerMgmt::Notify
         TDes8*              /*aDataPtr*/    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYTIMERMGMT_NOTIFY, "CSatNotifyTimerMgmt::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYTIMERMGMT_NOTIFY_TD, "CSatNotifyTimerMgmt::Notify" );
     // TimerManagement is completely implemented by SimAtkTsy. Client
     // insn't notified about the command.
     }
@@ -7516,7 +7523,7 @@ TUint32 CSatNotifyTimerMgmt::ConvertToSeconds
          TPtrC8 time
          )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYTIMERMGMT_CONVERTTOSECONDS, "CSatNotifyTimerMgmt::ConvertToSeconds" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYTIMERMGMT_CONVERTTOSECONDS_TD, "CSatNotifyTimerMgmt::ConvertToSeconds" );
     TFLOGSTRING("CSatNotifyTimerMgmt::ConvertToSeconds");
      TUint32 timeValue( 0 );
     // value of a timer, expressed using
@@ -7550,7 +7557,7 @@ CSatNotifyMoreTime::CSatNotifyMoreTime
         :
         CSatNotificationsBase( aSatMessHandler, aSatMessaging )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYMORETIME_CSATNOTIFYMORETIME, "CSatNotifyMoreTime::CSatNotifyMoreTime" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYMORETIME_CSATNOTIFYMORETIME_TD, "CSatNotifyMoreTime::CSatNotifyMoreTime" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KErrorRequiredValuesMissing;
@@ -7563,7 +7570,7 @@ CSatNotifyMoreTime::CSatNotifyMoreTime
 //
 CSatNotifyMoreTime::~CSatNotifyMoreTime()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYMORETIME_CSATNOTIFYMORETIME, "CSatNotifyMoreTime::~CSatNotifyMoreTime" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYMORETIME_CSATNOTIFYMORETIME_TD, "CSatNotifyMoreTime::~CSatNotifyMoreTime" );
     // None
     }
 
@@ -7579,7 +7586,7 @@ void CSatNotifyMoreTime::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYMORETIME_MESSAGERECEIVED, "CSatNotifyMoreTime::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYMORETIME_MESSAGERECEIVED_TD, "CSatNotifyMoreTime::MessageReceived" );
     TFLOGSTRING("CSatNotifyMoreTime::MessageReceived");
     //get ber tlv
     CBerTlv berTlv;
@@ -7607,7 +7614,7 @@ void CSatNotifyMoreTime::Notify
         TDes8*              /*aDataPtr*/    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYMORETIME_NOTIFY, "CSatNotifyMoreTime::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYMORETIME_NOTIFY_TD, "CSatNotifyMoreTime::Notify" );
     // MoreTime is completely implemented by SimAtkTsy. Client
     // insn't notified about the command.
     }
@@ -7628,7 +7635,7 @@ CSatNotifyLanguageNotification::CSatNotifyLanguageNotification
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iLanguageNotificationV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLANGUAGENOTIFICATION_CSATNOTIFYLANGUAGENOTIFICATION, "CSatNotifyLanguageNotification::CSatNotifyLanguageNotification" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLANGUAGENOTIFICATION_CSATNOTIFYLANGUAGENOTIFICATION_TD, "CSatNotifyLanguageNotification::CSatNotifyLanguageNotification" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KErrorRequiredValuesMissing;
@@ -7641,7 +7648,7 @@ CSatNotifyLanguageNotification::CSatNotifyLanguageNotification
 //
 CSatNotifyLanguageNotification::~CSatNotifyLanguageNotification()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYLANGUAGENOTIFICATION_CSATNOTIFYLANGUAGENOTIFICATION, "CSatNotifyLanguageNotification::~CSatNotifyLanguageNotification" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYLANGUAGENOTIFICATION_CSATNOTIFYLANGUAGENOTIFICATION_TD, "CSatNotifyLanguageNotification::~CSatNotifyLanguageNotification" );
     // None
     }
 
@@ -7657,7 +7664,7 @@ void CSatNotifyLanguageNotification::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLANGUAGENOTIFICATION_MESSAGERECEIVED, "CSatNotifyLanguageNotification::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLANGUAGENOTIFICATION_MESSAGERECEIVED_TD, "CSatNotifyLanguageNotification::MessageReceived" );
     TFLOGSTRING("TSY: CSatNotifyLanguageNotification::MessageReceived");
     TInt ret( KErrNone );
     TInt returnValue( KErrNone );
@@ -7707,7 +7714,7 @@ void CSatNotifyLanguageNotification::MessageReceived
             TFLOGSTRING("TSY: \
             CSatNotifyLanguageNotification::MessageReceived, \
             Command qualifier did not match.");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYLANGUAGENOTIFICATION_MESSAGERECEIVED, "CSatNotifyLanguageNotification::MessageReceived, Command qualifier did not match." );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYLANGUAGENOTIFICATION_MESSAGERECEIVED_TD, "CSatNotifyLanguageNotification::MessageReceived, Command qualifier did not match." );
             }
         CTlv language;
         returnValue = berTlv.TlvByTagValue( &language,
@@ -7734,7 +7741,7 @@ void CSatNotifyLanguageNotification::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLANGUAGENOTIFICATION_NOTIFY, "CSatNotifyLanguageNotification::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLANGUAGENOTIFICATION_NOTIFY_TD, "CSatNotifyLanguageNotification::Notify" );
     TFLOGSTRING("CSatNotifyLanguageNotification::Notify");
     iReqHandle = aReqHandle;
     iLanguageNotificationV2Pckg =
@@ -7755,7 +7762,7 @@ TInt CSatNotifyLanguageNotification::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYLANGUAGENOTIFICATION_TERMINALRESPONSE, "CSatNotifyLanguageNotification::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYLANGUAGENOTIFICATION_TERMINALRESPONSE_TD, "CSatNotifyLanguageNotification::TerminalResponse" );
     TFLOGSTRING("CSatNotifyLanguageNotification::TerminalResponse");
     TUint8 additionalInfo( 0 );
     RSat::TLanguageNotificationRspV2Pckg* aRspPckg =
@@ -7789,7 +7796,7 @@ CSatNotifyOpenChannel::CSatNotifyOpenChannel
         iOpenGprsChannelV4Pckg( NULL ),
         iOpenLocalLinksChannelV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYOPENCHANNEL_CSATNOTIFYOPENCHANNEL, "CSatNotifyOpenChannel::CSatNotifyOpenChannel" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYOPENCHANNEL_CSATNOTIFYOPENCHANNEL_TD, "CSatNotifyOpenChannel::CSatNotifyOpenChannel" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -7807,7 +7814,7 @@ CSatNotifyOpenChannel::CSatNotifyOpenChannel
 //
 CSatNotifyOpenChannel::~CSatNotifyOpenChannel()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYOPENCHANNEL_CSATNOTIFYOPENCHANNEL, "CSatNotifyOpenChannel::~CSatNotifyOpenChannel" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYOPENCHANNEL_CSATNOTIFYOPENCHANNEL_TD, "CSatNotifyOpenChannel::~CSatNotifyOpenChannel" );
     // None
     }
 
@@ -7823,7 +7830,7 @@ void CSatNotifyOpenChannel::MessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED, "CSatNotifyOpenChannel::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED_TD, "CSatNotifyOpenChannel::MessageReceived" );
     TFLOGSTRING("TSY: CSatNotifyOpenChannel::MessageReceived");
     TInt ret( KErrNone );
     // Get ber tlv
@@ -7837,7 +7844,7 @@ void CSatNotifyOpenChannel::MessageReceived
     if ( !iReqHandle )
         {
         TFLOGSTRING("TSY: CSatNotifyOpenChannel::MessageReceived - Request Off");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED, "CSatNotifyOpenChannel::MessageReceived - Request Off" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED_TD, "CSatNotifyOpenChannel::MessageReceived - Request Off" );
         // Request not on, returning response immediately
         TBuf8<1> noBearer( 0 );
         TBuf8<1> noAdditionalInfo( 0 );
@@ -7957,7 +7964,7 @@ void CSatNotifyOpenChannel::MessageReceived
                 case RSat::EGPRSBearer:
                     {
                     TFLOGSTRING("TSY: CSatNotifyOpenChannel::MessageReceived - GPRS Bearer");
-                    OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED, "CSatNotifyOpenChannel::MessageReceived - GPRS Bearer" );
+                    OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED_TD, "CSatNotifyOpenChannel::MessageReceived - GPRS Bearer" );
                     // Fill in TOpenGprsChannelV4
                     RSat::TOpenGprsChannelV4& openGprsChannelV4
                         = ( *iOpenGprsChannelV4Pckg )();
@@ -7975,7 +7982,7 @@ void CSatNotifyOpenChannel::MessageReceived
                         {
                         TFLOGSTRING("TSY: CSatNotifyOpenChannel::MessageReceived -\
                             Local Adress - not present");
-                        OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED, "CSatNotifyOpenChannel::MessageReceived - Local Adress - not present" );
+                        OstTrace0( TRACE_NORMAL,  DUP3_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED_TD, "CSatNotifyOpenChannel::MessageReceived - Local Adress - not present" );
                         openGprsChannelV4.iLocalAddress.iType =
                             RSat::EAddressNotPresent;
                         }
@@ -7991,7 +7998,7 @@ void CSatNotifyOpenChannel::MessageReceived
                 case RSat::EDefaultBearer:
                     {
                     TFLOGSTRING("TSY: CSatNotifyOpenChannel::MessageReceived - Default Bearer");
-                    OstTrace0( TRACE_NORMAL, DUP4_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED, "CSatNotifyOpenChannel::MessageReceived - Default Bearer" );
+                    OstTrace0( TRACE_NORMAL,  DUP4_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED_TD, "CSatNotifyOpenChannel::MessageReceived - Default Bearer" );
                     // Fill in TOpenChannelBaseV2
                     openChannelV2.iPCmdType = RSat::EAnyBearer;
                     break;
@@ -8003,7 +8010,7 @@ void CSatNotifyOpenChannel::MessageReceived
                 case RSat::EUSBBearer:
                     {
                     TFLOGSTRING("TSY: CSatNotifyOpenChannel::MessageReceived - Bearer not supported");
-                    OstTrace0( TRACE_NORMAL, DUP5_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED, "CSatNotifyOpenChannel::MessageReceived - Bearer not supported" );
+                    OstTrace0( TRACE_NORMAL,  DUP5_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED_TD, "CSatNotifyOpenChannel::MessageReceived - Bearer not supported" );
                     // Bearer not supported
                     TBuf8<1> noAdditionalInfo( 0 );
                     iSatMessHandler->OpenChannelTerminalResp(
@@ -8021,7 +8028,7 @@ void CSatNotifyOpenChannel::MessageReceived
                     {
                     // Bearer not supported (RFU)
                     TFLOGSTRING("TSY: CSatNotifyOpenChannel::MessageReceived - Bearer not supported");
-                    OstTrace0( TRACE_NORMAL, DUP6_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED, "CSatNotifyOpenChannel::MessageReceived - Bearer not supported" );
+                    OstTrace0( TRACE_NORMAL,  DUP6_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED_TD, "CSatNotifyOpenChannel::MessageReceived - Bearer not supported" );
                     // Required values missing
                     TBuf8<1> noBearer( 0 );
                     TBuf8<1> noAdditionalInfo( 0 );
@@ -8042,7 +8049,7 @@ void CSatNotifyOpenChannel::MessageReceived
         else
             {
             TFLOGSTRING("TSY: CSatNotifyOpenChannel::MessageReceived - Required values missing");
-            OstTrace0( TRACE_NORMAL, DUP7_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED, "CSatNotifyOpenChannel::MessageReceived - Required values missing" );
+            OstTrace0( TRACE_NORMAL,  DUP7_CSATNOTIFYOPENCHANNEL_MESSAGERECEIVED_TD, "CSatNotifyOpenChannel::MessageReceived - Required values missing" );
             // Required values missing
             TBuf8<1> noBearer( 0 );
             TBuf8<1> noAdditionalInfo( 0 );
@@ -8075,7 +8082,7 @@ void CSatNotifyOpenChannel::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYOPENCHANNEL_NOTIFY, "CSatNotifyOpenChannel::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYOPENCHANNEL_NOTIFY_TD, "CSatNotifyOpenChannel::Notify" );
     TFLOGSTRING("CSatNotifyOpenChannel::Notify");
     iReqHandle = aReqHandle;
     iOpenBaseChannelV2Pckg =
@@ -8101,7 +8108,7 @@ TInt CSatNotifyOpenChannel::TerminalResponse
         TDes8* aRsp // Response
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYOPENCHANNEL_TERMINALRESPONSE, "CSatNotifyOpenChannel::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYOPENCHANNEL_TERMINALRESPONSE_TD, "CSatNotifyOpenChannel::TerminalResponse" );
     TFLOGSTRING("CSatNotifyOpenChannel::TerminalResponse");
     TInt   ret( KErrNone );
     TBuf8<RSat::KAdditionalInfoMaxSize> additionalInfo;
@@ -8156,7 +8163,7 @@ void CSatNotifyOpenChannel::GetBearerTypeAndParams
         RSat::TBearer& aBearer
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYOPENCHANNEL_GETBEARERTYPEANDPARAMS, "CSatNotifyOpenChannel::GetBearerTypeAndParams" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYOPENCHANNEL_GETBEARERTYPEANDPARAMS_TD, "CSatNotifyOpenChannel::GetBearerTypeAndParams" );
     TFLOGSTRING("TSY: CSatNotifyOpenChannel::GetBearerTypeAndParams");
     TUint8 bearerType( aBearerDescriptionTlv.GetShortInfo( ETLV_BearerType ) );
 
@@ -8225,7 +8232,7 @@ TInt CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress
         RSat::TOtherAddress& aDestinationAddress
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS_TD, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress" );
     TFLOGSTRING("TSY: CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress");
 
     // SIM/ME Interface transport level ( Optional )
@@ -8236,7 +8243,7 @@ TInt CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress
         {
         TFLOGSTRING("CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress -\
             SIM/ME Interface");
-        OstTrace0( TRACE_NORMAL, DUP5_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress - SIM/ME Interface" );
+        OstTrace0( TRACE_NORMAL,  DUP5_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS_TD, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress - SIM/ME Interface" );
 
         aSimMeInterface.iPrtNumber = simMeInterfaceTlv.GetLongInfo(
             ETLV_PortNumber );
@@ -8260,7 +8267,7 @@ TInt CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress
         {
         TFLOGSTRING("TSY: CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress -\
             SIM/ME Interface - Not present");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress -SIM/ME Interface - Not present" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS_TD, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress -SIM/ME Interface - Not present" );
         aSimMeInterface.iTransportProto = RSat::EProtocolNotPresent;
         }
 
@@ -8316,7 +8323,7 @@ TInt CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress
         {
         TFLOGSTRING("TSY: CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress,\
             Transport protocol did not match.");
-        OstTrace0( TRACE_NORMAL, DUP2_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress, Transport protocol did not match." );
+        OstTrace0( TRACE_NORMAL,  DUP2_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS_TD, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress, Transport protocol did not match." );
         }
 
     // Other Address - Set Destination Address
@@ -8324,7 +8331,7 @@ TInt CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress
         {
         TFLOGSTRING("TSY: CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress -\
             Destination Address");
-        OstTrace0( TRACE_NORMAL, DUP3_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress - Destination Address" );
+        OstTrace0( TRACE_NORMAL,  DUP3_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS_TD, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress - Destination Address" );
         TUint8 typeOfAddress( dataDestAddressTlv->GetShortInfo(
             ETLV_TypeOfAddress ) );
         switch( typeOfAddress )
@@ -8356,7 +8363,7 @@ TInt CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress
         {
         TFLOGSTRING("TSY: CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress -\
             Destination Address - Not present");
-        OstTrace0( TRACE_NORMAL, DUP4_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress - Destination Address - Not present" );
+        OstTrace0( TRACE_NORMAL,  DUP4_CSATNOTIFYOPENCHANNEL_SIMMEINTERFACEANDDATADESTINATIONADDRESS_TD, "CSatNotifyOpenChannel::SimMeInterfaceAndDataDestinationAddress - Destination Address - Not present" );
         aDestinationAddress.iType = RSat::EAddressNotPresent;
         } // End of Other Address - Set Destination Address
 
@@ -8374,7 +8381,7 @@ void CSatNotifyOpenChannel::LocalAddress
         RSat::TOtherAddress& aLocalAddress
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYOPENCHANNEL_LOCALADDRESS, "CSatNotifyOpenChannel::LocalAddress" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYOPENCHANNEL_LOCALADDRESS_TD, "CSatNotifyOpenChannel::LocalAddress" );
     TFLOGSTRING("TSY: CSatNotifyOpenChannel::LocalAddress");
 
     // Other Address - Set Local Address ( Optional )
@@ -8407,7 +8414,7 @@ void CSatNotifyOpenChannel::LocalAddress
         else
             {
             TFLOGSTRING("TSY: CSatNotifyOpenChannel::LocalAddress - not present");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYOPENCHANNEL_LOCALADDRESS, "CSatNotifyOpenChannel::LocalAddress - not present" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYOPENCHANNEL_LOCALADDRESS_TD, "CSatNotifyOpenChannel::LocalAddress - not present" );
             aLocalAddress.iType = RSat::EAddressNotPresent;
             } // End of If Other local address present
         }
@@ -8424,7 +8431,7 @@ void CSatNotifyOpenChannel::GprsBearerSpecific
         RSat::TOpenGprsChannelV4& aOpenGprsChannelV4
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYOPENCHANNEL_GPRSBEARERSPECIFIC, "CSatNotifyOpenChannel::GprsBearerSpecific" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYOPENCHANNEL_GPRSBEARERSPECIFIC_TD, "CSatNotifyOpenChannel::GprsBearerSpecific" );
     TFLOGSTRING("TSY: CSatNotifyOpenChannel::GprsBearerSpecific");
 
     // Network Access Point Name ( Optional )
@@ -8435,7 +8442,7 @@ void CSatNotifyOpenChannel::GprsBearerSpecific
         {
         TFLOGSTRING("TSY: CSatNotifyOpenChannel::GprsBearerSpecific -\
             Access Point name");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYOPENCHANNEL_GPRSBEARERSPECIFIC, "CSatNotifyOpenChannel::GprsBearerSpecific - Access Point name" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYOPENCHANNEL_GPRSBEARERSPECIFIC_TD, "CSatNotifyOpenChannel::GprsBearerSpecific - Access Point name" );
         aOpenGprsChannelV4.iAccessName =
             nanTlv.GetData( ETLV_NetworkAccessName );
         }
@@ -8462,7 +8469,7 @@ CSatNotifyGetChannelStatus::CSatNotifyGetChannelStatus
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iGetChannelStatusRspV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYGETCHANNELSTATUS_CSATNOTIFYGETCHANNELSTATUS, "CSatNotifyGetChannelStatus::CSatNotifyGetChannelStatus" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYGETCHANNELSTATUS_CSATNOTIFYGETCHANNELSTATUS_TD, "CSatNotifyGetChannelStatus::CSatNotifyGetChannelStatus" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KPSessionTerminatedByUser
@@ -8476,7 +8483,7 @@ CSatNotifyGetChannelStatus::CSatNotifyGetChannelStatus
 //
 CSatNotifyGetChannelStatus::~CSatNotifyGetChannelStatus()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYGETCHANNELSTATUS_CSATNOTIFYGETCHANNELSTATUS, "CSatNotifyGetChannelStatus::~CSatNotifyGetChannelStatus" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYGETCHANNELSTATUS_CSATNOTIFYGETCHANNELSTATUS_TD, "CSatNotifyGetChannelStatus::~CSatNotifyGetChannelStatus" );
     // None
     }
 
@@ -8492,7 +8499,7 @@ void CSatNotifyGetChannelStatus::MessageReceived
         const TIsiReceiveC& aIsiMessage    // Received isi-message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYGETCHANNELSTATUS_MESSAGERECEIVED, "CSatNotifyGetChannelStatus::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYGETCHANNELSTATUS_MESSAGERECEIVED_TD, "CSatNotifyGetChannelStatus::MessageReceived" );
     TFLOGSTRING("CSatNotifyGetChannelStatus::MessageReceived");
     // Get ber tlv
     CBerTlv berTlv;
@@ -8538,7 +8545,7 @@ void CSatNotifyGetChannelStatus::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYGETCHANNELSTATUS_NOTIFY, "CSatNotifyGetChannelStatus::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYGETCHANNELSTATUS_NOTIFY_TD, "CSatNotifyGetChannelStatus::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifyGetChannelStatus::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -8560,7 +8567,7 @@ TInt CSatNotifyGetChannelStatus::TerminalResponse
         TDes8* aRsp     // Response package
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYGETCHANNELSTATUS_TERMINALRESPONSE, "CSatNotifyGetChannelStatus::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYGETCHANNELSTATUS_TERMINALRESPONSE_TD, "CSatNotifyGetChannelStatus::TerminalResponse" );
     TFLOGSTRING("CSatNotifyGetChannelStatus::TerminalResponse");
     TInt   ret( KErrNone );
     TBuf8<RSat::KAdditionalInfoMaxSize> additionalInfo;
@@ -8611,7 +8618,7 @@ CSatNotifyCloseChannel::CSatNotifyCloseChannel
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iCloseChannelRspV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYCLOSECHANNEL_CSATNOTIFYCLOSECHANNEL, "CSatNotifyCloseChannel::CSatNotifyCloseChannel" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYCLOSECHANNEL_CSATNOTIFYCLOSECHANNEL_TD, "CSatNotifyCloseChannel::CSatNotifyCloseChannel" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -8626,7 +8633,7 @@ CSatNotifyCloseChannel::CSatNotifyCloseChannel
 //
 CSatNotifyCloseChannel::~CSatNotifyCloseChannel()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYCLOSECHANNEL_CSATNOTIFYCLOSECHANNEL, "CSatNotifyCloseChannel::~CSatNotifyCloseChannel" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYCLOSECHANNEL_CSATNOTIFYCLOSECHANNEL_TD, "CSatNotifyCloseChannel::~CSatNotifyCloseChannel" );
     // None
     }
 
@@ -8642,7 +8649,7 @@ void CSatNotifyCloseChannel::MessageReceived
         const TIsiReceiveC& aIsiMessage    // Received isi-message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYCLOSECHANNEL_MESSAGERECEIVED, "CSatNotifyCloseChannel::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYCLOSECHANNEL_MESSAGERECEIVED_TD, "CSatNotifyCloseChannel::MessageReceived" );
     TFLOGSTRING("CSatNotifyCloseChannel::MessageReceived");
     // Get ber tlv
     CBerTlv berTlv;
@@ -8729,7 +8736,7 @@ void CSatNotifyCloseChannel::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYCLOSECHANNEL_NOTIFY, "CSatNotifyCloseChannel::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYCLOSECHANNEL_NOTIFY_TD, "CSatNotifyCloseChannel::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifyCloseChannel::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -8750,7 +8757,7 @@ TInt CSatNotifyCloseChannel::TerminalResponse
         TDes8* aRsp     // Response package
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYCLOSECHANNEL_TERMINALRESPONSE, "CSatNotifyCloseChannel::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYCLOSECHANNEL_TERMINALRESPONSE_TD, "CSatNotifyCloseChannel::TerminalResponse" );
     TFLOGSTRING("CSatNotifyCloseChannel::TerminalResponse");
     TInt   ret( KErrNone );
     TBuf8<RSat::KAdditionalInfoMaxSize> additionalInfo;
@@ -8800,7 +8807,7 @@ CSatNotifySendData::CSatNotifySendData
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iSendDataRspV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDDATA_CSATNOTIFYSENDDATA, "CSatNotifySendData::CSatNotifySendData" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDDATA_CSATNOTIFYSENDDATA_TD, "CSatNotifySendData::CSatNotifySendData" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -8815,7 +8822,7 @@ CSatNotifySendData::CSatNotifySendData
 //
 CSatNotifySendData::~CSatNotifySendData()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYSENDDATA_CSATNOTIFYSENDDATA, "CSatNotifySendData::~CSatNotifySendData" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYSENDDATA_CSATNOTIFYSENDDATA_TD, "CSatNotifySendData::~CSatNotifySendData" );
     // None
     }
 
@@ -8831,7 +8838,7 @@ void CSatNotifySendData::MessageReceived
         const TIsiReceiveC& aIsiMessage    // Received isi-message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDDATA_MESSAGERECEIVED, "CSatNotifySendData::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDDATA_MESSAGERECEIVED_TD, "CSatNotifySendData::MessageReceived" );
     TFLOGSTRING("CSatNotifySendData::MessageReceived");
     // return value for completion of the request
     TInt ret( KErrNone );
@@ -8954,7 +8961,7 @@ void CSatNotifySendData::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYSENDDATA_NOTIFY, "CSatNotifySendData::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYSENDDATA_NOTIFY_TD, "CSatNotifySendData::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifySendData::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -8975,7 +8982,7 @@ TInt CSatNotifySendData::TerminalResponse
         TDes8* aRsp     // Response package
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYSENDDATA_TERMINALRESPONSE, "CSatNotifySendData::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYSENDDATA_TERMINALRESPONSE_TD, "CSatNotifySendData::TerminalResponse" );
     TFLOGSTRING("CSatNotifySendData::TerminalResponse");
     TInt   ret( KErrNone );
     TBuf8<RSat::KAdditionalInfoMaxSize> additionalInfo;
@@ -9026,7 +9033,7 @@ CSatNotifyReceiveData::CSatNotifyReceiveData
         CSatNotificationsBase( aSatMessHandler, aSatMessaging ),
         iReceiveDataRspV2Pckg( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYRECEIVEDATA_CSATNOTIFYRECEIVEDATA, "CSatNotifyReceiveData::CSatNotifyReceiveData" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYRECEIVEDATA_CSATNOTIFYRECEIVEDATA_TD, "CSatNotifyReceiveData::CSatNotifyReceiveData" );
     // Following results are also allowed for this command:
     // (in addition to result declared in base class constructor)
     iAllowedResults += RSat::KSuccessRequestedIconNotDisplayed
@@ -9041,7 +9048,7 @@ CSatNotifyReceiveData::CSatNotifyReceiveData
 //
 CSatNotifyReceiveData::~CSatNotifyReceiveData()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYRECEIVEDATA_CSATNOTIFYRECEIVEDATA, "CSatNotifyReceiveData::~CSatNotifyReceiveData" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYRECEIVEDATA_CSATNOTIFYRECEIVEDATA_TD, "CSatNotifyReceiveData::~CSatNotifyReceiveData" );
     // None
     }
 
@@ -9057,7 +9064,7 @@ void CSatNotifyReceiveData::MessageReceived
         const TIsiReceiveC& aIsiMessage    // Received isi-message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYRECEIVEDATA_MESSAGERECEIVED, "CSatNotifyReceiveData::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYRECEIVEDATA_MESSAGERECEIVED_TD, "CSatNotifyReceiveData::MessageReceived" );
     TFLOGSTRING("CSatNotifyReceiveData::MessageReceived");
     // return value for completion of the request
     TInt ret( KErrNone );
@@ -9163,7 +9170,7 @@ void CSatNotifyReceiveData::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATNOTIFYRECEIVEDATA_NOTIFY, "CSatNotifyReceiveData::Notify Handle: %u", aReqHandle );
+    OstTrace1( TRACE_NORMAL,  CSATNOTIFYRECEIVEDATA_NOTIFY_TD, "CSatNotifyReceiveData::Notify Handle: %u", aReqHandle );
     TFLOGSTRING2("CSatNotifyReceiveData::Notify. \n\t\t\t Handle:%d\n\t\t\t",
                aReqHandle );
     iReqHandle = aReqHandle;
@@ -9184,7 +9191,7 @@ TInt CSatNotifyReceiveData::TerminalResponse
         TDes8* aRsp     // Response package
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYRECEIVEDATA_TERMINALRESPONSE, "CSatNotifyReceiveData::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYRECEIVEDATA_TERMINALRESPONSE_TD, "CSatNotifyReceiveData::TerminalResponse" );
     TFLOGSTRING("CSatNotifyReceiveData::TerminalResponse");
     TInt   ret( KErrNone );
     TBuf8<RSat::KAdditionalInfoMaxSize> additionalInfo;
@@ -9235,7 +9242,7 @@ CSatNotifyMoSmControlRequest::CSatNotifyMoSmControlRequest
         CTsySatMessaging*   aSatMessaging    //Pointer to satmessaging class
         ) : CSatNotificationsBase( aSatMessHandler, aSatMessaging )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYMOSMCONTROLREQUEST_CSATNOTIFYMOSMCONTROLREQUEST, "CSatNotifyMoSmControlRequest::CSatNotifyMoSmControlRequest" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYMOSMCONTROLREQUEST_CSATNOTIFYMOSMCONTROLREQUEST_TD, "CSatNotifyMoSmControlRequest::CSatNotifyMoSmControlRequest" );
     }
 
 // -----------------------------------------------------------------------------
@@ -9245,7 +9252,7 @@ CSatNotifyMoSmControlRequest::CSatNotifyMoSmControlRequest
 //
 CSatNotifyMoSmControlRequest::~CSatNotifyMoSmControlRequest()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATNOTIFYMOSMCONTROLREQUEST_CSATNOTIFYMOSMCONTROLREQUEST, "CSatNotifyMoSmControlRequest::~CSatNotifyMoSmControlRequest" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATNOTIFYMOSMCONTROLREQUEST_CSATNOTIFYMOSMCONTROLREQUEST_TD, "CSatNotifyMoSmControlRequest::~CSatNotifyMoSmControlRequest" );
     // None
     }
 
@@ -9261,7 +9268,7 @@ void CSatNotifyMoSmControlRequest::MessageReceived
         const TIsiReceiveC& /*aIsiMessage*/    // ISI  message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYMOSMCONTROLREQUEST_MESSAGERECEIVED, "CSatNotifyMoSmControlRequest::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYMOSMCONTROLREQUEST_MESSAGERECEIVED_TD, "CSatNotifyMoSmControlRequest::MessageReceived" );
     // In S60 phones, the MoSm control request is received via an ISI
     // message coming from the SMS server. That's why the body
     // of this method is empty, see the class CSatMoSmCtrl. The Etel Sat API is used
@@ -9282,7 +9289,7 @@ void CSatNotifyMoSmControlRequest::CompleteNotification
         RSat::TControlResult aResult    // Call Control result
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYMOSMCONTROLREQUEST_COMPLETENOTIFICATION, "CSatNotifyMoSmControlRequest::CompleteNotification" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYMOSMCONTROLREQUEST_COMPLETENOTIFICATION_TD, "CSatNotifyMoSmControlRequest::CompleteNotification" );
     TFLOGSTRING("CSatNotifyMoSmControlRequest::CompleteNotification");
     //check that a client has requested this notifications
     if ( iReqHandle )
@@ -9320,7 +9327,7 @@ void CSatNotifyMoSmControlRequest::Notify
         TDes8*              aDataPtr    // Pointer to data
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATNOTIFYMOSMCONTROLREQUEST_NOTIFY, "CSatNotifyMoSmControlRequest::Notify" );
+    OstTrace0( TRACE_NORMAL,  CSATNOTIFYMOSMCONTROLREQUEST_NOTIFY_TD, "CSatNotifyMoSmControlRequest::Notify" );
     TFLOGSTRING("CSatNotifyMoSmControlRequest::Notify");
     iReqHandle = aReqHandle;
     iMoSmControlV1Pckg = static_cast< RSat::TMoSmControlV1Pckg* >( aDataPtr );

@@ -36,7 +36,7 @@
 // None
 
 // FORWARD DECLARATIONS
-class DISAKernelChannel;
+class DISAKernelWrapperHelper;
 
 // CLASS DECLARATION
 
@@ -425,7 +425,7 @@ NONSHARABLE_CLASS( DIsaKernelAPI ) : public DBase
 
     // Owned
     // Kernel channel dedicated for this.
-    DISAKernelChannel*      iKernelChannel;
+    DISAKernelWrapperHelper*      iHelper;
 
     };
 

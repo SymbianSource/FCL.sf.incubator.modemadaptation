@@ -10,8 +10,8 @@
 * Nokia Corporation - initial contribution.
 *
 * Contributors:
-* 
-* Description: 
+*
+* Description:
 *     Implementation of DMC event handler.
 *
 */
@@ -42,8 +42,8 @@
 #include "dmc_event_handler_ape_centTraces.h"
 #endif
 
-// EXTERNAL DATA STRUCTURES 
-// EXTERNAL FUNCTION PROTOTYPES 
+// EXTERNAL DATA STRUCTURES
+// EXTERNAL FUNCTION PROTOTYPES
 // FORWARD DECLARATIONS
 // CONSTANTS
 
@@ -63,7 +63,7 @@ _LIT(KDmcDrvName, "dmc");
 
 #else // USE_MTC_SERVER
 
-/** 
+/**
  * Define MCE init state and action values because an ISI API does not provide them.
  */
 #define MCE_STATE_INIT_VALUE      static_cast<TUint8>(static_cast<TInt8>(~(MCE_NORMAL | MCE_LOCAL | MCE_SW_RESET | MCE_POWER_OFF)))
@@ -89,7 +89,7 @@ _LIT(KDmcDrvName, "dmc");
 */
 #define IDLE                      0x00  // All transactions begins in the IDLE-state.
 #define BUSY                      0x01  // Used while checking an incoming transaction request.
-#define APE_PWR_OFF               0x02  // Handling APE orginated power off request.
+#define APE_PWR_OFF               0x02  // Handling APE(through user or kernel if) orginated power off request.
 #define MODEM_PWR_OFF             0x03  // Handling Modem orginated power off request.
 #define APE_RESET                 0x04  // Handling APE orginated reset.
 #define MODEM_CONTROLLED_RESET    0x05  // Handling Modem controlled reset.
@@ -103,13 +103,16 @@ _LIT(KDmcDrvName, "dmc");
 DDmcExtension* DmcEvHandApeCent::iDmcExtPtr(NULL);
 DMutex* DmcEvHandApeCent::iMutexPtr(NULL);
 TDfc* DmcEvHandApeCent::iUserEventDfcPtr(NULL);
+TDfc* DmcEvHandApeCent::iKernelEventDfcPtr(NULL);
+TRawEvent DmcEvHandApeCent::iSwitchOffEvent;
+TRawEvent DmcEvHandApeCent::iResetEvent;
 TBootReason::TStartupMode DmcEvHandApeCent::iTargetStartupMode(TBootReason::EStartupModeNone);
 TBool DmcEvHandApeCent::iHiddenStatus(EFalse);
 // Init with no valid state value
 TUint8 DmcEvHandApeCent::iModemCurrentState(MCE_STATE_INIT_VALUE);
 TUint8 DmcEvHandApeCent::iModemActionBitMap(MODEM_NO_ACTIONS);
 TUint8 DmcEvHandApeCent::iPowerDownCalled(FALSE);
-TUint8 DmcEvHandApeCent::iEventType(USER_CLIENT_NO_EVENT);
+TUint8 DmcEvHandApeCent::iEventType(DMC_CLIENT_NO_EVENT);
 TUint8 DmcEvHandApeCent::iCurrentState(IDLE);
 
 // This table defines allowed state transitions.
@@ -141,13 +144,16 @@ const TUint8 DmcEvHandApeCent::iStateTransitionMap[LAST_STATE] =
     TO((NO_STATES_DEFINED)),
     };
 
-/* This bitmap defines user events that are handled in an any-state. Kernel event any
-   state checking is based on the resource ID and message ID.*/ 
-const TUint32 DmcEvHandApeCent::iAnyStateMap((1 << USER_GET_TARGET_STARTUP_MODE |
-                                              1 << USER_GET_HIDDEN_RESET_STATUS |
+/* This bitmap defines events that are handled in an any-state. ISI event any
+   state checking is based on the resource ID and message ID.*/
+const TUint32 DmcEvHandApeCent::iAnyStateMap((1 << KERNEL_IF_GET_STARTUP_MODE        |
+                                              1 << KERNEL_IF_GET_HIDDEN_RESET_STATUS |
+                                              1 << KERNEL_GET_EVENT_TYPE             |
+                                              1 << USER_GET_TARGET_STARTUP_MODE      |
+                                              1 << USER_GET_HIDDEN_RESET_STATUS      |
                                               1 << USER_GET_EVENT_TYPE));
 
-// LOCAL FUNCTION PROTOTYPES  
+// LOCAL FUNCTION PROTOTYPES
 
 
 // ==================== LOCAL FUNCTIONS ====================
@@ -217,6 +223,9 @@ void DmcEvHandApeCent::Init(DDmcExtension* const aDmcExtPtr)
     DMC_TRACE((("DMC:EH_APE_CEN: Init() - MutexCreate, err: %d "), err));
     DMC_TRACE_ASSERT_RESET(err == KErrNone , "Kern::MutexCreate failed", err);
 
+    iSwitchOffEvent.Set(TRawEvent::ESwitchOff);
+    iResetEvent.Set(TRawEvent::ERestartSystem);
+
 #if _DEBUG
     /* Print the bitmap(HW_CONF_RECORD) whom boot_reason_api uses in the target startup decision.
        Values of the HW_CONF_RECORD can be found in the "Loader Chipset API" specification. */
@@ -231,11 +240,19 @@ void DmcEvHandApeCent::Init(DDmcExtension* const aDmcExtPtr)
 #endif // _DEBUG
 
     DmcEvHandApeCent::Lock();
-    /* Get and set the target startup mode in which a device is started.
-       This is needed in case of device crash. */
+    /* Get the target startup mode in which a device is started. */
     TBootReason::GetStartupMode(iTargetStartupMode);
+
+    /* If we do not get a target startup mode do a brutal reset because
+       we do not know to which mode to boot up. It's a fatal error if the
+       target startup mode has not been updated. */
+    DMC_TRACE_ASSERT_RESET(iTargetStartupMode, "DMC:EH_APE_CEN: TStartupMode -> EStartupModeNone",
+                           KErrCorrupt);
+
+    /* Set the target startup mode in which a device is started.
+       This is needed in case of device crash. */
     TBootReason::SetTargetStartupMode(iTargetStartupMode);
-    
+
     // Get a hidden reset status.
     iHiddenStatus = TBootReason::IsHiddenReset();
     DmcEvHandApeCent::Unlock();
@@ -250,7 +267,7 @@ void DmcEvHandApeCent::Init(DDmcExtension* const aDmcExtPtr)
               iHiddenStatus);
     DMC_TRACE((("DMC:KERN_EXTEN: Init() - iHiddenStatus: %d"),
                  iHiddenStatus));
-                 
+
     // Get Modem current state
     MceIsi::MceModemStateQueryReq();
 
@@ -265,42 +282,78 @@ void DmcEvHandApeCent::Init(DDmcExtension* const aDmcExtPtr)
 // Set the user logical device dfc-queue available for modem events.
 // -----------------------------------------------------------------------------
 //
-void DmcEvHandApeCent::SubscribeEvents(TDfc* const aUserEventDfcPtr)
+void DmcEvHandApeCent::SubscribeEvents(const TUint8 aTypeBitMask, TDfc* const aReceiveEventDfcPtr)
     {
-    OstTrace1(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_APE_SUBSCRIBE_EVENTS_ENTRY,
-              "DMC:EH_APE_CEN: SubscribeEvents() # IN - aUserEventDfcPtr: 0x%x",
-              aUserEventDfcPtr);
-    DMC_TRACE((("DMC:EH_APE_CEN: SubscribeEvents() # IN - aUserEventDfcPtr: 0x%x "),
-                 aUserEventDfcPtr));
+    OstTraceExt2(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_APE_SUBSCRIBE_EVENTS_ENTRY,
+              "DMC:EH_APE_CEN: SubscribeEvents() # IN - aTypeBitMask: %d, aReceiveEventDfcPtr: 0x%x",
+              aTypeBitMask, (TUint)aReceiveEventDfcPtr);
+    DMC_TRACE((("DMC:EH_APE_CEN: SubscribeEvents() # IN - aTypeBitMask: %d, aReceiveEventDfcPtr: 0x%x "),
+                 aTypeBitMask, aReceiveEventDfcPtr));
 
-    DMC_TRACE_ASSERT_RESET(aUserEventDfcPtr, "DMC:EH_APE_CEN: aUserEventDfcPtr, NULL pointer",
+    DMC_TRACE_ASSERT_RESET(aReceiveEventDfcPtr, "DMC:EH_APE_CEN: aUserEventDfcPtr, NULL pointer",
                            KErrNoMemory);
 
-    iUserEventDfcPtr = aUserEventDfcPtr;
-    
-    // Check if there are pending events.
-    if (iEventType != USER_CLIENT_NO_EVENT)
+    // Registration is done only when a first client does the it for both side.
+    if (aTypeBitMask & DMC_USER_BIT)
         {
-        OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_APE_SUBSCRIBE_EVENTS_1,
-                  "DMC:EH_APE_CEN: SubscribeEvents() - Pending event, iEventType: %d",
-                  iEventType);
+        OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_APE_SUBSCRIBE_EVENTS_1,
+                  "DMC:EH_APE_CEN: SubscribeEvents() - DMC_USER_BIT");
+          DMC_TRACE((("DMC:EH_APE_CEN: SubscribeEvents() - DMC_USER_BIT")));
 
-        if (NKern::CurrentContext() == NKern::EInterrupt)
+        iUserEventDfcPtr = aReceiveEventDfcPtr;
+
+        // Check if there are pending events.
+        if (iEventType != DMC_CLIENT_NO_EVENT)
             {
-            iUserEventDfcPtr->Add();
+            OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_APE_SUBSCRIBE_EVENTS_2,
+                      "DMC:EH_APE_CEN: SubscribeEvents() - Pending event deliver to user, iEventType: %d",
+                      iEventType);
+          DMC_TRACE((("DMC:EH_APE_CEN: SubscribeEvents() - Pending event deliver to user, iEventType: %d"),
+                       iEventType));
+
+            if (NKern::CurrentContext() == NKern::EInterrupt)
+                {
+                iUserEventDfcPtr->Add();
+                }
+            else
+                {
+                iUserEventDfcPtr->Enque();
+                }
             }
-        else
-            {
-            iUserEventDfcPtr->Enque();
-            }        
         }
+    else if (aTypeBitMask & DMC_KERNEL_BIT)
+        {
+        OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_APE_SUBSCRIBE_EVENTS_3,
+                  "DMC:EH_APE_CEN: SubscribeEvents() - DMC_KERNEL_BIT");
+        DMC_TRACE((("DMC:EH_APE_CEN: SubscribeEvents() - DMC_KERNEL_BIT")));
 
-    OstTrace1(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_APE_SUBSCRIBE_EVENTS_RETURN,
-              "DMC:EH_APE_CEN: SubscribeEvents() # OUT - iUserEventDfcPtr: 0x%x",
-              iUserEventDfcPtr);
-    DMC_TRACE((("DMC:EH_APE_CEN: SubscribeEvents() # OUT - iUserEventDfcPtr: 0x%x"),
-                 iUserEventDfcPtr));
+        iKernelEventDfcPtr = aReceiveEventDfcPtr;
+
+        // Check if there are pending events.
+        if (iEventType != DMC_CLIENT_NO_EVENT)
+            {
+            OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_APE_SUBSCRIBE_EVENTS_4,
+                      "DMC:EH_APE_CEN: SubscribeEvents() - Pending event deliver to kernel, iEventType: %d",
+                      iEventType);
+          DMC_TRACE((("DMC:EH_APE_CEN: SubscribeEvents() - Pending event deliver to user, iEventType: %d"),
+                       iEventType));
+
+            if (NKern::CurrentContext() == NKern::EInterrupt)
+                {
+                iKernelEventDfcPtr->Add();
+                }
+            else
+                {
+                iKernelEventDfcPtr->Enque();
+                }
+            }
+        }// else not needed
+
+    OstTrace0(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_APE_SUBSCRIBE_EVENTS_RETURN,
+              "DMC:EH_APE_CEN: SubscribeEvents() # OUT");
+    DMC_TRACE((("DMC:EH_APE_CEN: SubscribeEvents() # OUT")));
     }
+
 
 // -----------------------------------------------------------------------------
 // DDmcExtension::UnsubscribeEvents
@@ -329,12 +382,12 @@ void DmcEvHandApeCent::UnsubscribeEvents(TDfc* const aUserEventDfcPtr)
 
 // -----------------------------------------------------------------------------
 // DDmcExtension::HandleEvent
-// This function is the only entry point to access to the DMC Ape Centric 
+// This function is the only entry point to access to the DMC Ape Centric
 // Event Handler.
 // -----------------------------------------------------------------------------
 //
 TInt DmcEvHandApeCent::HandleEvent(const TUint8  aEventType,
-                                   const TUint8* const aKernMsgPtr,
+                                   TUint8* const aKernMsgPtr,
                                    TUint* const  aUsrMsgPtr)
     {
     OstTraceExt3(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_HANDLE_EVENT_ENTRY,
@@ -370,9 +423,9 @@ TInt DmcEvHandApeCent::HandleEvent(const TUint8  aEventType,
                 OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_HANDLE_EVENT_IDLE_1,
                           "DMC:EH_APE_CEN: HandleEvent() - IDLE");
                 DMC_TRACE(("DMC:EH_APE_CEN: HandleEvent() - IDLE"));
-                
+
                 StateIdle(aEventType, aKernMsgPtr, aUsrMsgPtr);
-                
+
                 ret = KErrNone;
                 }
                 break;
@@ -386,7 +439,7 @@ TInt DmcEvHandApeCent::HandleEvent(const TUint8  aEventType,
                 DMC_TRACE(("DMC:EH_APE_CEN: HandleEvent() - BUSY"));
                 }
                 break;
-                
+
             case APE_PWR_OFF:
                 {
                 OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_HANDLE_EVENT_APE_PWR_OFF_1,
@@ -463,7 +516,7 @@ TInt DmcEvHandApeCent::HandleEvent(const TUint8  aEventType,
 // -----------------------------------------------------------------------------
 //
 TInt DmcEvHandApeCent::StateAny(const TUint8  aEventType,
-                                const TUint8* const aKernMsgPtr,
+                                TUint8* const aKernMsgPtr,
                                 TUint* const  aUsrMsgPtr)
     {
     OstTraceExt3(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_STATE_ANY_ENTRY,
@@ -473,14 +526,14 @@ TInt DmcEvHandApeCent::StateAny(const TUint8  aEventType,
                  aEventType, aKernMsgPtr, aUsrMsgPtr));
 
     TInt ret(KErrNone);
-    
+
     // Supported events in the state ANY. No state transitions are executed from state ANY.
     switch (aEventType)
         {
         case KERNEL_EVENT_ISI:
             {
             TUint8 resourceId = aKernMsgPtr[ISI_HEADER_OFFSET_RESOURCEID];
-    
+
             DMC_TRACE((("DMC:EH_APE_CEN: StateAny() - resource ID: 0x%x: "), resourceId));
 
 #ifdef USE_MTC_SERVER
@@ -489,13 +542,13 @@ TInt DmcEvHandApeCent::StateAny(const TUint8  aEventType,
                 DMC_TRACE(("DMC:EH_APE_CEN: StateAny() - PN_MTC"));
 
                 TUint8 messageId = aKernMsgPtr[ISI_HEADER_OFFSET_MESSAGEID];
-            
+
                 switch (messageId)
                     {
                     case MTC_STATE_QUERY_RESP:
                         {
                         DMC_TRACE(("DMC:EH_APE_CEN: StateAny() - MTC_STATE_QUERY_RESP"));
-    
+
                         HandleMceModemStateQueryResp(aKernMsgPtr);
                         }
                         break;
@@ -509,7 +562,7 @@ TInt DmcEvHandApeCent::StateAny(const TUint8  aEventType,
                 DMC_TRACE(("DMC:EH_APE_CEN: StateAny() - PN_MODEM_MCE"));
 
                 TUint8 messageId = aKernMsgPtr[ISI_HEADER_OFFSET_MESSAGEID];
-            
+
                 switch (messageId)
                     {
                     case MCE_MODEM_STATE_QUERY_RESP:
@@ -517,7 +570,7 @@ TInt DmcEvHandApeCent::StateAny(const TUint8  aEventType,
                         OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_STATE_ANY_KERN_2,
                                   "DMC:EH_APE_CEN: StateAny() - MCE_STATE_QUERY_RESP");
                         DMC_TRACE(("DMC:EH_APE_CEN: StateAny() - MCE_STATE_QUERY_RESP"));
-    
+
                         HandleMceModemStateQueryResp(aKernMsgPtr);
                         }
                         break;
@@ -534,8 +587,70 @@ TInt DmcEvHandApeCent::StateAny(const TUint8  aEventType,
             }
             break;
 
-        case KERNEL_EVENT_PWR_HANDLER:
+        case KERNEL_IF_GET_STARTUP_MODE:
             {
+            OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_STATE_ANY_KERN_GET_STARTUPMODE_1,
+                      "DMC:EH_APE_CEN: StateAny() - KERNEL_IF_GET_STARTUP_MODE");
+            DMC_TRACE(("DMC:EH_APE_CEN: StateAny() - KERNEL_IF_GET_STARTUP_MODE"));
+
+            DmcEvHandApeCent::Lock();
+            TBootReason::GetStartupMode(iTargetStartupMode);
+            DmcEvHandApeCent::Unlock();
+
+            /* If we do not get a target startup mode do a brutal reset because
+               we do not know to which mode to boot up. It's a fatal error if the
+               target startup mode has not been updated. */
+            DMC_TRACE_ASSERT_RESET(iTargetStartupMode, "DMC:EH_APE_CEN: TStartupMode -> EStartupModeNone",
+                                   KErrCorrupt);
+            /* At this point we cannot use mutex because this piece of code can be executed
+               before DMC kernel extension has been created, thus mutex is not available. */
+            *(TUint32 *)aKernMsgPtr = iTargetStartupMode;
+
+            OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_STATE_ANY_KERN_GET_STARTUPMODE_3,
+                      "DMC:EH_APE_CEN: StateAny() - iTargetStartupMode: 0x%x",
+                       iTargetStartupMode);
+            DMC_TRACE((("DMC:EH_APE_CEN: StateAny() - iTargetStartupMode: 0x%x"),
+                         iTargetStartupMode));
+            }
+            break;
+
+        case KERNEL_IF_GET_HIDDEN_RESET_STATUS:
+            {
+            OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_STATE_ANY_KERN_HIDDEN_STAT_1,
+                      "DMC:EH_APE_CEN: StateAny() - KERNEL_IF_GET_HIDDEN_RESET_STATUS");
+            DMC_TRACE(("DMC:EH_APE_CEN: StateAny() - KERNEL_IF_GET_HIDDEN_RESET_STATUS"));
+
+            DmcEvHandApeCent::Lock();
+            iHiddenStatus = TBootReason::IsHiddenReset();
+            DmcEvHandApeCent::Unlock();
+
+            *(TBool *)aKernMsgPtr = iHiddenStatus;
+
+            OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_STATE_ANY_KERN_HIDDEN_STAT_2,
+                      "DMC:EH_APE_CEN: StateAny() - IsHidden: %d",
+                       iHiddenStatus);
+            DMC_TRACE((("DMC:EH_APE_CEN: StateAny() - IsHidden: %d"),
+                         iHiddenStatus));
+            }
+            break;
+
+        case KERNEL_GET_EVENT_TYPE:
+            {
+            OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_STATE_ANY_KERN_GET_EVENT_1,
+                      "DMC:EH_APE_CEN: StateAny() - KERNEL_GET_EVENT_TYPE");
+            DMC_TRACE(("DMC:EH_APE_CEN: StateAny() - KERNEL_GET_EVENT_TYPE"));
+
+            DmcEvHandApeCent::Lock();
+
+            *aKernMsgPtr = iEventType;
+
+            DmcEvHandApeCent::Unlock();
+
+            OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_STATE_ANY_KERN_GET_EVENT_2,
+                      "DMC:EH_APE_CEN: StateAny() - Event *aKernMsgPtr: 0x%x",
+                       *aKernMsgPtr);
+            DMC_TRACE((("DMC:EH_APE_CEN: StateAny() - Event *aKernMsgPtr: 0x%x"),
+                         *aKernMsgPtr));
             }
             break;
 
@@ -547,15 +662,6 @@ TInt DmcEvHandApeCent::StateAny(const TUint8  aEventType,
 
             // Get the target startup mode if the mode has not been fetched yet
             DmcEvHandApeCent::Lock();
-
-            if (iTargetStartupMode == TBootReason::EStartupModeNone)
-                {
-                OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_STATE_ANY_EVENT_2,
-                          "DMC:EH_APE_CEN: StateAny() - Get the target startup mode through Boot Reason API");
-                DMC_TRACE(("DMC:EH_APE_CEN: StateAny() - Get the target startup mode through Boot Reason API"));
-
-                TBootReason::GetStartupMode(iTargetStartupMode);
-                }
 
             *aUsrMsgPtr = static_cast<TUint>(iTargetStartupMode);
             DmcEvHandApeCent::Unlock();
@@ -592,15 +698,15 @@ TInt DmcEvHandApeCent::StateAny(const TUint8  aEventType,
             DMC_TRACE(("DMC:EH_APE_CEN: StateAny() - USER_GET_EVENT_TYPE"));
 
             DmcEvHandApeCent::Lock();
-            
+
             *aUsrMsgPtr = iEventType;
-            
+
             DmcEvHandApeCent::Unlock();
 
             OstTrace1(TRACE_FLOW, STATE_ANY_EVENT_5,
-                      "DMC:EH_APE_CEN: StateAny() - User event type: 0x%x",
+                      "DMC:EH_APE_CEN: StateAny() - Event *aUsrMsgPtr: 0x%x",
                        *aUsrMsgPtr);
-            DMC_TRACE((("DMC:EH_APE_CEN: StateAny() - User event type: 0x%x"),
+            DMC_TRACE((("DMC:EH_APE_CEN: StateAny() - Event *aUsrMsgPtr: 0x%x"),
                          *aUsrMsgPtr));
             }
             break;
@@ -642,7 +748,7 @@ TInt DmcEvHandApeCent::StateIdle(const TUint8  aEventType,
     TInt ret(KErrNone);
 
     /*
-     * When checking whether a request is to be served in the IDLE-state, the 
+     * When checking whether a request is to be served in the IDLE-state, the
      * state is changed into BUSY to make sure that no new requqests are taken
      * into a process.
      *
@@ -685,7 +791,7 @@ TInt DmcEvHandApeCent::StateIdle(const TUint8  aEventType,
 
                         // Get the modem state and action information
                         MceIsi::MceModemStateInd(aKernMsgPtr, modemState, modemAction);
-                        
+
                         DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - modemState: 0x%x, modemAction: 0x%x"),
                                      modemState, modemAction));
 
@@ -693,24 +799,25 @@ TInt DmcEvHandApeCent::StateIdle(const TUint8  aEventType,
                        if (modemAction == MTC_START)
                            {
                            DMC_TRACE(("DMC:EH_APE_CEN: StateIdle() - MTC_START"));
-                           
+
                            if (modemState == MTC_POWER_OFF)
                                {
                                DMC_TRACE(("DMC:EH_APE_CEN: StateIdle() - MTC_POWER_OFF"));
-                               
+
                                // First set the target start-up mode to "none" meaning power off.
                                DmcEvHandApeCent::Lock();
                                iTargetStartupMode = TBootReason::EStartupModeNone;
                                TBootReason::SetTargetStartupMode(TBootReason::EStartupModeNone);
-                            
+
                                /* Set the user client event type. The type of the event is read
-                                  once the iUserEventDfcPtr dfc-queue gets execution time. */
-                               iEventType = USER_CLIENT_POWER_OFF_EVENT;
+                                  once the iUserEventDfcPtr and iKernelEventDfcPtr dfc-queues
+                                  gets execution time. */
+                               iEventType = DMC_CLIENT_POWER_OFF_EVENT;
                                DmcEvHandApeCent::Unlock();
-                            
-                               DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User iEventType: 0x%x"), 
+
+                               DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User iEventType: 0x%x"),
                                             iTargetStartupMode, iEventType));
-                               
+
                                // Change the state to MODEM_PWR_OFF
                                DmcEvHandApeCent::SetNextState(MODEM_PWR_OFF);
                                }
@@ -718,43 +825,30 @@ TInt DmcEvHandApeCent::StateIdle(const TUint8  aEventType,
                            if (modemState == MTC_SW_RESET)
                                {
                                DMC_TRACE(("DMC:EH_APE_CEN: StateIdle() - MTC_SW_RESET"));
-                               
+
                                // Reset a device back to the same state as started.
                                DmcEvHandApeCent::Lock();
                                TBootReason::SetTargetStartupMode(iTargetStartupMode);
-                            
+
                                /* Set the user client event type. The type of the event is read
-                                  once the iUserEventDfcPtr dfc-queue gets execution time. */
-                               iEventType = USER_CLIENT_RESET_EVENT;
+                                  once the iUserEventDfcPtr and iKernelEventDfcPtr dfc-queues
+                                  gets execution time. */
+                               iEventType = DMC_CLIENT_RESET_EVENT;
                                DmcEvHandApeCent::Unlock();
-                            
-                               DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User iEventType: 0x%x"), 
+
+                               DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User iEventType: 0x%x"),
                                             iTargetStartupMode, iEventType));
-                               
+
                                // Change the state to MODEM_CONTROLLED_RESET
                                DmcEvHandApeCent::SetNextState(MODEM_CONTROLLED_RESET);
                                }
 
-                           // Now check if we have to generate a user event.
+                           // Now check if we have to generate an event.
                            if ((modemState == MTC_POWER_OFF) || (modemState == MTC_SW_RESET))
                                {
-                               DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Generate User event, iUserEventDfcPtr: 0x%x"),
-                                             iUserEventDfcPtr));
-                               /* Generate the user event.
-                                  If no registered clients yet. Remain in the MODEM_CONTROLLED_RESET state
-                                  and as soon as the first client subscribes events, the power
-                                  off event is generated. */
-                               if (iUserEventDfcPtr)
-                                   {
-                                   if (NKern::CurrentContext() == NKern::EInterrupt)
-                                       {
-                                       iUserEventDfcPtr->Add();
-                                       }
-                                   else
-                                       {
-                                       iUserEventDfcPtr->Enque();
-                                       }
-                                   }
+                               /* Now we need to generate events to both user- and kernel side because
+                                  the transaction was launched from modem. */
+                               GenerateEvent((DMC_USER_BIT | DMC_KERNEL_BIT));
                                }
                            }
                         }
@@ -792,13 +886,13 @@ TInt DmcEvHandApeCent::StateIdle(const TUint8  aEventType,
                         // Get the modem state and action information
                         MceIsi::MceModemStateInd(aKernMsgPtr, modemState, modemAction);
 
-                        
+
                         OstTraceExt2(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_STATE_IDLE_MCE_STATE_IND_1,
                                      "DMC:EH_APE_CEN: DMC:EH_APE_CEN: StateIdle() - modemState: 0x%x, modemAction: 0x%x",
                                      (TUint)modemState, (TUint)modemAction);
                         DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - modemState: 0x%x, modemAction: 0x%x"),
                                      modemState, modemAction));
-                        
+
                         if (modemAction == MCE_START)
                             {
                             OstTrace0(TRACE_FLOW, STATE_STATE_IDLE_KERN_EV_ISI_CASE_2,
@@ -810,72 +904,56 @@ TInt DmcEvHandApeCent::StateIdle(const TUint8  aEventType,
                                 OstTrace0(TRACE_FLOW, STATE_STATE_IDLE_KERN_EV_ISI_CASE_3,
                                           "DMC:EH_APE_CEN: StateIdle() - MCE_POWER_OFF");
                                 DMC_TRACE(("DMC:EH_APE_CEN: StateIdle() - MCE_POWER_OFF"));
-                               
+
                                 // First set the target start-up mode to "none" meaning power off.
                                 DmcEvHandApeCent::Lock();
                                 iTargetStartupMode = TBootReason::EStartupModeNone;
                                 TBootReason::SetTargetStartupMode(TBootReason::EStartupModeNone);
-                            
-                                /* Set the user client event type. The type of the event is read
-                                   once the iUserEventDfcPtr dfc-queue gets execution time. */
-                                iEventType = USER_CLIENT_POWER_OFF_EVENT;
+
+                                /* Set the client event type. The type of the event is read
+                                   once the iUserEventDfcPtr and iKernelEventDfcPtr dfc-queues
+                                   gets execution time. */
+                                iEventType = DMC_CLIENT_POWER_OFF_EVENT;
                                 DmcEvHandApeCent::Unlock();
-                            
+
                                 OstTraceExt2(TRACE_FLOW, STATE_STATE_IDLE_KERN_EV_ISI_CASE_4,
                                              "DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User Event, iEventType: 0x%x",
                                              (TUint)iTargetStartupMode, (TUint)iEventType);
-                                DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User Event, iEventType: 0x%x"), 
+                                DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User Event, iEventType: 0x%x"),
                                              iTargetStartupMode, iEventType));
-                               
+
                                 // Change the state to MODEM_PWR_OFF
                                 DmcEvHandApeCent::SetNextState(MODEM_PWR_OFF);
                                 }
 
-                           // Modes  makes reset, MODEM_CONTROLLED_RESET. 
+                           // Modes  makes reset, MODEM_CONTROLLED_RESET.
                            if (modemState == MCE_SW_RESET)
                                {
                                DMC_TRACE(("DMC:EH_APE_CEN: StateIdle() - MCE_SW_RESET"));
-                               
+
                                // Reset a device back to the same state as started.
                                DmcEvHandApeCent::Lock();
                                TBootReason::SetTargetStartupMode(iTargetStartupMode);
-                            
+
                                /* Set the user client event type. The type of the event is read
-                                  once the iUserEventDfcPtr dfc-queue gets execution time. */
-                               iEventType = USER_CLIENT_RESET_EVENT;
+                                  once the iUserEventDfcPtr and iKernelEventDfcPtr dfc-queues
+                                  gets execution time. */
+                               iEventType = DMC_CLIENT_RESET_EVENT;
                                DmcEvHandApeCent::Unlock();
-                            
-                               DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User Event, iEventType: 0x%x"), 
+
+                               DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User Event, iEventType: 0x%x"),
                                             iTargetStartupMode, iEventType));
-                               
+
                                // Change the state to MODEM_CONTROLLED_RESET
                                DmcEvHandApeCent::SetNextState(MODEM_CONTROLLED_RESET);
                                }
 
                            // Now check if we have to generate a user event.
-                           if ((modemState == MCE_POWER_OFF) || (modemState == MCE_START))
+                           if ((modemState == MCE_POWER_OFF) || (modemState == MCE_SW_RESET))
                                {
-                               OstTrace1(TRACE_FLOW, STATE_STATE_IDLE_KERN_EV_ISI_CASE_5,
-                                         "DMC:EH_APE_CEN: StateIdle() - Generate User event, iUserEventDfcPtr: 0x%x",
-                                         iUserEventDfcPtr);
-                               DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Generate User event, iUserEventDfcPtr: 0x%x"),
-                                             iUserEventDfcPtr));
-    
-                               /* Generate the user event.
-                                  If no registered clients yet. Remain in the MODEM_CONTROLLED_RESET state
-                                  and as soon as the first client subscribes events, the power
-                                  off event is generated. */
-                               if (iUserEventDfcPtr)
-                                   {
-                                   if (NKern::CurrentContext() == NKern::EInterrupt)
-                                       {
-                                       iUserEventDfcPtr->Add();
-                                       }
-                                   else
-                                       {
-                                       iUserEventDfcPtr->Enque();
-                                       }
-                                   }
+                               /* Now we need to generate events to both user- and kernel side because
+                                  the transaction was launched from modem. */
+                               GenerateEvent((DMC_USER_BIT | DMC_KERNEL_BIT));
                                }
                             }
                         }
@@ -908,39 +986,82 @@ TInt DmcEvHandApeCent::StateIdle(const TUint8  aEventType,
             TBootReason::SetTargetStartupMode(iTargetStartupMode);
 
             /* Set the user client event type. The type of the event is read
-               once the iUserEventDfcPtr dfc-queue gets execution time. */
-           iEventType = USER_CLIENT_RESET_EVENT;
-           DmcEvHandApeCent::Unlock();
+               once the iUserEventDfcPtr and iKernelEventDfcPtr dfc-queues gets
+               execution time. */
+            iEventType = DMC_CLIENT_RESET_EVENT;
+            DmcEvHandApeCent::Unlock();
 
-           OstTraceExt2(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_STATE_IDLE_CONNECTION_NOK_2,
-                        "DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User Event, iEventType: 0x%x",
-                        (TUint)iTargetStartupMode, (TUint)iEventType);
-           DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User Event, iEventType: 0x%x"),
-                        iTargetStartupMode, iEventType));
+            OstTraceExt2(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_STATE_IDLE_CONNECTION_NOK_2,
+                         "DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User Event, iEventType: 0x%x",
+                         (TUint)iTargetStartupMode, (TUint)iEventType);
+            DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Boot API, iTargetStartupMode: 0x%x, User Event, iEventType: 0x%x"),
+                         iTargetStartupMode, iEventType));
 
-           OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_STATE_IDLE_CONNECTION_NOK_3,
-                     "DMC:EH_APE_CEN: StateIdle() - Generate User event, iUserEventDfcPtr: 0x%x", 
-                     iUserEventDfcPtr);
-           DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - Generate User event, iUserEventDfcPtr: 0x%x"),
-                        iUserEventDfcPtr));
-           /* Generate the user event.
-              If no registered clients yet. Remain in the MODEM_UNCONTROLLED_RESET state
-              and as soon as the first client subscribes events, the power
-              off event is generated. */
-           if (iUserEventDfcPtr)
-               {
-               if (NKern::CurrentContext() == NKern::EInterrupt)
-                   {
-                   iUserEventDfcPtr->Add();
-                   }
-               else
-                   {
-                   iUserEventDfcPtr->Enque();
-                   }
-               }
+            /* Now we need to generate events to both user- and kernel side because
+               the transaction was launched from modem. */
+            GenerateEvent((DMC_USER_BIT | DMC_KERNEL_BIT));
 
-           // Change the state to MODEM_UNCONTROLLED_RESET
-           DmcEvHandApeCent::SetNextState(MODEM_UNCONTROLLED_RESET);
+            // Change the state to MODEM_UNCONTROLLED_RESET
+            DmcEvHandApeCent::SetNextState(MODEM_UNCONTROLLED_RESET);
+            }
+            break;
+
+        case KERNEL_IF_GENERATE_RESET:
+            {
+            OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_STATE_IDLE_KERN_IF_RESET_1,
+                      "DMC:EH_APE_CEN: StateIdle() - KERNEL_IF_GENERATE_RESET, targetStartUpMode: 0x%x",
+                      (TUint8)*aKernMsgPtr);
+            DMC_TRACE((("DMC:EH_APE_CEN: StateIdle() - KERNEL_IF_GENERATE_RESET, targetStartUpMode: 0x%x"),
+                         (TUint8)*aKernMsgPtr));
+
+            DmcEvHandApeCent::Lock();
+            iTargetStartupMode = static_cast<TBootReason::TStartupMode>(*aKernMsgPtr);
+            TBootReason::SetTargetStartupMode(iTargetStartupMode);
+
+            /* Set the client event type. The type of the event is read
+               once the iUserEventDfcPtr and/or iKernelEventDfcPtr dfc-queues
+               gets execution time. */
+            iEventType = DMC_CLIENT_RESET_EVENT;
+
+            DmcEvHandApeCent::Unlock();
+
+            /* Now we need to generate event to user side because
+               the transaction was launched from the kernel if. */
+            GenerateEvent(DMC_USER_BIT);
+
+            /* Change the state to APE_RESET in which we wait a power down
+               signal from Power Handler.*/
+            DmcEvHandApeCent::SetNextState(APE_RESET);
+            }
+            break;
+
+        case KERNEL_IF_POWER_OFF:
+            {
+            OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_STATE_IDLE_KERN_IF_PWR_OFF_1,
+                      "DMC:EH_APE_CEN: StateIdle() - KERNEL_IF_POWER_OFF");
+            DMC_TRACE(("DMC:EH_APE_CEN: StateIdle() - KERNEL_IF_POWER_OFF"));
+
+            /* Set EStartupModeNone to power off the device.
+               A device still might do the reset if e.g. a charger is connected, an alarm
+               occurs or a power key is pressed. This detection is done by "Power Controller". */
+            DmcEvHandApeCent::Lock();
+            iTargetStartupMode = TBootReason::EStartupModeNone;
+            TBootReason::SetTargetStartupMode(TBootReason::EStartupModeNone);
+
+            /* Set the client event type. The type of the event is read
+               once the iUserEventDfcPtr and iKernelEventDfcPtr dfc-queues
+               gets execution time. */
+            iEventType = DMC_CLIENT_POWER_OFF_EVENT;
+
+            DmcEvHandApeCent::Unlock();
+
+            /* Now we need to generate events to user side because
+               the transaction was launched from the kernel if. */
+            GenerateEvent(DMC_USER_BIT);
+
+            /* Change the state to APE_PWR_OFF in which we wait a power down
+               signal from Power Handler.*/
+            DmcEvHandApeCent::SetNextState(APE_PWR_OFF);
             }
             break;
 
@@ -981,9 +1102,6 @@ TInt DmcEvHandApeCent::StateIdle(const TUint8  aEventType,
             TBootReason::SetTargetStartupMode(iTargetStartupMode);
             DmcEvHandApeCent::Unlock();
 
-            // Send indications that we are going to power off.
-            // Send DMC_POWER_OFF_STARTED_IND
-
             /* Change the state to APE_PWR_OFF in which we wait a power down
                signal from Power Handler.*/
             DmcEvHandApeCent::SetNextState(APE_PWR_OFF);
@@ -992,7 +1110,7 @@ TInt DmcEvHandApeCent::StateIdle(const TUint8  aEventType,
 
         default:
             {
-            /* Fatal error. */ 
+            /* Fatal error. */
             OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_STATE_IDLE_EV_TYPE_DEFAULT,
                       "DMC:EH_APE_CEN: StateIdle() - Illegal event type, aUsrMsgPtr->EventId: %d",
                       aEventType);
@@ -1077,7 +1195,7 @@ TInt DmcEvHandApeCent::StateApePwrOff(const TUint8  aEventType,
 
                             DmcEvHandApeCent::Unlock();
 
-                            DMC_TRACE((("DMC:EH_APE_CEN: StateApePwrOff() - MTC_POWER_OFF, MCE_READY, iModemCurrentState: 0x%x"), 
+                            DMC_TRACE((("DMC:EH_APE_CEN: StateApePwrOff() - MTC_POWER_OFF, MCE_READY, iModemCurrentState: 0x%x"),
                                          iModemCurrentState));
 
                             /* Modem has shut down properly and ready for power off.
@@ -1086,7 +1204,7 @@ TInt DmcEvHandApeCent::StateApePwrOff(const TUint8  aEventType,
                             if (iPowerDownCalled)
                                 {
                                 DMC_TRACE(("DMC:EH_APE_CEN: StateApePwrOff() - Complete Power Down" ));
-                                
+
                                 DmcEvHandApeCent::Lock();
                                 /* Make sure that Power Handler is not acknowledged twice. */
                                 iPowerDownCalled = FALSE;
@@ -1151,9 +1269,9 @@ TInt DmcEvHandApeCent::StateApePwrOff(const TUint8  aEventType,
                             OstTrace1(TRACE_FLOW, STATE_APE_PWR_OFF_CASE_2,
                                       "DMC:EH_APE_CEN: StateApePwrOff() - MCE_POWER_OFF, MCE_READY, iModemCurrentState: 0x%x",
                                       (TUint)iModemCurrentState);
-                            DMC_TRACE((("DMC:EH_APE_CEN: StateApePwrOff() - MCE_POWER_OFF, MCE_READY, iModemCurrentState: 0x%x"), 
+                            DMC_TRACE((("DMC:EH_APE_CEN: StateApePwrOff() - MCE_POWER_OFF, MCE_READY, iModemCurrentState: 0x%x"),
                                          iModemCurrentState));
-                         
+
                             /* Modem has shut down properly and ready for power off.
                                Acknowledge Power Handler in case it has already called Power Down,
                                oherwise wait Power Down call. */
@@ -1161,7 +1279,7 @@ TInt DmcEvHandApeCent::StateApePwrOff(const TUint8  aEventType,
                                 {
                                 OstTrace0(TRACE_FLOW, STATE_APE_PWR_OFF_CASE_3, "DMC:EH_APE_CEN: StateApePwrOff() - Complete Power Down");
                                 DMC_TRACE(("DMC:EH_APE_CEN: StateApePwrOff() - Complete Power Down" ));
-                                
+
                                 DmcEvHandApeCent::Lock();
                                 /* Make sure that Power Handler is not acknowledged twice. */
                                 iPowerDownCalled = FALSE;
@@ -1221,7 +1339,7 @@ TInt DmcEvHandApeCent::StateApePwrOff(const TUint8  aEventType,
                 OstTrace0(TRACE_FLOW, STATE_APE_PWR_OFF_CASE_MODEM_NOK_2,
                           "DMC:EH_APE_CEN: StateApePwrOff() - Modem power off ready, complete power down");
                 DMC_TRACE(("DMC:EH_APE_CEN: StateApePwrOff() - Modem power off ready, complete power down"));
-                
+
                 DmcEvHandApeCent::iDmcExtPtr->CompletePowerDown();
                 }
             }
@@ -1236,7 +1354,7 @@ TInt DmcEvHandApeCent::StateApePwrOff(const TUint8  aEventType,
                         iModemActionBitMap));
 
             // Complete the power down if the modem power off is ready.
-            if (iModemActionBitMap & (MODEM_READY | MODEM_CONNECTION_NOT_OK))
+            if ((iModemActionBitMap & MODEM_READY) && (iModemActionBitMap & MODEM_CONNECTION_NOT_OK))
                 {
                 OstTrace0(TRACE_FLOW, STATE_APE_PWR___PWR_HANDLER_2,
                           "DMC:EH_APE_CEN: StateApePwrOff() - Modem power off ready, complete power down");
@@ -1266,7 +1384,7 @@ TInt DmcEvHandApeCent::StateApePwrOff(const TUint8  aEventType,
 
         default:
             {
-            /* Fatal error if the event type. */ 
+            /* Fatal error if the event type. */
             OstTrace1(TRACE_FLOW, STATE_APE_PWR_OFF_EVENT_TYPE_DEFAULT,
                       "DMC:EH_APE_CEN: StateApePwrOff() - Illegal event type, aEventType: %d",
                       aEventType);
@@ -1274,7 +1392,7 @@ TInt DmcEvHandApeCent::StateApePwrOff(const TUint8  aEventType,
                                            aEventType);
             }
             break;
-        }    
+        }
 
     OstTrace1(TRACE_ENTRY_EXIT, STATE_APE_PWR_OFF_RETURN,
               "DMC:EH_APE_CEN: StateApePwrOff() # OUT - ret: %d", ret);
@@ -1307,13 +1425,13 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
         case KERNEL_EVENT_ISI:
             {
             TUint8 resourceId = aKernMsgPtr[ISI_HEADER_OFFSET_RESOURCEID];
-    
+
             OstTrace1(TRACE_FLOW, STATE_APE_RESET_CASE_KRN_EV_1,
                       "DMC:EH_APE_CEN: StateApePwrOff() - resourceId: 0x%x",
                       (TUint)resourceId);
             DMC_TRACE((("DMC:EH_APE_CEN: StateApeReset() - resource ID: 0x%x: "), resourceId));
 
-#ifdef USE_MTC_SERVER    
+#ifdef USE_MTC_SERVER
             if (resourceId == PN_MTC)
                 {
                 DMC_TRACE(("DMC:EH_APE_CEN: StateApeReset() - PN_MTC"));
@@ -1325,10 +1443,10 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
                     case MTC_STATE_INFO_IND:
                         {
                         DMC_TRACE(("DMC:EH_APE_CEN: StateApeReset() - MTC_STATE_INFO_IND"));
-    
+
                         TUint8 modemState(MCE_STATE_INIT_VALUE);
                         TUint8 modemAction(MCE_ACTION_INIT_VALUE);
-                        
+
                         // Get the modem state and action information
                         MceIsi::MceModemStateInd(aKernMsgPtr, modemState, modemAction);
 
@@ -1344,7 +1462,7 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
                             iPowerDownCalled = FALSE;
                             DmcEvHandApeCent::Unlock();
 
-                            DMC_TRACE((("DMC:EH_APE_CEN: StateApeReset() - MTC_READY, iModemCurrentState: 0x%x"), 
+                            DMC_TRACE((("DMC:EH_APE_CEN: StateApeReset() - MTC_READY, iModemCurrentState: 0x%x"),
                                          iModemCurrentState));
 
                             /* Modem has shut down properly and ready for power off.
@@ -1353,7 +1471,7 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
                             if (iPowerDownCalled)
                                 {
                                 DMC_TRACE(("DMC:EH_APE_CEN: StateApeReset() - Complete Power Down" ));
-                                
+
                                 DmcEvHandApeCent::Lock();
                                 /* Make sure that Power Handler is not acknowledged twice. */
                                 iPowerDownCalled = FALSE;
@@ -1364,15 +1482,15 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
                             }
                         }
                         break;
-            
+
                     case MTC_RESET_GENERATE_RESP:
                         {
                         DMC_TRACE(("DMC:EH_APE_CEN: StateApeReset() - MTC_RESET_GENERATE_RESP"));
-            
+
                         MceIsi::MceResetResp(aKernMsgPtr);
                         }
                         break;
-            
+
                     default:
                         {
                         DMC_TRACE((("MCE_ISIMSG:DMC:EH_APE_CEN: StateApeReset - MTC ISI message not supported in this state, messageId: 0x%x"),
@@ -1397,10 +1515,10 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
                         OstTrace0(TRACE_FLOW, STATE_APE_RESET_CASE_1,
                                       "DMC:EH_APE_CEN: StateApeReset() - MCE_MODEM_STATE_IND");
                         DMC_TRACE(("DMC:EH_APE_CEN: StateApeReset() - MCE_MODEM_STATE_IND"));
-    
+
                         TUint8 modemState(MCE_STATE_INIT_VALUE);
                         TUint8 modemAction(MCE_ACTION_INIT_VALUE);
-                        
+
                         // Get the modem state and action information
                         MceIsi::MceModemStateInd(aKernMsgPtr, modemState, modemAction);
 
@@ -1415,11 +1533,11 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
                             /* Make sure that Power Handler is not acknowledged twice. */
                             iPowerDownCalled = FALSE;
                             DmcEvHandApeCent::Unlock();
-                    
+
                             OstTrace1(TRACE_FLOW, STATE_APE_RESET_CASE_2,
                                       "DMC:EH_APE_CEN: StateApeReset() - MCE_READY, iModemCurrentState: 0x%x",
                                       (TUint)iModemCurrentState);
-                            DMC_TRACE((("DMC:EH_APE_CEN: StateApeReset() - MCE_READY, iModemCurrentState: 0x%x"), 
+                            DMC_TRACE((("DMC:EH_APE_CEN: StateApeReset() - MCE_READY, iModemCurrentState: 0x%x"),
                                          iModemCurrentState));
 
                             /* Modem has shut down properly and ready for power off.
@@ -1429,7 +1547,7 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
                                 {
                                 OstTrace0(TRACE_FLOW, STATE_APE_RESET_CASE_3, "DMC:EH_APE_CEN: StateApeReset() - Complete Power Down");
                                 DMC_TRACE(("DMC:EH_APE_CEN: StateApeReset() - Complete Power Down" ));
-                                
+
                                 DmcEvHandApeCent::Lock();
                                 /* Make sure that Power Handler is not acknowledged twice. */
                                 iPowerDownCalled = FALSE;
@@ -1440,7 +1558,7 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
                             }
                         }
                         break;
-            
+
                     case MCE_RESET_RESP:
                         {
                         OstTrace0(TRACE_FLOW, STATE_APE_RESET_CASE_5,
@@ -1504,7 +1622,8 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
                         iPowerDownCalled));
 
             // Complete the power down if the modem power off is ready.
-            if (iModemActionBitMap & (MODEM_READY | MODEM_CONNECTION_NOT_OK))
+            if ((iModemActionBitMap & MODEM_READY) && (iModemActionBitMap & MODEM_CONNECTION_NOT_OK))
+                
                 {
                 OstTrace0(TRACE_FLOW, STATE_APE_RESET__PWR_HANDLER_2,
                           "DMC:EH_APE_CEN: StateApeReset() - Modem power off ready, complete power down");
@@ -1534,7 +1653,7 @@ TInt DmcEvHandApeCent::StateApeReset(const TUint8  aEventType,
 
         default:
             {
-            /* Fatal error if the event type. */ 
+            /* Fatal error if the event type wrong. */
             OstTrace1(TRACE_FLOW, STATE_RESET__EVENT_TYPE_CASE_DEFAULT,
                       "DMC:EH_APE_CEN: StateApeReset() - Illegal event type, aEventType: %d",
                       aEventType);
@@ -1575,13 +1694,13 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
         case KERNEL_EVENT_ISI:
             {
             TUint8 resourceId = aKernMsgPtr[ISI_HEADER_OFFSET_RESOURCEID];
-    
+
             OstTrace1(TRACE_FLOW, STATE_MODEM_PWR_OFF_CASE_KRN_EV_1,
                       "DMC:EH_APE_CEN: StateModemPwrOff() - MCE_POWER_OFF, MCE_READY, resourceId: 0x%x",
                       (TUint)resourceId);
             DMC_TRACE((("DMC:EH_APE_CEN: StateModemPwrOff() - resource ID: 0x%x:"), resourceId));
 
-#ifdef USE_MTC_SERVER    
+#ifdef USE_MTC_SERVER
             if (resourceId == PN_MTC)
                 {
                 DMC_TRACE(("DMC:EH_APE_CEN: StateModemPwrOff() - PN_MTC"));
@@ -1593,10 +1712,10 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
                     case MTC_STATE_INFO_IND:
                         {
                         DMC_TRACE(("DMC:EH_APE_CEN: StateModemPwrOff() - MTC_STATE_INFO_IND"));
-    
+
                         TUint8 modemState(MCE_STATE_INIT_VALUE);
                         TUint8 modemAction(MCE_ACTION_INIT_VALUE);
-                        
+
                         // Get the modem state and action information
                         MceIsi::MceModemStateInd(aKernMsgPtr, modemState, modemAction);
 
@@ -1610,7 +1729,7 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
 
                             DmcEvHandApeCent::Unlock();
 
-                            DMC_TRACE((("DMC:EH_APE_CEN: StateModemPwrOff() - MTC_READY, iModemCurrentState: 0x%x"), 
+                            DMC_TRACE((("DMC:EH_APE_CEN: StateModemPwrOff() - MTC_READY, iModemCurrentState: 0x%x"),
                                          iModemCurrentState));
 
                             /* Modem has shut down properly and ready for power off.
@@ -1619,7 +1738,7 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
                             if (iPowerDownCalled)
                                 {
                                 DMC_TRACE(("DMC:EH_APE_CEN: StateModemPwrOff() - Complete Power Down" ));
-                                
+
                                 DmcEvHandApeCent::Lock();
                                 /* Make sure that Power Handler is not acknowledged twice. */
                                 iPowerDownCalled = FALSE;
@@ -1630,7 +1749,7 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
                             }
                         }
                         break;
-            
+
                     default:
                         {
                         DMC_TRACE((("MCE_ISIMSG:DMC:EH_APE_CEN: StateModemPwrOff - MTC ISI message not supported in this state, messageId: 0x%x"),
@@ -1658,7 +1777,7 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
 
                         TUint8 modemState(MCE_STATE_INIT_VALUE);
                         TUint8 modemAction(MCE_ACTION_INIT_VALUE);
-                        
+
                         // Get the modem state and action information
                         MceIsi::MceModemStateInd(aKernMsgPtr, modemState, modemAction);
 
@@ -1677,7 +1796,7 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
                             OstTrace1(TRACE_FLOW, STATE_MODEM_PWR_OFF_CASE_CASE_2,
                                       "DMC:EH_APE_CEN: StateModemPwrOff() - MCE_READY, iModemCurrentState: 0x%x",
                                       (TUint)iModemCurrentState);
-                            DMC_TRACE((("DMC:EH_APE_CEN: StateModemPwrOff() - MCE_READY, iModemCurrentState: 0x%x"), 
+                            DMC_TRACE((("DMC:EH_APE_CEN: StateModemPwrOff() - MCE_READY, iModemCurrentState: 0x%x"),
                                          iModemCurrentState));
 
                             /* Modem has shut down properly and ready for reset
@@ -1739,7 +1858,7 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
                         iModemActionBitMap));
 
             // Complete the power down if the modem power off is ready.
-            if (iModemActionBitMap & (MODEM_READY | MODEM_CONNECTION_NOT_OK))
+            if ((iModemActionBitMap & MODEM_READY) && (iModemActionBitMap & MODEM_CONNECTION_NOT_OK))
                 {
                 OstTrace0(TRACE_FLOW, STATE_MODEM_PWR_OFF__PWR_HANDLER_2,
                           "DMC:EH_APE_CEN: StateModemPwrOff() - Modem power off ready, complete power down");
@@ -1766,7 +1885,7 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
 
         default:
             {
-            /* Fatal error if the event type. */ 
+            /* Fatal error if the event type. */
             OstTrace1(TRACE_FLOW, STATE_MODEM_PWR_OFF__EVENT_TYPE_CASE_DEFAULT,
                       "DMC:EH_APE_CEN: StateModemPwrOff() - Illegal event type, aEventType: %d",
                       aEventType);
@@ -1780,7 +1899,7 @@ TInt DmcEvHandApeCent::StateModemPwrOff(const TUint8  aEventType,
               "DMC:EH_APE_CEN: StateModemPwrOff() # OUT - ret: %d", ret);
     DMC_TRACE((("DMC:EH_APE_CEN: StateModemPwrOff() # OUT - ret: %d"), ret));
 
-    return ret;    
+    return ret;
     }
 
 
@@ -1807,13 +1926,13 @@ TInt DmcEvHandApeCent::StateModemControlledReset(const TUint8  aEventType,
         case KERNEL_EVENT_ISI:
             {
             TUint8 resourceId = aKernMsgPtr[ISI_HEADER_OFFSET_RESOURCEID];
-    
+
             OstTrace1(TRACE_FLOW, STATE_MODEM_CONT_RESET_CASE_KRN_EV_1,
                       "DMC:EH_APE_CEN: StateModemControlledReset() - MCE_POWER_OFF, MCE_READY, resourceId: 0x%x",
                       (TUint)resourceId);
             DMC_TRACE((("DMC:EH_APE_CEN: StateModemControlledReset() - resource ID: 0x%x:"), resourceId));
 
-#ifdef USE_MTC_SERVER    
+#ifdef USE_MTC_SERVER
             if (resourceId == PN_MTC)
                 {
                 DMC_TRACE(("DMC:EH_APE_CEN: StateModemControlledReset() - PN_MTC"));
@@ -1844,7 +1963,7 @@ TInt DmcEvHandApeCent::StateModemControlledReset(const TUint8  aEventType,
                             iPowerDownCalled = FALSE;
                             DmcEvHandApeCent::Unlock();
 
-                            DMC_TRACE((("DMC:EH_APE_CEN: StateModemControlledReset() - MTC_READY, iModemCurrentState: 0x%x"), 
+                            DMC_TRACE((("DMC:EH_APE_CEN: StateModemControlledReset() - MTC_READY, iModemCurrentState: 0x%x"),
                                          iModemCurrentState));
 
                             /* Modem has shut down properly and ready to power off,
@@ -1853,7 +1972,7 @@ TInt DmcEvHandApeCent::StateModemControlledReset(const TUint8  aEventType,
                             }
                         }
                         break;
-            
+
                     default:
                         {
                         DMC_TRACE((("MCE_ISIMSG:DMC:EH_APE_CEN: StateModemControlledReset - MTC ISI message not supported in this state, messageId: 0x%x"),
@@ -1881,7 +2000,7 @@ TInt DmcEvHandApeCent::StateModemControlledReset(const TUint8  aEventType,
 
                         TUint8 modemState(MCE_STATE_INIT_VALUE);
                         TUint8 modemAction(MCE_ACTION_INIT_VALUE);
-                        
+
                         // Get the modem state and action information
                         MceIsi::MceModemStateInd(aKernMsgPtr, modemState, modemAction);
 
@@ -1902,7 +2021,7 @@ TInt DmcEvHandApeCent::StateModemControlledReset(const TUint8  aEventType,
                             OstTrace1(TRACE_FLOW, STATE_MODEM_CONT_RESET_CASE_CASE_2,
                                       "DMC:EH_APE_CEN: StateModemControlledReset() - MCE_READY, iModemCurrentState: 0x%x",
                                       (TUint)iModemCurrentState);
-                            DMC_TRACE((("DMC:EH_APE_CEN: StateModemControlledReset() - MCE_READY, iModemCurrentState: 0x%x"), 
+                            DMC_TRACE((("DMC:EH_APE_CEN: StateModemControlledReset() - MCE_READY, iModemCurrentState: 0x%x"),
                                          iModemCurrentState));
 
                             /* Modem has shut down properly and ready for reset
@@ -1960,7 +2079,7 @@ TInt DmcEvHandApeCent::StateModemControlledReset(const TUint8  aEventType,
                         iModemActionBitMap));
 
             // Complete the power down if the modem power off is ready or the communication is not possible.
-            if (iModemActionBitMap & (MODEM_READY | MODEM_CONNECTION_NOT_OK))
+            if ((iModemActionBitMap & iModemActionBitMap) && (iModemActionBitMap & MODEM_CONNECTION_NOT_OK))
                 {
                 OstTrace0(TRACE_FLOW, STATE_MODEM_CONT_RESET__PWR_HANDLER_2,
                           "DMC:EH_APE_CEN: StateModemControlledReset() - Modem power off ready, complete power down");
@@ -1983,7 +2102,7 @@ TInt DmcEvHandApeCent::StateModemControlledReset(const TUint8  aEventType,
 
         default:
             {
-            /* Fatal error. */ 
+            /* Fatal error. */
             OstTrace1(TRACE_FLOW, STATE_MODEM_CONT_RESET__EVENT_TYPE_CASE_DEFAULT,
                       "DMC:EH_APE_CEN: StateModemControlledReset() - Illegal event type, aEventType: %d",
                       aEventType);
@@ -1997,7 +2116,7 @@ TInt DmcEvHandApeCent::StateModemControlledReset(const TUint8  aEventType,
               "DMC:EH_APE_CEN: StateModemControlledReset() # OUT - ret: %d", ret);
     DMC_TRACE((("DMC:EH_APE_CEN: StateModemControlledReset() # OUT - ret: %d"), ret));
 
-    return ret;    
+    return ret;
     }
 
 
@@ -2058,7 +2177,7 @@ TInt DmcEvHandApeCent::StateModemUncontrolledReset(const TUint8  aEventType,
     DMC_TRACE((("DMC:EH_APE_CEN: StateModemUncontrolledReset() # OUT - ret: %d"), ret));
 
 
-    return ret;    
+    return ret;
     }
 
 
@@ -2083,11 +2202,11 @@ void DmcEvHandApeCent::HandleMceModemStateQueryResp(const TUint8* const aMsgPtr)
         DmcEvHandApeCent::Lock();
         DmcEvHandApeCent::iModemCurrentState = modemCurrentState;
         DmcEvHandApeCent::Unlock();
-        
+
         OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_HANDLE_MCE_STATE_QUERY_RESP_1,
                   "DMC:EH_APE_CEN: HandleMceModemStateQueryResp() - iModemCurrentState: 0x%02x",
                   DmcEvHandApeCent::iModemCurrentState);
-        DMC_TRACE((("DMC:EH_APE_CEN: HandleMceModemStateQueryResp() - iModemCurrentState: 0x%02x"), 
+        DMC_TRACE((("DMC:EH_APE_CEN: HandleMceModemStateQueryResp() - iModemCurrentState: 0x%02x"),
                      DmcEvHandApeCent::iModemCurrentState));
         }
     else
@@ -2101,6 +2220,93 @@ void DmcEvHandApeCent::HandleMceModemStateQueryResp(const TUint8* const aMsgPtr)
     OstTrace0(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_APE_CENT_HANDLE_MCE_STATE_QUERY_RESP_RETURN,
               "DMC:EH_APE_CEN: HandleMceModemStateInd() # OUT");
     DMC_TRACE(("DMC:EH_APE_CEN: HandleMceModemStateInd() # OUT"));
+    }
+
+// -----------------------------------------------------------------------------
+// DmcEvHandApeCent::GenerateEvent
+// Generates events for user and kernel side.
+// -----------------------------------------------------------------------------
+//
+void DmcEvHandApeCent::GenerateEvent(const TUint8 aToWhomBitMask)
+    {
+    OstTrace1(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_APE_CENT_GEN_EVENT_ENTRY,
+              "DMC:EH_APE_CEN: GenerateEvent() # IN - aToWhomBitMask: 0x%x", aToWhomBitMask);
+    DMC_TRACE((("DMC:EH_APE_CEN: GenerateEvent() # IN - aToWhomBitMask: 0x%x"), aToWhomBitMask));
+
+    if (aToWhomBitMask & DMC_USER_BIT)
+        {
+        if (iUserEventDfcPtr)
+            {
+            OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_GEN_EVENT_1,
+              "DMC:EH_APE_CEN: GenerateEvent() - iUserEventDfcPtr: 0x%x", iUserEventDfcPtr);
+            DMC_TRACE((("DMC:EH_APE_CEN: GenerateEvent() - Generate User event, iUserEventDfcPtr: 0x%x"),
+                         iUserEventDfcPtr));
+
+            /* Generate the user event If registered clients exists. */
+             if (NKern::CurrentContext() == NKern::EInterrupt)
+                {
+                iUserEventDfcPtr->Add();
+                }
+            else
+                {
+                iUserEventDfcPtr->Enque();
+                }
+            }
+        else
+            {
+            OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_GEN_EVENT_2,
+              "DMC:EH_APE_CEN: GenerateEvent() - iEventType: 0x%x", iEventType);
+            DMC_TRACE((("DMC:EH_APE_CEN: GenerateEvent() - iEventType: 0x%x"), iEventType));
+
+            TInt err(KErrGeneral);
+
+            /* This is the situation in which DMC has no clients but a device has to shutdown, thus
+               generate a switch off restart system event. */
+
+            if (iEventType == DMC_CLIENT_POWER_OFF_EVENT)
+                {
+                OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_GEN_EVENT_3,
+                          "DMC:EH_APE_CEN: GenerateEvent() - Kern::AddEvent(iSwitchOffEvent)");
+                DMC_TRACE((("DMC:EH_APE_CEN: GenerateEvent() - Kern::AddEvent(iSwitchOffEvent)")));
+
+                err = Kern::AddEvent(iSwitchOffEvent);
+                DMC_TRACE_ASSERT_RESET(err == KErrNone, "Generating iSwitchOffEvent event failed", err);
+                }
+            else
+                {
+                OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_GEN_EVENT_4,
+                          "DMC:EH_APE_CEN: GenerateEvent() - Kern::AddEvent(iResetEvent)");
+                DMC_TRACE((("DMC:EH_APE_CEN: GenerateEvent() - Kern::AddEvent(iResetEvent)")));
+
+                err = Kern::AddEvent(iResetEvent);
+                DMC_TRACE_ASSERT_RESET(err == KErrNone, "Generating iResetEvent event failed", err);
+                }
+            }
+        }
+
+    if (aToWhomBitMask & DMC_KERNEL_BIT)
+        {
+        if (iKernelEventDfcPtr)
+            {
+            OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_APE_CENT_GEN_EVENT_5,
+              "DMC:EH_APE_CEN: GenerateEvent() - iKernelEventDfcPtr: 0x%x", iUserEventDfcPtr);
+            DMC_TRACE((("DMC:EH_APE_CEN: GenerateEvent() - Generate Kernel event, iKernelEventDfcPtr: 0x%x"),
+                         iKernelEventDfcPtr));
+            /* Generate the kernel event if registered kernel clients exists. */
+            if (NKern::CurrentContext() == NKern::EInterrupt)
+                {
+                iKernelEventDfcPtr->Add();
+                }
+            else
+                {
+                iKernelEventDfcPtr->Enque();
+                }
+            }
+        }
+
+    OstTrace0(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_APE_CENT_GEN_EVENT_RETURN,
+              "DMC:EH_APE_CEN: GenerateEvent() # OUT");
+    DMC_TRACE((("DMC:EH_APE_CEN: GenerateEvent() # OUT")));
     }
 
 
@@ -2154,20 +2360,12 @@ TUint8 DmcEvHandApeCent::IsAnyStateEvent(const TUint8 aEventType, const TUint8* 
     OstTrace1(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_IS_ANY_STATE_ENTRY,
               "DMC:EH_APE_CEN: IsAnyStateEvent() # IN - aEventType: 0x%x",
               aEventType);
-    DMC_TRACE((("DMC:EH_APE_CEN: IsAnyStateEvent() # IN - aType: 0x%x"), aEventType));
+    DMC_TRACE((("DMC:EH_APE_CEN: IsAnyStateEvent() # IN - aEventType: 0x%x"), aEventType));
 
     TUint8 bit(0);
-    
-    if (aEventType > KERNEL_LAST_KERNEL_EVENT)
-        {
-        // User any state event checking
-        OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_IS_ANY_STATE_1,
-                  "DMC:EH_APE_CEN: HandleEvent() - User event");
-        DMC_TRACE((("DMC:EH_APE_CEN: User event")));
-        bit = ((iAnyStateMap >> aEventType) & 1);
-        }
+
      // Only the listed ISI-messages are part of the any state.
-    else if (aEventType == KERNEL_EVENT_ISI)
+    if (aEventType == KERNEL_EVENT_ISI)
         {
         // Kernel any state event checking
         OstTrace0(TRACE_FLOW, DMC_EVENT_HAND_IS_ANY_STATE_2,
@@ -2175,7 +2373,7 @@ TUint8 DmcEvHandApeCent::IsAnyStateEvent(const TUint8 aEventType, const TUint8* 
         DMC_TRACE((("DMC:EH_APE_CEN: Kernel event")));
 
         /* Check msg ID, which are supported by any state.
-           A message pointer is already checked in the associated Dfc queue. */        
+           A message pointer is already checked in the associated Dfc queue. */
         TUint8 resourceId = aKernMsgPtr[ISI_HEADER_OFFSET_RESOURCEID];
 
         DMC_TRACE((("DMC:EH_APE_CEN: IsAnyStateEvent() - resource ID: 0x%x: "), resourceId));
@@ -2186,7 +2384,7 @@ TUint8 DmcEvHandApeCent::IsAnyStateEvent(const TUint8 aEventType, const TUint8* 
             DMC_TRACE(("DMC:EH_APE_CEN: IsAnyStateEvent() - PN_MTC"));
 
             TUint8 messageId = aKernMsgPtr[ISI_HEADER_OFFSET_MESSAGEID];
-        
+
             switch (messageId)
                 {
                 case MTC_STATE_QUERY_RESP:
@@ -2196,7 +2394,7 @@ TUint8 DmcEvHandApeCent::IsAnyStateEvent(const TUint8 aEventType, const TUint8* 
                     bit = 1;
                     }
                     break;
-                
+
                 default: // nothing to do
                     break;
                 }
@@ -2209,7 +2407,7 @@ TUint8 DmcEvHandApeCent::IsAnyStateEvent(const TUint8 aEventType, const TUint8* 
             DMC_TRACE(("DMC:EH_APE_CEN: IsAnyStateEvent() - PN_MODEM_MCE"));
 
             TUint8 messageId = aKernMsgPtr[ISI_HEADER_OFFSET_MESSAGEID];
-        
+
             switch (messageId)
                 {
                 case MCE_MODEM_STATE_QUERY_RESP:
@@ -2221,12 +2419,21 @@ TUint8 DmcEvHandApeCent::IsAnyStateEvent(const TUint8 aEventType, const TUint8* 
                     bit = 1;
                     }
                     break;
-                
+
                 default: // nothing to do
                     break;
                 }
             }
 #endif // USE_MTC_SERVER
+        }
+    else
+        {
+        // The input was not an ISI-message, check then the anystate bitmap
+        OstTrace1(TRACE_FLOW, DMC_EVENT_HAND_IS_ANY_STATE_5,
+              "DMC:EH_APE_CEN: IsAnyStateEvent() - iAnyStateMap: 0x%08x", iAnyStateMap);
+        DMC_TRACE((("DMC:EH_APE_CEN: IsAnyStateEvent() - iAnyStateMap: 0x%08x"), iAnyStateMap));
+
+        bit = ((iAnyStateMap >> aEventType) & 1);
         }
 
     OstTrace1(TRACE_ENTRY_EXIT, DMC_EVENT_HAND_IS_ANY_STATE_RETURN,

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -420,20 +420,34 @@ class CMmSupplServMessHandler
          */
         void UiccHandleCallFwdFlagsResp(
             TInt aStatus,
-            TInt aTrId, 
+            TInt aTrId,
             const TDesC8& aFileData );
 
         /**
          * Write call forwarding flags REL4
+         * @param aVoiceStatus voice flag value
+         * @param aFaxStatus fax flag value
+         * @param aDataStatus data flag status
          * @return KErrNone or error code
          */
-        TInt UiccWriteCallFwdFlagsRel4Req();
+        TInt UiccWriteCallFwdFlagsRel4Req(
+            TUint8 aVoiceStatus,
+            TUint8 aFaxStatus,
+            TUint8 aDataStatus );
 
         /**
          * Write call forwarding flags CPHS
+         * @param aVoiceLine1Status voice line 1 flag value
+         * @param aVoiceLine2Status voice line 2 flag value
+         * @param aFaxStatus fax flag value
+         * @param aDataStatus data flag value
          * @return KErrNone or error code
          */
-        TInt UiccWriteCallFwdFlagsCPHSReq();
+        TInt UiccWriteCallFwdFlagsCPHSReq(
+            TUint8 aVoiceLine1Status,
+            TUint8 aVoiceLine2Status,
+            TUint8 aFaxStatus,
+            TUint8 aDataStatus );
 
         /**
          * Read voice message flags REL4
@@ -761,15 +775,6 @@ class CMmSupplServMessHandler
         // Mobile address
         RMobilePhone::TMobileAddress iCFAddress;
 
-        // Stores voice indicator status read from the USIM
-        TUint8 iVoiceStatus;
-
-        // Stores data indicator status read from the USIM
-        TUint8 iDataStatus;
-
-        // Stores fax indicator status read from the USIM
-        TUint8 iFaxStatus;
-
         // Stores Call Forwarding Number read from the USIM
         TBuf<RMobilePhone::KMaxMobileTelNumberSize> iCFTelNumberFromSim;
 
@@ -787,18 +792,6 @@ class CMmSupplServMessHandler
 
         // Stores Call Forwarding indicators read from the USIM
         RMmCustomAPI::TCFIndicators iTCFIndicators;
-
-        // Stores voice line1 flag read from the USIM
-        TUint8 iVoiceLine1;
-
-        // Stores voice line2 flag read from the USIM
-        TUint8 iVoiceLine2;
-
-        // Stores fax flag read from the USIM
-        TUint8 iFax;
-
-        // Stores data flag read from the USIM
-        TUint8 iData;
 
         // Current ALS line used
         RMobilePhone::TMobilePhoneALSLine iAlsLine;

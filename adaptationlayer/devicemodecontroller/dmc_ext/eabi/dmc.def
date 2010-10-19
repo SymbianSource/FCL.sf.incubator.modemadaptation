@@ -1,3 +1,9 @@
 EXPORTS
 	_Z19CreateLogicalDevicev @ 1 NONAME
+	_ZN11DmcKernelIf12CancelEventsEPFvRNS_6TEventEE @ 2 NONAME
+	_ZN11DmcKernelIf13GenerateResetENS_18TTargetStartupModeE @ 3 NONAME
+	_ZN11DmcKernelIf13IsHiddenResetERi @ 4 NONAME
+	_ZN11DmcKernelIf13ReceiveEventsEPFvRNS_6TEventEE @ 5 NONAME
+	_ZN11DmcKernelIf14GetStartUpModeERNS_18TTargetStartupModeE @ 6 NONAME
+	_ZN11DmcKernelIf8PowerOffEv @ 7 NONAME
 

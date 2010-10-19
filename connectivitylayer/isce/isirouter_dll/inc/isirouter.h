@@ -22,12 +22,12 @@
 
 
 #include "misilinkrouterif.h"     // For MISILinkRouterIf
-#include "misichannelrouterif.h"  // For MISIChannelRouterIf
+#include "misiobjectrouterif.h"  // For MISIObjectRouterIf
 #include "isiinternaldefs.h"      // For KMaxAmountOfObjId
 //#include "misiobjectrouterif.h"
 
 
-class MISIRouterChannelIf;
+class MISIRouterObjectIf;
 class MISIRouterObjectIf;
 class MISIRouterLinkIf;
 class DISICLTransceiver;
@@ -36,7 +36,7 @@ class DISIThreadContainer;
 /*
 * ISI router.
 */
-NONSHARABLE_CLASS( DISIRouter ) : public DBase, public MISIChannelRouterIf
+NONSHARABLE_CLASS( DISIRouter ) : public DBase, public MISIObjectRouterIf
     {
 
     public:
@@ -51,64 +51,55 @@ NONSHARABLE_CLASS( DISIRouter ) : public DBase, public MISIChannelRouterIf
         */
         ~DISIRouter();
         
-        /*
-        * See comments from MISILinkRouterIf
-        */
-        //void Receive( TDes8& aMessage );
-        
         //From CLTransceiver
         TBool Receive( TDes8& aMessage, const TUint8 aObjId );
         
         /*
-        * See comments from MISIChannelRouterIf
+        * See comments from MISIObjectRouterIf
         */
         TInt Send( TDes8& aMessage, const TUint8 aObjId );
 
         /*
-        * See comments from MISIChannelRouterIf
+        * See comments from MISIObjectRouterIf
         */
         void Disconnect( const TUint8 aObjId );
 
         /*
-        * See comments from MISIChannelRouterIf
+        * See comments from MISIObjectRouterIf
         */
         TDfcQue* GetDfcThread( const TISIDfcQThreadType aType );
 
         void FreeDfcThread( TDfcQue* aThread );
 
         /*
-        * See comments from MISIChannelRouterIf
+        * See comments from MISIObjectRouterIf
         */
-        void Connect( const TInt32 aUID, TUint8& aObjId, MISIRouterChannelIf* aCallback );
+        void Connect( const TInt32 aUID, TUint8& aObjId, MISIRouterObjectIf* aCallback );
 
         /*
-        * Returns pointer to router it self, called only from MISIChannelRouterIf::GetIf
+        * Returns pointer to router it self, called only from MISIObjectRouterIf::GetIf
         * @return pointer to router.
         */
         static DISIRouter* GetRouter(){ return iSelfPtr; };
-        
-   
+
     private:
 
         NONSHARABLE_CLASS( TISIClient )
             {
             public:
-            
                 TInt32                 iUID;
                 TUint8                 iObjId;
-                MISIRouterChannelIf*   iChannel;
-            };        
-        //private:
+                MISIRouterObjectIf*   iChannel;
+            };
+
         NONSHARABLE_CLASS( TStaticId )
             {
             public:
-            
                 TStaticId( const TInt32 aUID, TUint8 aObjId ){iUID = aUID; iObjId = aObjId;};
-            
                 TInt32 iUID;
                 TUint8 iObjId;
             };
-            
+
     private:
 
         /*
@@ -116,36 +107,39 @@ NONSHARABLE_CLASS( DISIRouter ) : public DBase, public MISIChannelRouterIf
         * Called in own thread context not supervisors
         */
         void Initialize();
-        
-        void CheckUIDUniqueness( const TInt32 aUID );
-        
-        TUint8 ReceiveStaticObjId( const TInt32 aUID );
-        
-        TUint8 ReserveNewDynamicObjId();
-        
-        static void InitializeDfc( TAny* aPtr );
-        
-                        
-    public:
-        // Written only once no need to synch.
-        static DISIRouter*   iSelfPtr;  
-        MISIRouterObjectIf*  iNameService;
-        MISIRouterObjectIf*  iCommunicationManager; 
-                                
-    private:     
 
+        TBool CheckUIDUniqueness( const TInt32 aUID );
+
+        TUint8 ReserveStaticObjId( const TInt32 aUID );
+
+        TUint8 ReserveNewDynamicObjId();
+
+        static void InitializeDfc( TAny* aPtr );
+
+    public:
+
+        // Written only once no need to synch.
+        static DISIRouter*   iSelfPtr;
+
+
+        DISICLTransceiver* GetDISICLTransceiver(){ return iShCLTransceiver;};
+
+    private:
+	
         // Owned, synchronized internally with fastmutexes.
         RArray< TStaticId* > iStaticObjIdTable;
         // Owned, synchronized internally with fastmutexes.
-        TISIClient*          iClientTable[ KMaxAmountOfObjId ];        
+        TISIClient*          iClientTable[ KMaxAmountOfObjId ];//  switch this to objects
         // Guards class shared array, owned
         NFastMutex*          iClientTableFastMutex;
-        // Owned
+        // Owned, executed only from one thread.
         TDfc*                iInitializeDfc;
+        // Owned, executed only from one thread.
         TDfcQue*             iInitThread;
-        DISICLTransceiver*   iCLTransceiver;
-        DISIThreadContainer* iClientThreadContainer;
-
+        // Owned, synch done inside the class.
+        DISICLTransceiver*   iShCLTransceiver;
+        // Owned, synch done inside the class.
+        DISIThreadContainer* iShClientThreadContainer;
 
     };
 

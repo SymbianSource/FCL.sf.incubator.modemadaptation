@@ -21,7 +21,6 @@
 #include <platform_paths.hrh>
 #include "kernel/kern_ext.mmh"
 
-
 TARGET          ismpmultiplexer.dll
 TARGETTYPE      kext
 linkas          ismpmultiplexer.dll
@@ -41,7 +40,7 @@ SOURCE          mux.cpp
 USERINCLUDE     ../inc
 USERINCLUDE     ../../memmanager_dll/inc
 
-// TODO OST TRACE USERINCLUDE     ../traces
+//  OST TRACE USERINCLUDE     ../traces
 
 OS_LAYER_SYSTEMINCLUDE
 NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE

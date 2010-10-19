@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -38,14 +38,14 @@
 #include "cmmsupplservmesshandler.h"
 #include "tssparser.h" // for parsing service string
 #include "tsylogger.h"
-#include "OstTraceDefinitions.h"
 #include "cmmuiccmesshandler.h"
 #include "cmmphonemesshandler.h"  // for CallForwFlagsCachingCompleted
+#include <satcs.h>
+
+#include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
 #include "cmmsupplservmesshandlerTraces.h"
 #endif
- // logging
-#include <satcs.h>
 
 // EXTERNAL DATA STRUCTURES
     //None
@@ -69,7 +69,12 @@ _LIT(KGsmVerifiedPasswordFiller, "1111");
     //None
 
 // MODULE DATA STRUCTURES
-    //None
+enum TCphsCallForwardingFlagStatus
+    {
+    ECphsCallForwardingUnknown  = 0x0,
+    ECphsCallForwardingActive   = 0xA,
+    ECphsCallForwardingInactive = 0x5
+    };
 
 // LOCAL FUNCTION PROTOTYPES
     //None
@@ -85,7 +90,7 @@ CMmSupplServMessHandler::CMmSupplServMessHandler
     )
     {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::CMmSupplServMessHandler - Start" );
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_CMMSUPPLSERVMESSHANDLER, "CMmSupplServMessHandler::CMmSupplServMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_CMMSUPPLSERVMESSHANDLER_TD, "CMmSupplServMessHandler::CMmSupplServMessHandler" );
     //none
     }
 
@@ -103,7 +108,7 @@ CMmSupplServMessHandler* CMmSupplServMessHandler::NewL
     )
     {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::NewL" );
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_NEWL, "CMmSupplServMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_NEWL_TD, "CMmSupplServMessHandler::NewL" );
 
     CMmSupplServMessHandler* supplServMessHandler =
         new ( ELeave ) CMmSupplServMessHandler();
@@ -157,7 +162,7 @@ void CMmSupplServMessHandler::ConstructL
     )
     {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::ConstructL" );
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_CONSTRUCTL, "CMmSupplServMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_CONSTRUCTL_TD, "CMmSupplServMessHandler::ConstructL" );
 
     iVoiceServiceMappedToTelephony = EFalse;
     iCircuitServiceMappedToAllBearer = EFalse;
@@ -185,7 +190,7 @@ CMmSupplServMessHandler::~CMmSupplServMessHandler
     )
     {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::~CMmSupplServMessHandler" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_CMMSUPPLSERVMESSHANDLER, "CMmSupplServMessHandler::~CMmSupplServMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_CMMSUPPLSERVMESSHANDLER_TD, "CMmSupplServMessHandler::~CMmSupplServMessHandler" );
 
     delete iCFResults;
     delete iCBResults;
@@ -205,7 +210,7 @@ TInt CMmSupplServMessHandler::ExtFuncL
     )
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::ExtFuncL: IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_EXTFUNCL_TD, "CMmSupplServMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     //*************************************************************//
     // NOTE
@@ -287,11 +292,11 @@ OstTrace1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMessHand
             iCFAddress = changeInfo->iNumber;
 
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::ExtFuncL - EMobilePhoneSetCallForwardingStatus - Number: %S", &iCFAddress.iTelNumber);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMessHandler::ExtFuncL;EMobilePhoneSetCallForwardingStatus iCFTelNumber=%S", iCFAddress.iTelNumber );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_EXTFUNCL_TD, "CMmSupplServMessHandler::ExtFuncL;EMobilePhoneSetCallForwardingStatus iCFTelNumber=%S", iCFAddress.iTelNumber );
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::ExtFuncL - EMobilePhoneSetCallForwardingStatus - MobileService: %d", iMobileService);
-OstTrace1( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMessHandler::ExtFuncL;EMobilePhoneSetCallForwardingStatus iMobileService=%d", iMobileService );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMSUPPLSERVMESSHANDLER_EXTFUNCL_TD, "CMmSupplServMessHandler::ExtFuncL;EMobilePhoneSetCallForwardingStatus iMobileService=%d", iMobileService );
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::ExtFuncL - EMobilePhoneSetCallForwardingStatus - Condition: %d", iMmCFCondition);
-OstTrace1( TRACE_NORMAL, DUP3_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMessHandler::ExtFuncL;EMobilePhoneSetCallForwardingStatus iMmCFCondition=%d", iMmCFCondition );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMSUPPLSERVMESSHANDLER_EXTFUNCL_TD, "CMmSupplServMessHandler::ExtFuncL;EMobilePhoneSetCallForwardingStatus iMmCFCondition=%d", iMmCFCondition );
 
             //map operation
             ret = MapOperationMmToIsi( changeInfo->iAction, &operation );
@@ -545,12 +550,34 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMes
                     ssInfoA,
                     ssInfoB,
                     ssInfoC );
+                    
+                if( KErrNone != ret )
+                    {                   
+                    TUint srcByteCount( 0 );
+                    // max length of ussd string is 161
+                    TBuf8<KMaxLengthOfUssdMessage> packedString;
+                    // max length of ussd string is 161
+                    TBuf8<KMaxLengthOfUssdMessage> srcString;
+
+                    // 16 byte descriptor is appended to 8 byte descriptor as single bytes,
+                    // therefore length can be the same in both descriptors
+                    srcString.Append( serviceString->Left( serviceString->Length() ) );
+                    srcByteCount = srcString.Length();
+                    // pack string
+                    GsmLibSmsPackMessage( 
+                        packedString,
+                        srcString, 
+                        srcByteCount );
+
+                    // send ussd request
+                    ret = SsGsmUssdSendReq( trId, &packedString );
+                    }
                 }
             else
                 {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::ExtFuncL: parsing of \
               service string failed!" );
-OstTrace0( TRACE_NORMAL, DUP4_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMessHandler::ExtFuncL, parsing of service string failed!" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMSUPPLSERVMESSHANDLER_EXTFUNCL_TD, "CMmSupplServMessHandler::ExtFuncL, parsing of service string failed!" );
                 ret = KErrArgument;
                 }
 
@@ -618,7 +645,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMes
             // this method should only be called for SS cases
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::ExtFuncL - Unknown IPC: %d",
               aIpc);
-OstTrace1( TRACE_NORMAL, DUP5_CMMSUPPLSERVMESSHANDLER_EXTFUNCL, "CMmSupplServMessHandler::ExtFuncL;Unknown aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMSUPPLSERVMESSHANDLER_EXTFUNCL_TD, "CMmSupplServMessHandler::ExtFuncL;Unknown aIpc=%d", aIpc );
             ret = KErrArgument;
             break;
             }
@@ -639,7 +666,7 @@ TInt CMmSupplServMessHandler::ProcessUiccMsg(
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY: CMmSupplServMessHandler::ProcessUiccMsg, transaction ID: %d, status: %d", aTraId, aStatus );
-OstTraceExt2( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSUICCMSG, "CMmSupplServMessHandler::ProcessUiccMsg;aTraId=%d;aStatus=%d", aTraId, aStatus );
+OstTraceExt2( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_PROCESSUICCMSG_TD, "CMmSupplServMessHandler::ProcessUiccMsg;aTraId=%d;aStatus=%d", aTraId, aStatus );
 
 switch( aTraId )
         {
@@ -738,7 +765,7 @@ switch( aTraId )
         default:
             {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::ProcessUiccMsg - unknown transaction ID" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_PROCESSUICCMSG, "CMmSupplServMessHandler::ProcessUiccMsg - unknown transaction ID" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_PROCESSUICCMSG_TD, "CMmSupplServMessHandler::ProcessUiccMsg - unknown transaction ID" );
             break;
             }
         }
@@ -760,7 +787,7 @@ void CMmSupplServMessHandler::ReceiveMessageL
 
 TFLOGSTRING3("TSY: CMmSupplServMessHandler::ReceiveMessageL - resource: %d, \
               messageId: %d", resource, messageId);
-OstTraceExt2( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_RECEIVEMESSAGEL, "CMmSupplServMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmSupplServMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
 
     switch ( resource )
         {
@@ -802,7 +829,7 @@ OstTraceExt2( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_RECEIVEMESSAGEL, "CMmSupplSe
                     {
 TFLOGSTRING2( "TSY: CMmSupplServMessHandler::ReceiveMessageL - \
                PN_SS - unknown msgId: %d", messageId );
-OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_RECEIVEMESSAGEL, "CMmSupplServMessHandler::ReceiveMessageL;PN_SS - unknown msgId=%d", messageId );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmSupplServMessHandler::ReceiveMessageL;PN_SS - unknown msgId=%d", messageId );
                     break;
                     }
                 } // switch( messageId )
@@ -812,7 +839,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_RECEIVEMESSAGEL, "CMmSuppl
             {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::ReceiveMessageL - unknown \
               resource: %d", resource);
-OstTrace1( TRACE_NORMAL, DUP3_CMMSUPPLSERVMESSHANDLER_RECEIVEMESSAGEL, "CMmSupplServMessHandler::ReceiveMessageL;unknown resource=%d", resource );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMSUPPLSERVMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmSupplServMessHandler::ReceiveMessageL;unknown resource=%d", resource );
             break;
             }
         } // switch( resource )
@@ -834,7 +861,7 @@ TInt CMmSupplServMessHandler::SsServiceReqSatOriginated(
     const TDesC& ssInfoC )           // SS info C
     {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::SsServiceReqSatOriginated" );
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED, "CMmSupplServMessHandler::SsServiceReqSatOriginated" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED_TD, "CMmSupplServMessHandler::SsServiceReqSatOriginated" );
 
     TInt ret( KErrNone );
     TUint8 basicServiceCode( SS_ALL_TELE_AND_BEARER );
@@ -852,7 +879,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED, "CMm
             {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::SsServiceReqSatOriginated, \
               call forwarding" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED, "CMmSupplServMessHandler::SsServiceReqSatOriginated, call forwarding" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED_TD, "CMmSupplServMessHandler::SsServiceReqSatOriginated, call forwarding" );
 
             TUint8 numberType ( SS_NBR_TYPE_UNKNOWN );
             TUint8 numberPlan ( SS_NBR_PLAN_ISDN_TELEPHONY );
@@ -917,7 +944,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED,
             {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::SsServiceReqSatOriginated, \
               call barring" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED, "CMmSupplServMessHandler::SsServiceReqSatOriginated, call barring" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED_TD, "CMmSupplServMessHandler::SsServiceReqSatOriginated, call barring" );
 
             // basic service code is in ssInfoB, must be converted to TUint8
             basicServiceCode = ( TUint8 )parser.GetInt( ssInfoB );
@@ -940,7 +967,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED,
             {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::SsServiceReqSatOriginated, \
               call waiting" );
-OstTrace0( TRACE_NORMAL, DUP3_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED, "CMmSupplServMessHandler::SsServiceReqSatOriginated, call waiting" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED_TD, "CMmSupplServMessHandler::SsServiceReqSatOriginated, call waiting" );
             // basic service code is in ssInfoA, must be converted to TUint8
             basicServiceCode = ( TUint8 )parser.GetInt( ssInfoA );
             ret = CreateServiceReqWithCheckInfo(
@@ -961,7 +988,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED,
             {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::SsServiceReqSatOriginated, \
               other ss codes" );
-OstTrace0( TRACE_NORMAL, DUP6_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED, "CMmSupplServMessHandler::SsServiceReqSatOriginated, other ss codes" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED_TD, "CMmSupplServMessHandler::SsServiceReqSatOriginated, other ss codes" );
             ret = CreateServiceReqWithCheckInfo(
                 aTrId,
                 aOperation,
@@ -975,7 +1002,7 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED,
             {
 TFLOGSTRING2( "TSY: CMmSupplServMessHandler::SsServiceReqSatOriginated, \
                error: unknown ss service: %d", aServiceCode );
-OstTraceExt1( TRACE_NORMAL, DUP7_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED, "CMmSupplServMessHandler::SsServiceReqSatOriginated;ERROR: unknown ss service=%hu", aServiceCode );
+OstTraceExt1( TRACE_NORMAL,  DUP7_CMMSUPPLSERVMESSHANDLER_SSSERVICEREQSATORIGINATED_TD, "CMmSupplServMessHandler::SsServiceReqSatOriginated;ERROR: unknown ss service=%hu", aServiceCode );
             ret = KErrArgument;
             break;
             }
@@ -998,7 +1025,7 @@ TInt CMmSupplServMessHandler::CreateServiceReqWithCheckInfo(
     const TUint8 aBasicServiceCode )
     {
 TFLOGSTRING( "TSY: CMmSupplServMessHandler::CreateServiceReqWithCheckInfo" );
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_CREATESERVICEREQWITHCHECKINFO, "CMmSupplServMessHandler::CreateServiceReqWithCheckInfo" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_CREATESERVICEREQWITHCHECKINFO_TD, "CMmSupplServMessHandler::CreateServiceReqWithCheckInfo" );
     TInt ret( KErrNone );
     TUint8 numOfSubblocks( 1 );
 
@@ -1083,7 +1110,7 @@ TInt CMmSupplServMessHandler::SsCallForwServiceReq
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsCallForwServiceReq");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSCALLFORWSERVICEREQ, "CMmSupplServMessHandler::SsCallForwServiceReq" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSCALLFORWSERVICEREQ_TD, "CMmSupplServMessHandler::SsCallForwServiceReq" );
 
     TUint8 numOfSubblocks( 0 );
     TBuf<RMobilePhone::KMaxMobileTelNumberSize> number( 0 );
@@ -1282,10 +1309,10 @@ void CMmSupplServMessHandler::SsServiceCompletedRespL
 
 TFLOGSTRING3("TSY: CMmSupplServMessHandler::SsServiceCompletedRespL number \
               of sub blocks: %d, operation: %d", response.iNumSubBlocks, response.iOperation );
-OstTraceExt2( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSSERVICECOMPLETEDRESPL, "CMmSupplServMessHandler::SsServiceCompletedRespL;numSubBlocks=%hhu;operation=%hhu", response.iNumSubBlocks, response.iOperation );
+OstTraceExt2( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSSERVICECOMPLETEDRESPL_TD, "CMmSupplServMessHandler::SsServiceCompletedRespL;numSubBlocks=%hhu;operation=%hhu", response.iNumSubBlocks, response.iOperation );
 TFLOGSTRING3("TSY: CMmSupplServMessHandler::SsServiceCompletedRespL ssCode: \
               %d, basicService: %d", response.iSsCode, response.iBasicService );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICECOMPLETEDRESPL, "CMmSupplServMessHandler::SsServiceCompletedRespL;ssCode=%hu;basicService=%hhu", response.iSsCode, response.iBasicService );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICECOMPLETEDRESPL_TD, "CMmSupplServMessHandler::SsServiceCompletedRespL;ssCode=%hu;basicService=%hhu", response.iSsCode, response.iBasicService );
 
     if (
        ProcessIfSsRequestChanged( response ) ||         // original SS request is changed, or initiated by Call Control
@@ -1304,7 +1331,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICECOMPLETEDRESPL
         {
         TFLOGSTRING2("TSY: CMmSupplServMessHandler::SsServiceCompletedRespL \
                       - unknown ssCode: %d", response.iSsCode );
-OstTraceExt1( TRACE_NORMAL, DUP5_CMMSUPPLSERVMESSHANDLER_SSSERVICECOMPLETEDRESPL, "CMmSupplServMessHandler::SsServiceCompletedRespL;ssCode=%hu", response.iSsCode );
+OstTraceExt1( TRACE_NORMAL,  DUP5_CMMSUPPLSERVMESSHANDLER_SSSERVICECOMPLETEDRESPL_TD, "CMmSupplServMessHandler::SsServiceCompletedRespL;ssCode=%hu", response.iSsCode );
         }
     }
 
@@ -1322,7 +1349,7 @@ void CMmSupplServMessHandler::HandleSsGsmForwardingSubBlockL
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::HandleSsGsmForwardingSubBlockL - \
               SS condition: %d", aSsCode);
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_HANDLESSGSMFORWARDINGSUBBLOCKL, "CMmSupplServMessHandler::HandleSsGsmForwardingSubBlockL;aSsCode=%hu", aSsCode );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_HANDLESSGSMFORWARDINGSUBBLOCKL_TD, "CMmSupplServMessHandler::HandleSsGsmForwardingSubBlockL;aSsCode=%hu", aSsCode );
 
     TUint sbStartOffset( aSbStartOffset );
 
@@ -1429,7 +1456,7 @@ void CMmSupplServMessHandler::HandleBarringSsGsmBscInfoSubBlockL
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::HandleBarringSsGsmBscInfoSubBlockL \
               - service code: %d", aSsCode);
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_HANDLEBARRINGSSGSMBSCINFOSUBBLOCKL, "CMmSupplServMessHandler::HandleBarringSsGsmBscInfoSubBlockL;aSsCode=%hu", aSsCode );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_HANDLEBARRINGSSGSMBSCINFOSUBBLOCKL_TD, "CMmSupplServMessHandler::HandleBarringSsGsmBscInfoSubBlockL;aSsCode=%hu", aSsCode );
 
     //get number of basic service codes in this SS_GSM_BSC_INFO sub block
     TUint8 numBsc( aIsiMessage.Get8bit(
@@ -1462,7 +1489,7 @@ OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_HANDLEBARRINGSSGSMBSCINFOSUB
                 {
 TFLOGSTRING2( "TSY: CMmSupplServMessHandler::HandleSsGsmBscInfoSubBlockL: \
                Unknown Basic Service Group = %d received. Skipping this entry.", bsc );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_HANDLEBARRINGSSGSMBSCINFOSUBBLOCKL, "CMmSupplServMessHandler::HandleBarringSsGsmBscInfoSubBlockL;Unknown Basic Service Group=%hhu", bsc );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_HANDLEBARRINGSSGSMBSCINFOSUBBLOCKL_TD, "CMmSupplServMessHandler::HandleBarringSsGsmBscInfoSubBlockL;Unknown Basic Service Group=%hhu", bsc );
                 continue; // ignore this entry and go to the next one
                 }
 
@@ -1489,7 +1516,7 @@ void CMmSupplServMessHandler::HandleWaitingSsGsmBscInfoSubBlockL
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::HandleWaitingSsGsmBscInfoSubBlockL");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_HANDLEWAITINGSSGSMBSCINFOSUBBLOCKL, "CMmSupplServMessHandler::HandleWaitingSsGsmBscInfoSubBlockL" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_HANDLEWAITINGSSGSMBSCINFOSUBBLOCKL_TD, "CMmSupplServMessHandler::HandleWaitingSsGsmBscInfoSubBlockL" );
 
     //get number of basic service codes in this SS_GSM_BSC_INFO sub block
     TUint8 numBsc( aIsiMessage.Get8bit(
@@ -1521,7 +1548,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_HANDLEWAITINGSSGSMBSCINFOSUBBLO
                 {
 TFLOGSTRING2( "TSY: CMmSupplServMessHandler::HandleSsGsmDataSubBlockL: \
                Unknown Basic Service Group = %d received. Skipping this entry.", bsc );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_HANDLEWAITINGSSGSMBSCINFOSUBBLOCKL, "CMmSupplServMessHandler::HandleWaitingSsGsmBscInfoSubBlockL;Unknown Basic Service Group=%hhu", bsc );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_HANDLEWAITINGSSGSMBSCINFOSUBBLOCKL_TD, "CMmSupplServMessHandler::HandleWaitingSsGsmBscInfoSubBlockL;Unknown Basic Service Group=%hhu", bsc );
                 continue; // ignore this entry and go to the next one
                 }
             // Save this entry
@@ -1545,7 +1572,7 @@ void CMmSupplServMessHandler::SsServiceFailedResp
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsServiceFailedResp");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "CMmSupplServMessHandler::SsServiceFailedResp" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmSupplServMessHandler::SsServiceFailedResp" );
 
     TInt errorToClient( KErrGeneral );
 
@@ -1562,7 +1589,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "CMmSupplS
         TUint8 subBlockId = aIsiMessage.Get8bit( sbStartOffset );
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::SsServiceFailedResp - \
               sub block Id: %d", subBlockId);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "CMmSupplServMessHandler::SsServiceFailedResp;subBlockId=%hhu", subBlockId );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmSupplServMessHandler::SsServiceFailedResp;subBlockId=%hhu", subBlockId );
         switch ( subBlockId )
             {
             case SS_GSM_INDICATE_PASSWORD_ERROR:
@@ -1616,7 +1643,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "C
                         KErrGsmSMSNoNetworkService );
 TFLOGSTRING("CMmSupplServMessHandler::SsServiceFailedRespL. \
              Cause: KSsGsmSsNotAvailable => No network coverage." );
-OstTrace0( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "CMmSupplServMessHandler::SsServiceFailedResp, Cause: KSsGsmSsNotAvailable => No network coverage" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmSupplServMessHandler::SsServiceFailedResp, Cause: KSsGsmSsNotAvailable => No network coverage" );
                     }
                 else if( SS_RESOURCE_CONTROL_DENIED == errorCode )
                     {
@@ -1637,9 +1664,9 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "CMmS
                          TUint8 sw1 = data[KSw1Index];
                          TUint8 sw2 = data[KSw2Index];
                          TUint8 result = data[KResultIndex];
-                         errorToClient = CMmStaticUtility::MapSw1Sw2ToEpocError( 
-                             sw1, 
-                             sw2, 
+                         errorToClient = CMmStaticUtility::MapSw1Sw2ToEpocError(
+                             sw1,
+                             sw2,
                              result );
                          }
                      else
@@ -1665,7 +1692,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "CMmS
                 {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::SsServiceFailedResp \
               - unknown sub block Id: %d", subBlockId);
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP, "CMmSupplServMessHandler::SsServiceFailedResp;unknown subBlockId=%hhu", subBlockId );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMSUPPLSERVMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmSupplServMessHandler::SsServiceFailedResp;unknown subBlockId=%hhu", subBlockId );
                 // unknown error sub block
                 errorToClient = KErrGeneral;
                 break;
@@ -1690,7 +1717,7 @@ void CMmSupplServMessHandler::SsServiceNotSupportedResp
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsServiceNotSupportedResp");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSSERVICENOTSUPPORTEDRESP, "CMmSupplServMessHandler::SsServiceNotSupportedResp" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSSERVICENOTSUPPORTEDRESP_TD, "CMmSupplServMessHandler::SsServiceNotSupportedResp" );
 
     //create ss service not supported response message
     // complete to SOS layer
@@ -1714,7 +1741,7 @@ void CMmSupplServMessHandler::CompleteFailedSSRequest
     {
 TFLOGSTRING3("TSY: CMmSupplServMessHandler::CompleteFailedSSRequest - \
               traId: %d, error code: %d", aTransactionId, aError);
-OstTraceExt2( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_COMPLETEFAILEDSSREQUEST, "CMmSupplServMessHandler::CompleteFailedSSRequest;aTransactionId=%hhu;aError=%d", aTransactionId, aError );
+OstTraceExt2( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_COMPLETEFAILEDSSREQUEST_TD, "CMmSupplServMessHandler::CompleteFailedSSRequest;aTransactionId=%hhu;aError=%d", aTransactionId, aError );
 
     TBool isExpectedMessage = ETrue;
     switch ( aTransactionId )
@@ -1793,7 +1820,7 @@ OstTraceExt2( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_COMPLETEFAILEDSSREQUEST, "CM
             {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::CompleteFailedSSRequest \
               - unknown traId: %d", aTransactionId );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_COMPLETEFAILEDSSREQUEST, "CMmSupplServMessHandler::CompleteFailedSSRequest;aTransactionId=%hhu", aTransactionId );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_COMPLETEFAILEDSSREQUEST_TD, "CMmSupplServMessHandler::CompleteFailedSSRequest;aTransactionId=%hhu", aTransactionId );
             // ignore unknown response; do nothing
             isExpectedMessage = EFalse;
             break;
@@ -1824,7 +1851,7 @@ TInt CMmSupplServMessHandler::SsGsmBarringReq
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsGsmBarringReq");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSGSMBARRINGREQ, "CMmSupplServMessHandler::SsGsmBarringReq" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSGSMBARRINGREQ_TD, "CMmSupplServMessHandler::SsGsmBarringReq" );
 
     TUint8 numOfSubblocks( 0 );
     TInt subblockStart = ISI_HEADER_SIZE + SIZE_SS_SERVICE_REQ;
@@ -1982,7 +2009,7 @@ TInt CMmSupplServMessHandler::SsGsmWaitingReq
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsGsmWaitingReq");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSGSMWAITINGREQ, "CMmSupplServMessHandler::SsGsmWaitingReq" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSGSMWAITINGREQ_TD, "CMmSupplServMessHandler::SsGsmWaitingReq" );
 
     TUint8 numOfSubblocks( 0 );
     TBuf8<8> data( 0 );
@@ -2064,7 +2091,7 @@ TInt CMmSupplServMessHandler::SsIdentityServiceReq
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsIdentityServiceReq");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSIDENTITYSERVICEREQ, "CMmSupplServMessHandler::SsIdentityServiceReq" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSIDENTITYSERVICEREQ_TD, "CMmSupplServMessHandler::SsIdentityServiceReq" );
 
     //create ss service request message and set it to point send buffer
     TIsiSend isimsg( iPhoNetSender->SendBufferDes() );
@@ -2151,7 +2178,7 @@ TInt CMmSupplServMessHandler::SsGsmUssdSendReq
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsGsmUssdSendReq");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSGSMUSSDSENDREQ, "CMmSupplServMessHandler::SsGsmUssdSendReq" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSGSMUSSDSENDREQ_TD, "CMmSupplServMessHandler::SsGsmUssdSendReq" );
 
     //create ss service request message
     TBuf8<4> data( 0 ); //allocate memory for data
@@ -2202,17 +2229,24 @@ void CMmSupplServMessHandler::SsGsmUssdSendResp
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsGsmUssdSendResp");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSGSMUSSDSENDRESP, "CMmSupplServMessHandler::SsGsmUssdSendResp" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSGSMUSSDSENDRESP_TD, "CMmSupplServMessHandler::SsGsmUssdSendResp" );
 
-    if ( ESSOperationTypeSendNetworkServiceRequest == aIsiMessage.Get8bit(
-        ISI_HEADER_SIZE + SS_GSM_USSD_SEND_RESP_OFFSET_TRANSID ) )
+    TUint8 trId( aIsiMessage.Get8bit( ISI_HEADER_SIZE + SS_GSM_USSD_SEND_RESP_OFFSET_TRANSID ) );
+
+    if ( ESSOperationTypeSendNetworkServiceRequest == trId )
         {
         // complete (no packed parameter)
         iMessageRouter->Complete(
             EMobilePhoneSendNetworkServiceRequest,
             KErrNone );
         }
-
+    else if( ESSOperationTypeSendNetworkServiceRequestNoFdnCheck == trId )
+        {
+        // complete (no packed parameter)
+        iMessageRouter->Complete(
+            EMobilePhoneSendNetworkServiceRequestNoFdnCheck,
+            KErrNone );
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -2227,7 +2261,7 @@ void CMmSupplServMessHandler::SsStatusInd
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsStatusInd");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSSTATUSIND, "CMmSupplServMessHandler::SsStatusInd" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSSTATUSIND_TD, "CMmSupplServMessHandler::SsStatusInd" );
 
     // Get number of subblocks
     TInt numOfSubBlocks( 0 );
@@ -2359,7 +2393,7 @@ void CMmSupplServMessHandler::SsCompleteInd
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SsCompleteInd");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SSCOMPLETEIND, "CMmSupplServMessHandler::SsCompleteInd" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SSCOMPLETEIND_TD, "CMmSupplServMessHandler::SsCompleteInd" );
 
     TUint sbStartOffSet( 0 );
     RMobilePhone::TMobilePhoneSendSSRequestV3 returnResult;
@@ -2436,7 +2470,7 @@ TInt CMmSupplServMessHandler::MapMobileServiceToBasicServiceCodeIsi
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapMobileServiceToBasicServiceCodeIsi \
               - basic service code: %d", aIsiBasicServiceCode);
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPMOBILESERVICETOBASICSERVICECODEISI, "CMmSupplServMessHandler::MapMobileServiceToBasicServiceCodeIsi;aIsiBasicServiceCode=%hhu", *aIsiBasicServiceCode );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPMOBILESERVICETOBASICSERVICECODEISI_TD, "CMmSupplServMessHandler::MapMobileServiceToBasicServiceCodeIsi;aIsiBasicServiceCode=%hhu", *aIsiBasicServiceCode );
 
     TInt ret ( KErrNone );
     //get the right mobile service
@@ -2612,7 +2646,7 @@ OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPMOBILESERVICETOBASICSERVI
             // not expected.
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapMobileServiceToBasicServiceCodeIsi \
               - unknown mobile service: %d", aMobileService);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPMOBILESERVICETOBASICSERVICECODEISI, "CMmSupplServMessHandler::MapMobileServiceToBasicServiceCodeIsi;aMobileService=%d", aMobileService );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPMOBILESERVICETOBASICSERVICECODEISI_TD, "CMmSupplServMessHandler::MapMobileServiceToBasicServiceCodeIsi;aMobileService=%d", aMobileService );
             ret = KErrArgument;
             break;
         }
@@ -2634,7 +2668,7 @@ TInt CMmSupplServMessHandler::MapCFConditionMmToIsi
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::MapCFConditionMmToIsi");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONMMTOISI, "CMmSupplServMessHandler::MapCFConditionMmToIsi" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONMMTOISI_TD, "CMmSupplServMessHandler::MapCFConditionMmToIsi" );
     TInt retVal( KErrNone );
 
     switch ( aMmCFCondition )
@@ -2661,7 +2695,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONMMTOISI, "CMmSupp
         default:
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapCFConditionMmToIsi - \
               unknown call forward condition: %d", aCFCondition);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONMMTOISI, "CMmSupplServMessHandler::MapCFConditionMmToIsi;aCFCondition=%hu", *aCFCondition );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONMMTOISI_TD, "CMmSupplServMessHandler::MapCFConditionMmToIsi;aCFCondition=%hu", *aCFCondition );
             retVal = KErrNotSupported;
             break;
         }
@@ -2683,7 +2717,7 @@ TInt CMmSupplServMessHandler::MapTypeOfNumberIsiToMm
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::MapTypeOfNumberIsiToMm");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERISITOMM, "CMmSupplServMessHandler::MapTypeOfNumberIsiToMm" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERISITOMM_TD, "CMmSupplServMessHandler::MapTypeOfNumberIsiToMm" );
 
     TInt retVal( KErrNone );
     //get the right numbering plan
@@ -2715,7 +2749,7 @@ TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapTypeOfNumberIsiToMm - \
                                  // compiler warning when trace compiler is not
                                  // in use.
          TUint8 tOn = aIsiTypeOfNumber & 0x0F; // parameter made just for tracing.
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERISITOMM, "CMmSupplServMessHandler::MapTypeOfNumberIsiToMm;aIsiTypeOfNumber=%hhu", tOn );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERISITOMM_TD, "CMmSupplServMessHandler::MapTypeOfNumberIsiToMm;aIsiTypeOfNumber=%hhu", tOn );
 #endif
             retVal = KErrArgument;
             break;
@@ -2753,7 +2787,7 @@ TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapTypeOfNumberIsiToMm - \
                                  // compiler warning when trace compiler is not
                                  // in use.
             TUint8 tOn = ( ( aIsiTypeOfNumber & 0x70  ) >> 4 ); // Parameter just for tracing.
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERISITOMM, "CMmSupplServMessHandler::MapTypeOfNumberIsiToMm;tOn=%hhu", tOn );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERISITOMM_TD, "CMmSupplServMessHandler::MapTypeOfNumberIsiToMm;tOn=%hhu", tOn );
 #endif
             retVal =  KErrArgument;
             break;
@@ -2775,7 +2809,7 @@ void CMmSupplServMessHandler::MapCFStatusIsiToMm
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapCFStatusIsiToMm - SS status: %d",
               aIsiSsStatus);
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCFSTATUSISITOMM, "CMmSupplServMessHandler::MapCFStatusIsiToMm;aIsiSsStatus=%hhu", aIsiSsStatus );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPCFSTATUSISITOMM_TD, "CMmSupplServMessHandler::MapCFStatusIsiToMm;aIsiSsStatus=%hhu", aIsiSsStatus );
 
     if ( ( 0 == ( aIsiSsStatus & ( SS_GSM_ACTIVE + SS_GSM_REGISTERED +
         SS_GSM_PROVISIONED + SS_GSM_QUIESCENT ) ) ) &&
@@ -2819,7 +2853,7 @@ void CMmSupplServMessHandler::MapCWStatusIsiToMm
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::MapCWStatusIsiToMm");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCWSTATUSISITOMM, "CMmSupplServMessHandler::MapCWStatusIsiToMm" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPCWSTATUSISITOMM_TD, "CMmSupplServMessHandler::MapCWStatusIsiToMm" );
 
     if ( ( 0 == ( aIsiSsStatus & ( SS_GSM_ACTIVE + SS_GSM_REGISTERED +
         SS_GSM_PROVISIONED + SS_GSM_QUIESCENT ) ) ) &&
@@ -2866,7 +2900,7 @@ TInt CMmSupplServMessHandler::MapBasicServiceCodeIsiToMm
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapBasicServiceCodeIsiToMm - \
               isi basic service code: %d", aIsiBasicServiceCode);
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPBASICSERVICECODEISITOMM, "CMmSupplServMessHandler::MapBasicServiceCodeIsiToMm;aIsiBasicServiceCode=%hhu", aIsiBasicServiceCode );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPBASICSERVICECODEISITOMM_TD, "CMmSupplServMessHandler::MapBasicServiceCodeIsiToMm;aIsiBasicServiceCode=%hhu", aIsiBasicServiceCode );
 
     TInt ret( KErrNone );
 
@@ -3038,7 +3072,7 @@ OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPBASICSERVICECODEISITOMM, 
         default:
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapBasicServiceCodeIsiToMm \
               - unknown isi basic service code: %d", aIsiBasicServiceCode);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPBASICSERVICECODEISITOMM, "CMmSupplServMessHandler::MapBasicServiceCodeIsiToMm;unknown isi basic service code=%hhu", aIsiBasicServiceCode );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPBASICSERVICECODEISITOMM_TD, "CMmSupplServMessHandler::MapBasicServiceCodeIsiToMm;unknown isi basic service code=%hhu", aIsiBasicServiceCode );
             ret = KErrGeneral; // this can't be KErrArgument because basic
                             // service code isn't usually given as argument
             break;
@@ -3060,7 +3094,7 @@ void CMmSupplServMessHandler::MapCFConditionIsiToMm
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapCFConditionIsiToMm - isi call \
               forward condition: %d", aCFCondition);
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONISITOMM, "CMmSupplServMessHandler::MapCFConditionIsiToMm;aCFCondition=%hu", aCFCondition );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONISITOMM_TD, "CMmSupplServMessHandler::MapCFConditionIsiToMm;aCFCondition=%hu", aCFCondition );
 
     //get the right condition code
     switch ( aCFCondition )
@@ -3085,7 +3119,7 @@ OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONISITOMM, "CMmS
             break;
         default:
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapCFConditionIsiToMm - unknown isi call forward condition: %d", aCFCondition);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONISITOMM, "CMmSupplServMessHandler::MapCFConditionIsiToMm;unknown isi call forward condition=%hu", aCFCondition );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPCFCONDITIONISITOMM_TD, "CMmSupplServMessHandler::MapCFConditionIsiToMm;unknown isi call forward condition=%hu", aCFCondition );
             *aMmCFCondition = RMobilePhone::ECallForwardingUnspecified;
             break;
         }
@@ -3104,7 +3138,7 @@ void CMmSupplServMessHandler::MapTimeoutIsiToMm
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapTimeoutIsiToMm - isi timeout: %d",
               aISITimeout);
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPTIMEOUTISITOMM, "CMmSupplServMessHandler::MapTimeoutIsiToMm;aISITimeout=%hhu", aISITimeout );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPTIMEOUTISITOMM_TD, "CMmSupplServMessHandler::MapTimeoutIsiToMm;aISITimeout=%hhu", aISITimeout );
 
     if ( SS_UNDEFINED_TIME == aISITimeout )
         {
@@ -3131,7 +3165,7 @@ TInt CMmSupplServMessHandler::MapOperationMmToIsi
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapOperationMmToIsi - multimode \
               api service action: %d", aMmOperation);
-OstTrace1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPOPERATIONMMTOISI, "CMmSupplServMessHandler::MapOperationMmToIsi;aMmOperation=%d", aMmOperation );
+OstTrace1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPOPERATIONMMTOISI_TD, "CMmSupplServMessHandler::MapOperationMmToIsi;aMmOperation=%d", aMmOperation );
 
     TInt ret( KErrNone );
 
@@ -3155,7 +3189,7 @@ OstTrace1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPOPERATIONMMTOISI, "CMmSupplS
         default:
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapOperationMmToIsi - \
               unknown multimode api service action: %d", aMmOperation);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPOPERATIONMMTOISI, "CMmSupplServMessHandler::MapOperationMmToIsi;unknown multimode api service action=%d", aMmOperation );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPOPERATIONMMTOISI_TD, "CMmSupplServMessHandler::MapOperationMmToIsi;unknown multimode api service action=%d", aMmOperation );
             ret = KErrArgument;
             break;
         }
@@ -3176,7 +3210,7 @@ void CMmSupplServMessHandler::MapCBConditionIsiToMm
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapCBConditionIsiToMm - isi call \
               barring condition: %d", aCBCondition);
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONISITOMM, "CMmSupplServMessHandler::MapCBConditionIsiToMm;aCBCondition=%hu", aCBCondition );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONISITOMM_TD, "CMmSupplServMessHandler::MapCBConditionIsiToMm;aCBCondition=%hu", aCBCondition );
 
     //get the right condition code
     switch ( aCBCondition )
@@ -3207,7 +3241,7 @@ OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONISITOMM, "CMmS
             break;
         default:
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapCBConditionIsiToMm - unknown isi call barring condition: %d", aCBCondition);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONISITOMM, "CMmSupplServMessHandler::MapCBConditionIsiToMm;unknown isi call barring condition=%hu", aCBCondition );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONISITOMM_TD, "CMmSupplServMessHandler::MapCBConditionIsiToMm;unknown isi call barring condition=%hu", aCBCondition );
             *aMmCBCondition = RMobilePhone::EBarUnspecified;
             break;
         }
@@ -3228,7 +3262,7 @@ TInt CMmSupplServMessHandler::MapCBConditionMmToIsi
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapCBConditionMmToIsi - multimode \
               api call barring condition: %d", aMmCBCondition);
-OstTrace1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONMMTOISI, "CMmSupplServMessHandler::MapCBConditionMmToIsi;aMmCBCondition=%d", aMmCBCondition );
+OstTrace1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONMMTOISI_TD, "CMmSupplServMessHandler::MapCBConditionMmToIsi;aMmCBCondition=%d", aMmCBCondition );
 
     TInt ret( KErrNone );
 
@@ -3262,7 +3296,7 @@ OstTrace1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONMMTOISI, "CMmSupp
         default:
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapCBConditionMmToIsi - \
               unknown multimode api call barring condition: %d", aMmCBCondition);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONMMTOISI, "CMmSupplServMessHandler::MapCBConditionMmToIsi;unknown multimode api call barring condition=%d", aMmCBCondition );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPCBCONDITIONMMTOISI_TD, "CMmSupplServMessHandler::MapCBConditionMmToIsi;unknown multimode api call barring condition=%d", aMmCBCondition );
             ret = KErrNotSupported;
             break;
         }
@@ -3282,7 +3316,7 @@ void CMmSupplServMessHandler::MapCBStatusIsiToMm
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapCBStatusIsiToMm - isi status: %d",
               aIsiSsStatus);
-OstTraceExt1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPCBSTATUSISITOMM, "CMmSupplServMessHandler::MapCBStatusIsiToMm;aIsiSsStatus=%hhu", aIsiSsStatus );
+OstTraceExt1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPCBSTATUSISITOMM_TD, "CMmSupplServMessHandler::MapCBStatusIsiToMm;aIsiSsStatus=%hhu", aIsiSsStatus );
 
     //get the right status code
    if ( ( 0 == ( aIsiSsStatus & ( SS_GSM_ACTIVE + SS_GSM_REGISTERED +
@@ -3325,7 +3359,7 @@ TInt CMmSupplServMessHandler::MapIdentityServiceMmToIsi
     {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapIdentityServiceMmToIsi - \
               multimode api identity service: %d", aService);
-OstTrace1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPIDENTITYSERVICEMMTOISI, "CMmSupplServMessHandler::MapIdentityServiceMmToIsi;aService=%d", aService );
+OstTrace1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPIDENTITYSERVICEMMTOISI_TD, "CMmSupplServMessHandler::MapIdentityServiceMmToIsi;aService=%d", aService );
 
     TInt ret( KErrNone );
 
@@ -3352,7 +3386,7 @@ OstTrace1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPIDENTITYSERVICEMMTOISI, "CMm
         default:
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::MapIdentityServiceMmToIsi \
               - unknown multimode api identity service: %d", aService);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPIDENTITYSERVICEMMTOISI, "CMmSupplServMessHandler::MapIdentityServiceMmToIsi;unknown multimode api identity service=%d", aService );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPIDENTITYSERVICEMMTOISI_TD, "CMmSupplServMessHandler::MapIdentityServiceMmToIsi;unknown multimode api identity service=%d", aService );
             ret = KErrNotSupported;
             break;
         }
@@ -3378,7 +3412,7 @@ void CMmSupplServMessHandler::MapIdentityServiceStatusIsiToMm
 TFLOGSTRING3("TSY: CMmSupplServMessHandler::MapIdentityServiceStatusIsiToMm \
               - isi id service status: %d, isi clir operation: %d",
               aIsiIdentityServiceStatus, aIsiClirOption);
-OstTraceExt2( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPIDENTITYSERVICESTATUSISITOMM, "CMmSupplServMessHandler::MapIdentityServiceStatusIsiToMm;aIsiIdentityServiceStatus=%hhu;aIsiClirOption=%hhu", aIsiIdentityServiceStatus, aIsiClirOption );
+OstTraceExt2( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPIDENTITYSERVICESTATUSISITOMM_TD, "CMmSupplServMessHandler::MapIdentityServiceStatusIsiToMm;aIsiIdentityServiceStatus=%hhu;aIsiClirOption=%hhu", aIsiIdentityServiceStatus, aIsiClirOption );
 
     if ( 0 == ( aIsiIdentityServiceStatus & SS_GSM_PROVISIONED ) )
         {
@@ -3434,7 +3468,7 @@ TUint16 CMmSupplServMessHandler::GsmLibSmsPackMessage
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::GsmLibSmsPackMessage");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_GSMLIBSMSPACKMESSAGE, "CMmSupplServMessHandler::GsmLibSmsPackMessage" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_GSMLIBSMSPACKMESSAGE_TD, "CMmSupplServMessHandler::GsmLibSmsPackMessage" );
 
     TUint16 si( 0 );
     TUint16 di( 0 ); // Indexes
@@ -3491,7 +3525,7 @@ void CMmSupplServMessHandler::HandleError
     )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::HandleError");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_HANDLEERROR, "CMmSupplServMessHandler::HandleError" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_HANDLEERROR_TD, "CMmSupplServMessHandler::HandleError" );
     //none
     }
 
@@ -3500,16 +3534,18 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_HANDLEERROR, "CMmSupplServMessH
 // Write call forwarding flags REL4 to UICC
 // -----------------------------------------------------------------------------
 //
-TInt CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req()
+TInt CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req
+    (
+    TUint8 aVoiceStatus,
+    TUint8 aFaxStatus,
+    TUint8 aDataStatus
+    )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ_TD, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req" );
 
     TBuf<RMobilePhone::KMaxMobileTelNumberSize> telNumber( 0 );
 
-    TUint8 voiceStatus( iVoiceStatus );
-    TUint8 faxStatus( iFaxStatus );
-    TUint8 dataStatus( iDataStatus );
     TUint8 numberLength( iCFAddress.iTelNumber.Length() );
     TUint8 status( 0 );
 
@@ -3529,8 +3565,8 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
                 telNumber.Copy( iCFAddress.iTelNumber );
-                voiceStatus = status;
-                faxStatus = status;
+                aVoiceStatus = status;
+                aFaxStatus = status;
                 }
             break;
             }
@@ -3539,7 +3575,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
                 telNumber.Copy( iCFAddress.iTelNumber );
-                voiceStatus = status;
+                aVoiceStatus = status;
                 }
             else
                 {
@@ -3555,7 +3591,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "
 
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
-                dataStatus = status;
+                aDataStatus = status;
                 }
 
             break;
@@ -3567,7 +3603,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "
 
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
-                faxStatus = status;
+                aFaxStatus = status;
                 }
             break;
             }
@@ -3577,9 +3613,9 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "
                 RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
                 telNumber.Copy( iCFAddress.iTelNumber );
-                voiceStatus = status;
-                dataStatus = status;
-                faxStatus = status;
+                aVoiceStatus = status;
+                aDataStatus = status;
+                aFaxStatus = status;
                 }
             break;
             }
@@ -3588,7 +3624,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
                 telNumber.Copy( iCFAddress.iTelNumber );
-                dataStatus = status;
+                aDataStatus = status;
                 }
             break;
             }
@@ -3597,29 +3633,29 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
                 telNumber.Copy( iCFAddress.iTelNumber );
-                dataStatus = status;
+                aDataStatus = status;
                 }
             break;
             }
         default:
             {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req - unknown call service: %d", iMobileService);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req;iMobileService=%d", iMobileService );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ_TD, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req;iMobileService=%d", iMobileService );
             break;
             }
         }
 
 TFLOGSTRING3("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req -  Number: %S, length: %d", &telNumber, numberLength);
-TFLOGSTRING4("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req - VoiceStatus: %d, FaxStatus: %d, DataStatus: %d", voiceStatus, faxStatus, dataStatus);
-OstTraceExt5( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req;telNumber=%S;numberLength=%hhu;voiceStatus=%hhu;faxStatus=%hhu;dataStatus=%hhu", telNumber, numberLength, voiceStatus, faxStatus, dataStatus );
+TFLOGSTRING4("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req - VoiceStatus: %d, FaxStatus: %d, DataStatus: %d", aVoiceStatus, aFaxStatus, aDataStatus);
+OstTraceExt5( TRACE_NORMAL,  DUP2_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSREL4REQ_TD, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsRel4Req;telNumber=%S;numberLength=%hhu;voiceStatus=%hhu;faxStatus=%hhu;dataStatus=%hhu", telNumber, numberLength, aVoiceStatus, aFaxStatus, aDataStatus );
 
     // Status of the call forward unconditional indicator
     TUint8 cfuIndicatorStatus( 0 );
-    cfuIndicatorStatus = voiceStatus; // 1st bit is for voice
+    cfuIndicatorStatus = aVoiceStatus; // 1st bit is for voice
     // 2nd bit is for fax
-    cfuIndicatorStatus = cfuIndicatorStatus | ( faxStatus << 1 );
+    cfuIndicatorStatus = cfuIndicatorStatus | ( aFaxStatus << 1 );
     // 3rd bit is for data
-    cfuIndicatorStatus = cfuIndicatorStatus | ( dataStatus << 2 );
+    cfuIndicatorStatus = cfuIndicatorStatus | ( aDataStatus << 2 );
 
     // Convert number to BCD format
     TBuf8<RMobilePhone::KMaxMobileTelNumberSize> bcdNumberToSim( 0 );
@@ -3686,27 +3722,20 @@ OstTraceExt5( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSRE
 // Write call forwarding flags CPHS to UICC
 // -----------------------------------------------------------------------------
 //
-TInt CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq()
+TInt CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq
+    (
+    TUint8 aVoiceLine1Status,
+    TUint8 aVoiceLine2Status,
+    TUint8 aFaxStatus,
+    TUint8 aDataStatus
+    )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq" );
-
-    TUint8 voiceLine1( iVoiceLine1 );
-    TUint8 voiceLine2( iVoiceLine2 );
-    TUint8 faxFlag( iFax );
-    TUint8 dataFlag( iData );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ_TD, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq" );
 
     TUint8 numberLength = iCFAddress.iTelNumber.Length();
-    TUint8 status( 0 );
-
-    if ( 0 < numberLength )
-        {
-        status = 0x0A; // set divert
-        }
-    else
-        {
-        status = 0x05; // cancel divert
-        }
+    TCphsCallForwardingFlagStatus status( 0 < numberLength ?
+        ECphsCallForwardingActive : ECphsCallForwardingInactive );
 
     switch ( iMobileService )
         {
@@ -3714,7 +3743,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ, "
             {
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
-                voiceLine1 = status;
+                aVoiceLine1Status = status;
                 }
             break;
             }
@@ -3722,7 +3751,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ, "
             {
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
-                dataFlag = status;
+                aDataStatus = status;
                 }
             break;
             }
@@ -3730,7 +3759,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ, "
             {
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
-                faxFlag = status;
+                aFaxStatus = status;
                 }
             break;
             }
@@ -3739,9 +3768,9 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ, "
             if ( RMobilePhone::ECallForwardingAllCases == iMmCFCondition ||
                 RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
-                voiceLine1 = status;
-                dataFlag = status;
-                faxFlag = status;
+                aVoiceLine1Status = status;
+                aDataStatus = status;
+                aFaxStatus = status;
                 }
             break;
             }
@@ -3749,52 +3778,48 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ, "
             {
             if ( RMobilePhone::ECallForwardingUnconditional == iMmCFCondition )
                 {
-                voiceLine2 = status;
+                aVoiceLine2Status = status;
                 }
             else if ( RMobilePhone::ECallForwardingAllCases == iMmCFCondition )
                 {
-                voiceLine2 = status;
-                dataFlag = status;
-                faxFlag = status;
+                aVoiceLine2Status = status;
+                aDataStatus = status;
+                aFaxStatus = status;
                 }
             break;
             }
         default:
             {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - unknown call service: %d", iMobileService);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq;iMobileService=%d", iMobileService );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ_TD, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq;iMobileService=%d", iMobileService );
             break;
             }
         }
 
-TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - VoiceLine1: %d", voiceLine1);
-TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - VoiceLine2: %d", voiceLine2);
-TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - Fax: %d", faxFlag);
-TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - Data: %d", dataFlag);
-OstTraceExt4( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq;voiceLine1=%hhu;voiceLine2=%hhu;faxFlag=%hhu;dataFlag=%hhu", voiceLine1, voiceLine2, faxFlag, dataFlag );
+TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - VoiceLine1: %d", aVoiceLine1Status);
+TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - VoiceLine2: %d", aVoiceLine2Status);
+TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - Fax: %d", aFaxStatus);
+TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - Data: %d", aDataStatus);
+OstTraceExt4( TRACE_NORMAL,  DUP2_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ_TD, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq;voiceLine1=%hhu;voiceLine2=%hhu;faxFlag=%hhu;dataFlag=%hhu", aVoiceLine1Status, aVoiceLine2Status, aFaxStatus, aDataStatus );
 
     // Stores CPHS indicator values to be used in notify
     // ECustomNotifyIccCallForwardingStatusChangeIPC
     // Stores CAPI CF indicator values
     iTCFIndicators.iMultipleSubscriberProfileID = RMmCustomAPI::KProfileIdentityOne;
-    iTCFIndicators.iIndicator =
-        ( voiceLine1 == 0x0A ? RMobilePhone::KCFUIndicatorVoice:
-        RMobilePhone::KCFUIndicatorUnknown );
+    iTCFIndicators.iIndicator = aVoiceLine1Status == ECphsCallForwardingActive
+        ? RMobilePhone::KCFUIndicatorVoice : RMobilePhone::KCFUIndicatorUnknown;
 
-    iTCFIndicators.iIndicator |=
-        ( voiceLine2 == 0x0A ? RMobilePhone::KCFUIndicatorAuxVoice:
-        RMobilePhone::KCFUIndicatorUnknown );
+    iTCFIndicators.iIndicator |= aVoiceLine2Status == ECphsCallForwardingActive
+        ? RMobilePhone::KCFUIndicatorAuxVoice : RMobilePhone::KCFUIndicatorUnknown;
 
-    iTCFIndicators.iIndicator |=
-        ( faxFlag == 0x0A ? RMobilePhone::KCFUIndicatorFax:
-        RMobilePhone::KCFUIndicatorUnknown  );
+    iTCFIndicators.iIndicator |= aFaxStatus == ECphsCallForwardingActive
+        ? RMobilePhone::KCFUIndicatorFax : RMobilePhone::KCFUIndicatorUnknown;
 
-    iTCFIndicators.iIndicator |=
-        ( dataFlag == 0x0A ? RMobilePhone::KCFUIndicatorData:
-        RMobilePhone::KCFUIndicatorUnknown );
+    iTCFIndicators.iIndicator |= aDataStatus == ECphsCallForwardingActive
+        ? RMobilePhone::KCFUIndicatorData : RMobilePhone::KCFUIndicatorUnknown;
 
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq - Indicator: 0x%x", iTCFIndicators.iIndicator );
-OstTrace1( TRACE_NORMAL, DUP3_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq;iTCFIndicators.iIndicator=%x", iTCFIndicators.iIndicator );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSREQ_TD, "CMmSupplServMessHandler::UiccWriteCallFwdFlagsCPHSReq;iTCFIndicators.iIndicator=%x", iTCFIndicators.iIndicator );
 
     iTCFIndicators.iCFNumber.iTelNumber.Zero();
 
@@ -3816,10 +3841,19 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSR
 
     // File data tu be updated.
     TBuf8<2> fileDataBuf;
-    // Byte 1: Voice line 2 (bits 4-7) and Voice line 1 (bits 0-3)
-    fileDataBuf.Append( ( voiceLine2 << 4 ) | ( voiceLine1 ) );
-    // Byte 2: Data calls (bits 4-7) and Fax calls (bits 0-3)
-    fileDataBuf.Append( ( dataFlag << 4 ) | ( faxFlag ) );
+    // Byte 1[M]: Voice line 2 (bits 4-7) and Voice line 1 (bits 0-3)
+    fileDataBuf.Append( aVoiceLine2Status << 4 | aVoiceLine1Status );
+    // Byte 2[O]: Data calls (bits 4-7) and Fax calls (bits 0-3)
+    // write only if it makes sense
+    if ( ECphsCallForwardingUnknown != aFaxStatus ||
+        ECphsCallForwardingUnknown != aDataStatus )
+        {
+        aDataStatus = aDataStatus == ECphsCallForwardingUnknown ?
+            ECphsCallForwardingInactive : aDataStatus;
+        aFaxStatus = aFaxStatus == ECphsCallForwardingUnknown ?
+            ECphsCallForwardingInactive : aFaxStatus;
+        fileDataBuf.Append( aDataStatus << 4 | aFaxStatus );
+        }
 
     params.fileData.Append( fileDataBuf );
 
@@ -3834,7 +3868,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMSUPPLSERVMESSHANDLER_UICCWRITECALLFWDFLAGSCPHSR
 TInt CMmSupplServMessHandler::UiccReadCallFwdFlagsRel4Req()
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccReadCallFwdFlagsRel4Req");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCREADCALLFWDFLAGSREL4REQ, "CMmSupplServMessHandler::UiccReadCallFwdFlagsRel4Req" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_UICCREADCALLFWDFLAGSREL4REQ_TD, "CMmSupplServMessHandler::UiccReadCallFwdFlagsRel4Req" );
 
     // At first try to read rel4 EF ( 6FCB )
     // If reading is not successful, then we try CPHS file ( 6F13 )
@@ -3864,7 +3898,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCREADCALLFWDFLAGSREL4REQ, "C
 TInt CMmSupplServMessHandler::UiccReadCallFwdFlagsCphsReq()
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccReadCallFwdFlagsCphsReq");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCREADCALLFWDFLAGSCPHSREQ, "CMmSupplServMessHandler::UiccReadCallFwdFlagsCphsReq" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_UICCREADCALLFWDFLAGSCPHSREQ_TD, "CMmSupplServMessHandler::UiccReadCallFwdFlagsCphsReq" );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccReadTransparent params;
@@ -3895,26 +3929,34 @@ void CMmSupplServMessHandler::UiccHandleCallFwdFlagsResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccHandleCallFwdFlagsResp");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP, "CMmSupplServMessHandler::UiccHandleCallFwdFlagsResp" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP_TD, "CMmSupplServMessHandler::UiccHandleCallFwdFlagsResp" );
 
     CMmDataPackage dataPackage;
     CMmDataPackage customDataPackage;
-    TBool rel4Exists( EFalse );
-    TBool cphsExists( EFalse );
+    enum
+    {
+        EForwardFlagsConfigurationUnknown,
+        EForwardFlagsConfigurationRel4,
+        EForwardFlagsConfigurationCphs
+    } configuration( EForwardFlagsConfigurationUnknown );
 
+    TUint8 voiceStatus( 0 );
+    TUint8 auxVoiceStatus( 0 );
+    TUint8 faxStatus( 0 );
+    TUint8 dataStatus( 0 );
     // Read file data only if UICC status is OK
     if ( UICC_STATUS_OK == aStatus )
         {
         if ( ETrIdReadCallFwdFlagsRel4 == aTrId )
             {
-            rel4Exists = ETrue;
-            iVoiceStatus = aFileData[1] & 0x01;
-            iFaxStatus = ( ( aFileData[1] & 0x02 ) >> 1 );
-            iDataStatus = ( ( aFileData[1] & 0x04 ) >> 2 );
+            configuration = EForwardFlagsConfigurationRel4;
+            voiceStatus = aFileData[1] & 0x01;
+            faxStatus = ( aFileData[1] & 0x02 ) >> 1;
+            dataStatus = ( aFileData[1] & 0x04 ) >> 2;
 
             // In case of inactive flags, remaining bytes may be set to 0xFF in SIM
             // Check the byte 3 for avoiding crash in that case.
-            if ( iVoiceStatus || iFaxStatus || iDataStatus &&
+            if ( ( voiceStatus || faxStatus || dataStatus ) &&
                 0xFF != aFileData[2] )
                 {
                 TUint8 numberLen( aFileData[2] );
@@ -3934,15 +3976,25 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP, "CM
                     {
                     iCFTelNumberFromSim.SetLength( index );
                     }
+                // no else
                 }
+            // no else
             }
         else // CPHS case
             {
-            iVoiceLine1 = aFileData[0] & 0x0F;
-            iVoiceLine2 = ( aFileData[0] & 0xF0 ) >> 4;
-            iFax = aFileData[1] & 0x0F;
-            iData = ( aFileData[1] & 0xF0 ) >> 4;
-            cphsExists = ETrue;
+            configuration = EForwardFlagsConfigurationCphs;
+            voiceStatus = aFileData[0] & 0x0F;
+            auxVoiceStatus = ( aFileData[0] & 0xF0 ) >> 4;
+            if ( 1 < aFileData.Length() )
+                {
+                faxStatus = aFileData[1] & 0x0F;
+                dataStatus = ( aFileData[1] & 0xF0 ) >> 4;
+                }
+            else
+                {
+                faxStatus = ECphsCallForwardingUnknown;
+                dataStatus = ECphsCallForwardingUnknown;
+                }
             }
         } // End of if ( UICC_STATUS_OK == aStatus )
 
@@ -3952,37 +4004,35 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP, "CM
     iTCFIndicators.iMultipleSubscriberProfileID =
         RMmCustomAPI::KProfileIdentityOne;
 
-    if ( rel4Exists )
+    if ( EForwardFlagsConfigurationRel4 == configuration )
         {
         iTCFIndicators.iIndicator =
-            ( iVoiceStatus ? RMobilePhone::KCFUIndicatorVoice:
-            RMobilePhone::KCFUIndicatorUnknown );
+            voiceStatus ? RMobilePhone::KCFUIndicatorVoice :
+            RMobilePhone::KCFUIndicatorUnknown;
         iTCFIndicators.iIndicator |=
-            ( iFaxStatus ? RMobilePhone::KCFUIndicatorFax:
-            RMobilePhone::KCFUIndicatorUnknown );
+            faxStatus ? RMobilePhone::KCFUIndicatorFax :
+            RMobilePhone::KCFUIndicatorUnknown;
         iTCFIndicators.iIndicator |=
-            ( iDataStatus ? RMobilePhone::KCFUIndicatorData:
-            RMobilePhone::KCFUIndicatorUnknown );
-
+            dataStatus ? RMobilePhone::KCFUIndicatorData :
+            RMobilePhone::KCFUIndicatorUnknown;
         iTCFIndicators.iCFNumber.iTelNumber.Copy( iCFTelNumberFromSim );
         }
-    else if ( cphsExists )  // CPHS
+    else if ( EForwardFlagsConfigurationCphs == configuration )  // CPHS
         {
         iTCFIndicators.iIndicator =
-            ( iVoiceLine1 == 0x0A ? RMobilePhone::KCFUIndicatorVoice:
-            RMobilePhone::KCFUIndicatorUnknown );
-
+            voiceStatus == ECphsCallForwardingActive ?
+            RMobilePhone::KCFUIndicatorVoice : RMobilePhone::KCFUIndicatorUnknown;
         iTCFIndicators.iIndicator |=
-            ( iVoiceLine2 == 0x0A ? RMobilePhone::KCFUIndicatorAuxVoice:
-            RMobilePhone::KCFUIndicatorUnknown );
-
+            auxVoiceStatus == ECphsCallForwardingActive ?
+            RMobilePhone::KCFUIndicatorAuxVoice : RMobilePhone::KCFUIndicatorUnknown;
         iTCFIndicators.iIndicator |=
-            ( iFax == 0x0A ? RMobilePhone::KCFUIndicatorFax:
-            RMobilePhone::KCFUIndicatorUnknown  );
+            faxStatus == ECphsCallForwardingActive ?
+            RMobilePhone::KCFUIndicatorFax : RMobilePhone::KCFUIndicatorUnknown;
         iTCFIndicators.iIndicator |=
-            ( iData == 0x0A ? RMobilePhone::KCFUIndicatorData:
-            RMobilePhone::KCFUIndicatorUnknown );
+            dataStatus == ECphsCallForwardingActive ?
+            RMobilePhone::KCFUIndicatorData : RMobilePhone::KCFUIndicatorUnknown;
         }
+    // no else
 
     if ( iGetIccCallForwardingStatus ) // ECustomGetIccCallForwardingStatusIPC
         {
@@ -4011,24 +4061,25 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP, "CM
             KErrNone );
 
 TFLOGSTRING("TSY: CMmSupplServMessHandler::SimCallFwdRespL - Check possible refresh status");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP, "CMmSupplServMessHandler::UiccHandleCallFwdFlagsResp - Check possible refresh status" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP_TD, "CMmSupplServMessHandler::UiccHandleCallFwdFlagsResp - Check possible refresh status" );
         iMessageRouter->GetPhoneMessHandler()->CallForwFlagsCachingCompleted( aStatus );
         }
     else if ( !iGetCallForwardingNumber ) // EMobilePhoneSetCallForwardingStatus
         {
-        if ( rel4Exists )
+        if ( EForwardFlagsConfigurationRel4 == configuration )
             {
             // Call forwarding status successfully read from the SIM
             // Write call forwarding number and indicator status
             // to the SIM
-            UiccWriteCallFwdFlagsRel4Req();
+            UiccWriteCallFwdFlagsRel4Req( voiceStatus, faxStatus, dataStatus );
             }
-        else if ( cphsExists )
+        else if ( EForwardFlagsConfigurationCphs == configuration )
             {
             // Call forwarding status successfully read from the SIM
             // Write call forwarding number and indicator status
             // to the SIM
-            UiccWriteCallFwdFlagsCPHSReq();
+            UiccWriteCallFwdFlagsCPHSReq(
+                voiceStatus, auxVoiceStatus, faxStatus, dataStatus );
             }
         else
             {
@@ -4047,7 +4098,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP
         iGetCallForwardingNumber = EFalse;
         dataPackage.PackData( &iCFTelNumberFromSim );
 
-        if ( rel4Exists )
+        if ( EForwardFlagsConfigurationRel4 == configuration )
             {
             // Call forwarding number successfully read from the SIM
             // Complete the GetCallForwardingNumber to SOS layer
@@ -4078,7 +4129,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_UICCHANDLECALLFWDFLAGSRESP
 TInt CMmSupplServMessHandler::UiccReadVoiceMsgFlagsRel4Req()
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccReadVoiceMsgFlagsRel4Req");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_UICCREADVOICEMSGFLAGSREL4REQ, "CMmSupplServMessHandler::UiccReadVoiceMsgFlagsRel4Req" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_UICCREADVOICEMSGFLAGSREL4REQ_TD, "CMmSupplServMessHandler::UiccReadVoiceMsgFlagsRel4Req" );
 
     // At first try to read rel4 EF ( 6FCA )
     // If reading is not successful, then we try CPHS file ( 6F11 )
@@ -4110,7 +4161,7 @@ void CMmSupplServMessHandler::UiccReadVoiceMsgFlagsResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccReadVoiceMsgFlagsResp");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCREADVOICEMSGFLAGSRESP, "CMmSupplServMessHandler::UiccReadVoiceMsgFlagsResp" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_UICCREADVOICEMSGFLAGSRESP_TD, "CMmSupplServMessHandler::UiccReadVoiceMsgFlagsResp" );
 
     TInt ret( KErrNone );
     CMmDataPackage dataPackage;
@@ -4174,7 +4225,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCREADVOICEMSGFLAGSRESP, "CMm
 TInt CMmSupplServMessHandler::UiccReadVoiceMsgFlagsCphsReq()
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccHandleCallFwdFlagsResp");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCREADVOICEMSGFLAGSCPHSREQ, "CMmSupplServMessHandler::UiccReadVoiceMsgFlagsCphsReq" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_UICCREADVOICEMSGFLAGSCPHSREQ_TD, "CMmSupplServMessHandler::UiccReadVoiceMsgFlagsCphsReq" );
 
     // Reading of rel4 was not successful, we try CPHS file ( 6F11 )
     // Set parameters for UICC_APPL_CMD_REQ message
@@ -4203,7 +4254,7 @@ TInt CMmSupplServMessHandler::UiccWriteVoiceMsgFlagsCPHSReq(
     const RMobilePhone::TMobilePhoneMessageWaitingV1& aMsgWaiting )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccWriteVoiceMsgFlagsCPHSReq");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITEVOICEMSGFLAGSCPHSREQ, "CMmSupplServMessHandler::UiccWriteVoiceMsgFlagsCPHSReq" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_UICCWRITEVOICEMSGFLAGSCPHSREQ_TD, "CMmSupplServMessHandler::UiccWriteVoiceMsgFlagsCPHSReq" );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccWriteTransparent params;
@@ -4258,7 +4309,7 @@ TInt CMmSupplServMessHandler::UiccWriteVoiceMsgFlagsRel4Req(
     const RMobilePhone::TMobilePhoneMessageWaitingV1& aMsgWaiting )
     {
 TFLOGSTRING("TSY: CMmSupplServMessHandler::UiccHandleCallFwdFlagsResp");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_UICCWRITEVOICEMSGFLAGSREL4REQ, "CMmSupplServMessHandler::UiccWriteVoiceMsgFlagsRel4Req" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_UICCWRITEVOICEMSGFLAGSREL4REQ_TD, "CMmSupplServMessHandler::UiccWriteVoiceMsgFlagsRel4Req" );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccWriteLinearFixed params;
@@ -4300,7 +4351,7 @@ void CMmSupplServMessHandler::MapTypeOfNumberMmToIsi(
     TUint8& aIsiTypeOfNumber )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::MapTypeOfNumberMmToIsi");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERMMTOISI, "CMmSupplServMessHandler::MapTypeOfNumberMmToIsi" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERMMTOISI_TD, "CMmSupplServMessHandler::MapTypeOfNumberMmToIsi" );
 
      //get the right numbering plan
     switch ( aMmNumberingPlan )
@@ -4343,7 +4394,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERMMTOISI, "CMmSup
             {
 TFLOGSTRING2("TSY: CMmCallMessHandler::MapTypeOfNumberMmToIsi -\
               Not supported numbering plan: %d", aMmNumberingPlan);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERMMTOISI, "CMmSupplServMessHandler::MapTypeOfNumberMmToIsi;aMmNumberingPlan=%d", aMmNumberingPlan );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERMMTOISI_TD, "CMmSupplServMessHandler::MapTypeOfNumberMmToIsi;aMmNumberingPlan=%d", aMmNumberingPlan );
             break;
             }
         }
@@ -4398,7 +4449,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERMMTOISI, "C
             {
 TFLOGSTRING2("TSY: CMmCallMessHandler::MapTypeOfNumberMmToIsi -\
               Not supported number type: %d", aMmTypeOfNumber);
-OstTrace1( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERMMTOISI, "CMmSupplServMessHandler::MapTypeOfNumberMmToIsi;aMmTypeOfNumber=%d", aMmTypeOfNumber );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMSUPPLSERVMESSHANDLER_MAPTYPEOFNUMBERMMTOISI_TD, "CMmSupplServMessHandler::MapTypeOfNumberMmToIsi;aMmTypeOfNumber=%d", aMmTypeOfNumber );
             break;
             }
         }
@@ -4416,7 +4467,7 @@ void CMmSupplServMessHandler::SetVoiceCallForwardLine
 {
 TFLOGSTRING2("TSY: CMmSupplServMessHandler::SetVoiceCallForwardLine: %d",
               aAlsLine);
-OstTrace1( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_SETVOICECALLFORWARDLINE, "CMmSupplServMessHandler::SetVoiceCallForwardLine;aAlsLine=%d", aAlsLine );
+OstTrace1( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_SETVOICECALLFORWARDLINE_TD, "CMmSupplServMessHandler::SetVoiceCallForwardLine;aAlsLine=%d", aAlsLine );
     iAlsLine = aAlsLine;
 }
 
@@ -4429,17 +4480,17 @@ TBool CMmSupplServMessHandler::ProcessIfSsRequestChanged(
         const TPreprocessedSsServiceCompleteResponse& aResponse)
     {
 TFLOGSTRING("TSY:CMmSupplServMessHandler::ProcessIfSsRequestChanged");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSIFSSREQUESTCHANGED, "CMmSupplServMessHandler::ProcessIfSsRequestChanged" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_PROCESSIFSSREQUESTCHANGED_TD, "CMmSupplServMessHandler::ProcessIfSsRequestChanged" );
     TBool ret( EFalse );
 
     // original SS request is changed, or initiated by Call Control
-    if ( ESSOperationTypeUnknown == aResponse.iTraId && iSsCode != aResponse.iSsCode )
+    if ( iSsCode != aResponse.iSsCode )
         {
         ret = ETrue;
         if ( KSsCodeNoValue != iSsCode )
             {
 TFLOGSTRING("TSY: call control has changed SS request -> complete with error");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_PROCESSIFSSREQUESTCHANGED, "CMmSupplServMessHandler::ProcessIfSsRequestChanged, call control has changed SS request -> complete with error" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_PROCESSIFSSREQUESTCHANGED_TD, "CMmSupplServMessHandler::ProcessIfSsRequestChanged, call control has changed SS request -> complete with error" );
             //call control has changed SS request -> complete with error
             iMessageRouter->Complete(
                 iIpc,
@@ -4450,7 +4501,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_PROCESSIFSSREQUESTCHANGED,
         else
             {
 TFLOGSTRING("TSY: call control has changed call request to SS request -> ignored");
-OstTrace0( TRACE_NORMAL, DUP2_CMMSUPPLSERVMESSHANDLER_PROCESSIFSSREQUESTCHANGED, "CMmSupplServMessHandler::ProcessIfSsRequestChanged,call control has changed call request to SS request -> ignored" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSUPPLSERVMESSHANDLER_PROCESSIFSSREQUESTCHANGED_TD, "CMmSupplServMessHandler::ProcessIfSsRequestChanged,call control has changed call request to SS request -> ignored" );
             // call control has changed call request to SS request.
             // CTSY doesn't expect the completion, ignore this (error EXTL-6XJ9KC)
             }
@@ -4467,7 +4518,7 @@ TBool CMmSupplServMessHandler::ProcessIfSimpleCompletionPossible(
         const TPreprocessedSsServiceCompleteResponse& /*aResponse*/)
     {
 TFLOGSTRING("TSY:CMmSupplServMessHandler::ProcessIfSimpleCompletionPossible");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSIFSIMPLECOMPLETIONPOSSIBLE, "CMmSupplServMessHandler::ProcessIfSimpleCompletionPossible" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_PROCESSIFSIMPLECOMPLETIONPOSSIBLE_TD, "CMmSupplServMessHandler::ProcessIfSimpleCompletionPossible" );
     TBool ret( EFalse );
 
     if ( EMobilePhoneSendNetworkServiceRequestNoFdnCheck == iIpc ||
@@ -4488,7 +4539,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSIFSIMPLECOMPLETIONPOSSIB
 TBool CMmSupplServMessHandler::ProcessSsGsmPasswordRegistration(
         const TPreprocessedSsServiceCompleteResponse& aResponse)
     {
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSSSGSMPASSWORDREGISTRATION, "CMmSupplServMessHandler::ProcessSsGsmPasswordRegistration" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_PROCESSSSGSMPASSWORDREGISTRATION_TD, "CMmSupplServMessHandler::ProcessSsGsmPasswordRegistration" );
 TFLOGSTRING("TSY:CMmSupplServMessHandler::ProcessSsGsmPasswordRegistration");
     TBool ret( EFalse );
 
@@ -4511,7 +4562,7 @@ TBool CMmSupplServMessHandler::ProcessIfCallForwardingL(
         const TPreprocessedSsServiceCompleteResponse& aResponse)
     {
 TFLOGSTRING("TSY:CMmSupplServMessHandler::ProcessIfCallForwardingL");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSIFCALLFORWARDINGL, "CMmSupplServMessHandler::ProcessIfCallForwardingL" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_PROCESSIFCALLFORWARDINGL_TD, "CMmSupplServMessHandler::ProcessIfCallForwardingL" );
     TBool ret( EFalse );
     // offset where the subblock starts
     TUint sbStartOffset( 0 );
@@ -4647,7 +4698,7 @@ TBool CMmSupplServMessHandler::ProcessIfCallBarringL(
         const TPreprocessedSsServiceCompleteResponse& aResponse)
     {
 TFLOGSTRING("TSY:CMmSupplServMessHandler::ProcessIfCallBarringL");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSIFCALLBARRINGL, "CMmSupplServMessHandler::ProcessIfCallBarringL" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_PROCESSIFCALLBARRINGL_TD, "CMmSupplServMessHandler::ProcessIfCallBarringL" );
     TBool ret( EFalse );
     // offset where the subblock starts
     TUint sbStartOffset( 0 );
@@ -4784,7 +4835,7 @@ TBool CMmSupplServMessHandler::ProcessIfCallWaitingL(
         const TPreprocessedSsServiceCompleteResponse& aResponse)
     {
 TFLOGSTRING("TSY:CMmSupplServMessHandler::ProcessIfCallWaitingL");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSIFCALLWAITINGL, "CMmSupplServMessHandler::ProcessIfCallWaitingL" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_PROCESSIFCALLWAITINGL_TD, "CMmSupplServMessHandler::ProcessIfCallWaitingL" );
     TBool ret( EFalse );
     // offset where the subblock starts
     TUint sbStartOffset( 0 );
@@ -4927,7 +4978,7 @@ TBool CMmSupplServMessHandler::ProcessIfIdentityServices(
         const TPreprocessedSsServiceCompleteResponse& aResponse)
     {
 TFLOGSTRING("TSY:CMmSupplServMessHandler::ProcessIfIdentityServices");
-OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSIFIDENTITYSERVICES, "CMmSupplServMessHandler::ProcessIfIdentityServices" );
+OstTrace0( TRACE_NORMAL,  CMMSUPPLSERVMESSHANDLER_PROCESSIFIDENTITYSERVICES_TD, "CMmSupplServMessHandler::ProcessIfIdentityServices" );
     TBool ret( EFalse );
     // offset where the subblock starts
     TUint sbStartOffset( 0 );
@@ -4967,7 +5018,7 @@ OstTrace0( TRACE_NORMAL, CMMSUPPLSERVMESSHANDLER_PROCESSIFIDENTITYSERVICES, "CMm
                             sbStartOffset ) ) )
                         {
 TFLOGSTRING("TSY:CMmSupplServMessHandler::ProcessIfIdentityServices: KSsGsmGenericServiceInfo found");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSUPPLSERVMESSHANDLER_PROCESSIFIDENTITYSERVICES, "CMmSupplServMessHandler::ProcessIfIdentityServices, KSsGsmGenericServiceInfo found" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSUPPLSERVMESSHANDLER_PROCESSIFIDENTITYSERVICES_TD, "CMmSupplServMessHandler::ProcessIfIdentityServices, KSsGsmGenericServiceInfo found" );
                         clirInfoFound = ETrue;
                         // get status
                         TUint8 statusIsi = aResponse.iIsiMessage.Get8bit(

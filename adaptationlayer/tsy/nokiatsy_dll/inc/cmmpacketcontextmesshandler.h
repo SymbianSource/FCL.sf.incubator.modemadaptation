@@ -475,10 +475,12 @@ class CMmPacketContextMessHandler : public CBase,
         * This function starts the third phase of the context initialisation.
         * @param aStatus: GPDS Status
         * @param aContextId: Context Id
+        * @param aTrId: transaction id used in context initialisation sequence
         */
         void InitialiseContextPhase3(
-            const TUint8 aStatus,
-            const TUint8 aContextId );
+            TUint8 aStatus,
+            TUint8 aContextId,
+            TUint8 aTrId );
 
         /**
         * Set configuration data for context.
@@ -506,12 +508,11 @@ class CMmPacketContextMessHandler : public CBase,
 
         /**
         * This function starts the second phase of the context activation.
-        * @param aPipeHandle: pipe handle
-        * @param aTransactionId: transaction id
+        * @param aDataPackage: data package from CommonTSY
+        * @return TInt: KErrNone or error code
         */
-        void ActivatePhase2(
-            const TUint8 aPipeHandle,
-            const TUint8 aTransactionId );
+        TInt ActivatePhase2(
+            const CMmDataPackage& aDataPackage );
 
         /**
         * Map the Packet API pdp type to the Gpds server pdp type.
@@ -840,6 +841,18 @@ class CMmPacketContextMessHandler : public CBase,
         * @return TInt: Channel ID
         */
         TInt getProxyId(const TInfoName& contextName);
+
+        /**
+        * PnsNameAdd indication.
+        * @param aIsiMessage, reference to the received message.
+        */
+        void PnsNameAddInd( const TIsiReceiveC& aIsiMessage );
+
+        /**
+        * PnsNameRemove indication.
+        * @param aIsiMessage, reference to the received message.
+        */
+        void PnsNameRemoveInd( const TIsiReceiveC& aIsiMessage );
 
     public: // Data
         // None

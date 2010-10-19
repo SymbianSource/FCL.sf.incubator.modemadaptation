@@ -37,6 +37,8 @@ enum TTrxId
     ETrxPartnerOS,
     ETrxTest,           // Only for testing purposes
     ETrxTest2,          // Only for testing purposes
+    ETrxUSB,
+    ETrxBT,    
     EAmountOfTrxs,      // Not used by transceivers
     };
 

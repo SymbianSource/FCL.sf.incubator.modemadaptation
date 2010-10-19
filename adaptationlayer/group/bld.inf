@@ -22,8 +22,12 @@ PRJ_PLATFORMS
 BASEDEFAULT
 
 #include "../bcaiscadapter/group/bld.inf"
+#include "../dataport/group/bld.inf"
 #include "../devicemodecontroller/group/bld.inf"
+#include "../filesystemaccess/group/bld.inf"
+#include "../mobileterminalcontroller/group/bld.inf"
 #include "../modematadaptation/group/bld.inf"
+#include "../phoneinfoserver/group/bld.inf"
 #include "../systemstatemanageradaptation/group/bld.inf"
 #include "../tsy/group/bld.inf"
 

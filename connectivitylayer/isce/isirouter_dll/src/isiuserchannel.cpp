@@ -20,7 +20,7 @@
 #include <kern_priv.h>              // For DMutex
 #include "isiuserchannel.h"         // For DISIUserChanneel
 #include "isiroutertrace.h"         // For C_TRACE, ASSERT_RESET.. and fault codes
-#include "misichannelrouterif.h"    // For MISIChannelRouterIf
+#include "misiobjectrouterif.h"    // For MISIObjectRouterIf
 #include "memapi.h"                 // For MemApi
 #include "isimsgqueue.h"            // For DISIMsgQueue
 
@@ -79,9 +79,9 @@ DISIUserChannel::DISIUserChannel(
             iUID( KNotInitializedUID )
     {
     C_TRACE( ( _T( "DISIUserChannel::DISIUserChannel>" ) ) );
-    iRouterIf = MISIChannelRouterIf::GetIf();
+    iRouterIf = MISIObjectRouterIf::GetIf();
     ASSERT_RESET_ALWAYS( iRouterIf, ( EISIUserChannelMemAllocFail | EDISIUserChannelTraceId << KClassIdentifierShift ) );
-    iCompletionThread = iRouterIf->GetDfcThread( MISIChannelRouterIf::EISIUserRequestCompletionThread );
+    iCompletionThread = iRouterIf->GetDfcThread( MISIObjectRouterIf::EISIUserRequestCompletionThread );
     iEmptyRxQueueDfc = new TDfc( EmptyRxQueueDfc, this, iCompletionThread, KISILddEmptyRxQueuePriori );
     ASSERT_RESET_ALWAYS( iEmptyRxQueueDfc, ( EISIUserChannelMemAllocFail2 | EDISIUserChannelTraceId << KClassIdentifierShift ) );
     iCompleteChannelRequestDfc = new TDfc( CompleteChannelRequestDfc, this, iCompletionThread, KISILddCompleteRequestPriori );
@@ -147,7 +147,7 @@ TInt DISIUserChannel::DoCreate(
     iRx = new DISIMsgQueue( KISILddRxQueueSize );
     ASSERT_RESET_ALWAYS( iRx, ( EISIUserChannelMemAllocFail1 | EDISIUserChannelTraceId << KClassIdentifierShift ) );
     // Other DFC functions handling user<>kernel copying done in ldd DFC. Ldd DFC function priority is 1.
-    iMainThread = iRouterIf->GetDfcThread( MISIChannelRouterIf::EISIUserMainThread );
+    iMainThread = iRouterIf->GetDfcThread( MISIObjectRouterIf::EISIUserMainThread );
     SetDfcQ( iMainThread );
     iMsgQ.Receive();
     DObject* thread = reinterpret_cast<DObject*>( iThread );
@@ -296,7 +296,7 @@ TInt DISIUserChannel::HandleSyncRequest(
                 TDes8& sendBlock = MemApi::AllocBlock( msgLength );
                 ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, firstParam, sendBlock, 0, KChunkShiftBy0 ), ( EISIUserChannelDesReadFailed | EDISIUserChannelTraceId << KClassIdentifierShift ) );
                 TRACE_ASSERT_INFO( sendBlock.Length() == msgLength, iObjId << KObjIdShift );
-                C_TRACE( ( _T( "DISIUserChannel::HandleAsyncRequest EISISend 0x%x 0x%x" ), this, &sendBlock ) );
+                C_TRACE( ( _T( "DISIUserChannel::HandleSyncRequest EISISend 0x%x 0x%x" ), this, &sendBlock ) );
                 error = iRouterIf->Send( sendBlock, iObjId );
                 }
             else
@@ -429,16 +429,16 @@ void DISIUserChannel::ResetQueues(
     }
 
 // This is called in 1...N thread contextes
-void DISIUserChannel::ReceiveMsg(
+void DISIUserChannel::Receive(
         const TDesC8& aMessage
         )
     {
-    C_TRACE( ( _T( "DISIUserChannel::ReceiveMsg 0x%x 0x%x 0x%x>" ), this, &aMessage, iObjId ) );
+    C_TRACE( ( _T( "DISIUserChannel::Receive 0x%x 0x%x 0x%x>" ), this, &aMessage, iObjId ) );
     // Can only be called from thread context.
     ASSERT_THREAD_CONTEXT_ALWAYS( ( EISIUserChannelfNotThreadContext3 | EDISIUserChannelTraceId << KClassIdentifierShift ) );
     iRx->Add( aMessage );
     iEmptyRxQueueDfc->Enque();
-    C_TRACE( ( _T( "DISIUserChannel::ReceiveMsg 0x%x 0x%x 0x%x<" ), this, &aMessage, iObjId ) );
+    C_TRACE( ( _T( "DISIUserChannel::Receive 0x%x 0x%x 0x%x<" ), this, &aMessage, iObjId ) );
     }
 
 DISIUserChannel::DISIUserAsyncRequests::DISIUserAsyncRequests(
@@ -562,7 +562,7 @@ void DISIUserChannel::EnqueChannelRequestCompleteDfc(
     {
     C_TRACE( ( _T( "DISIUserChannel::EnqueChannelRequestCompleteDfc 0x%x %d %d 0x%x>" ), this, aRequest, aStatusToComplete, iObjId ) );
     ASSERT_THREAD_CONTEXT_ALWAYS( ( EISIUserChannelfNotThreadContext | EDISIUserChannelTraceId << KClassIdentifierShift ) );    
-    //TODO check the error code
+
     iRequests->iRequestCompletedList.Append( aRequest ); 
     iRequests->iRequestCompletionValueList[ aRequest ] = aStatusToComplete;
     iCompleteChannelRequestDfc->Enque();

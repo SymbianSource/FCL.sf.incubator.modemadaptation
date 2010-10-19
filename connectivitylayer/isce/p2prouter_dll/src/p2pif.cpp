@@ -27,7 +27,7 @@
 const TInt KFirstParam( 0 );
 const TInt KSecondParam( 1 );
 const TInt KThirdParam( 2 );
-const TInt KOneParam( 2 );
+const TInt KOneParam( 1 );
 const TInt KTwoParams( 2 );
 const TInt KThreeParams( 3 );
 

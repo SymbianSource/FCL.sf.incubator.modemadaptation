@@ -98,6 +98,15 @@ class CDpPif : public CActive
         */
         inline void SetPipeState( const TDpPipeState aPipeState );
 
+#ifdef PIPECAMP_DATAPORT_PNS_PEP_STATUS_IND_PHONET_ADDRESS_FROM_PNS_PEP_CTRL_REQ // 20100523_1300
+        inline void SetPipeControllerDeviceIdentifier( const TUint8 aDeviceId );
+        
+        inline void SetPipeControllerObjectIdentifier( const TUint8 aObjectId );
+				
+				inline TUint8 GetPipeControllerDeviceIdentifier();
+				
+				inline TUint8 GetPipeControllerObjectIdentifier();
+#endif
         /**
         * This method registers DataPort to Name Service.
         * @param aUnit: Port unit number
@@ -169,7 +178,10 @@ class CDpPif : public CActive
 
         // Pipe handle
         TUint8 iPipeHandle;
-
+#ifdef PIPECAMP_DATAPORT_PNS_PEP_STATUS_IND_PHONET_ADDRESS_FROM_PNS_PEP_CTRL_REQ // 20100523_1300
+        TUint8 iPipeControllerDevId;
+        TUint8 iPipeControllerObjId;
+#endif        
         // PIF state
         TDpPifState iPifState;
 

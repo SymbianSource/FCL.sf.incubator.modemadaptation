@@ -20,9 +20,9 @@
 #ifndef __ISCEDEFS_H__
 #define __ISCEDEFS_H__
 
-// TODO: static configuration needs works
-// TODO: Separate protocol spesific parts from generic ones.
-// TODO: check dependenciest of. h files (definitions etc..)
+//  static configuration needs works
+//  Separate protocol spesific parts from generic ones.
+//  check dependenciest of. h files (definitions etc..)
 
 // L2 Multiplexing protocol identifiers.
 // Follow MeXe protocol

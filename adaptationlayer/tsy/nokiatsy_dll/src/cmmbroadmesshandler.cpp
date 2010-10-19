@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -70,7 +70,7 @@ const TUint8 KBroadPadding( 0x00 );
 CMmBroadMessHandler::CMmBroadMessHandler()
     {
 TFLOGSTRING("TSY: CMmBroadMessHandler::CMmBroadMessHandler");
-OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_CMMBROADMESSHANDLER, "CMmBroadMessHandler::CMmBroadMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMBROADMESSHANDLER_CMMBROADMESSHANDLER_TD, "CMmBroadMessHandler::CMmBroadMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_CMMBROADMESSHANDLER, "CMmBroadMessH
 void CMmBroadMessHandler::ConstructL()
     {
 TFLOGSTRING("TSY: CMmBroadMessHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_CONSTRUCTL, "CMmBroadMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMBROADMESSHANDLER_CONSTRUCTL_TD, "CMmBroadMessHandler::ConstructL" );
     // Initialise the array. Maximun of pages in a WCDMA CBS message is 15
     iCbsMsg = new( ELeave ) CArrayPtrFlat< TWcdmaCbsMsg >( 10 );
 
@@ -103,7 +103,7 @@ CMmBroadMessHandler* CMmBroadMessHandler::NewL
     )
     {
 TFLOGSTRING("TSY: CMmBroadMessHandler::NewL");
-OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_NEWL, "CMmBroadMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMBROADMESSHANDLER_NEWL_TD, "CMmBroadMessHandler::NewL" );
     CMmBroadMessHandler* mmBroadMessHandler =
         new( ELeave ) CMmBroadMessHandler();
 
@@ -134,7 +134,7 @@ OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_NEWL, "CMmBroadMessHandler::NewL" )
 CMmBroadMessHandler::~CMmBroadMessHandler()
     {
 TFLOGSTRING("TSY: CMmBroadMessHandler::~CMmBroadMessHandler");
-OstTrace0( TRACE_NORMAL, DUP1_CMMBROADMESSHANDLER_CMMBROADMESSHANDLER, "CMmBroadMessHandler::~CMmBroadMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMBROADMESSHANDLER_CMMBROADMESSHANDLER_TD, "CMmBroadMessHandler::~CMmBroadMessHandler" );
     if ( iCbsMsg )
         {
         iCbsMsg->ResetAndDestroy();
@@ -153,14 +153,14 @@ void CMmBroadMessHandler::ReceiveMessageL( const TIsiReceiveC& aIsiMessage )
     TUint8 messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
 TFLOGSTRING3("TSY: CMmBroadMessHandler::ReceiveMessageL. Resource:%d, MsgId:%d", resource,messageId);
-OstTraceExt2( TRACE_NORMAL, CMMBROADMESSHANDLER_RECEIVEMESSAGEL, "CMmBroadMessHandler::ReceiveMessageL;resource=%hhd;messageId=%hhx", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  CMMBROADMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmBroadMessHandler::ReceiveMessageL;resource=%hhd;messageId=%hhx", resource, messageId );
 
     switch ( resource )
         {
         case PN_SMS:
             {
 TFLOGSTRING("TSY: CMmBroadMessHandler::ReceiveMessageL - PN_SMS");
-OstTrace0( TRACE_NORMAL, DUP1_CMMBROADMESSHANDLER_RECEIVEMESSAGEL, "CMmBroadMessHandler::ReceiveMessageL - PN_SMS" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMBROADMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmBroadMessHandler::ReceiveMessageL - PN_SMS" );
 
             switch( messageId )
                 {
@@ -177,7 +177,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMBROADMESSHANDLER_RECEIVEMESSAGEL, "CMmBroadMess
                 default:
                     {
 TFLOGSTRING("TSY: CMmBroadMessHandler::ReceiveMessageL - PN_SMS - default");
-OstTrace0( TRACE_NORMAL, DUP3_CMMBROADMESSHANDLER_RECEIVEMESSAGEL, "CMmBroadMessHandler::ReceiveMessageL - PN_SMS - default" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMBROADMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmBroadMessHandler::ReceiveMessageL - PN_SMS - default" );
                     // No appropriate handler methods for ISI-message found.
                     break;
                     }
@@ -187,7 +187,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMBROADMESSHANDLER_RECEIVEMESSAGEL, "CMmBroadMess
         default:
             {
 TFLOGSTRING("TSY: CMmBroadMessHandler::ReceiveMessageL. Switch resource case default");
-OstTrace0( TRACE_NORMAL, DUP2_CMMBROADMESSHANDLER_RECEIVEMESSAGEL, "CMmBroadMessHandler::ReceiveMessageL. Switch resource case default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMBROADMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmBroadMessHandler::ReceiveMessageL. Switch resource case default" );
             // No appropriate handler methods for ISI-message found.
             break;
             }
@@ -208,7 +208,7 @@ TInt CMmBroadMessHandler::SmsCbRoutingRequest
     )
     {
 TFLOGSTRING("TSY: CMmBroadMessHandler::SmsCbRoutingRequest");
-OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST, "CMmBroadMessHandler::SmsCbRoutingRequest" );
+OstTrace0( TRACE_NORMAL,  CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST_TD, "CMmBroadMessHandler::SmsCbRoutingRequest" );
 
     // Variable for the routing command initialized
     TUint8 routingCommand( 0 );
@@ -221,14 +221,14 @@ OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST, "CMmBroadMessH
         {
         // Release routing
 TFLOGSTRING("TSY:CMmBroadMessHandler::SmsCbRoutingRequest:CB routing will be released.");
-OstTrace0( TRACE_NORMAL, DUP1_CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST, "CMmBroadMessHandler::SmsCbRoutingRequest:CB routing will be released." );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST_TD, "CMmBroadMessHandler::SmsCbRoutingRequest:CB routing will be released." );
         routingCommand = SMS_ROUTING_RELEASE;
         }
     else if ( RMobileBroadcastMessaging::EBroadcastAcceptAll == data.iSetting )
         {
         // Activate routing
 TFLOGSTRING("TSY:CMmBroadMessHandler::SmsCbRoutingRequest:CB routing will be activated.");
-OstTrace0( TRACE_NORMAL, DUP2_CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST, "CMmBroadMessHandler::SmsCbRoutingRequest:CB routing will be activated." );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST_TD, "CMmBroadMessHandler::SmsCbRoutingRequest:CB routing will be activated." );
         routingCommand = SMS_ROUTING_SET;
         }
     else
@@ -238,7 +238,7 @@ TFLOGSTRING2("TSY:CMmBroadMessHandler::SmsCbRoutingRequest:Unsupported filter 0x
 // compiler is not in use.
 #ifdef OST_TRACE_COMPILER_IN_USE
         TUint tempValue = data.iSetting; // Parameter just for tracing
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST, "CMmBroadMessHandler::SmsCbRoutingRequest;data.iSetting=%hhx", tempValue );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMBROADMESSHANDLER_SMSCBROUTINGREQUEST_TD, "CMmBroadMessHandler::SmsCbRoutingRequest;data.iSetting=%hhx", tempValue );
 #endif // OST_TRACE_COMPILER_IN_USE
         return KErrArgument;
         }
@@ -282,47 +282,51 @@ void CMmBroadMessHandler::SmsCbRoutingResp
     const TIsiReceiveC& aSmsCbRoutingResp // Received isimsg
     )
     {
-TFLOGSTRING("TSY: CMmBroadMessHandler::SmsCbRoutingResp");
-OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_SMSGSMCBROUTINGRESP, "CMmBroadMessHandler::SmsCbRoutingResp" );
     TInt ipc( 0 ); // Initialize to zero
-
-    iCbSubscriptionNumber = aSmsCbRoutingResp.Get8bit(
-        ISI_HEADER_SIZE + SMS_CB_ROUTING_RESP_OFFSET_SUBSCRIPTIONNUMBER );
-
-    TUint8 isiCause( aSmsCbRoutingResp.Get8bit( ISI_HEADER_SIZE
-        + SMS_CB_ROUTING_RESP_OFFSET_SMSCAUSE ) );
-
-    TInt cause( CMmStaticUtility::CSCauseToEpocError(
-        PN_SMS,
-        SMS_CAUSE_TYPE_COMMON,
-        isiCause ) );
 
     TUint8 traid( aSmsCbRoutingResp.Get8bit( ISI_HEADER_SIZE
         + SMS_CB_ROUTING_RESP_OFFSET_TRANSID ) );
 
-    // Response for SmsGsmCbRoutingReq (receive message)
-    if ( EBroadcastMessagingReceiveMessage == traid )
+    if( EBroadcastMessagingReceiveMessage == traid ||
+        EBroadcastMessagingReceiveMessageCancel == traid ||
+        EBroadcastMessagingSetFilterSetting == traid )
         {
-        ipc = EMobileBroadcastMessagingReceiveMessage;
-        }
-    // Response for SmsGsmCbRoutingReq (receive message cancel)
-    else if ( EBroadcastMessagingReceiveMessageCancel == traid )
-        {
-        ipc = EMobileBroadcastMessagingReceiveMessageCancel;
-        }
-    // Response for SmsGsmCbRoutingReq (set filter setting)
-    else if ( EBroadcastMessagingSetFilterSetting == traid )
-        {
-        ipc = EMobileBroadcastMessagingSetFilterSetting;
-        }
+TFLOGSTRING("TSY: CMmBroadMessHandler::SmsCbRoutingResp");
+OstTrace0( TRACE_NORMAL,  CMMBROADMESSHANDLER_SMSGSMCBROUTINGRESP_TD, "CMmBroadMessHandler::SmsCbRoutingResp" );
 
-    // Complete status change indication, if ipc is set
-    if ( 0 != ipc )
-        {
-        iMessageRouter->Complete( ipc, cause );
-        }
+        iCbSubscriptionNumber = aSmsCbRoutingResp.Get8bit(
+            ISI_HEADER_SIZE + SMS_CB_ROUTING_RESP_OFFSET_SUBSCRIPTIONNUMBER );
 
-    return;
+        TUint8 isiCause( aSmsCbRoutingResp.Get8bit( ISI_HEADER_SIZE
+            + SMS_CB_ROUTING_RESP_OFFSET_SMSCAUSE ) );
+
+        TInt cause( CMmStaticUtility::CSCauseToEpocError(
+            PN_SMS,
+            SMS_CAUSE_TYPE_COMMON,
+            isiCause ) );
+
+        // Response for SmsGsmCbRoutingReq (receive message)
+        if ( EBroadcastMessagingReceiveMessage == traid )
+            {
+            ipc = EMobileBroadcastMessagingReceiveMessage;
+            }
+        // Response for SmsGsmCbRoutingReq (receive message cancel)
+        else if ( EBroadcastMessagingReceiveMessageCancel == traid )
+            {
+            ipc = EMobileBroadcastMessagingReceiveMessageCancel;
+            }
+        // Response for SmsGsmCbRoutingReq (set filter setting)
+        else if ( EBroadcastMessagingSetFilterSetting == traid )
+            {
+            ipc = EMobileBroadcastMessagingSetFilterSetting;
+            }
+
+        // Complete status change indication, if ipc is set
+        if ( 0 != ipc )
+            {
+            iMessageRouter->Complete( ipc, cause );
+            }
+       }
     }
 
 // -----------------------------------------------------------------------------
@@ -338,7 +342,7 @@ void CMmBroadMessHandler::SmsCbRoutingIndL
     )
     {
 TFLOGSTRING("TSY: CMmBroadMessHandler::SmsCbRoutingInd");
-OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL, "CMmBroadMessHandler::SmsCbRoutingIndL" );
+OstTrace0( TRACE_NORMAL,  CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL_TD, "CMmBroadMessHandler::SmsCbRoutingIndL" );
 
     CMmDataPackage data;
     TInt error ( KErrNone );
@@ -364,7 +368,7 @@ OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL, "CMmBroadMessH
         }
 
 TFLOGSTRING2("TSY: CMmBroadMessHandler::SmsCbRoutingIndL. infoLength:%d",infoLength);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL, "CMmBroadMessHandler::SmsCbRoutingIndL;infoLength=%hhu", infoLength );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL_TD, "CMmBroadMessHandler::SmsCbRoutingIndL;infoLength=%hhu", infoLength );
 
     // Reset and destroy the array
     iCbsMsg->ResetAndDestroy();
@@ -419,9 +423,13 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL, "CMmBr
     else if ( ( SMS_CB_MESSAGE_CONTENT_SIZE >= infoLength )
         && ( KWcdmaCbsNumberOfSbMax >= sbNumber ) )
         {
-        TUint currSbOffset( firstSbOffset );
-        // Loop through the SMS_SB_CB_MESSAGE sub blocks.
-        for ( TInt i( 0 ); i < sbNumber; i++)
+        TUint currSbOffset( ISI_HEADER_SIZE + SIZE_SMS_CB_ROUTING_IND );
+        // Search all SMS_SB_CB_MESSAGE subblocks
+        while ( KErrNone == aSmsCbRoutingInd.FindSubBlockOffsetById(
+            currSbOffset,
+            SMS_SB_CB_MESSAGE,
+            EIsiSubBlockTypeId16Len16,
+            currSbOffset ) )
             {
             TWcdmaCbsMsg* wcdmaCbsMsg = new ( ELeave ) TWcdmaCbsMsg;
             CleanupStack::PushL( wcdmaCbsMsg );
@@ -475,7 +483,6 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL, "CMmBr
             //the following command
             //lint -e429
             }
-
         // Pack data
         data.PackData( &iCbsMsg, &sbNumber );
 
@@ -488,7 +495,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL, "CMmBr
     else    // Illegal value ( e.g network is not working correctly )
         {
 TFLOGSTRING("TSY: CMmBroadMessHandler::SmsGsmCbRoutingNtfL illegal value (e.g network problem )");
-OstTrace0( TRACE_NORMAL, DUP2_CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL, "CMmBroadMessHandler::SmsGsmCbRoutingNtfL-illegal value (e.g network problem" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMBROADMESSHANDLER_SMSGSMCBROUTINGNTFL_TD, "CMmBroadMessHandler::SmsGsmCbRoutingNtfL-illegal value (e.g network problem" );
 
         error = KErrGeneral;
         // Complete. We could complete with either ipc
@@ -515,7 +522,7 @@ TInt CMmBroadMessHandler::ExtFuncL
     )
     {
 TFLOGSTRING("TSY: CMmBroadMessHandler::ExtFuncL");
-OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_EXTFUNCL, "CMmBroadMessHandler::ExtFuncL" );
+OstTrace0( TRACE_NORMAL,  CMMBROADMESSHANDLER_EXTFUNCL_TD, "CMmBroadMessHandler::ExtFuncL" );
     TInt ret( KErrNone );
 
     TUint8 transId( 0 ); // Initialize to zero
@@ -541,7 +548,7 @@ OstTrace0( TRACE_NORMAL, CMMBROADMESSHANDLER_EXTFUNCL, "CMmBroadMessHandler::Ext
             {
             // This method should only be called for Broadcast cases
 TFLOGSTRING2("TSY: CMmBroadMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMBROADMESSHANDLER_EXTFUNCL, "CMmBroadMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMBROADMESSHANDLER_EXTFUNCL_TD, "CMmBroadMessHandler::ExtFuncL;aIpc=%d", aIpc );
             ret = KErrArgument;
             break;
             }

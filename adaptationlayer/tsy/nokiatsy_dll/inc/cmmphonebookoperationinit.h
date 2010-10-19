@@ -199,7 +199,7 @@ class CMmPhoneBookOperationInit : public CMmPhoneBookStoreOperationBase
         * @param const TDes8& aFileData: UICC Message
         * @return TInt: KErrNone or error value.
         */
-        TInt HandleMBIFileResp( const TDesC8 &aFileData , TInt aStatus );
+        void HandleMBIFileResp( const TDesC8 &aFileData , TInt aStatus );
 
         
         

@@ -62,7 +62,7 @@
 CMmSmsCache::CMmSmsCache()
     {
 TFLOGSTRING("TSY: CMmSmsCache::CMmSmsCache");
-OstTrace0( TRACE_NORMAL, CMMSMSCACHE_CMMSMSCACHE, "CMmSmsCache::CMmSmsCache" );
+OstTrace0( TRACE_NORMAL,  CMMSMSCACHE_CMMSMSCACHE_TD, "CMmSmsCache::CMmSmsCache" );
     Reset();
     // If SIM is offline,then won't get
     // sim ready completion and cache error state stays as
@@ -79,7 +79,7 @@ OstTrace0( TRACE_NORMAL, CMMSMSCACHE_CMMSMSCACHE, "CMmSmsCache::CMmSmsCache" );
 CMmSmsCache::~CMmSmsCache()
     {
 TFLOGSTRING("TSY: CMmSmsCache::~CMmSmsCache");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSMSCACHE_CMMSMSCACHE, "CMmSmsCache::~CMmSmsCache" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSMSCACHE_CMMSMSCACHE_TD, "CMmSmsCache::~CMmSmsCache" );
     Reset();
     }
 
@@ -91,7 +91,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMSMSCACHE_CMMSMSCACHE, "CMmSmsCache::~CMmSmsCach
 void CMmSmsCache::Reset()
     {
 TFLOGSTRING("TSY: CMmSmsCache::Reset");
-OstTrace0( TRACE_NORMAL, CMMSMSCACHE_RESET, "CMmSmsCache::Reset" );
+OstTrace0( TRACE_NORMAL,  CMMSMSCACHE_RESET_TD, "CMmSmsCache::Reset" );
 
     iError = KErrNotReady;
     iDeleteLocation = 0;
@@ -112,7 +112,7 @@ OstTrace0( TRACE_NORMAL, CMMSMSCACHE_RESET, "CMmSmsCache::Reset" );
 TInt CMmSmsCache::UsedEntries()
     {
 TFLOGSTRING("TSY: CMmSmsCache::UsedEntries");
-OstTrace0( TRACE_NORMAL, CMMSMSCACHE_USEDENTRIES, "CMmSmsCache::UsedEntries" );
+OstTrace0( TRACE_NORMAL,  CMMSMSCACHE_USEDENTRIES_TD, "CMmSmsCache::UsedEntries" );
     TInt count( 0 );
     for ( TInt i = 0; i < iElements.Count(); i++ )
        {
@@ -132,7 +132,7 @@ OstTrace0( TRACE_NORMAL, CMMSMSCACHE_USEDENTRIES, "CMmSmsCache::UsedEntries" );
 TInt CMmSmsCache::TotalEntries()
     {
 TFLOGSTRING2("TSY: CMmSmsCache::TotalEntries: %d",iElements.Count());
-OstTrace1( TRACE_NORMAL, CMMSMSCACHE_TOTALENTRIES, "CMmSmsCache::TotalEntries;iElements.Count=%d", iElements.Count() );
+OstTrace1( TRACE_NORMAL,  CMMSMSCACHE_TOTALENTRIES_TD, "CMmSmsCache::TotalEntries;iElements.Count=%d", iElements.Count() );
     return iElements.Count();
     }
 
@@ -146,7 +146,7 @@ OstTrace1( TRACE_NORMAL, CMMSMSCACHE_TOTALENTRIES, "CMmSmsCache::TotalEntries;iE
 TInt CMmSmsCache::Status()
     {
 TFLOGSTRING("TSY: CMmSmsCache::Status");
-OstTrace0( TRACE_NORMAL, CMMSMSCACHE_STATUS, "CMmSmsCache::Status" );
+OstTrace0( TRACE_NORMAL,  CMMSMSCACHE_STATUS_TD, "CMmSmsCache::Status" );
     return iError;
     }
 
@@ -158,7 +158,7 @@ OstTrace0( TRACE_NORMAL, CMMSMSCACHE_STATUS, "CMmSmsCache::Status" );
 void CMmSmsCache::SetStatus( TInt aError )
     {
 TFLOGSTRING2("TSY: CMmSmsCache::SetStatus %d", aError);
-OstTrace1( TRACE_NORMAL, CMMSMSCACHE_SETSTATUS, "CMmSmsCache::SetStatus;aError=%d", aError );
+OstTrace1( TRACE_NORMAL,  CMMSMSCACHE_SETSTATUS_TD, "CMmSmsCache::SetStatus;aError=%d", aError );
     iError = aError;
     }
 
@@ -171,7 +171,7 @@ OstTrace1( TRACE_NORMAL, CMMSMSCACHE_SETSTATUS, "CMmSmsCache::SetStatus;aError=%
 void CMmSmsCache::SetTotalEntriesL( TInt aTotal )
     {
 TFLOGSTRING2("TSY: CMmSmsCache::SetTotalEntriesL %d", aTotal);
-OstTrace1( TRACE_NORMAL, CMMSMSCACHE_SETTOTALENTRIESL, "CMmSmsCache::SetTotalEntriesL;aTotal=%d", aTotal );
+OstTrace1( TRACE_NORMAL,  CMMSMSCACHE_SETTOTALENTRIESL_TD, "CMmSmsCache::SetTotalEntriesL;aTotal=%d", aTotal );
 
     RMobileSmsStore::TMobileGsmSmsEntryV1* element = NULL;
     for ( TInt i = 0; i < aTotal; i++ )
@@ -193,7 +193,7 @@ TBool CMmSmsCache::AddEntryL(
     const TUint8  aRecordId )
     {
 TFLOGSTRING("TSY: CMmSmsCache::AddEntryL");
-OstTrace0( TRACE_NORMAL, CMMSMSCACHE_ADDENTRYL, "CMmSmsCache::AddEntryL" );
+OstTrace0( TRACE_NORMAL,  CMMSMSCACHE_ADDENTRYL_TD, "CMmSmsCache::AddEntryL" );
 
     if ( 0 < iElements.Count() )
         {
@@ -229,7 +229,7 @@ OstTrace0( TRACE_NORMAL, CMMSMSCACHE_ADDENTRYL, "CMmSmsCache::AddEntryL" );
 RMobileSmsStore::TMobileGsmSmsEntryV1* CMmSmsCache::GetEntry( TInt aLocation )
     {
 TFLOGSTRING2("TSY: CMmSmsCache::GetEntry - location: %d", aLocation);
-OstTrace1( TRACE_NORMAL, CMMSMSCACHE_GETENTRY, "CMmSmsCache::GetEntry;aLocation=%d", aLocation );
+OstTrace1( TRACE_NORMAL,  CMMSMSCACHE_GETENTRY_TD, "CMmSmsCache::GetEntry;aLocation=%d", aLocation );
     RMobileSmsStore::TMobileGsmSmsEntryV1* smsData = NULL;
     if ( aLocation <= iElements.Count() && aLocation >= 1 )
         {
@@ -252,7 +252,7 @@ OstTrace1( TRACE_NORMAL, CMMSMSCACHE_GETENTRY, "CMmSmsCache::GetEntry;aLocation=
 TUint CMmSmsCache::FirstFreeLocation()
     {
 TFLOGSTRING("TSY: CMmSmsCache::FirstFreeLocation");
-OstTrace0( TRACE_NORMAL, CMMSMSCACHE_FIRSTFREELOCATION, "CMmSmsCache::FirstFreeLocation" );
+OstTrace0( TRACE_NORMAL,  CMMSMSCACHE_FIRSTFREELOCATION_TD, "CMmSmsCache::FirstFreeLocation" );
     TInt location( 0 );
     for ( TInt i = 0; i < iElements.Count(); i++ )
         {
@@ -263,7 +263,7 @@ OstTrace0( TRACE_NORMAL, CMMSMSCACHE_FIRSTFREELOCATION, "CMmSmsCache::FirstFreeL
             }
         }
 TFLOGSTRING2("TSY: CMmSmsCache::FirstFreeLocation - found location: %d", location);
-OstTrace0( TRACE_NORMAL, DUP1_CMMSMSCACHE_FIRSTFREELOCATION, "CMmSmsCache::FirstFreeLocation" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSMSCACHE_FIRSTFREELOCATION_TD, "CMmSmsCache::FirstFreeLocation" );
     return location;
     }
 
@@ -275,7 +275,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMSMSCACHE_FIRSTFREELOCATION, "CMmSmsCache::First
 void CMmSmsCache::SetDeleteLocation( TInt aLocation )
     {
 TFLOGSTRING2("TSY: CMmSmsCache::SetDeleteLocation %d", aLocation);
-OstTrace1( TRACE_NORMAL, CMMSMSCACHE_SETDELETELOCATION, "CMmSmsCache::SetDeleteLocation;aLocation=%d", aLocation );
+OstTrace1( TRACE_NORMAL,  CMMSMSCACHE_SETDELETELOCATION_TD, "CMmSmsCache::SetDeleteLocation;aLocation=%d", aLocation );
     iDeleteLocation = aLocation;
     }
 
@@ -287,7 +287,7 @@ OstTrace1( TRACE_NORMAL, CMMSMSCACHE_SETDELETELOCATION, "CMmSmsCache::SetDeleteL
 void CMmSmsCache::Delete()
     {
 TFLOGSTRING("TSY: CMmSmsCache::Delete");
-OstTrace0( TRACE_NORMAL, CMMSMSCACHE_DELETE, "CMmSmsCache::Delete" );
+OstTrace0( TRACE_NORMAL,  CMMSMSCACHE_DELETE_TD, "CMmSmsCache::Delete" );
     if ( iDeleteLocation!=0 )
         {
         Delete( iDeleteLocation );
@@ -303,7 +303,7 @@ OstTrace0( TRACE_NORMAL, CMMSMSCACHE_DELETE, "CMmSmsCache::Delete" );
 void CMmSmsCache::Delete( TInt aLocation )
     {
 TFLOGSTRING2("TSY: CMmSmsCache::Delete %d", aLocation);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSMSCACHE_DELETE, "CMmSmsCache::Delete;aLocation=%d", aLocation );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSMSCACHE_DELETE_TD, "CMmSmsCache::Delete;aLocation=%d", aLocation );
 
     if ( aLocation <= iElements.Count() && aLocation >= 1 )
         {
@@ -320,7 +320,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSMSCACHE_DELETE, "CMmSmsCache::Delete;aLocation
 void CMmSmsCache::DeleteAll()
     {
 TFLOGSTRING("TSY: CMmSmsCache::DeleteAll");
-OstTrace0( TRACE_NORMAL, CMMSMSCACHE_DELETEALL, "CMmSmsCache::DeleteAll" );
+OstTrace0( TRACE_NORMAL,  CMMSMSCACHE_DELETEALL_TD, "CMmSmsCache::DeleteAll" );
     for ( TInt i = 0; i < iElements.Count(); i++ )
         {
         delete iElements[i];
@@ -338,7 +338,7 @@ void CMmSmsCache::SetStorageStatus(
     RMobileSmsStore::TMobileSmsStoreStatus aMsgStatus )
     {
 TFLOGSTRING2("TSY: CMmSmsCache::SetStorageStatus(loc=%d)", aLocation);
-OstTrace1( TRACE_NORMAL, CMMSMSCACHE_SETSTORAGESTATUS, "CMmSmsCache::SetStorageStatus;aLocation=%d", aLocation );
+OstTrace1( TRACE_NORMAL,  CMMSMSCACHE_SETSTORAGESTATUS_TD, "CMmSmsCache::SetStorageStatus;aLocation=%d", aLocation );
 
     if ( aLocation <= iElements.Count()
         && aLocation >= 1

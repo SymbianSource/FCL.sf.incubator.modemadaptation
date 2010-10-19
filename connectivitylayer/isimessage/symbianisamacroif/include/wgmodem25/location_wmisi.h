@@ -13,7 +13,7 @@
 * 
 * Description:
 * Name      : PN_MODEM_LCS [ 0x90 ] Resource Modem LCS Server
-* Version   : 006.000
+* Version   : 008.000
 *
 * Documentation: www.wirelessmodemapi.com
 *
@@ -23,7 +23,7 @@
 #ifndef _SYMBIAN_ISI_LOCATION_WMISI_H_
 #define _SYMBIAN_ISI_LOCATION_WMISI_H_
 
-#define MODEM_LCS_SERVER_ISI_VERSION_Z	 7
+#define MODEM_LCS_SERVER_ISI_VERSION_Z	 8
 #define MODEM_LCS_SERVER_ISI_VERSION_Y	 0
 
 
@@ -383,6 +383,7 @@
 #define MODEM_LCS_SS_MM_ERROR                             	0x0B                                                 	
 #define MODEM_LCS_SS_CS_INACTIVE                          	0x0F                                                 	
 #define MODEM_LCS_SS_SS_NOT_AVAILABLE                     	0x12                                              	
+#define MODEM_LCS_SS_MO_LR_TIMER_TLCSL_EXPIRED            	0x17                                              	
 
 //ConstantTable for MODEM_LCS_SS_PSEUDONYM_REQUESTED
 #define MODEM_LCS_SS_PSEUDONYM_NOT_REQUESTED              	0x00                                                 	
@@ -1543,6 +1544,14 @@
 #define MODEM_LCS_SUPPORT_CONTROL_RESP_OFFSET_MESSAGEID   	1 //size 1 byte(s)
 #define MODEM_LCS_SUPPORT_CONTROL_RESP_OFFSET_FILLERBYTE1 	2 //size 2 byte(s)
 #define SIZE_MODEM_LCS_SUPPORT_CONTROL_RESP               	4
+
+
+//Definition for MODEM_LCS_SUPPORT_CONTROL_IND
+#define MODEM_LCS_SUPPORT_CONTROL_IND                     	0x22                                              	
+#define MODEM_LCS_SUPPORT_CONTROL_IND_OFFSET_TRANSID      	0 //size 1 byte(s)
+#define MODEM_LCS_SUPPORT_CONTROL_IND_OFFSET_MESSAGEID    	1 //size 1 byte(s)
+#define MODEM_LCS_SUPPORT_CONTROL_IND_OFFSET_FILLERBYTE1  	2 //size 2 byte(s)
+#define SIZE_MODEM_LCS_SUPPORT_CONTROL_IND                	4
 
 
 //Definition for MODEM_LCS_RRLP_ASTNC_IND

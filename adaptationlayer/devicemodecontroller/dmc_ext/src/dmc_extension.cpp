@@ -27,6 +27,7 @@
 #include "dmc_extension.h"          // DDmcExtension
 #include "dmc_trace.h"
 #include "dmc_event_handler_ape_cent.h"
+#include "dmc_kernel_if.h"
 
 #include "OstTraceDefinitions.h"    // For Open System Trace
 #ifdef OST_TRACE_COMPILER_IN_USE
@@ -159,6 +160,12 @@ void DDmcExtension::Init()
 
     // Register to Power Handler
     Add();
+
+    OstTrace1(TRACE_FLOW, DDMC_INIT_4, "DMC:KERN_EXTEN: Init() - DmcKernelIf::Init, iDmcExtPtr: 0x%x",
+              DDmcExtension::iDmcExtPtr);
+    DMC_TRACE((("DMC:KERN_EXTEN: Init() - DmcKernelIf::Init, iDmcExtPtr: 0x%x"), DDmcExtension::iDmcExtPtr));
+    
+    DmcKernelIf::Init(DDmcExtension::iDmcExtPtr);
 
     OstTrace0(TRACE_FLOW, DDMC_INIT_2, "DMC:KERN_EXTEN: Init() - DIsaKernelAPI::NewF");
     DMC_TRACE(("DMC:KERN_EXTEN: Init() - DIsaKernelAPI::NewF"));

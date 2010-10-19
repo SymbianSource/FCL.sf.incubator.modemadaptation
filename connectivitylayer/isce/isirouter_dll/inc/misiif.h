@@ -84,7 +84,7 @@ class MISIIf
         * Blocking:     No
         * Panic mode:   Kernel: Kern::Fault, User: User::Panic
         * SMP safe:     Yes
-        * @param aUID, clients unique UID identifier.
+        * @param aUID, clients unique UID identifier. TODO: Symbian UID
         * @param aObjId, reference to write clients object id.
         * @return pointer to new interface.
         * @pre Called always in thread context (Kernel: in kernel thread context).

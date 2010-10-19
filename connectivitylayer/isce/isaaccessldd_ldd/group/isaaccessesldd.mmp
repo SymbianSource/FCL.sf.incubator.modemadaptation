@@ -19,22 +19,27 @@
 
 #include <non_foundation_paths.hrh>
 #include <platform_paths.hrh>
-#include        "kernel/kern_ext.mmh"
+#include "kernel/kern_ext.mmh"
 
-
+FEATUREVARIANT
 TARGET          isaaccessldd.ldd
 TARGETTYPE      ldd
 CAPABILITY      ALL
 UID             0x100000AF 0x1028312A
 VENDORID        VID_DEFAULT
-FEATUREVARIANT
 
 SMPSAFE
 
 SOURCEPATH      ../src
-SOURCE          isauserdevice.cpp
-SOURCE          isauserchannel.cpp
 
+SOURCE          isauserdevice_isce.cpp
+SOURCE          isauserchannel_isce.cpp
+SOURCE          queue.cpp
+SOURCE          ../../isaaccessextension_dll/src/common_wrapper.cpp
+
+USERINCLUDE     ../../isirouter_dll/inc
+USERINCLUDE     ../../memmanager_dll/inc
+USERINCLUDE     ../../isicommunicationmanager_dll/inc
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../traces
@@ -44,9 +49,9 @@ OS_LAYER_SYSTEMINCLUDE
 NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE    // FOR isakernelapi.h
 SYSTEMINCLUDE     /epoc32/include/kernel
 
-LIBRARY         isaaccessextension.lib        // For DQueue
-
-DEFFILE         isaaccessldd.def
+LIBRARY         memmanager.lib
+LIBRARY         isirouter.lib
+DEFFILE         isaaccessldd_isce.def
 
 START WINS
 win32_library kernel32.lib
@@ -59,3 +64,4 @@ MACRO   API_TRACE_FLAG
 MACRO   COMPONENT_TRACE_FLAG
 
 
+MACRO ISCE_INTERNAL_WIDER_NAME_SERVICE_IN_USE

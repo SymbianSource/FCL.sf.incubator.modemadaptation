@@ -4,8 +4,8 @@
 *  Part of:        SSMA MiscAdaptation
 *  Interface:      N/A
 *  Description:    Implementation of CMiscAdaptation class
-*  %version:       2 %
-*  %date_modified: Fri Feb 12 10:56:14 2010 %
+*  %version:       3 %
+*  %date_modified: Tue May 04 09:25:07 2010 %
 *
 * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -78,7 +78,7 @@ CMiscAdaptation* CMiscAdaptation::NewL()
     self->ConstructL();
     CleanupStack::Pop( self );
 
-    OstTrace1( TRACE_API, CMISCADAPTATION_NEWL_2,
+    OstTrace1( TRACE_BORDER, CMISCADAPTATION_NEWL_2,
                "SSMA # CEmergencyCallRfAdaptation::NewL - return 0x%08x", self );
     INTERNAL_TRACE((_L("SSMA # CEmergencyCallRfAdaptation::NewL - return 0x%08x"), self ));
     return self;

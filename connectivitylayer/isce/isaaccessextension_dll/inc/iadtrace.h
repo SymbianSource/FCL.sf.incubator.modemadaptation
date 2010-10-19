@@ -60,6 +60,8 @@ enum TIADFaultCategories
     EIADCommon,                                 // 0x1b  ident 0
     EIADOverTheLimits,                          // 0x1c  ident 43
     EIADDesWriteFailed,                         // 0x1d  ident 4
+    EIADInvalidRcvMsg,                          // 0x1e  ident 0
+    EIADInvalidRcvMsg2,                         // 0x1f  ident 0
     };
 // Used to identify code line where reset happens
 enum TIADFaultIdentifier
@@ -89,24 +91,41 @@ enum TIADFaultIdentifier
     EIADFaultIdentifier23,                       // 0x17
     EIADFaultIdentifier24,                       // 0x18
     EIADFaultIdentifier25,                       // 0x19
-    EIADFaultIdentifier26,                       // 0x1a
-    EIADFaultIdentifier27,                       // 0x1b
-    EIADFaultIdentifier28,                       // 0x1c    
-    EIADFaultIdentifier29,                       // 0x1d    
-    EIADFaultIdentifier30,                       // 0x1e    
-    EIADFaultIdentifier31,                       // 0x1f    
-    EIADFaultIdentifier32,                       // 0x20    
-    EIADFaultIdentifier33,                       // 0x21    
-    EIADFaultIdentifier34,                       // 0x22    
-    EIADFaultIdentifier35,                       // 0x23    
-    EIADFaultIdentifier36,                       // 0x24    
-    EIADFaultIdentifier37,                       // 0x25    
-    EIADFaultIdentifier38,                       // 0x26    
-    EIADFaultIdentifier39,                       // 0x27    
-    EIADFaultIdentifier40,                       // 0x28    
-    EIADFaultIdentifier41,                       // 0x29    
-    EIADFaultIdentifier42,                       // 0x2a    
-    EIADFaultIdentifier43,                       // 0x2b    
+    EIADFaultIdentifier26,                       // 0x20
+    EIADFaultIdentifier27,                       // 0x21
+    EIADFaultIdentifier28,                       // 0x22    
+    EIADFaultIdentifier29,                       // 0x23    
+    EIADFaultIdentifier30,                       // 0x24    
+    EIADFaultIdentifier31,                       // 0x25    
+    EIADFaultIdentifier32,                       // 0x26    
+    EIADFaultIdentifier33,                       // 0x27    
+    EIADFaultIdentifier34,                       // 0x28    
+    EIADFaultIdentifier35,                       // 0x29    
+    EIADFaultIdentifier36,                       // 0x2a    
+    EIADFaultIdentifier37,                       // 0x2b    
+    EIADFaultIdentifier38,                       // 0x2c    
+    EIADFaultIdentifier39,                       // 0x2d    
+    EIADFaultIdentifier40,                       // 0x2e    
+    EIADFaultIdentifier41,                       // 0x2f    
+    EIADFaultIdentifier42,                       // 0x30    
+    EIADFaultIdentifier43,                       // 0x31    
+    EIADFaultIdentifier44,                       // 0x32    
+    EIADFaultIdentifier45,                       // 0x33    
+    EIADFaultIdentifier46,                       // 0x34    
+    EIADFaultIdentifier47,                       // 0x35    
+    EIADFaultIdentifier48,                       // 0x36    
+    EIADFaultIdentifier49,                       // 0x37    
+    EIADFaultIdentifier50,                       // 0x38    
+    EIADFaultIdentifier51,                       // 0x39    
+    EIADFaultIdentifier52,                       // 0x3a    
+    EIADFaultIdentifier53,                       // 0x3b    
+    EIADFaultIdentifier54,                       // 0x3c    
+    EIADFaultIdentifier55,                       // 0x3d    
+    EIADFaultIdentifier56,                       // 0x3e    
+    EIADFaultIdentifier57,                       // 0x3f    
+    EIADFaultIdentifier58,                       // 0x40    
+    EIADFaultIdentifier59,                       // 0x41    
+    EIADFaultIdentifier60                        // 0x42    
     };
     
 //ISCE

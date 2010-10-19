@@ -67,7 +67,7 @@ enum TP2PKernelChannelFaults
     EP2PKernelChannelRxBufferNotReleased,
     };
 
-// TODO: Create a common Kernel channel FW (P2P, ISI, etc..) after APIs are locked
+//  Create a common Kernel channel FW (P2P, ISI, etc..) after APIs are locked
 
 DP2PKernelChannel::DP2PKernelChannel(
         // None
@@ -106,7 +106,10 @@ DP2PKernelChannel::~DP2PKernelChannel(
     iRx = NULL;
     C_TRACE( ( _T( "DP2PKernelChannel::~DP2PKernelChannel iEmptyRxDfc 0x%x" ), iEmptyRxDfc ) );
     // Only modified in constructor, if not created already reseted.
-    iEmptyRxDfc->Cancel();
+    if (iEmptyRxDfc)
+    {	
+       iEmptyRxDfc->Cancel();
+    } 
     delete iEmptyRxDfc;
     iEmptyRxDfc = NULL;
     iPtrPtrToRxBuf = NULL;
@@ -127,7 +130,7 @@ TInt DP2PKernelChannel::HandleRequest(
     {
 
     C_TRACE( ( _T( "DP2PKernelChannel::HandleRequest 0x%x 0x%x 0x%x>" ), this, iP2PProtocolId, aMsg.iValue ) );
-    // TODO : similar__NK_ASSERT_UNLOCKED;
+
     __ASSERT_CRITICAL;      // From kern_priv.h published partner
     __ASSERT_NO_FAST_MUTEX; // From nk_priv.h published partner.
     ASSERT_THREAD_CONTEXT_ALWAYS( ( EP2PKernelChannelNotThreadContext | EDP2PKernelChannelId << KClassIdentifierShift ) );
@@ -198,7 +201,7 @@ void DP2PKernelChannel::EnqueChannelRequestCompleteDfc(
 
     C_TRACE( ( _T( "DP2PKernelChannel::EnqueChannelRequestCompleteDfc 0x%x 0x%x %d %d 0x%x>" ), this, iP2PProtocolId, aRequest, aStatusToComplete ) );
     ASSERT_THREAD_CONTEXT_ALWAYS( ( EP2PKernelChannelNotThreadContext2 | EDP2PKernelChannelId << KClassIdentifierShift ) );
-    // TODO: assert router ext thread context
+    //  assert router ext thread context
     if( aRequest == EP2PAsyncOpen )
         {
         iP2PProtocolId = ( KErrNone == aStatusToComplete || KErrInUse == aStatusToComplete ) ? ~iP2PProtocolId : EP2PAmountOfProtocols;
@@ -348,7 +351,7 @@ void DP2PKernelChannel::HandleDfcRequest(
                 iP2PProtocolId = tablePtr[ KThirdParam ];
                 iP2PProtocolId = ~iP2PProtocolId;
                 C_TRACE( ( _T( "DP2PKernelChannel::HandleDfcRequest EP2PNokiaKernelOpen 0x%x 0x%x 0x%x" ), this, iP2PProtocolId, ~iP2PProtocolId ) );
-                iRouterIf->Open( ~iP2PProtocolId, this );
+                iRouterIf->Connect( ~iP2PProtocolId, this );
                 break;
                 }
             case EP2PAsyncReceive:
@@ -532,7 +535,7 @@ void DP2PKernelChannel::ResetQueues(
     {
 
     C_TRACE( ( _T( "DP2PKernelChannel::ResetQueues 0x%x 0x%x>" ), this, iP2PProtocolId ) );
-    // TODO: assert router ext thread context
+    //  assert router ext thread context
     if( iRx )
         {
         C_TRACE( ( _T( "DP2PKernelChannel::ResetQueues 0x%x 0x%x iRx 0x%x" ), this, iP2PProtocolId, iRx ) );

@@ -643,14 +643,13 @@ class CMmCallMessHandler : public CBase,
 
         /**
         * Creates PnsPipeCreateReq ISI message and sends it to Phonet.
-        * @param aPipeStateAfter: pipe state
-		* @return error value: Symbian error code
+        * @return error value: Symbian error code
         */
-        TInt PnsPipeCreateReq( const TUint8 aPipeStateAfter ) const;
+        TInt PnsPipeCreateReq() const;
 
         /**
         * Creates PnsPipeRemoveReq ISI message and sends it to Phonet.
-		* @return error value: Symbian error code
+        * @return error value: Symbian error code
         */
         TInt PnsPipeRemoveReq();
 
@@ -660,6 +659,18 @@ class CMmCallMessHandler : public CBase,
         * @return void
         */
         void PnsPipeCreateResp( const TIsiReceiveC &aIsiMessage );
+
+        /**
+        * Builds PNS_PIPE_ENABLE_REQ ISI message and sends it to Phonet.
+        * @return error value: Symbian error code
+        */
+        TInt PnsPipeEnableReq() const;
+
+        /**
+        * Handles PNS_PIPE_ENABLE_RESP.
+        * @param aIsiMessage, reference to the received message.
+        */
+        void PnsPipeEnableResp( const TIsiReceiveC &aIsiMessage );
 
     public:     // Data
         // None

@@ -42,7 +42,7 @@ void TTlvBase::Begin
         TUint8 aTag //tag
         )
     {
-    OstTrace0( TRACE_DETAILED, TTLVBASE_BEGIN, "TTlvBase::Begin" );
+    OstTrace0( TRACE_INTERNALS,  TTLVBASE_BEGIN_TD, "TTlvBase::Begin" );
     TFLOGSTRING("TSY: TTlvBase::Begin");
     iData.Zero();
     iData.Append( aTag );
@@ -59,7 +59,7 @@ void TTlvBase::AddTag
         TUint8 aTag //tag
         )
     {
-    OstTrace0( TRACE_DETAILED, TTLVBASE_ADDTAG, "TTlvBase::AddTag" );
+    OstTrace0( TRACE_INTERNALS,  TTLVBASE_ADDTAG_TD, "TTlvBase::AddTag" );
     TFLOGSTRING("TSY: TTlvBase::AddTag");
     iData.Append( aTag );           // tag
     iData.Append( 0 );              // length
@@ -76,7 +76,7 @@ void TTlvBase::AddByte
         TUint8 aValue
         )
     {
-    OstTrace0( TRACE_DETAILED, TTLVBASE_ADDBYTE, "TTlvBase::AddByte" );
+    OstTrace0( TRACE_INTERNALS,  TTLVBASE_ADDBYTE_TD, "TTlvBase::AddByte" );
     TFLOGSTRING("TSY: TTlvBase::AddByte");
     iData.Append( aValue );
     iData[iLenIndex]++;
@@ -92,7 +92,7 @@ void TTlvBase::AddData
         const TDesC8& aValue
         )
     {
-    OstTrace0( TRACE_DETAILED, TTLVBASE_ADDDATA, "TTlvBase::AddData" );
+    OstTrace0( TRACE_INTERNALS,  TTLVBASE_ADDDATA_TD, "TTlvBase::AddData" );
     TFLOGSTRING("TSY: TTlvBase::AddData");
     iData.Append( aValue );
     iData[iLenIndex] = TUint8(iData[iLenIndex] + aValue.Length());
@@ -108,7 +108,7 @@ void TTlvBase::AddData
 //
 const TDesC8& TTlvBase::End()
     {
-    OstTrace0( TRACE_DETAILED, TTLVBASE_END, "TTlvBase::End" );
+    OstTrace0( TRACE_INTERNALS,  TTLVBASE_END_TD, "TTlvBase::End" );
     TFLOGSTRING("TSY: TTlvBase::End");
 
     _LIT8( KLenTag, "\x81" );
@@ -149,7 +149,7 @@ const TDesC8& TTlvBase::End()
 //
 const TDesC8& TTlvBase::GetDataWithoutTopLevelTag()
     {
-    OstTrace0( TRACE_DETAILED, TTLVBASE_GETDATAWITHOUTTOPLEVELTAG, "TTlvBase::GetDataWithoutTopLevelTag" );
+    OstTrace0( TRACE_INTERNALS,  TTLVBASE_GETDATAWITHOUTTOPLEVELTAG_TD, "TTlvBase::GetDataWithoutTopLevelTag" );
     TFLOGSTRING("TSY: TTlvBase::GetDataWithoutTopLevelTag");
 
     _LIT8( KLenTag, "\x81" );
@@ -180,7 +180,7 @@ const TDesC8& TTlvBase::GetDataWithoutTopLevelTag()
 //
 CBerTlv::CBerTlv()
     {
-    OstTrace0( TRACE_DETAILED, CBERTLV_CBERTLV, "CBerTlv::CBerTlv" );
+    OstTrace0( TRACE_INTERNALS,  CBERTLV_CBERTLV_TD, "CBerTlv::CBerTlv" );
     TFLOGSTRING("TSY: CBerTlv::CBerTlv");
     //none
     }
@@ -200,7 +200,7 @@ TInt CBerTlv::TlvByTagValue
         TInt aItemNbr                //item number
         )
     {
-    OstTrace0( TRACE_DETAILED, CBERTLV_TLVBYTAGVALUE, "CBerTlv::TlvByTagValue" );
+    OstTrace0( TRACE_INTERNALS,  CBERTLV_TLVBYTAGVALUE_TD, "CBerTlv::TlvByTagValue" );
     TFLOGSTRING("TSY: CBerTlv::TlvByTagValue");
     TInt currentTlv( 0 );
     TInt tlvLength( 0 );
@@ -287,7 +287,7 @@ TInt CBerTlv::TlvByTagValueMulti
         TUint8 aTlvTagValue         // tag of tlv to find
         )
     {
-    OstTrace0( TRACE_DETAILED, CBERTLV_TLVBYTAGVALUEMULTI, "CBerTlv::TlvByTagValueMulti" );
+    OstTrace0( TRACE_INTERNALS,  CBERTLV_TLVBYTAGVALUEMULTI_TD, "CBerTlv::TlvByTagValueMulti" );
     TFLOGSTRING("TSY: CBerTlv::TlvByTagValueMulti");
 
     TInt currentTlv( 0 );
@@ -363,7 +363,7 @@ TInt CBerTlv::TlvByTagValueMulti
 //
 CTlv::CTlv()
     {
-    OstTrace0( TRACE_DETAILED, CTLV_CTLV, "CTlv::CTlv" );
+    OstTrace0( TRACE_INTERNALS,  CTLV_CTLV_TD, "CTlv::CTlv" );
     TFLOGSTRING("TSY: CTlv::CTlv");
     //none
     }
@@ -379,7 +379,7 @@ TUint8 CTlv::GetShortInfo
         TTlvSpesificDataType aType //Info spesific data type
         )
     {
-    OstTrace0( TRACE_DETAILED, CTLV_GETSHORTINFO, "CTlv::GetShortInfo" );
+    OstTrace0( TRACE_INTERNALS,  CTLV_GETSHORTINFO_TD, "CTlv::GetShortInfo" );
     TFLOGSTRING("TSY: CTlv::GetShortInfo");
 
     //information is generally at index 2. NOTE! This method should be optimised
@@ -908,7 +908,7 @@ TUint8 CTlv::GetShortInfo
         {
         // Data type did not match with any of enumerations
         TFLOGSTRING2("TSY: CTlv::GetShortInfo, Unknown data type:0x%x", aType);
-        OstTrace1( TRACE_DETAILED, DUP1_CTLV_GETSHORTINFO, "CTlv::GetShortInfo Unknown data type: %{TTlvSpesificDataType}", aType );
+        OstTrace1( TRACE_INTERNALS,  DUP1_CTLV_GETSHORTINFO_TD, "CTlv::GetShortInfo Unknown data type: %{TTlvSpesificDataType}", aType );
 
         }
 
@@ -926,7 +926,7 @@ TPtrC8 CTlv::GetData
         TTlvSpesificDataType aType //Info spesific data type
         )
     {
-    OstTrace0( TRACE_DETAILED, CTLV_GETDATA, "CTlv::GetData" );
+    OstTrace0( TRACE_INTERNALS,  CTLV_GETDATA_TD, "CTlv::GetData" );
     TFLOGSTRING("TSY: CTlv::GetData");
 
     //information is generally at index 2.
@@ -1481,7 +1481,7 @@ TPtrC8 CTlv::GetData
         {
         // Data type did not match
         TFLOGSTRING2("TSY: CTlv::GetData, Unknown data type: 0x%x", aType );
-        OstTrace1( TRACE_DETAILED, DUP2_CTLV_GETDATA, "CTlv::GetData Unknown data type: %{TTlvSpesificDataType}", aType );
+        OstTrace1( TRACE_INTERNALS,  DUP2_CTLV_GETDATA_TD, "CTlv::GetData Unknown data type: %{TTlvSpesificDataType}", aType );
 
         }
 
@@ -1500,7 +1500,7 @@ TPtrC8 CTlv::GetData
         TTlvSpesificDataType aType //Info spesific data type
         )
     {
-    OstTrace0( TRACE_DETAILED, CTLV_GETLONGINFO, "CTlv::GetLongInfo" );
+    OstTrace0( TRACE_INTERNALS,  CTLV_GETLONGINFO_TD, "CTlv::GetLongInfo" );
     TFLOGSTRING("TSY: CTlv::GetLongInfo");
 
     TUint16 ret( 0x0000 );
@@ -1568,7 +1568,7 @@ TPtrC8 CTlv::GetData
         {
         // Data type did not match
         TFLOGSTRING2("TSY: CTlv::GetLongInfo, Unknown data type:0x%x", aType );
-        OstTrace1( TRACE_DETAILED, DUP1_CTLV_GETLONGINFO, "CTlv::GetLongInfo, Unknown data type: %{TTlvSpesificDataType}", aType );
+        OstTrace1( TRACE_INTERNALS,  DUP1_CTLV_GETLONGINFO_TD, "CTlv::GetLongInfo, Unknown data type: %{TTlvSpesificDataType}", aType );
 
         }
     return ret;
@@ -1584,7 +1584,7 @@ TPtrC8 CTlv::GetData
 //
 TInt CBerTlv::BerTlv( const TIsiReceiveC& aIsiMessage )
     {
-    OstTrace0( TRACE_DETAILED, CBERTLV_BERTLV, "CBerTlv::BerTlv" );
+    OstTrace0( TRACE_INTERNALS,  CBERTLV_BERTLV_TD, "CBerTlv::BerTlv" );
     TFLOGSTRING("TSY: CBerTlv::BerTlv");
 
     TInt result ( KErrNotFound );

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -58,7 +58,7 @@ RESOURCE REGISTRY_INFO theInfo
           implementation_uid = 0x20022E87;
           version_no = 1;
           display_name = "Modem AT EXT";
-          default_data = "PAT+WS46|PATA|PATH|PATH0|PATO|PATO0|PAT+DS|PAT+DR|PATB|PATB0|PATB1|PATB2|PAT+CSTA|PAT+CHUP|PAT+CR|PAT+CEER|PAT+CRC|PAT+CSNS|PAT+CVHU|PAT+CREG|PAT+CLIP|PAT+CLIR|PAT+COLP|PAT+CCFC|PAT+CCWA|PAT+CHLD|PAT+CLCC|PAT+CSSN|PAT+CPAS";
+          default_data = "PAT+WS46|PATA|PATH|PATH0|PATO|PATO0|PAT+DS|PAT+DR|PAT+CSTA|PAT+CHUP|PAT+CR|PAT+CEER|PAT+CRC|PAT+CSNS|PAT+CVHU|PAT+CREG|PAT+CLIP|PAT+CLIR|PAT+COLP|PAT+CCFC|PAT+CCWA|PAT+CHLD|PAT+CLCC|PAT+CSSN|PAT+CPAS";
           opaque_data = "";
           rom_only = 0;
           },
@@ -76,7 +76,7 @@ RESOURCE REGISTRY_INFO theInfo
           implementation_uid = 0x20022E89;
           version_no = 1;
           display_name = "Modem AT EXT";
-          default_data = "PAT+CGTFT|PAT+CGCMOD|PAT|PATD*|PATI|PATI0|PATI1|PATI2|PATI3|PATI4|PATI9|PATI10|PATI11|PAT+CPNET|PAT+CPNSTAT|PAT+CGPADDR|PAT+ES|PAT+ESA|PAT+CRSM|PAT+CSIM|PAT+CPLS";
+          default_data = "PAT+CGTFT|PAT+CGCMOD|PAT|PATD*|PATI|PATI0|PATI1|PATI2|PATI3|PATI4|PATI9|PATI10|PATI11|PAT+CPNET|PAT+CPNSTAT|PAT+CGPADDR|PAT+CSIM";
           opaque_data = "";
           rom_only = 0;
           }

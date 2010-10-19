@@ -22,7 +22,7 @@
 #include <dfcs.h>                 // For TDfc
 #include "isikernelchannel.h"     // For DISIKernelChannel
 #include "isiroutertrace.h"       // For C_TRACE, ASSERT_RESET.. and fault codes
-#include "misichannelrouterif.h"  // For MISIChannelRouterIf
+#include "misiobjectrouterif.h"  // For MISIObjectRouterIf
 #include "memapi.h"               // For MemApi
 #include "isimsgqueue.h"          // For DISIMsgQueue
 
@@ -67,16 +67,18 @@ enum TISIKernelChannelFaults
 DISIKernelChannel::DISIKernelChannel( 
         const TUint16& aObjId
         ) : iKernelChMsgQue( MsgQDfc, this, NULL, KISIKernelChannelMsgQueDfcPrio )
+        , iObjId(KNotInitializedId)
+        , iUID( KNotInitializedUID )
     {
     C_TRACE( ( _T( "DISIKernelChannel::DISIKernelChannel 0x%x>" ), this ) );
-    iRouterIf = MISIChannelRouterIf::GetIf();
+    iRouterIf = MISIObjectRouterIf::GetIf();
     ASSERT_RESET_ALWAYS( iRouterIf, ( EISIKernelChannelMemAllocFailure | EDISIKernelChannelId << KClassIdentifierShift ) );
     iRequests = new DISIKernelAsyncRequests( EISILastAsyncRequest );
     iRx = new DISIMsgQueue( KISILddRxQueueSize );
-    iCompletionThread = iRouterIf->GetDfcThread( MISIChannelRouterIf::EISIUserRequestCompletionThread );
+    iCompletionThread = iRouterIf->GetDfcThread( MISIObjectRouterIf::EISIUserRequestCompletionThread );
     iEmptyRxDfc = new TDfc( EmptyRxDfc, this, iCompletionThread, KISIKernelEmptyRxQueuePrio );
     ASSERT_RESET_ALWAYS( ( iEmptyRxDfc && iRequests && iRx ), ( EISIKernelChannelMemAllocFailure1 | EDISIKernelChannelId << KClassIdentifierShift ) );
-    iMainThread = iRouterIf->GetDfcThread( MISIChannelRouterIf::EISIKernelMainThread );
+    iMainThread = iRouterIf->GetDfcThread( MISIObjectRouterIf::EISIKernelMainThread );
     iKernelChMsgQue.SetDfcQ( iMainThread );
     iKernelChMsgQue.Receive();
     C_TRACE( ( _T( "DISIKernelChannel::DISIKernelChannel 0x%x<" ), this ) );
@@ -97,9 +99,12 @@ DISIKernelChannel::~DISIKernelChannel(
     iRx = NULL;
     C_TRACE( ( _T( "DISIKernelChannel::~DISIKernelChannel iEmptyRxDfc 0x%x" ), iEmptyRxDfc ) );
     // Only modified in constructor, if not created already reseted.
-    iEmptyRxDfc->Cancel();
-    delete iEmptyRxDfc;
-    iEmptyRxDfc = NULL;
+    if ( iEmptyRxDfc )
+        {
+        iEmptyRxDfc->Cancel();
+        delete iEmptyRxDfc;
+        iEmptyRxDfc = NULL;
+        }
     C_TRACE( ( _T( "DISIKernelChannel::~DISIKernelChannel iRequests 0x%x" ), iEmptyRxDfc ) );
     iPtrPtrToRxBuf = NULL;
     iRouterIf = NULL;
@@ -271,95 +276,20 @@ void DISIKernelChannel::HandleDfcRequest(
     }
 
 // Called in 1...N transceivers thread context
-void DISIKernelChannel::ReceiveMsg(
+void DISIKernelChannel::Receive(
         const TDesC8& aMessage
         )
     {
-    C_TRACE( ( _T( "DISIKernelChannel::ReceiveMsg 0x%x 0x%x 0x%x>" ), this, &aMessage, iObjId ) );
+    C_TRACE( ( _T( "DISIKernelChannel::Receive 0x%x 0x%x 0x%x>" ), this, &aMessage, iObjId ) );
     ASSERT_THREAD_CONTEXT_ALWAYS( ( EISIKernelChannelNotThreadContext1 | EDISIKernelChannelId << KClassIdentifierShift ) );
     iRx->Add( aMessage );
     iEmptyRxDfc->Enque();
-    C_TRACE( ( _T( "DISIKernelChannel::ReceiveMsg 0x%x 0x%x 0x%x<" ), this, &aMessage, iObjId ) );
+    C_TRACE( ( _T( "DISIKernelChannel::Receive 0x%x 0x%x 0x%x<" ), this, &aMessage, iObjId ) );
     }
 
 // From MISIRouterChannelIf end
 
-DISIKernelChannel::DISIKernelAsyncRequests::DISIKernelAsyncRequests(
-        const TInt aSize
-        )
-    {
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::DISIKernelAsyncRequests size %d>" ), aSize ) );
-    iRequestLock = new NFastMutex();
-    iDfcFunctionList = new TDfc*[ aSize ];
-    iRequestStatusList = new TRequestStatus*[ aSize ];
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::DISIKernelAsyncRequests<" ) ) );
-    }
-
-DISIKernelChannel::DISIKernelAsyncRequests::~DISIKernelAsyncRequests()
-    {
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::~DISIKernelAsyncRequests>" ) ) );
-    // Delete space reserved for the array not the contents of the array, so mem behind pointers that are not owned are not deleted.
-    delete iDfcFunctionList;
-    delete iRequestStatusList;
-    // Deletes lock
-    delete iRequestLock;
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::~DISIKernelAsyncRequests<" ) ) );
-    }
-
-void DISIKernelChannel::DISIKernelAsyncRequests::SetPending(
-        const TUint aRequest,
-        TDfc* aDfc,
-        TRequestStatus* aStatus
-        )
-    {
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::SetPending %d 0x%x 0x%x>" ), aRequest, aDfc, aStatus ) );
-    ASSERT_RESET_ALWAYS( aDfc, ( EISIKernelChannelNullParam5 | EDISIKernelChannelId << KClassIdentifierShift ) );
-    ASSERT_RESET_ALWAYS( aStatus, ( EISIKernelChannelNullParam6 | EDISIKernelChannelId << KClassIdentifierShift ) );
-    ASSERT_RESET_ALWAYS( ( EISILastAsyncRequest > aRequest && EISIAsyncReceive <= aRequest ), ( EISIKernelChannelOverTheLimits2 | EDISIKernelChannelId << KClassIdentifierShift ) );
-    // Note asserts must be done before holding the lock.
-    NKern::FMWait( iRequestLock );
-    iDfcFunctionList[ aRequest ] = aDfc;
-    iRequestStatusList[ aRequest ] = aStatus;
-    *iRequestStatusList[ aRequest ] = KRequestPending;
-    NKern::FMSignal( iRequestLock );
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::SetPending %d 0x%x 0x%x<" ), aRequest, aDfc, aStatus ) );
-    }
-
-TBool DISIKernelChannel::DISIKernelAsyncRequests::IsPending(
-        const TUint aRequest
-        )
-    {
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::IsPending %d>" ), aRequest ) );
-    ASSERT_RESET_ALWAYS( ( EISILastAsyncRequest > aRequest && EISIAsyncReceive <= aRequest ), ( EISIKernelChannelOverTheLimits3 | EDISIKernelChannelId << KClassIdentifierShift ) );
-    TBool ret( EFalse );
-    NKern::FMWait( iRequestLock );
-    ret = ( iDfcFunctionList[ aRequest ] && iRequestStatusList[ aRequest ] ) ? ETrue : EFalse;
-    NKern::FMSignal( iRequestLock );
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::IsPending %d %d<" ), aRequest, ret ) );
-    return ret;
-    }
-
-void DISIKernelChannel::DISIKernelAsyncRequests::Complete(
-        const TUint aRequest,
-        const TInt aStatusToComplete
-        )
-    {
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::Complete %d>" ), aRequest ) );
-    // Check that request is legal.
-    ASSERT_RESET_ALWAYS( ( EISILastAsyncRequest > aRequest && EISIAsyncReceive <= aRequest ), ( EISIKernelChannelOverTheLimits4 | EDISIKernelChannelId << KClassIdentifierShift ) );
-    NKern::FMWait( iRequestLock );
-    TDfc* completeDfc = iDfcFunctionList[ aRequest ];
-    if( ( completeDfc && iRequestStatusList[ aRequest ] ) )
-        {
-        // Writing straight to clients pointer. There is a risk that malfunctioning client can mess up it's own pointer, if used out side of rx dfc, but what can you do..
-        *iRequestStatusList[ aRequest ] = aStatusToComplete;
-        ASSERT_RESET_ALWAYS( !completeDfc->Queued(), ( EISIKernelChannelDfcAlreadyQueued | EDISIKernelChannelId << KClassIdentifierShift ) );
-        completeDfc->Enque();
-        iDfcFunctionList[ aRequest ] = NULL;
-        }
-    NKern::FMSignal( iRequestLock );
-    C_TRACE( ( _T( "DISIKernelAsyncRequests::Complete %d<" ), aRequest ) );
-    }
+// Internal start
 
 void DISIKernelChannel::EmptyRxDfc(
         TAny* aPtr // self
@@ -367,7 +297,7 @@ void DISIKernelChannel::EmptyRxDfc(
     {
     C_TRACE( ( _T( "DISIKernelChannel::EmptyRxDfc>" ) ) );
     DISIKernelChannel& chTmp = *reinterpret_cast<DISIKernelChannel*>( aPtr );
-    C_TRACE( ( _T( "DISIKernelChannel::EmptyRxDfc 0x%x 0x%x>" ), &chTmp, chTmp.iObjId ) );
+    C_TRACE( ( _T( "DISIKernelChannel::EmptyRxDfc 0x%x 0x%x" ), &chTmp, chTmp.iObjId ) );
     if( chTmp.iRequests->IsPending( EISIAsyncReceive ) && chTmp.iRx->Count() > 0 )
         {
         C_TRACE( ( _T( "DISIKernelChannel::EmptyRxDfc 0x%x writing to kernel client" ), &chTmp ) );
@@ -432,7 +362,7 @@ TInt DISIKernelChannel::HandleSyncRequest(
             {
             C_TRACE( ( _T( "DISIKernelChannel::HandleSyncRequest EISIConnect 0x%x" ), this ) );
             iUID = tablePtr[ KFirstParam ];
-            TUint8* objIdPtr = reinterpret_cast<TUint8*>( tablePtr[ KSecondParam ] ); //TODO vasta tempobjid
+            TUint8* objIdPtr = reinterpret_cast<TUint8*>( tablePtr[ KSecondParam ] );
             C_TRACE( ( _T( "DISIKernelChannel::HandleDfcRequest EISINokiaKernelOpen 0x%x" ), this ) );
             iRouterIf->Connect( iUID, iObjId, this );
             *objIdPtr = iObjId;
@@ -516,7 +446,7 @@ void DISIKernelChannel::ResetQueues(
         )
     {
     C_TRACE( ( _T( "DISIKernelChannel::ResetQueues 0x%x 0x%x>" ), this, iObjId ) );
-    // TODO: assert router ext thread context
+    //  assert router ext thread context
     if( iRx )
         {
         C_TRACE( ( _T( "DISIKernelChannel::ResetQueues 0x%x iRx 0x%x" ), this, iRx ) );
@@ -527,6 +457,85 @@ void DISIKernelChannel::ResetQueues(
         }
     C_TRACE( ( _T( "DISIKernelChannel::ResetQueues 0x%x 0x%x<" ), this, iObjId ) );
     }
+
+DISIKernelChannel::DISIKernelAsyncRequests::DISIKernelAsyncRequests(
+        const TInt aSize
+        )
+    {
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::DISIKernelAsyncRequests size %d>" ), aSize ) );
+    iRequestLock = new NFastMutex();
+    iDfcFunctionList = new TDfc*[ aSize ];
+    iRequestStatusList = new TRequestStatus*[ aSize ];
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::DISIKernelAsyncRequests<" ) ) );
+    }
+
+DISIKernelChannel::DISIKernelAsyncRequests::~DISIKernelAsyncRequests()
+    {
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::~DISIKernelAsyncRequests>" ) ) );
+    // Delete space reserved for the array not the contents of the array, so mem behind pointers that are not owned are not deleted.
+    delete iDfcFunctionList;
+    delete iRequestStatusList;
+    // Deletes lock
+    delete iRequestLock;
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::~DISIKernelAsyncRequests<" ) ) );
+    }
+
+void DISIKernelChannel::DISIKernelAsyncRequests::SetPending(
+        const TUint aRequest,
+        TDfc* aDfc,
+        TRequestStatus* aStatus
+        )
+    {
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::SetPending %d 0x%x 0x%x>" ), aRequest, aDfc, aStatus ) );
+    ASSERT_RESET_ALWAYS( aDfc, ( EISIKernelChannelNullParam5 | EDISIKernelChannelId << KClassIdentifierShift ) );
+    ASSERT_RESET_ALWAYS( aStatus, ( EISIKernelChannelNullParam6 | EDISIKernelChannelId << KClassIdentifierShift ) );
+    ASSERT_RESET_ALWAYS( ( EISILastAsyncRequest > aRequest && EISIAsyncReceive <= aRequest ), ( EISIKernelChannelOverTheLimits2 | EDISIKernelChannelId << KClassIdentifierShift ) );
+    // Note asserts must be done before holding the lock.
+    NKern::FMWait( iRequestLock );
+    iDfcFunctionList[ aRequest ] = aDfc;
+    iRequestStatusList[ aRequest ] = aStatus;
+    *iRequestStatusList[ aRequest ] = KRequestPending;
+    NKern::FMSignal( iRequestLock );
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::SetPending %d 0x%x 0x%x<" ), aRequest, aDfc, aStatus ) );
+    }
+
+TBool DISIKernelChannel::DISIKernelAsyncRequests::IsPending(
+        const TUint aRequest
+        )
+    {
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::IsPending %d>" ), aRequest ) );
+    ASSERT_RESET_ALWAYS( ( EISILastAsyncRequest > aRequest && EISIAsyncReceive <= aRequest ), ( EISIKernelChannelOverTheLimits3 | EDISIKernelChannelId << KClassIdentifierShift ) );
+    TBool ret( EFalse );
+    NKern::FMWait( iRequestLock );
+    ret = ( iDfcFunctionList[ aRequest ] && iRequestStatusList[ aRequest ] ) ? ETrue : EFalse;
+    NKern::FMSignal( iRequestLock );
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::IsPending %d %d<" ), aRequest, ret ) );
+    return ret;
+    }
+
+void DISIKernelChannel::DISIKernelAsyncRequests::Complete(
+        const TUint aRequest,
+        const TInt aStatusToComplete
+        )
+    {
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::Complete %d>" ), aRequest ) );
+    // Check that request is legal.
+    ASSERT_RESET_ALWAYS( ( EISILastAsyncRequest > aRequest && EISIAsyncReceive <= aRequest ), ( EISIKernelChannelOverTheLimits4 | EDISIKernelChannelId << KClassIdentifierShift ) );
+    NKern::FMWait( iRequestLock );
+    TDfc* completeDfc = iDfcFunctionList[ aRequest ];
+    if( ( completeDfc && iRequestStatusList[ aRequest ] ) )
+        {
+        // Writing straight to clients pointer. There is a risk that malfunctioning client can mess up it's own pointer, if used out side of rx dfc, but what can you do..
+        *iRequestStatusList[ aRequest ] = aStatusToComplete;
+        ASSERT_RESET_ALWAYS( !completeDfc->Queued(), ( EISIKernelChannelDfcAlreadyQueued | EDISIKernelChannelId << KClassIdentifierShift ) );
+        completeDfc->Enque();
+        iDfcFunctionList[ aRequest ] = NULL;
+        }
+    NKern::FMSignal( iRequestLock );
+    C_TRACE( ( _T( "DISIKernelAsyncRequests::Complete %d<" ), aRequest ) );
+    }
+
+// Internal end
 
 // End of file.
 

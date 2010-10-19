@@ -24,7 +24,7 @@ EXPORTS
 	_ZN13DIsaKernelAPID1Ev @ 23 NONAME
 	_ZN13DIsaKernelAPID2Ev @ 24 NONAME
 	_ZN19DIsaAccessExtension12GetDFCThreadE13TIADDfcThread @ 25 NONAME
-	_ZN7DRouter14DummyDoNothingEv @ 26 NONAME
+	_ZN11MIST2IADApi7GetSelfEv @ 26 NONAME
 	_ZN19DIsaAccessExtension17GetChannel2IADApiEv @ 27 NONAME
 	_ZN6DQueue3AddERK6TDesC8 @ 28 NONAME
 	_ZN6DQueue3GetEv @ 29 NONAME
@@ -41,7 +41,7 @@ EXPORTS
 	_ZN7DRouter14GetMaxDataSizeEv @ 40 NONAME
 	_ZN7DRouter14SendIndicationER5TDes8t @ 41 NONAME
 	_ZN7DRouter15DeAllocateBlockER5TDes8 @ 42 NONAME
-	_ZN7DRouter15DummyDoNothing2Ev @ 43 NONAME
+	_ZN7DRouter14ReceiveMessageER5TDes8 @ 43 NONAME
 	_ZN7DRouter15OrderIndicationER5TDes8ti @ 44 NONAME
 	_ZN7DRouter17AllocateDataBlockEt @ 45 NONAME
 	_ZN7DRouter19GetConnectionStatusEv @ 46 NONAME
@@ -63,5 +63,11 @@ EXPORTS
 	_ZN9DReqQueueD1Ev @ 62 NONAME
 	_ZN9DReqQueueD2Ev @ 63 NONAME
 	_ZNK13DIsaKernelAPI23NotifyStateChangeCancelEv @ 64 NONAME
-	_ZN18MISIObjectRouterIf7ConnectElRhP18MISIRouterObjectIf @ 65 NONAME
+	_ZN7DRouter14GetBlockConfigEv @ 65 NONAME
+	_ZN7DRouter22NotifyConnectionStatusEN11MIST2IADApi20TISTConnectionStatusE @ 66 NONAME
+	_ZN7DRouter8RegisterEP11MIAD2ISTApi @ 67 NONAME
+	_ZThn4_N7DRouter14GetBlockConfigEv @ 68 NONAME
+	_ZThn4_N7DRouter14ReceiveMessageER5TDes8 @ 69 NONAME
+	_ZThn4_N7DRouter22NotifyConnectionStatusEN11MIST2IADApi20TISTConnectionStatusE @ 70 NONAME
+	_ZThn4_N7DRouter8RegisterEP11MIAD2ISTApi @ 71 NONAME
 

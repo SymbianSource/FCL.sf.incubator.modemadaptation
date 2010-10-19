@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -432,25 +432,25 @@ class CMmSmsMessHandler :
         * @param aIsiMsg ISI message
         * @param aDestAddressLength Destination address length
         * @param aMsgOffset Offset of ISI message where to append subblock
-        * @return void
+        * @return length of composed subblock
         */
-        void BuildSmsSbSubmit(
+        TUint16 BuildSmsSbSubmit(
             const TDesC8& aMsgData,
             TIsiSend& aIsiMsg,
             TUint8 aDestAddressLength,
-            TUint8 aMsgOffset ) const;
+            TUint aMsgOffset ) const;
 
         /**
         * Creates SMS_SB_COMMAND subblock and appends it to ISI message
         * @param aMsgData SMS TPDU
         * @param aIsiMsg ISI message
         * @param aMsgOffset Offset of ISI message where to append subblock
-        * @return void
+        * @return length of composed subblock
         */
-        void BuildSmsSbCommand(
+        TUint16 BuildSmsSbCommand(
             const TDesC8& aMsgData,
             TIsiSend& aIsiMsg,
-            TUint8 aMsgOffset ) const;
+            TUint aMsgOffset ) const;
 
         /**
         * Creates SMS_SB_ADDRESS subblock and appends it to ISI message
@@ -460,11 +460,11 @@ class CMmSmsMessHandler :
         * @param aMsgOffset Offset of ISI message where to append subblock
         * @return Length of created subblock
         */
-        TUint8 BuildSmsSbAddress(
+        TUint16 BuildSmsSbAddress(
             const TDesC8& aAddress,
             TIsiSend& aIsiMsg,
             TUint8 aAddressType,
-            TUint8 aMsgOffset ) const;
+            TUint aMsgOffset ) const;
 
         /**
         * Creates SMS_SB_USER_DATA subblock and appends it to ISI message
@@ -476,13 +476,13 @@ class CMmSmsMessHandler :
         * @param aMsgOffset Offset of ISI message where to append subblock
         * @return Length of created subblock
         */
-        TUint8 BuildSmsSbUserData(
+        TUint16 BuildSmsSbUserData(
             const TDesC8& aMsgData,
             TIsiSend& aIsiMsg,
             TUint8 aTpUdl,
             TUint8 aTpUserDataIndex,
             TBool aDefaultAlphabet,
-            TUint8 aMsgOffset ) const;
+            TUint aMsgOffset ) const;
 
         /**
         * Creates SMS_SB_VALIDITY_PERIOD subblock and appends it to ISI message
@@ -491,25 +491,25 @@ class CMmSmsMessHandler :
         * @param aTpVpIndex Index of validity period in TPDU
         * @param aTpVpLength Length of validity period
         * @param aMsgOffset Offset of ISI message where to append subblock
-        * @return void
+        * @return Length of created subblock
         */
-        void BuildSmsSbValidityPeriod(
+        TUint16 BuildSmsSbValidityPeriod(
             const TDesC8& aMsgData,
             TIsiSend& aIsiMsg,
             TUint8 aTpVpIndex,
             TUint8 aTpVpLength,
-            TUint8 aMsgOffset )const;
+            TUint aMsgOffset )const;
 
         /**
         * Creates SMS_SB_CHECK_INFO sub block with SMS_CHECK_DISABLE_FDN and appends it
         * to ISI message.
         * @param aIsiMsg ISI message
         * @param aMsgOffset Offset of ISI message where to append subblock
-        * @return void
+        * @return Length of created subblock
         */
-        void BuildSmsCheckInfo(
+        TUint16 BuildSmsCheckInfo(
             TIsiSend& aIsiMsg,
-            TUint8 aMsgOffset )const;
+            TUint aMsgOffset )const;
 
         /**
         * Read SMS or EF SMS record count from SIM/USIM
@@ -649,6 +649,20 @@ class CMmSmsMessHandler :
         * @return Symbian error code
         */
         TInt UiccSmsUpdateParameterReq( const CMmDataPackage* aDataPackage );
+
+        /**
+        * Handles SMS resouce conf information
+        * @param aIsiMsg message data
+        * @return void
+        */
+        void SmsResourceConfInd( const TIsiReceiveC& aIsiMsg );
+
+        /**
+        * Sends SMS_RESOURCE_CONF_REQ for disabling resource control
+        * @return void
+        */
+        void SmsResourceConfReq();
+
         //ATTRIBUTES
     public:
         //none
@@ -707,11 +721,11 @@ class CMmSmsMessHandler :
         // Flag to check is the case class 2 SMS write or EMobileStoreWrite
         TBool iSMSClass2Write;
 
-        // Client has no storage to receive anymore SM's
-        TBool iMemoryCapacityExceeded;
-
         // Record number of EF smsp
         TUint8 iSmspRecordNumber;
+
+        // pointer to phonet receiver
+        CMmPhoNetReceiver* iPhonetReceiver;
     };
 
 #endif // _CMMSMSMESSHANDLER_H_

@@ -57,7 +57,7 @@ EXPORT_C RUsbPnClient::RUsbPnClient()
 //
 EXPORT_C void RUsbPnClient::ConnectL()
     {
-    OstTrace0( TRACE_API, RUSBPNCLIENT_CONNECTL_ENTRY, "RUsbPnClient::ConnectL" );
+    OstTrace0( TRACE_BORDER, RUSBPNCLIENT_CONNECTL_ENTRY, "RUsbPnClient::ConnectL" );
     A_TRACE( ( _T( "RUsbPnClient::ConnectL()" ) ) );
 
     TInt err( KErrNone );
@@ -77,7 +77,7 @@ EXPORT_C void RUsbPnClient::ConnectL()
         if ( err == KErrNotFound )
             {
             // Lock is not enabled
-            OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL, "RUsbPnClient::ConnectL() - semaphore not found, start server" );
+            OstTrace0( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL, "RUsbPnClient::ConnectL() - semaphore not found, start server" );
             E_TRACE( ( _L( "RUsbPnClient::ConnectL() - semaphore not found, start server" ) ) );
 
             RSemaphore startLock;
@@ -105,7 +105,7 @@ EXPORT_C void RUsbPnClient::ConnectL()
               server.Resume();  // Logon OK -> start the server
               }
 
-            OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP1, "RUsbPnClient::ConnectL() - waiting server response" );
+            OstTrace0( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL_DUP1, "RUsbPnClient::ConnectL() - waiting server response" );
             E_TRACE( ( _T( "RUsbPnClient::ConnectL() - waiting server response" ) ) );
             User::WaitForRequest( status );  // Wait for start or death
 
@@ -122,7 +122,7 @@ EXPORT_C void RUsbPnClient::ConnectL()
 
             if( err )
                 {
-                OstTrace1( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP2, "RUsbPnClient::ConnectL() - waiting server response status; err=%d", err );
+                OstTrace1( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL_DUP2, "RUsbPnClient::ConnectL() - waiting server response status; err=%d", err );
                 E_TRACE( ( _T( "RUsbPnClient::ConnectL() - waiting server response status: %d" ), err ) );
                 TRACE_ASSERT_ALWAYS;
                 User::LeaveIfError( err );
@@ -130,7 +130,7 @@ EXPORT_C void RUsbPnClient::ConnectL()
             /* End of starting process */
             /********************************************/
 
-            OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP3, "RUsbPnClient::ConnectL() - server is started, signal other clients" );
+            OstTrace0( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL_DUP3, "RUsbPnClient::ConnectL() - server is started, signal other clients" );
             E_TRACE( ( _L( "RUsbPnClient::ConnectL() - server is started, signal other clients" ) ) );
             // Signal other clients
             startLock.Signal( KMaxTInt );
@@ -147,11 +147,11 @@ EXPORT_C void RUsbPnClient::ConnectL()
             // Open lock semaphore
             User::LeaveIfError( startLock.Open( lock ) );
 
-            OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP4, "RUsbPnClient::ConnectL() - server is starting, wait for signal" );
+            OstTrace0( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL_DUP4, "RUsbPnClient::ConnectL() - server is starting, wait for signal" );
             E_TRACE( ( _L( "RUsbPnClient::ConnectL() - server is starting, wait for signal" ) ) );
             // Wait for signal
             startLock.Wait();
-            OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP5, "RUsbPnClient::ConnectL() - signal received" );
+            OstTrace0( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL_DUP5, "RUsbPnClient::ConnectL() - signal received" );
             E_TRACE( ( _L( "RUsbPnClient::ConnectL() - signal received" ) ) );
 
             // Close semaphore
@@ -160,27 +160,27 @@ EXPORT_C void RUsbPnClient::ConnectL()
             }
 
         // Create USB Phonet Link server session
-        OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP6, "RUsbPnClient::ConnectL() - Create session" );
+        OstTrace0( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL_DUP6, "RUsbPnClient::ConnectL() - Create session" );
         E_TRACE( ( _L( "RUsbPnClient::ConnectL() - Create session" ) ) );
 
         User::LeaveIfError( CreateSession( KUsbPnServerName, TVersion(1,0,0) ) );
 
-        OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP7, "RUsbPnClient::ConnectL() - session created1" );
+        OstTrace0( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL_DUP7, "RUsbPnClient::ConnectL() - session created1" );
         E_TRACE( ( _L( "RUsbPnClient::ConnectL() - session created1" ) ) );
         }
     else if ( err )
         {
-        OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP8, "RUsbPnClient::ConnectL() - session not created, reason uknown" );
+        OstTrace0( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL_DUP8, "RUsbPnClient::ConnectL() - session not created, reason uknown" );
         E_TRACE( ( _L( "RUsbPnClient::ConnectL() - session not created, reason uknown" ) ) );            
         TRACE_ASSERT_ALWAYS;
         User::Leave( err );
         }
     else
         {
-        OstTrace0( TRACE_DETAILED, RUSBPNCLIENT_CONNECTL_DUP9, "RUsbPnClient::ConnectL() - session created2" );
+        OstTrace0( TRACE_INTERNALS, RUSBPNCLIENT_CONNECTL_DUP9, "RUsbPnClient::ConnectL() - session created2" );
         E_TRACE( ( _T( "RUsbPnClient::ConnectL() - session created2" ) ) );
         }
-    OstTrace0( TRACE_API, RUSBPNCLIENT_CONNECTL_EXIT, "RUsbPnClient::ConnectL() - return void" );
+    OstTrace0( TRACE_BORDER, RUSBPNCLIENT_CONNECTL_EXIT, "RUsbPnClient::ConnectL() - return void" );
     A_TRACE( ( _T( "RUsbPnClient::ConnectL() - return void" ) ) );
     }
 
@@ -191,12 +191,12 @@ EXPORT_C void RUsbPnClient::ConnectL()
 //
 EXPORT_C void RUsbPnClient::Detach()
     {
-    OstTrace0( TRACE_API, RUSBPNCLIENT_DETACH_ENTRY, "RUsbPnClient::Detach" );
+    OstTrace0( TRACE_BORDER, RUSBPNCLIENT_DETACH_ENTRY, "RUsbPnClient::Detach" );
     A_TRACE( ( _T( "RUsbPnClient::Disconnect()" ) ) );
     SendReceive( EPnDetach );
     // close the session
     RSessionBase::Close();
-    OstTrace0( TRACE_API, RUSBPNCLIENT_DETACH_EXIT, "RUsbPnClient::Detach - return void" );
+    OstTrace0( TRACE_BORDER, RUSBPNCLIENT_DETACH_EXIT, "RUsbPnClient::Detach - return void" );
     A_TRACE( ( _T( "RUsbPnClient::Disconnect() - return void" ) ) );
     }
 

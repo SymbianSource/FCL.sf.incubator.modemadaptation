@@ -37,7 +37,7 @@ SOURCE          p2pif.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../p2prouter_dll/inc
-//TODO OST Traces USERINCLUDE     ../traces
+// OST Traces USERINCLUDE     ../traces
 
 SYSTEMINCLUDE   /epoc32/include
 NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE

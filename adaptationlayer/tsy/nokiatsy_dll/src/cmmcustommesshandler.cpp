@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -36,7 +36,7 @@
 #include <net_modemisi.h>
 #include <uiccisi.h>
 #include <ss_wmisi.h>
-// #include <permisi.h> To be done in CPS
+// #include <permisi.h> 
 #include <product_profile_definitions.h>
 
 #include <ctsy/serviceapi/mmgsmwcdmautils.h>
@@ -167,7 +167,7 @@ const TUint8 KServiceMBMSsecurity = 0x45; // service no 69
 CMmCustomMessHandler::CMmCustomMessHandler()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::CMmCustomMessHandler.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CMMCUSTOMMESSHANDLER, "CMmCustomMessHandler::CMmCustomMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CMMCUSTOMMESSHANDLER_TD, "CMmCustomMessHandler::CMmCustomMessHandler" );
     iSimCBTopicToBeDeleted = KUnusedCbMsgId;
     // Set to true because it doesn't delete topic at start up
     iTopicInSimMemoryDelete = ETrue;
@@ -181,7 +181,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CMMCUSTOMMESSHANDLER, "CMmCustomMe
 CMmCustomMessHandler::~CMmCustomMessHandler()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::~CMmCustomMessHandler.\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_CMMCUSTOMMESSHANDLER, "CMmCustomMessHandler::~CMmCustomMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_CMMCUSTOMMESSHANDLER_TD, "CMmCustomMessHandler::~CMmCustomMessHandler" );
 
     if( iListOfCiphValues )
         {
@@ -208,7 +208,7 @@ CMmCustomMessHandler* CMmCustomMessHandler::NewL
         )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NewL.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NEWL, "CMmCustomMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NEWL_TD, "CMmCustomMessHandler::NewL" );
 
     CMmCustomMessHandler* customMessHandler =
         new( ELeave ) CMmCustomMessHandler();
@@ -234,7 +234,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NEWL, "CMmCustomMessHandler::NewL"
 
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
 
-// TO BE DONE WITH INFO_PP_DATA_READ_RESP
+ 
     aPhoNetReceiver->RegisterL(
         customMessHandler,
         PN_INFO,
@@ -277,7 +277,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NEWL, "CMmCustomMessHandler::NewL"
         GSS_HSXPA_USER_SETTING_IND );
 
     // PMM
-    /* To be done in CPS
+    /* 
     aPhoNetReceiver->RegisterL( customMessHandler,
         PN_PERMANENT_DATA,
         PERM_PM_RECORD_READ_RESP );
@@ -309,7 +309,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NEWL, "CMmCustomMessHandler::NewL"
 void CMmCustomMessHandler::ConstructL()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ConstructL.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CONSTRUCTL, "CMmCustomMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CONSTRUCTL_TD, "CMmCustomMessHandler::ConstructL" );
 
     // Initialize iListOfCiphValues
     iListOfCiphValues = new ( ELeave ) RArray<TCiphListEntry>( 1 );
@@ -349,7 +349,7 @@ void CMmCustomMessHandler::ReceiveMessageL
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
 TFLOGSTRING3("TSY: CMmCustomMessHandler::ReceiveMessageL, Resource: %d, Message: %d", resource, messageId);
-OstTraceExt2( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCustomMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
 
     switch( resource )
         {
@@ -397,7 +397,7 @@ OstTraceExt2( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMess
                 default:
                     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_MODEM_CALL, switch messageId - default");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_CALL, switch messageId - default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_CALL, switch messageId - default" );
                     break;
                     }
                 }
@@ -437,7 +437,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMe
                 default:
                     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_GSS, switch messageId - default");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_GSS, switch messageId - default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_GSS, switch messageId - default" );
                     break;
                     }
                 }
@@ -487,7 +487,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMe
                 default:
                     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_MODEM_NETWORK, switch messageId - default");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_MODEM_NETWORK, switch messageId - default" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_MODEM_NETWORK, switch messageId - default" );
                     break;
                     }
                 }
@@ -504,7 +504,6 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMe
             switch( messageId )
                 {
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-                 // TO BE DONE WITH INFO_PP_DATA_READ_RESP
                  case INFO_PP_READ_RESP:
                     {
                     InfoPpReadResp( aIsiMessage );
@@ -514,7 +513,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMe
                  default:
                     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_INFO, switch messageId - default");
-OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_INFO, switch messageId - default" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_INFO, switch messageId - default" );
                     break;
                     }
                 }
@@ -542,13 +541,13 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMe
                 default:
                     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_SS, switch messageId - default");
-OstTrace0( TRACE_NORMAL, DUP12_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_SS, switch messageId - default" );
+OstTrace0( TRACE_NORMAL,  DUP12_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCustomMessHandler::ReceiveMessageL- switch resource - case PN_SS, switch messageId - default" );
                     break;
                     }
                 }
             break;
             }
-        /* To be done in CPS
+        /*
         case PN_PERMANENT_DATA:
             {
             if ( KCustomTransId == aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) )
@@ -571,13 +570,13 @@ OstTrace0( TRACE_NORMAL, DUP12_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomM
                         {
                         TFLOGSTRING("TSY: CMmCustomMessHandler::ReceiveMessageL\
                             - switch resource - case PN_PERMANENT_DATA, switch messageId - default.\n");
-OstTrace0( TRACE_NORMAL, DUP16_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_PERMANENT_DATA, switch messageId - default." );
+OstTrace0( TRACE_NORMAL,  DUP16_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_PERMANENT_DATA, switch messageId - default." );
                         break;
                         }
                     }
                 TFLOGSTRING("TSY: CMmCustomMessHandler::ReceiveMessageL\
                             - switch resource - case PN_PERMANENT_DATA, transaction id is not KCustomTransId\n");
-OstTrace0( TRACE_NORMAL, DUP14_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_PERMANENT_DATA, transaction id is not KCustomTransId" );
+OstTrace0( TRACE_NORMAL,  DUP14_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCustomMessHandler::ReceiveMessageL - switch resource - case PN_PERMANENT_DATA, transaction id is not KCustomTransId" );
                 }
             break;
             }*/
@@ -593,7 +592,7 @@ OstTrace0( TRACE_NORMAL, DUP14_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomM
         default:
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ReceiveMessageL - switch resource - default" );
-OstTrace0( TRACE_NORMAL, DUP13_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL, "CMmCustomMessHandler::ReceiveMessageL- switch resource - default" );
+OstTrace0( TRACE_NORMAL,  DUP13_CMMCUSTOMMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCustomMessHandler::ReceiveMessageL- switch resource - default" );
             break; // server not known
             }
         } // end of switch
@@ -614,7 +613,7 @@ TInt CMmCustomMessHandler::CallReleaseReq
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::CallReleaseReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLRELEASEREQ, "CMmCustomMessHandler::CallReleaseReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLRELEASEREQ_TD, "CMmCustomMessHandler::CallReleaseReq" );
 
     iReleaseCauseValueSent = aCause;
 
@@ -648,7 +647,7 @@ void CMmCustomMessHandler::CallReleaseResp
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::CallReleaseResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLRELEASERESP, "CMmCustomMessHandler::CallReleaseResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLRELEASERESP_TD, "CMmCustomMessHandler::CallReleaseResp" );
 
     //initialize the causeType and causeValue
     TUint8 causeType  = 0;
@@ -696,7 +695,7 @@ void CMmCustomMessHandler::CallMoAlertInd
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::CallMoAlertInd.");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLMOALERTIND, "CMmCustomMessHandler::CallMoAlertInd" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLMOALERTIND_TD, "CMmCustomMessHandler::CallMoAlertInd" );
 
     TBool playRemoteAlertToneLocally( EFalse );
     TUint sbStartOffSet( 0 );
@@ -711,7 +710,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLMOALERTIND, "CMmCustomMessHand
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::CallMoAlertInd,\
             - CALL_MODEM_SB_ALERTING_INFO sub block found.");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_CALLMOALERTIND, "CMmCustomMessHandler::CallMoAlertInd, CALL_MODEM_SB_ALERTING_INFO sub block found" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_CALLMOALERTIND_TD, "CMmCustomMessHandler::CallMoAlertInd, CALL_MODEM_SB_ALERTING_INFO sub block found" );
 
         // Get alerting info
         TUint8 callAlertingInfo( aIsiMsg.Get8bit(
@@ -742,7 +741,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_CALLMOALERTIND, "CMmCustomMes
 TInt CMmCustomMessHandler::UiccReadCiReq( TInt aTrId )
     {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccReadCiReq, transaction ID: %d", aTrId );
-OstTrace1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADCIREQ, "CMmCustomMessHandler::UiccReadCiReq;aTrId=%d", aTrId );
+OstTrace1( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADCIREQ_TD, "CMmCustomMessHandler::UiccReadCiReq;aTrId=%d", aTrId );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccReadTransparent params;
@@ -776,7 +775,7 @@ void CMmCustomMessHandler::UiccReadCiResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadCiResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADCIRESP, "CMmCustomMessHandler::UiccReadCiResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADCIRESP_TD, "CMmCustomMessHandler::UiccReadCiResp" );
 
     TInt ret( KErrNone );
     TBool cipherIndicatorStatus( EFalse );
@@ -851,7 +850,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADCIRESP, "CMmCustomMessHand
 TInt CMmCustomMessHandler::NetCsWakeupReq( TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetCsWakeupReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETCSWAKEUPREQ, "CMmCustomMessHandler::NetCsWakeupReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETCSWAKEUPREQ_TD, "CMmCustomMessHandler::NetCsWakeupReq" );
 
     //Data buffer length is 2
     TBuf8<2> data;
@@ -875,7 +874,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETCSWAKEUPREQ, "CMmCustomMessHand
 void CMmCustomMessHandler::NetCsWakeupResp()
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::NetCsWakeupResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETCSWAKEUPRESP, "CMmCustomMessHandler::NetCsWakeupResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETCSWAKEUPRESP_TD, "CMmCustomMessHandler::NetCsWakeupResp" );
 
     //getting this message indicates that the wakeup was successful
     //complete NetWakeup method (no packed parameters)
@@ -895,7 +894,7 @@ void CMmCustomMessHandler::NetCipheringInd(
         const TIsiReceiveC &aIsiMsg )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::NetCipheringInd.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETCIPHERINGIND, "CMmCustomMessHandler::NetCipheringInd" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETCIPHERINGIND_TD, "CMmCustomMessHandler::NetCipheringInd" );
 
     //set chipering to False
     TBool cipher( EFalse );
@@ -938,7 +937,7 @@ void CMmCustomMessHandler::NetModemRegStatusInd
         )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetModemRegStatusInd");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND, "CMmCustomMessHandler::NetModemRegStatusInd" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND_TD, "CMmCustomMessHandler::NetModemRegStatusInd" );
 
     if ( 0 != aIsiMsg.Get8bit(
         ISI_HEADER_SIZE +
@@ -974,7 +973,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND, "CMmCustomMe
                 case NET_REG_STATUS_NOSERV_SIM_REJECTED_BY_NW:
                     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetModemRegStatusInd, No SIM");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND, "CMmCustomMessHandler::NetModemRegStatusInd, No SIM" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND_TD, "CMmCustomMessHandler::NetModemRegStatusInd, No SIM" );
                     // Complete NetworkConnectionFailure notification
                     // (no packed parameters).
                     // If puk code is required notification shouldn't
@@ -983,7 +982,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND, "CMmCus
                     if( !pukCodeRequired )
                         {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetModemRegStatusInd - Complete network connection failure");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND, "CMmCustomMessHandler::NetModemRegStatusInd - Complete network connection failure" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND_TD, "CMmCustomMessHandler::NetModemRegStatusInd - Complete network connection failure" );
 
                         iMessageRouter->Complete(
                             ECustomNotifyNetworkConnectionFailureIPC,
@@ -994,7 +993,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND, "CMmCus
                 default:
                     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetModemRegStatusInd, switch registrationStatus - default");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND, "CMmCustomMessHandler::NetModemRegStatusInd, switch registrationStatus - default" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND_TD, "CMmCustomMessHandler::NetModemRegStatusInd, switch registrationStatus - default" );
                     break;
                     }
                 }
@@ -1025,7 +1024,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSIND, "CMmCus
 TInt CMmCustomMessHandler::UiccReadDynamic2FlagsReq()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadDynamic2FlagsReq");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADDYNAMIC2FLAGSREQ, "CMmCustomMessHandler::UiccReadDynamic2FlagsReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADDYNAMIC2FLAGSREQ_TD, "CMmCustomMessHandler::UiccReadDynamic2FlagsReq" );
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccWriteTransparent params;
     params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
@@ -1053,7 +1052,7 @@ void CMmCustomMessHandler::UiccReadDynamic2FlagsResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadDynamic2FlagsResp");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADDYNAMIC2FLAGSRESP, "CMmCustomMessHandler::UiccReadDynamic2FlagsResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADDYNAMIC2FLAGSRESP_TD, "CMmCustomMessHandler::UiccReadDynamic2FlagsResp" );
 
     TInt ret( KErrNone );
     RMmCustomAPI::TGetAlsBlockStatus blockStatus
@@ -1094,7 +1093,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADDYNAMIC2FLAGSRESP, "CMmCus
 TInt CMmCustomMessHandler::UiccWriteDynamic2FlagsReq( TUint8 aInfo )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccWriteDynamic2FlagsReq");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEDYNAMIC2FLAGSREQ, "CMmCustomMessHandler::UiccWriteDynamic2FlagsReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCWRITEDYNAMIC2FLAGSREQ_TD, "CMmCustomMessHandler::UiccWriteDynamic2FlagsReq" );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccWriteTransparent params;
@@ -1123,7 +1122,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEDYNAMIC2FLAGSREQ, "CMmCus
 void CMmCustomMessHandler::UiccWriteDynamic2FlagsResp( TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccWriteDynamic2FlagsReq");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEDYNAMIC2FLAGSRESP, "CMmCustomMessHandler::UiccWriteDynamic2FlagsResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCWRITEDYNAMIC2FLAGSRESP_TD, "CMmCustomMessHandler::UiccWriteDynamic2FlagsResp" );
 
     TInt ret( KErrNone );
 
@@ -1149,7 +1148,7 @@ void CMmCustomMessHandler::CallTerminateInd
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::CallTerminateInd.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLTERMINATEIND, "CMmCustomMessHandler::CallTerminateInd" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLTERMINATEIND_TD, "CMmCustomMessHandler::CallTerminateInd" );
 
     //unique call id (without possible generic id)
     TInt callId = static_cast<TInt>( aIsiMsg.Get8bit( ISI_HEADER_SIZE +
@@ -1179,7 +1178,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLTERMINATEIND, "CMmCustomMessHa
                 ssDiagnostics |= 0x80; // binary 10000000
                 TFLOGSTRING3("TSY:CMmCustomMessHandler::CallTerminatedInd: Diagnostic octet=%d received for call id=%d",
                     ssDiagnostics, callId );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_CALLTERMINATEIND, "CMmCustomMessHandler::CallTerminateInd;Diagnostic octet==%hhu received for call id=%d", ssDiagnostics, callId );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_CALLTERMINATEIND_TD, "CMmCustomMessHandler::CallTerminateInd;Diagnostic octet==%hhu received for call id=%d", ssDiagnostics, callId );
                 }
             }
 
@@ -1207,7 +1206,7 @@ void CMmCustomMessHandler::CallReleaseInd
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::CallReleaseInd.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLRELEASEIND, "CMmCustomMessHandler::CallReleaseInd" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLRELEASEIND_TD, "CMmCustomMessHandler::CallReleaseInd" );
 
     //unique call id (without possible generic id)
     TInt callId = static_cast<TInt>( aIsiMsg.Get8bit( ISI_HEADER_SIZE +
@@ -1237,7 +1236,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLRELEASEIND, "CMmCustomMessHand
                 ssDiagnostics |= 0x80; // binary 10000000
                 TFLOGSTRING3("TSY:CMmCustomMessHandler::CallReleaseInd: Diagnostic octet=%d received for call id=%d",
                     ssDiagnostics, callId );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_CALLRELEASEIND, "CMmCustomMessHandler::CallReleaseInd;Diagnostic octet==%hhu received for call id=%d", ssDiagnostics, callId );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_CALLRELEASEIND_TD, "CMmCustomMessHandler::CallReleaseInd;Diagnostic octet==%hhu received for call id=%d", ssDiagnostics, callId );
                 }
             }
 
@@ -1266,7 +1265,7 @@ TInt CMmCustomMessHandler::InfoPpReadReq
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::InfoPpReadReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_INFOPPREADREQ, "CMmCustomMessHandler::InfoPpReadReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_INFOPPREADREQ_TD, "CMmCustomMessHandler::InfoPpReadReq" );
 
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     //create the buffer for SB_PP subblock
@@ -1289,18 +1288,18 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_INFOPPREADREQ, "CMmCustomMessHandl
         {
         sbPPSubBlockBuf.Append( KinfoPpTwoDigitDial );
         }
-  else
-    {
-    // not supported
-    return KErrArgument;
-    }
+    else
+        {
+        // not supported
+        return KErrArgument;
+        }
 
     //value of the product profile is 0x00, not need cause we are reading
     sbPPSubBlockBuf.Append( 0x00 );
 
-  // Construct INFO_PP_READ_REQ message (1 data byte +
-  // sub block count + INFO_SB_PP sub block)
-  TBuf8< 2 + SIZE_INFO_SB_PP > infoPpReadReq;
+    // Construct INFO_PP_READ_REQ message (1 data byte +
+    // sub block count + INFO_SB_PP sub block)
+    TBuf8< 2 + SIZE_INFO_SB_PP > infoPpReadReq;
 
     //set pp batch reading to read specific product profile, thus 0.
     infoPpReadReq.Append( INFO_PP_PROD_PROFILE_FEATURE );
@@ -1310,8 +1309,8 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_INFOPPREADREQ, "CMmCustomMessHandl
     infoPpReadReq.Append( sbPPSubBlock.CompleteSubBlock() );
 
     //create the isi message
-  //transaction id = request type
-  TUint8 transId = static_cast<TUint8>( aReqType );
+    //transaction id = request type
+    TUint8 transId = static_cast<TUint8>( aReqType );
 
     return iPhoNetSender->Send( PN_INFO, transId, INFO_PP_READ_REQ, infoPpReadReq );
 
@@ -1334,7 +1333,7 @@ void CMmCustomMessHandler::InfoPpReadResp
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::InfoPpReadResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMessHandler::InfoPpReadResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_INFOPPREADRESP_TD, "CMmCustomMessHandler::InfoPpReadResp" );
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     TInt errorValue( KErrGeneral );
 
@@ -1348,18 +1347,14 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMessHand
     RMmCustomAPI::TTwoDigitDialSupport twoDigitDialSupport(
         RMmCustomAPI::ETwoDigitDialSupportOff );
 
-  TFLOGSTRING2("TSY: CMmCustomMessHandler::InfoPpReadResp - Status: %d",
-    status );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMessHandler::InfoPpReadResp;status=%hhu", status );
+TFLOGSTRING2("TSY: CMmCustomMessHandler::InfoPpReadResp - Status: %d", status );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_INFOPPREADRESP_TD, "CMmCustomMessHandler::InfoPpReadResp;status=%hhu", status );
 
     switch ( status )
         {
         case INFO_OK:
             {
-
-          TUint sbInfoPpReadStartOffset( 0 );
-
-
+            TUint sbInfoPpReadStartOffset(0);
             if ( KErrNone == aIsiMessage.FindSubBlockOffsetById( ISI_HEADER_SIZE + SIZE_INFO_PP_READ_RESP,
               INFO_SB_PP, EIsiSubBlockTypeId8Len8, sbInfoPpReadStartOffset ) )
 
@@ -1369,8 +1364,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustom
 
         TFLOGSTRING2("TSY: CMmCustomMessHandler::InfoPpReadResp - Info length: %d",
           length );
-OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMessHandler::InfoPpReadResp - Info length=%d", length );
-
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_INFOPPREADRESP_TD, "CMmCustomMessHandler::InfoPpReadResp - Info length=%d", length );
                 if ( 1 == length )
                     {
                     //introduce the pPFeatures buffer to hold the feature value,
@@ -1383,7 +1377,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMes
 
           TFLOGSTRING2("TSY: CMmCustomMessHandler::InfoPpReadResp - Info data: %S",
             &pPFeatures );
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMessHandler::InfoPpReadResp;pPfeatures=%s", pPFeatures );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_INFOPPREADRESP_TD, "CMmCustomMessHandler::InfoPpReadResp;pPfeatures=%s", pPFeatures );
 
                     //check that product profile is requested one
                     if ( INFO_PP_ALS == pPFeatures [0] )
@@ -1392,7 +1386,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustom
                         if ( 0 != pPFeatures [1] )
                             {
               TFLOGSTRING("TSY: CMmCustomMessHandler::InfoPpReadResp - EAlsSupportOn");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMessHandler::InfoPpReadResp - EAlsSupportOn" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_INFOPPREADRESP_TD, "CMmCustomMessHandler::InfoPpReadResp - EAlsSupportOn" );
               alsSupport = RMmCustomAPI::EAlsSupportOn;
                             }
                         //set the error value to KErrNone
@@ -1404,16 +1398,14 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMes
                         if ( 0 != pPFeatures [1] )
                             {
               TFLOGSTRING("TSY: CMmCustomMessHandler::InfoPpReadResp - EAlsSupportOff");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMessHandler::InfoPpReadResp - EAlsSupportOff" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCUSTOMMESSHANDLER_INFOPPREADRESP_TD, "CMmCustomMessHandler::InfoPpReadResp - EAlsSupportOff" );
               twoDigitDialSupport =
                 RMmCustomAPI::ETwoDigitDialSupportOn;
                             }
                         //set the error value to KErrNone
                         errorValue = KErrNone;
                         }
-
                     //No else
-
                     }
                 }
             break;
@@ -1432,8 +1424,8 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMes
             }
         default:
             {
-            TFLOGSTRING("TSY: CMmCustomMessHandler::InfoPpReadResp, switch status - default.\n" );
-OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMessHandler::InfoPpReadResp, switch status - default" );
+TFLOGSTRING("TSY: CMmCustomMessHandler::InfoPpReadResp, switch status - default.\n" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMCUSTOMMESSHANDLER_INFOPPREADRESP_TD, "CMmCustomMessHandler::InfoPpReadResp, switch status - default" );
             errorValue = KErrNotSupported;
             break;
             }
@@ -1456,7 +1448,6 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_INFOPPREADRESP, "CMmCustomMes
     iMessageRouter->Complete( ECustomCheckTwoDigitDialSupportIPC,
       &dataPackage, errorValue );
         }
-
     //No else
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
     }
@@ -1474,7 +1465,7 @@ TInt CMmCustomMessHandler::CallGsmBlackListClearReq
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmBlackListClearReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLGSMBLACKLISTCLEARREQ, "CMmCustomMessHandler::CallGsmBlackListClearReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLGSMBLACKLISTCLEARREQ_TD, "CMmCustomMessHandler::CallGsmBlackListClearReq" );
 
   // Construct CALL_MODEM_BLACKLIST_CLEAR_REQ message (1 data byte +
   // sub block count)
@@ -1502,7 +1493,7 @@ void CMmCustomMessHandler::CallGsmBlackListClearResp
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmBlackListClearResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLGSMBLACKLISTCLEARRESP, "CMmCustomMessHandler::CallGsmBlackListClearResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLGSMBLACKLISTCLEARRESP_TD, "CMmCustomMessHandler::CallGsmBlackListClearResp" );
 
     // call server response
     //getting this message indicates that the clear blacklist was successful
@@ -1524,7 +1515,7 @@ void CMmCustomMessHandler::SsServiceCompletedInd
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::SsServiceCompletedInd");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_SSSERVICECOMPLETEDIND, "CMmCustomMessHandler::SsServiceCompletedInd" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_SSSERVICECOMPLETEDIND_TD, "CMmCustomMessHandler::SsServiceCompletedInd" );
 
     if ( 0 < aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                 SS_SERVICE_COMPLETED_IND_OFFSET_SUBBLOCKCOUNT ) )
@@ -1642,7 +1633,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_SSSERVICECOMPLETEDIND, "CMmCustomM
                 }
       TFLOGSTRING2("TSY: CMmCustomMessHandler::SsServiceCompletedInd: Complete SsRequestCompleteNotification ssStatus:%d",
         ssStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_SSSERVICECOMPLETEDIND, "CMmCustomMessHandler::SsServiceCompletedInd;Complete SsRequestCompleteNotification ssStatus=%u", ssStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_SSSERVICECOMPLETEDIND_TD, "CMmCustomMessHandler::SsServiceCompletedInd;Complete SsRequestCompleteNotification ssStatus=%u", ssStatus );
 
             CMmDataPackage dataPackage;
             // pack parameter: a TInt with SS status
@@ -1673,7 +1664,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_SSSERVICECOMPLETEDIND, "CMmCu
                 length  ) );
 
       TFLOGSTRING("TSY: CMmCustomMessHandler::SsServiceCompletedInd: Complete SsAdditionalInfoNotification");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_SSSERVICECOMPLETEDIND, "CMmCustomMessHandler::SsServiceCompletedInd - Complete SsAdditionalInfoNotification" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_SSSERVICECOMPLETEDIND_TD, "CMmCustomMessHandler::SsServiceCompletedInd - Complete SsAdditionalInfoNotification" );
 
       // complete notification
             CMmDataPackage dataPackage;
@@ -1713,7 +1704,7 @@ void CMmCustomMessHandler::SsServiceFailedResp
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::SsServiceFailedResp");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP, "CMmCustomMessHandler::SsServiceFailedResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmCustomMessHandler::SsServiceFailedResp" );
 
     TInt ssStatus( RMmCustomAPI::KSsStatusReturnError );
 
@@ -1808,7 +1799,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP, "CMmCustomMes
                 }
             }
         TFLOGSTRING2("TSY: CMmCustomMessHandler::SsServiceFailedResp: Ss Status: %d", ssStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP, "CMmCustomMessHandler::SsServiceFailedResp;Ss Status=%d", ssStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmCustomMessHandler::SsServiceFailedResp;Ss Status=%d", ssStatus );
         // pack parameter: a TInt with SS status
         dataPackage.PackData( &ssStatus );
 
@@ -1819,7 +1810,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP, "CMmCust
             KErrNone );
 
         TFLOGSTRING2("TSY: CMmCustomMessHandler::SsServiceFailedResp: SB ID: 0x%x",subBlockId );
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP, "CMmCustomMessHandler::SsServiceFailedResp;subBlockId=%hhx", subBlockId );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmCustomMessHandler::SsServiceFailedResp;subBlockId=%hhx", subBlockId );
         // pack parameter: pointer to RMmCustomAPI::TSsAdditionalInfo
         RMmCustomAPI::TSsAdditionalInfo* additionalInfoPtr = &additionalInfo;
         dataPackage.PackData( &additionalInfoPtr );
@@ -1833,7 +1824,7 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP, "CMmC
     else
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::SsServiceFailedResp: No subblock's");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP, "CMmCustomMessHandler::SsServiceFailedResp - No subblock's" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmCustomMessHandler::SsServiceFailedResp - No subblock's" );
 
         dataPackage.PackData( &ssStatus );
 
@@ -1862,7 +1853,7 @@ TInt CMmCustomMessHandler::CallEmergencyNbrCheckReq
         )
     {
   TFLOGSTRING( "TSY: CMmCustomMessHandler::CallEmergencyNbrCheckReq" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLEMERGENCYNBRCHECKREQ, "CMmCustomMessHandler::CallEmergencyNbrCheckReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLEMERGENCYNBRCHECKREQ_TD, "CMmCustomMessHandler::CallEmergencyNbrCheckReq" );
 
     //save the information to match it when the response is got
     iUsedEmergencyNbrCheckMode = aCheckMode;
@@ -1923,7 +1914,7 @@ void CMmCustomMessHandler::CallEmergencyNbrCheckResp
         )
     {
   TFLOGSTRING("TSY: CMmCustomMessHandler::CallEmergencyNbrCheckResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLEMERGENCYNBRCHECKRESP, "CMmCustomMessHandler::CallEmergencyNbrCheckResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLEMERGENCYNBRCHECKRESP_TD, "CMmCustomMessHandler::CallEmergencyNbrCheckResp" );
 
     // Get Status
     TUint8 status( aIsiMsg.Get8bit( ISI_HEADER_SIZE +
@@ -1998,7 +1989,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLEMERGENCYNBRCHECKRESP, "CMmCus
 TInt CMmCustomMessHandler::UiccOperatorReq()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccOperatorReq" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCOPERATORREQ, "CMmCustomMessHandler::UiccOperatorReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCOPERATORREQ_TD, "CMmCustomMessHandler::UiccOperatorReq" );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccReadTransparent params;
@@ -2024,18 +2015,18 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCOPERATORREQ, "CMmCustomMessHan
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccOperatorResp(
-    TInt aStatus,
+    TUint8 aStatus,
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccOperatorResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCOPERATORRESP, "CMmCustomMessHandler::UiccOperatorResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCOPERATORRESP_TD, "CMmCustomMessHandler::UiccOperatorResp" );
 
     TInt errorValue( KErrGeneral );
 
     // Network provider name
     TBuf<KNwProviderNameLength> name;
 
-    if ( KErrNone == aStatus )
+    if ( UICC_STATUS_OK == aStatus )
         {
         errorValue = KErrNone;
         name.Copy( aFileData );
@@ -2066,7 +2057,7 @@ TInt CMmCustomMessHandler::SsGsmUssdSendReq
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::SsGsmUssdSendReq" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_SSGSMUSSDSENDREQ, "CMmCustomMessHandler::SsGsmUssdSendReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_SSGSMUSSDSENDREQ_TD, "CMmCustomMessHandler::SsGsmUssdSendReq" );
 
     // create buffer for isi msg data
     TBuf8<2> data;
@@ -2094,7 +2085,7 @@ void CMmCustomMessHandler::SsGsmUssdSendResp
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::SsGsmUssdSendResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_SSGSMUSSDSENDRESP, "CMmCustomMessHandler::SsGsmUssdSendResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_SSGSMUSSDSENDRESP_TD, "CMmCustomMessHandler::SsGsmUssdSendResp" );
 
 
     TUint ussdType( aIsiMessage.Get8bit(
@@ -2122,7 +2113,7 @@ TBool CMmCustomMessHandler::Match
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::Match.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_MATCH, "CMmCustomMessHandler::Match" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_MATCH_TD, "CMmCustomMessHandler::Match" );
 
     TBool ret ( EFalse );
 
@@ -2148,7 +2139,7 @@ TInt CMmCustomMessHandler::NetModemRegStatusGetReq
         )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetModemRegStatusGetReq." );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSGETREQ, "CMmCustomMessHandler::NetModemRegStatusGetReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSGETREQ_TD, "CMmCustomMessHandler::NetModemRegStatusGetReq" );
 
     // Data length buffer is 2.
     TBuf8<2> data;
@@ -2174,7 +2165,7 @@ void CMmCustomMessHandler::NetModemRegStatusGetResp(
        const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetModemRegStatusGetResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSGETRESP, "CMmCustomMessHandler::NetModemRegStatusGetResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETMODEMREGSTATUSGETRESP_TD, "CMmCustomMessHandler::NetModemRegStatusGetResp" );
 
     // Get the success code.
     TUint8 successCode( aIsiMsg.Get8bit(
@@ -2203,7 +2194,7 @@ void CMmCustomMessHandler::CallGsmNotificationInd
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd" );
 
     TInt ret( KErrNone );
 
@@ -2237,7 +2228,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustom
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
             - CALL_MODEM_SB_SS_CODE sub block founded");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_CODE sub block found" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_CODE sub block found" );
 
         TUint16 ssCode( aIsiMsg.Get16bit(
             sbStartOffSet + CALL_MODEM_SB_SS_CODE_OFFSET_MMISSCODE ) );
@@ -2289,7 +2280,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmC
                 {
                 TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
                     switch ssCode - default.");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, switch ssCode - default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, switch ssCode - default" );
                 break;
                 }
             }
@@ -2304,7 +2295,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmC
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
             - CALL_MODEM_SB_SS_NOTIFY sub block founded");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_NOTIFY sub block found" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_NOTIFY sub block found" );
 
         // Get the SsNotifyIndictor
         TUint8 ssNotify( aIsiMsg.Get8bit(
@@ -2338,7 +2329,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmC
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
             - CALL_MODEM_SB_SS_NOTIFY_INDICATOR sub block founded");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_NOTIFY_INDICATOR sub block found" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_NOTIFY_INDICATOR sub block found" );
 
         // Get the SsNotifyIndictor
         TUint8 ssNotifyIndicator( aIsiMsg.Get8bit( sbStartOffSet +
@@ -2370,7 +2361,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmC
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
             - CALL_MODEM_SB_SS_HOLD_INDICATOR sub block founded");
-OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_HOLD_INDICATOR sub block found" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_HOLD_INDICATOR sub block found" );
 
         // Get the ectIndictor
         TUint8 holdIndicator( aIsiMsg.Get8bit( sbStartOffSet +
@@ -2396,7 +2387,7 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmC
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
             - CALL_MODEM_SB_CUG_INFO sub block founded");
-OstTrace0( TRACE_NORMAL, DUP7_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_CUG_INFO sub block found" );
+OstTrace0( TRACE_NORMAL,  DUP7_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_CUG_INFO sub block found" );
 
         // Get the CUG index
         ssInfo.iCugIndex = aIsiMsg.Get16bit(
@@ -2412,7 +2403,7 @@ OstTrace0( TRACE_NORMAL, DUP7_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmC
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
             - CALL_MODEM_SB_SS_ECT_INDICATOR sub block founded");
-OstTrace0( TRACE_NORMAL, DUP8_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_ECT_INDICATOR sub block found" );
+OstTrace0( TRACE_NORMAL,  DUP8_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_SS_ECT_INDICATOR sub block found" );
 
         // Get the ectIndictor
         TUint8 ectIndicator( aIsiMsg.Get8bit(
@@ -2438,7 +2429,7 @@ OstTrace0( TRACE_NORMAL, DUP8_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmC
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
             - CALL_MODEM_SB_REMOTE_ADDRESS sub block founded");
-OstTrace0( TRACE_NORMAL, DUP9_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_REMOTE_ADDRESS sub block found" );
+OstTrace0( TRACE_NORMAL,  DUP9_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_REMOTE_ADDRESS sub block found" );
 
         // Get the presentation
 
@@ -2469,7 +2460,7 @@ OstTrace0( TRACE_NORMAL, DUP9_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmC
                 TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
                     - CALL_MODEM_SB_REMOTE_ADDRESS sub block\
                     - switch presentationIndicator - default.");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, switch presentationIndicator - default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, switch presentationIndicator - default" );
                 // The variable already has a default value
                 break;
                 }
@@ -2495,7 +2486,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmC
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::CallGsmNotificationInd,\
             - CALL_MODEM_SB_ALERTING_INFO sub block founded");
-OstTrace0( TRACE_NORMAL, DUP10_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_ALERTING_INFO sub block found" );
+OstTrace0( TRACE_NORMAL,  DUP10_CMMCUSTOMMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCustomMessHandler::CallGsmNotificationInd, CALL_MODEM_SB_ALERTING_INFO sub block found" );
 
         TBool playRemoteAlertToneLocally( EFalse );
 
@@ -2544,7 +2535,7 @@ void CMmCustomMessHandler::HandleForwarding
         ) const
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::HandleForwarding.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_HANDLEFORWARDING, "CMmCustomMessHandler::HandleForwarding" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_HANDLEFORWARDING_TD, "CMmCustomMessHandler::HandleForwarding" );
 
     //identify the kind of forwarding
     switch ( aSsCode )
@@ -2569,7 +2560,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_HANDLEFORWARDING, "CMmCustomMessHa
             break;
         default:
             TFLOGSTRING("TSY: CMmCustomMessHandler::HandleForwarding, switch aSsCode - default.\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_HANDLEFORWARDING, "CMmCustomMessHandler::HandleForwarding, switch aSsCode - default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_HANDLEFORWARDING_TD, "CMmCustomMessHandler::HandleForwarding, switch aSsCode - default" );
             //this case is imposible, added due code convention
             break;
         }
@@ -2630,7 +2621,7 @@ void CMmCustomMessHandler::HandleBarring
         ) const
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::HandleBarring.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_HANDLEBARRING, "CMmCustomMessHandler::HandleBarring" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_HANDLEBARRING_TD, "CMmCustomMessHandler::HandleBarring" );
 
     //identify the kind of barring
     switch ( aSsCode )
@@ -2643,7 +2634,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_HANDLEBARRING, "CMmCustomMessHandl
              break;
          default:
              TFLOGSTRING("TSY: CMmCustomMessHandler::HandleBarring, switch aSsCode - default.\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_HANDLEBARRING, "CMmCustomMessHandler::HandleBarring, switch aSsCode - default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_HANDLEBARRING_TD, "CMmCustomMessHandler::HandleBarring, switch aSsCode - default" );
              //this case is imposible, added due code convention
              break;
         }
@@ -2693,7 +2684,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_HANDLEBARRING, "CMmCustomMess
 TInt CMmCustomMessHandler::NetSetReq( TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetSetReq");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETSETREQ, "CMmCustomMessHandler::NetSetReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETSETREQ_TD, "CMmCustomMessHandler::NetSetReq" );
 
     // Data for ISI message, buffer size is one
     TBuf8<2 + SIZE_NET_OPERATOR_INFO_COMMON> netSetReq;
@@ -2733,7 +2724,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETSETREQ, "CMmCustomMessHandler::
 void CMmCustomMessHandler::NetSetResp( const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetSetResp");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETSETRESP, "CMmCustomMessHandler::NetSetResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETSETRESP_TD, "CMmCustomMessHandler::NetSetResp" );
 
     // Get the cause
     TUint8 cause( aIsiMsg.Get8bit(
@@ -2761,7 +2752,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETSETRESP, "CMmCustomMessHandler:
 void CMmCustomMessHandler::NetRatResp( const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING( "TSY: CMmCustomMessHandler::NetRatResp");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETRATRESP, "CMmCustomMessHandler::NetRatResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETRATRESP_TD, "CMmCustomMessHandler::NetRatResp" );
 
     // Get the success code
     TUint8 successCode( aIsiMsg.Get8bit(
@@ -2772,7 +2763,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETRATRESP, "CMmCustomMessHandler:
     TUint32 supportedNetworkModes( 0 );
 
 TFLOGSTRING2( "TSY: CMmCustomMessHandler::NetRatResp successCode : %d", successCode);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_NETRATRESP, "CMmCustomMessHandler::NetRatResp;successCode=%hhu", successCode );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_NETRATRESP_TD, "CMmCustomMessHandler::NetRatResp;successCode=%hhu", successCode );
 
     // Check if we have sub blocks in the message
     if ( aIsiMsg.Get8bit( ISI_HEADER_SIZE + NET_RAT_RESP_OFFSET_SUBBLOCKCOUNT )
@@ -2821,7 +2812,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_NETRATRESP, "CMmCustomMess
     dataPackage.PackData( &supportedNetworkModes );
 
 TFLOGSTRING2( "TSY: CMmCustomMessHandler::NetRatResp - ret: %d", ret);
-OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETRATRESP, "CMmCustomMessHandler::NetRatResp;ret=%d", ret );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_NETRATRESP_TD, "CMmCustomMessHandler::NetRatResp;ret=%d", ret );
 
     // Completion ResetNetServer method (packed parameters)
     iMessageRouter->Complete(
@@ -2843,7 +2834,7 @@ void CMmCustomMessHandler::GssCsServiceResp (
         const TIsiReceiveC& aIsiMessage ) // Received isi message
     {
 TFLOGSTRING( "TSY: CMmCustomMessHandler::GssCsServiceResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP_TD, "CMmCustomMessHandler::GssCsServiceResp" );
 
     TUint8 transactId ( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + GSS_CS_SERVICE_RESP_OFFSET_TRANSID ) );
@@ -2857,7 +2848,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHa
         if ( GSS_SELECTED_RAT_WRITE == operation )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetSystemNetworkModeIPC");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetSystemNetworkModeIPC" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP_TD, "CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetSystemNetworkModeIPC" );
             //completion ResetGssServer method (no packed parameters)
             iMessageRouter->Complete( ECustomSetSystemNetworkModeIPC, KErrNone );
             }
@@ -2865,7 +2856,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomM
         else if ( GSS_SELECTED_RAT_READ == operation )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Complete ECustomGetCurrentSystemNetworkModesIPC");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp - Complete ECustomGetCurrentSystemNetworkModesIPC" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP_TD, "CMmCustomMessHandler::GssCsServiceResp - Complete ECustomGetCurrentSystemNetworkModesIPC" );
             TInt err( KErrNone );
             TUint32 ratMode ( RMmCustomAPI::KCapsNetworkModeDual );
             TUint subblockOffset( 0 );
@@ -2897,7 +2888,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomM
                     default:
                         {
 TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Unrecognized RAT");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp - Unrecognized RAT" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP_TD, "CMmCustomMessHandler::GssCsServiceResp - Unrecognized RAT" );
                         err = KErrGeneral;
                         break;
                         }
@@ -2919,7 +2910,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomM
         else if ( GSS_SELECTED_BANDS_WRITE == operation )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetBandSelectionIPC");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP, "CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetBandSelectionIPC" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_GSSCSSERVICERESP_TD, "CMmCustomMessHandler::GssCsServiceResp - Complete ECustomSetBandSelectionIPC" );
             iMessageRouter->Complete( ECustomSetBandSelectionIPC, KErrNone );
             }
         // GSS_SELECTED_BANDS_READ (0x9E)
@@ -2943,7 +2934,7 @@ void CMmCustomMessHandler::GssCsServiceFailResp (
         const TIsiReceiveC& aIsiMessage ) // Received isi message
     {
     TFLOGSTRING( "TSY: CMmCustomMessHandler::GssCsServiceFailResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP, "CMmCustomMessHandler::GssCsServiceFailResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP_TD, "CMmCustomMessHandler::GssCsServiceFailResp" );
 
     TUint8 transactId ( aIsiMessage.Get8bit( ISI_HEADER_SIZE +
         GSS_CS_SERVICE_FAIL_RESP_OFFSET_TRANSID ) );
@@ -2955,7 +2946,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP, "CMmCustomMe
         {
         //completion ResetGssServer method (no packed parameters)
         TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceFailResp - ECustomSetSystemNetworkModeIPC");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP, "CMmCustomMessHandler::GssCsServiceFailResp - ECustomSetSystemNetworkModeIPC" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP_TD, "CMmCustomMessHandler::GssCsServiceFailResp - ECustomSetSystemNetworkModeIPC" );
         iMessageRouter->Complete( ECustomSetSystemNetworkModeIPC, KErrGeneral );
         }
 // not suppoted for S60 ver 3.2
@@ -2964,13 +2955,13 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP, "CMmCus
     else if ( GSS_SELECTED_BANDS_WRITE == operation )
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceFailResp - ECustomSetBandSelectionIPC");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP, "CMmCustomMessHandler::GssCsServiceFailResp - ECustomSetBandSelectionIPC" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP_TD, "CMmCustomMessHandler::GssCsServiceFailResp - ECustomSetBandSelectionIPC" );
         iMessageRouter->Complete( ECustomSetBandSelectionIPC, KErrGeneral );
         }
     else if ( GSS_SELECTED_BANDS_READ == operation )
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::GssCsServiceFailResp - ECustomGetBandSelectionIPC");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP, "CMmCustomMessHandler::GssCsServiceFailResp - ECustomGetBandSelectionIPC" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_GSSCSSERVICEFAILRESP_TD, "CMmCustomMessHandler::GssCsServiceFailResp - ECustomGetBandSelectionIPC" );
         iMessageRouter->Complete( ECustomGetBandSelectionIPC, KErrGeneral );
         }
 #endif // NCP_COMMON_S60_VERSION_SUPPORT
@@ -2985,7 +2976,7 @@ TInt CMmCustomMessHandler::UiccReadFieldReq(
     RMmCustomAPI::TSimFileInfo& aSimFileInfo )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadFieldReq" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADFIELDREQ, "CMmCustomMessHandler::UiccReadFieldReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADFIELDREQ_TD, "CMmCustomMessHandler::UiccReadFieldReq" );
 
     // We have received only file path, file ID is two last bytes of path
     TInt length( aSimFileInfo.iPath.Length() );
@@ -3015,14 +3006,14 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADFIELDREQ, "CMmCustomMessHa
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccReadFieldResp(
-    TInt aStatus,
+    TUint8 aStatus,
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadFieldResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADFIELDRESP, "CMmCustomMessHandler::UiccReadFieldResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADFIELDRESP_TD, "CMmCustomMessHandler::UiccReadFieldResp" );
 
     TInt error( KErrNone );
-    if ( aStatus != KErrNone )
+    if ( aStatus != UICC_STATUS_OK )
         {
         error = KErrNotFound;
         }
@@ -3048,10 +3039,10 @@ TInt CMmCustomMessHandler::NetRatReq
         )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetRatReq");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETRATREQ, "CMmCustomMessHandler::NetRatReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETRATREQ_TD, "CMmCustomMessHandler::NetRatReq" );
 
 TFLOGSTRING3( "TSY: CCMmCustomMessHandler::NetRatReq - aTransId: %d, aUseCurrentRats: %d", aTransId, aUseCurrentRats );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_NETRATREQ, "CMmCustomMessHandler::NetRatReq;aTransId=%hhu;aUseCurrentRats=%hhu", aTransId, aUseCurrentRats );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_NETRATREQ_TD, "CMmCustomMessHandler::NetRatReq;aTransId=%hhu;aUseCurrentRats=%hhu", aTransId, aUseCurrentRats );
 
     // Create message data buffer for service type, buffer size is 1
     TBuf8<1> messageData;
@@ -3089,7 +3080,7 @@ TInt CMmCustomMessHandler::GssCsServiceReq
 
     TFLOGSTRING2( "TSY: CMmCustomMessHandler::GssCsServiceReq - aTransId: %d",
                     aTransId );
-OstTraceExt1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICEREQ, "CMmCustomMessHandler::GssCsServiceReq;aTransId=%hhu", aTransId );
+OstTraceExt1( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_GSSCSSERVICEREQ_TD, "CMmCustomMessHandler::GssCsServiceReq;aTransId=%hhu", aTransId );
 
     // create message data buffer for service type, buffer size is 6
     TBuf8< KGssCsBufferSize > messageData;
@@ -3144,7 +3135,7 @@ TInt CMmCustomMessHandler::GssCsServiceReq
         )
     {
 TFLOGSTRING( "TSY: CMmCustomMessHandler::GssCsServiceReq" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICEREQ, "CMmCustomMessHandler::GssCsServiceReq" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICEREQ_TD, "CMmCustomMessHandler::GssCsServiceReq" );
 
     TBuf8<KTwo> messageData;
 
@@ -3180,7 +3171,7 @@ TInt CMmCustomMessHandler::ExtFuncL
     TUint8 transId = KCustomTransId;
 
     TFLOGSTRING2("TSY: CMmCustomMessHandler::ExtFuncL -- aIpc -- (%d)", aIpc );
-OstTrace1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_EXTFUNCL, "CMmCustomMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_EXTFUNCL_TD, "CMmCustomMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     switch ( aIpc )
         {
@@ -3228,14 +3219,14 @@ OstTrace1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_EXTFUNCL, "CMmCustomMessHandler::E
             if ( 0 >= callId )
                 {
                 TFLOGSTRING("TSY: CMmCustomMessHandler::ExtFuncL -- ECustomTerminateCallIPC -- (hold+active+alerting)");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_EXTFUNCL, "CMmCustomMessHandler::ExtFuncL - ECustomTerminateCallIPC - (hold+active+alerting)" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_EXTFUNCL_TD, "CMmCustomMessHandler::ExtFuncL - ECustomTerminateCallIPC - (hold+active+alerting)" );
                 // alerting call (if any) is included as negated value..
                 callIdISA = TUint8( CALL_MODEM_ID_HOLD | CALL_MODEM_ID_ACTIVE | ( -callId ));
                 }
             else if ( 1 <= callId && 7 >= callId )
                 {
                 TFLOGSTRING2("TSY: CMmCustomMessHandler::ExtFuncL -- ECustomTerminateCallIPC -- (%d)", TInt(callId) );
-OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_EXTFUNCL, "CMmCustomMessHandler::ExtFuncL;callId=%d", callId );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_EXTFUNCL_TD, "CMmCustomMessHandler::ExtFuncL;callId=%d", callId );
                 callIdISA = static_cast<TUint8>( callId );
                 }
             else
@@ -3522,7 +3513,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_EXTFUNCL, "CMmCustomMessHandl
             {
             // this method should only be called for Custom Tsy cases
             TFLOGSTRING2("TSY: CMmCustomMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_EXTFUNCL, "CMmCustomMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_EXTFUNCL_TD, "CMmCustomMessHandler::ExtFuncL;aIpc=%d", aIpc );
             ret = KErrArgument;
             break;
             }
@@ -3544,7 +3535,7 @@ TInt CMmCustomMessHandler::ProcessUiccMsg(
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY: CMmCustomMessHandler::ProcessUiccMsg, transaction ID: %d, status: %d", aTraId, aStatus );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_PROCESSUICCMSG, "CMmCustomMessHandler::ProcessUiccMsg" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_PROCESSUICCMSG_TD, "CMmCustomMessHandler::ProcessUiccMsg" );
 
     TInt ret( KErrNone );
 
@@ -3705,7 +3696,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_PROCESSUICCMSG, "CMmCustomMessHand
         default:
             {
 TFLOGSTRING("TSY: CMmNetMessHandler::ProcessUiccMsg - unknown transaction ID" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_PROCESSUICCMSG, "CMmCustomMessHandler::ProcessUiccMsg - unknown transaction ID" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_PROCESSUICCMSG_TD, "CMmCustomMessHandler::ProcessUiccMsg - unknown transaction ID" );
 
             break;
             }
@@ -3721,7 +3712,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_PROCESSUICCMSG, "CMmCustomMes
 TInt CMmCustomMessHandler::UiccReadViagHomeZoneParametersReq()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadViagHomeZoneParametersReq" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONEPARAMETERSREQ, "CMmCustomMessHandler::UiccReadViagHomeZoneParametersReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONEPARAMETERSREQ_TD, "CMmCustomMessHandler::UiccReadViagHomeZoneParametersReq" );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccReadTransparent params;
@@ -3747,14 +3738,14 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONEPARAMETERSREQ,
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccReadViagHomeZoneParametersResp(
-    TInt aStatus,
+    TUint8 aStatus,
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadViagHomeZoneParametersResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONEPARAMETERSRESP, "CMmCustomMessHandler::UiccReadViagHomeZoneParametersResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONEPARAMETERSRESP_TD, "CMmCustomMessHandler::UiccReadViagHomeZoneParametersResp" );
 
     TInt error( KErrNone );
-    if ( KErrNone == aStatus )
+    if ( UICC_STATUS_OK == aStatus )
         {
         TUint8 length( 0 );
         TUint8 i( 0 );
@@ -3902,7 +3893,7 @@ TInt CMmCustomMessHandler::UiccReadViagHomeZoneCacheReq(
     const RMmCustomAPI::TViagCacheRecordId& aRecordId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadViagHomeZoneCacheReq" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONECACHEREQ, "CMmCustomMessHandler::UiccReadViagHomeZoneCacheReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONECACHEREQ_TD, "CMmCustomMessHandler::UiccReadViagHomeZoneCacheReq" );
 
     TUint8 cacheId( aRecordId.iCacheId );
     TUint8 recordId( aRecordId.iRecordId );
@@ -3968,17 +3959,17 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONECACHEREQ, "CMm
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccReadViagHomeZoneCacheResp(
-    TInt aStatus,
+    TUint8 aStatus,
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadViagHomeZoneCacheResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONECACHERESP, "CMmCustomMessHandler::UiccReadViagHomeZoneCacheResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADVIAGHOMEZONECACHERESP_TD, "CMmCustomMessHandler::UiccReadViagHomeZoneCacheResp" );
 
     TInt ret( KErrAccessDenied );
 
     RMmCustomAPI::TViagCacheRecordContent viagRecord;
 
-    if ( KErrNone == aStatus )
+    if ( UICC_STATUS_OK == aStatus )
         {
         viagRecord.iLac = ( aFileData[0] << 8 ) | aFileData[1];
         viagRecord.iCellId = ( aFileData[2] << 8 ) | aFileData[3];
@@ -4009,7 +4000,7 @@ TInt CMmCustomMessHandler::UiccWriteViagHomeZoneCacheReq(
     const RMmCustomAPI::TViagCacheRecordContent& aViagRecordContent )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccWriteViagHomeZoneCacheReq" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONECACHEREQ, "CMmCustomMessHandler::UiccWriteViagHomeZoneCacheReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONECACHEREQ_TD, "CMmCustomMessHandler::UiccWriteViagHomeZoneCacheReq" );
 
     TUint8 cacheId( (TUint8)aRecordId.iCacheId );
     TUint8 recordId( (TUint8)aRecordId.iRecordId );
@@ -4085,12 +4076,12 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONECACHEREQ, "CM
 // Complete home zone cache
 // -----------------------------------------------------------------------------
 //
-void CMmCustomMessHandler::UiccWriteViagHomeZoneCacheResp( TInt aStatus )
+void CMmCustomMessHandler::UiccWriteViagHomeZoneCacheResp( TUint8 aStatus )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccWriteViagHomeZoneCacheResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONECACHERESP, "CMmCustomMessHandler::UiccWriteViagHomeZoneCacheResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONECACHERESP_TD, "CMmCustomMessHandler::UiccWriteViagHomeZoneCacheResp" );
 
-    if ( KErrNone == aStatus )
+    if ( UICC_STATUS_OK == aStatus )
         {
         iMessageRouter->Complete( EWriteViagHomeZoneCacheIPC, KErrNone );
         }
@@ -4109,7 +4100,7 @@ TInt CMmCustomMessHandler::UiccWriteViagHomeZoneUhziueSettingsReq(
     const RMmCustomAPI::TViagUHZIUESettings& aUhziuiSettings )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccWriteViagHomeZoneUhziueSettingsReq" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONEUHZIUESETTINGSREQ, "CMmCustomMessHandler::UiccWriteViagHomeZoneUhziueSettingsReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONEUHZIUESETTINGSREQ_TD, "CMmCustomMessHandler::UiccWriteViagHomeZoneUhziueSettingsReq" );
 
     TUint8 settingsField( aUhziuiSettings.iSettings );
     TUint8 versionField( aUhziuiSettings.iVersion );
@@ -4145,14 +4136,14 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONEUHZIUESETTING
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccWriteViagHomeZoneUhziueSettingsResp(
-    TInt aStatus )
+    TUint8 aStatus )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccWriteViagHomeZoneUhziueSettingsResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONEUHZIUESETTINGSRESP, "CMmCustomMessHandler::UiccWriteViagHomeZoneUhziueSettingsResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONEUHZIUESETTINGSRESP_TD, "CMmCustomMessHandler::UiccWriteViagHomeZoneUhziueSettingsResp" );
 
     TInt status( KErrAccessDenied );
 
-    if ( KErrNone == aStatus  )
+    if ( UICC_STATUS_OK == aStatus  )
         {
         status = KErrNone;
         }
@@ -4167,7 +4158,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCWRITEVIAGHOMEZONEUHZIUESETTING
 TInt CMmCustomMessHandler::UiccReadCbMsgIdsReq( TUiccTrId aTrId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadCbMsgIdsReq" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADCBMSGIDSREQ, "CMmCustomMessHandler::UiccReadCbMsgIdsReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADCBMSGIDSREQ_TD, "CMmCustomMessHandler::UiccReadCbMsgIdsReq" );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccReadTransparent params;
@@ -4193,62 +4184,37 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADCBMSGIDSREQ, "CMmCustomMes
 // -----------------------------------------------------------------------------
 //
 void CMmCustomMessHandler::UiccReadCbMsgIdsResp(
-    TInt aStatus,
+    TUint8 aStatus,
     TInt aTraId,
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccReadCbMsgIdsResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADCBMSGIDSRESP, "CMmCustomMessHandler::UiccReadCbMsgIdsResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCREADCBMSGIDSRESP_TD, "CMmCustomMessHandler::UiccReadCbMsgIdsResp" );
 
-    TInt numOfCbIds( 0 );
-    // File data in bytes
-    TInt length( aFileData.Length() );
-    // Divide by two to get number of 16-bit CB ids
-    numOfCbIds = length >> 1;
-    // Buffer for 16 bits CB identifiers
-    TBuf16<KSimNumberOfCbMsgIds> cbIds;
-    TInt i( 0 );
-    TInt j( 0 );
-    // Loop all the bytes and append 16 bit id to buffer
-    for ( ; i < length && j < numOfCbIds; i += 2, j++ )
-        {
-        TUint16 cbId ( ( aFileData[i] << 8 ) | ( aFileData[i+1] ) );
-        cbIds.Append( cbId );
-        }
+    TInt err( KErrNone );
+
+    TPtrC16 cbIdsBigEndian( reinterpret_cast<const TUint16*>( aFileData.Ptr() ),
+        aFileData.Length() / 2);
     // Read request, complete CB topic list to CTSY
-    if ( KErrNone == aStatus && ETrIdReadCbMsgIds == aTraId && numOfCbIds > 0 )
+    if ( UICC_STATUS_OK == aStatus && ETrIdReadCbMsgIds == aTraId &&
+        cbIdsBigEndian.Length() > 0 )
         {
-        CArrayFixFlat<RMmCustomAPI::TSimCbTopic>* simCbTopics = new ( ELeave )
-            CArrayFixFlat<RMmCustomAPI::TSimCbTopic> ( numOfCbIds );
-
-        for ( i = 0; i < numOfCbIds; i++ )
+        CArrayFixFlat<RMmCustomAPI::TSimCbTopic>* simCbTopics( NULL );
+        TRAP(err, simCbTopics = CollectCbTopicIdsL( cbIdsBigEndian ) );
+        if ( KErrNone == err )
             {
-            if ( KUnusedCbMsgId != cbIds[i] )
-                {
-                RMmCustomAPI::TSimCbTopic simCbTopic;
-                // CB ID
-                simCbTopic.iNumber = cbIds[i];
-                // Topic names are not stored on the SIM
-                simCbTopic.iName.Zero();
-                // Add CB topic to array
-                simCbTopics->AppendL( simCbTopic );
-                }
-             }
-        simCbTopics->Compress();
-
-        // Complete to SOS layer with packed parameter:
-        // pointer to array with CB topics
-        CMmDataPackage dataPackage;
-        dataPackage.PackData( &simCbTopics );
-
-        iMessageRouter->Complete(
-            ECustomStartSimCbTopicBrowsingIPC,
-            &dataPackage,
-            KErrNone );
+            CMmDataPackage dataPackage;
+            dataPackage.PackData( &simCbTopics );
+            iMessageRouter->Complete(
+                ECustomStartSimCbTopicBrowsingIPC,
+                &dataPackage,
+                KErrNone );
+            delete simCbTopics;
+            }
         }
     // Delete request, update EF CBMI with new topic list
-    else if ( KErrNone == aStatus && ETrIdUpdateCbMsgIdsPhase1 == aTraId &&
-        numOfCbIds > 0 && iTopicInSimMemoryDelete )
+    else if ( UICC_STATUS_OK == aStatus && ETrIdUpdateCbMsgIdsPhase1 == aTraId
+        && cbIdsBigEndian.Length() > 0 && iTopicInSimMemoryDelete )
         {
         // Set parameters for UICC_APPL_CMD_REQ message
         TUiccWriteTransparent params;
@@ -4264,41 +4230,41 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADCBMSGIDSRESP, "CMmCustomMe
         params.filePath.Append( KMasterFileId );
         params.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
 
-        // File data to be updated.
-        TBuf8<KSimNumberOfCbMsgIds*2> fileDataBuf;
-        for ( i = 0; i < numOfCbIds; i++ )
+        TUint16 topicToDeleteBigEndian =
+            ( iSimCBTopicToBeDeleted >> 8 ) | ( iSimCBTopicToBeDeleted << 8 );
+        for ( TInt i = 0 ; i < cbIdsBigEndian.Length(); i++ )
             {
-            if ( cbIds[ i ] != iSimCBTopicToBeDeleted )
-                {
-                fileDataBuf.Append( cbIds[ i ] >> 8 ); // MSB
-                fileDataBuf.Append( cbIds[ i ] & 0x00FF ); // LSB
-                }
-            else // This CB id is deleted-> set unused
-                {
-                fileDataBuf.Append( 0xFF );
-                fileDataBuf.Append( 0xFF );
-                }
+            TUint16 appendData = cbIdsBigEndian[i] == topicToDeleteBigEndian ?
+                KUnusedCbMsgId : cbIdsBigEndian[i];
+            // already big-endian
+            params.fileData.Append( appendData );
+            params.fileData.Append( appendData >> 8 );
             }
         iSimCBTopicToBeDeleted = KUnusedCbMsgId;
-        params.fileData.Append( fileDataBuf );
         iMmUiccMessHandler->CreateUiccApplCmdReq( params );
         }
-    else // Complete error values
+    else
+        {
+        err = KErrNotFound;
+        }
+
+    if ( KErrNone != err )
         {
         if ( ETrIdReadCbMsgIds == aTraId )
             {
             iMessageRouter->Complete(
                 ECustomStartSimCbTopicBrowsingIPC,
-                KErrNotFound );
+                err );
             }
         else // Delete request
             {
             iMessageRouter->Complete(
                 ECustomDeleteSimCbTopicIPC,
-                KErrNotFound );
+                err );
             }
-        iTopicInSimMemoryDelete = ETrue;
         }
+
+    iTopicInSimMemoryDelete = ETrue;
     }
 
 // -----------------------------------------------------------------------------
@@ -4306,13 +4272,13 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCREADCBMSGIDSRESP, "CMmCustomMe
 // Delete CB message ID
 // -----------------------------------------------------------------------------
 //
-void CMmCustomMessHandler::UiccDeleteCbMsgIdResp( TInt aStatus )
+void CMmCustomMessHandler::UiccDeleteCbMsgIdResp( TUint8 aStatus )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccDeleteCbMsgIdResp" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCDELETECBMSGIDRESP, "CMmCustomMessHandler::UiccDeleteCbMsgIdResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCDELETECBMSGIDRESP_TD, "CMmCustomMessHandler::UiccDeleteCbMsgIdResp" );
 
     TInt err( KErrNone );
-    if ( KErrNone != aStatus )
+    if ( UICC_STATUS_OK != aStatus )
         {
         err = KErrAccessDenied;
         }
@@ -4333,7 +4299,7 @@ TInt CMmCustomMessHandler::WriteHSxPAStatusReq
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::WriteHSxPAStatusReq");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_WRITEHSXPASTATUSREQ, "CMmCustomMessHandler::WriteHSxPAStatusReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_WRITEHSXPASTATUSREQ_TD, "CMmCustomMessHandler::WriteHSxPAStatusReq" );
 
     TBuf8<KHSxPAMaxMessageSize> data;
     TUint8 value(0);
@@ -4368,7 +4334,7 @@ void CMmCustomMessHandler::WriteHSxPAStatusResp
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::WriteHSxPAStatusResp");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_WRITEHSXPASTATUSRESP, "CMmCustomMessHandler::WriteHSxPAStatusResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_WRITEHSXPASTATUSRESP_TD, "CMmCustomMessHandler::WriteHSxPAStatusResp" );
 
     TInt epocError( KErrWrite );
 
@@ -4386,7 +4352,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_WRITEHSXPASTATUSRESP, "CMmCustomMe
     else if ( GSS_HSXPA_DISABLED_VIA_PP == reason )
         {
         TFLOGSTRING("TSY: CMmCustomMessHandler::WriteHSxPAStatusResp. KErrNotSupported");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_WRITEHSXPASTATUSRESP, "CMmCustomMessHandler::WriteHSxPAStatusResp, KErrNotSupported" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_WRITEHSXPASTATUSRESP_TD, "CMmCustomMessHandler::WriteHSxPAStatusResp, KErrNotSupported" );
         epocError = KErrNotSupported;
         }
 
@@ -4405,7 +4371,7 @@ TInt CMmCustomMessHandler::ReadHSxPAStatusReq
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::ReadHSxPAStatusReq");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_READHSXPASTATUSREQ, "CMmCustomMessHandler::ReadHSxPAStatusReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_READHSXPASTATUSREQ_TD, "CMmCustomMessHandler::ReadHSxPAStatusReq" );
 
     TBuf8<KHSxPAMaxMessageSize> data;
     data.Append( KCustomPadding ); //Filler
@@ -4429,7 +4395,7 @@ void CMmCustomMessHandler::ReadHSxPAStatusResp
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::ReadHSxPAStatusResp");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_READHSXPASTATUSRESP, "CMmCustomMessHandler::ReadHSxPAStatusResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_READHSXPASTATUSRESP_TD, "CMmCustomMessHandler::ReadHSxPAStatusResp" );
 
     CMmDataPackage dataPackage;
 
@@ -4480,7 +4446,7 @@ void CMmCustomMessHandler::HSxPASettingInd
         )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::HSxPASettingInd");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_HSXPASETTINGIND, "CMmCustomMessHandler::HSxPASettingInd" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_HSXPASETTINGIND_TD, "CMmCustomMessHandler::HSxPASettingInd" );
 
     CMmDataPackage dataPackage;
     RMmCustomAPI::THSxPAStatus hsxpaStatus;
@@ -4510,7 +4476,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_HSXPASETTINGIND, "CMmCustomMessHan
 TInt CMmCustomMessHandler::NetNeighbourCellsReq( const TUint8 aTraId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetNeighbourCellsReq");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSREQ, "CMmCustomMessHandler::NetNeighbourCellsReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSREQ_TD, "CMmCustomMessHandler::NetNeighbourCellsReq" );
 
     // Add NET_NEIGHBOUR_CELL_INFO_TYPE
     // (data size is allways 1)
@@ -4534,9 +4500,9 @@ void CMmCustomMessHandler::NetNeighbourCellsResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetNeighbourCellsResp");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCustomMessHandler::NetNeighbourCellsResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP_TD, "CMmCustomMessHandler::NetNeighbourCellsResp" );
 
-    TECIDInfo tempECIDInfo;
+    TBool triggerNotify( EFalse );
     TInt ret( KErrNone );
 
     // Get the success code.
@@ -4547,7 +4513,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCustomM
     if ( NET_CAUSE_OK == successCode )
         {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetNeighbourCellsResp - NET_CAUSE_OK");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCustomMessHandler::NetNeighbourCellsResp, NET_CAUSE_OK" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP_TD, "CMmCustomMessHandler::NetNeighbourCellsResp, NET_CAUSE_OK" );
 
         TUint sbOffset( 0 );
 
@@ -4559,25 +4525,49 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCu
             {
             // GSM cell info.
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetNeighbourCellsResp - NET_ECID_GERAN_INFO found");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCustomMessHandler::NetNeighbourCellsResp - NET_ECID_GERAN_INFO found" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP_TD, "CMmCustomMessHandler::NetNeighbourCellsResp - NET_ECID_GERAN_INFO found" );
             // Set mode
-            tempECIDInfo.iCellInfo.iMode = RMmCustomAPI::TMmCellInfo::EGSM;
+            if ( RMmCustomAPI::TMmCellInfo::EGSM != iECIDInfo.iCellInfo.iMode )
+                {
+                triggerNotify = ETrue;
+                iECIDInfo.iCellInfo.iMode = RMmCustomAPI::TMmCellInfo::EGSM;
+                }
 
             // Set Current MCC.
-            tempECIDInfo.iMCC = aIsiMessage.Get16bit(
-                sbOffset + NET_ECID_GERAN_INFO_OFFSET_CURRENTMCC );
+            TUint16 mcc( aIsiMessage.Get16bit(
+                sbOffset + NET_ECID_GERAN_INFO_OFFSET_CURRENTMCC ) );
+            if ( mcc != iECIDInfo.iMCC )
+                {
+                triggerNotify = ETrue;
+                iECIDInfo.iMCC = mcc;
+                }
 
             // Set Current MNC.
-            tempECIDInfo.iMNC = aIsiMessage.Get16bit(
-                sbOffset + NET_ECID_GERAN_INFO_OFFSET_CURRENTMNC );
+            TUint16 mnc( aIsiMessage.Get16bit(
+                sbOffset + NET_ECID_GERAN_INFO_OFFSET_CURRENTMNC ) );
+            if ( mnc != iECIDInfo.iMNC )
+                {
+                triggerNotify = ETrue;
+                iECIDInfo.iMNC = mnc;
+                }
 
             // Set Current LAC.
-            tempECIDInfo.iLAC = aIsiMessage.Get16bit(
-                sbOffset + NET_ECID_GERAN_INFO_OFFSET_CURRENTLAC );
+            TUint16 lac( aIsiMessage.Get16bit(
+                sbOffset + NET_ECID_GERAN_INFO_OFFSET_CURRENTLAC ) );
+            if ( lac != iECIDInfo.iLAC )
+                {
+                triggerNotify = ETrue;
+                iECIDInfo.iLAC = lac;
+                }
 
             // Set Current Cell ID.
-            tempECIDInfo.iCID = aIsiMessage.Get16bit(
-                sbOffset + NET_ECID_GERAN_INFO_OFFSET_CURRENTCELLID );
+            TUint16 cid( aIsiMessage.Get16bit(
+                sbOffset + NET_ECID_GERAN_INFO_OFFSET_CURRENTCELLID ) );
+            if ( cid != iECIDInfo.iCID )
+                {
+                triggerNotify = ETrue;
+                iECIDInfo.iCID = cid;
+                }
 
             // Set Current TA.
             TUint8 temp8bitUVal( aIsiMessage.Get8bit(
@@ -4585,7 +4575,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCu
 
             if ( NET_ECID_TA_UNDEFINED != temp8bitUVal )
                 {
-                tempECIDInfo.iCellInfo.iGsmCellInfo.iTA = temp8bitUVal;
+                iECIDInfo.iCellInfo.iGsmCellInfo.iTA = temp8bitUVal;
                 }
             // No else.
 
@@ -4597,19 +4587,19 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCu
             for ( TUint8 i = 0; i < nmrCount; i++ )
                 {
                 // Set Carrier number.
-                tempECIDInfo.iCellInfo.iGsmCellInfo.iNmr[ i ].iARFCN =
+                iECIDInfo.iCellInfo.iGsmCellInfo.iNmr[i].iARFCN =
                     aIsiMessage.Get16bit(
                         sbOffset + NET_ECID_GERAN_INFO_OFFSET_GSMNMRLIST +
                         ( i * SIZE_NET_GSM_NMR_LIST_SEQ ) +
                         NET_GSM_NMR_LIST_SEQ_OFFSET_ARFCN );
                 // Set BSIC.
-                tempECIDInfo.iCellInfo.iGsmCellInfo.iNmr[ i ].iBSIC =
+                iECIDInfo.iCellInfo.iGsmCellInfo.iNmr[i].iBSIC =
                     aIsiMessage.Get8bit(
                         sbOffset + NET_ECID_GERAN_INFO_OFFSET_GSMNMRLIST +
                         ( i * SIZE_NET_GSM_NMR_LIST_SEQ ) +
                         NET_GSM_NMR_LIST_SEQ_OFFSET_BSIC );
                 // Set RX level.
-                tempECIDInfo.iCellInfo.iGsmCellInfo.iNmr[ i ].iRxLEV =
+                iECIDInfo.iCellInfo.iGsmCellInfo.iNmr[i].iRxLEV =
                     aIsiMessage.Get8bit(
                         sbOffset + NET_ECID_GERAN_INFO_OFFSET_GSMNMRLIST +
                         ( i * SIZE_NET_GSM_NMR_LIST_SEQ ) +
@@ -4624,34 +4614,52 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCu
             {
             // WCDMA cell info.
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetNeighbourCellsResp - NET_ECID_UTRAN_FDD_INFO found");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCustomMessHandler::NetNeighbourCellsResp - NET_ECID_UTRAN_FDD_INFO found" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP_TD, "CMmCustomMessHandler::NetNeighbourCellsResp - NET_ECID_UTRAN_FDD_INFO found" );
             // Set mode.
-            tempECIDInfo.iCellInfo.iMode = RMmCustomAPI::TMmCellInfo::EWCDMA;
+            if ( RMmCustomAPI::TMmCellInfo::EWCDMA != iECIDInfo.iCellInfo.iMode )
+                {
+                triggerNotify = ETrue;
+                iECIDInfo.iCellInfo.iMode = RMmCustomAPI::TMmCellInfo::EWCDMA;
+                }
 
             // Set UCID.
-            tempECIDInfo.iCID = aIsiMessage.Get32bit(
-                sbOffset + NET_ECID_UTRAN_FDD_INFO_OFFSET_UCID );
+            TUint32 cid( aIsiMessage.Get32bit(
+                sbOffset + NET_ECID_UTRAN_FDD_INFO_OFFSET_UCID ) );
+            if ( cid != iECIDInfo.iCID )
+                {
+                triggerNotify = ETrue;
+                iECIDInfo.iCID = cid;
+                }
 
             // Set current MCC.
-            tempECIDInfo.iMCC = aIsiMessage.Get16bit(
-                sbOffset + NET_ECID_UTRAN_FDD_INFO_OFFSET_CURRENTMCC );
+            TUint16 mcc( aIsiMessage.Get16bit(
+                sbOffset + NET_ECID_UTRAN_FDD_INFO_OFFSET_CURRENTMCC ) );
+            if ( mcc != iECIDInfo.iMCC )
+                {
+                triggerNotify = ETrue;
+                iECIDInfo.iMCC = mcc;
+                }
 
             // Set current MNC.
-            tempECIDInfo.iMNC = aIsiMessage.Get16bit(
-                sbOffset + NET_ECID_UTRAN_FDD_INFO_OFFSET_CURRENTMNC );
+            TUint16 mnc( aIsiMessage.Get16bit(
+                sbOffset + NET_ECID_UTRAN_FDD_INFO_OFFSET_CURRENTMNC ) );
+            if ( mnc != iECIDInfo.iMNC )
+                {
+                triggerNotify = ETrue;
+                iECIDInfo.iMNC = mnc;
+                }
 
-            // Set current LAC (new value not received here).
-            tempECIDInfo.iLAC = iECIDInfo.iLAC;
+            // New LAC not received here
 
             // Set primary scrambling code.
-            tempECIDInfo.iCellInfo.iWcdmaCellInfo.iPrimaryScrambilingCode =
+            iECIDInfo.iCellInfo.iWcdmaCellInfo.iPrimaryScrambilingCode =
                 aIsiMessage.Get16bit(
                     sbOffset + NET_ECID_UTRAN_FDD_INFO_OFFSET_PRISCRAMBLING );
 
             // Set Frequency Info.
             // Set frequency Info (Uplink UARFCN and UARFCN-Nt not available)
             // Downlink UARFCN.
-            tempECIDInfo.iCellInfo.iWcdmaCellInfo.iFrequencyInfo.iFddDL =
+            iECIDInfo.iCellInfo.iWcdmaCellInfo.iFrequencyInfo.iFddDL =
                 aIsiMessage.Get16bit(
                     sbOffset + NET_ECID_UTRAN_FDD_INFO_OFFSET_UARFCNDL );
 
@@ -4667,18 +4675,18 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCu
             for ( TUint8 i( 0 ); i < nmrCount; i++ )
                 {
                 // Set Frequency Info: Downlink UARFCN.
-                tempECIDInfo.iCellInfo.iWcdmaCellInfo.
+                iECIDInfo.iCellInfo.iWcdmaCellInfo.
                     iNwkMeasureReport[i].iFrequencyInfo.iFddDL =
                         aIsiMessage.Get16bit( nmrListOffset );
 
                 // Uplink UARFCN and UARFCN-Nt not available, set to -1.
-                tempECIDInfo.iCellInfo.iWcdmaCellInfo.
+                iECIDInfo.iCellInfo.iWcdmaCellInfo.
                     iNwkMeasureReport[i].iFrequencyInfo.iFddUL = -1;
-                tempECIDInfo.iCellInfo.iWcdmaCellInfo.
+                iECIDInfo.iCellInfo.iWcdmaCellInfo.
                     iNwkMeasureReport[i].iFrequencyInfo.iTddNt = -1;
 
                 // Set UTRA Carrier RSSI.
-                tempECIDInfo.iCellInfo.iWcdmaCellInfo.
+                iECIDInfo.iCellInfo.iWcdmaCellInfo.
                     iNwkMeasureReport[i].iCarrierRSSI =
                         aIsiMessage.Get8bit(
                             nmrListOffset +
@@ -4701,14 +4709,14 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCu
 
                     if ( NET_ECID_UCID_UNDEFINED != temp32bitUVal )
                         {
-                        tempECIDInfo.iCellInfo.iWcdmaCellInfo.
+                        iECIDInfo.iCellInfo.iWcdmaCellInfo.
                             iNwkMeasureReport[i].iCellMeasuredResult[f].iCID =
                                 temp32bitUVal;
                         }
                     // No else.
 
                     // Set Primary CPICH.
-                    tempECIDInfo.iCellInfo.iWcdmaCellInfo.
+                    iECIDInfo.iCellInfo.iWcdmaCellInfo.
                         iNwkMeasureReport[i].iCellMeasuredResult[f].
                             iFddInfo.iPrimaryCPICH = aIsiMessage.Get16bit(
                                 nmrListOffset +
@@ -4721,14 +4729,14 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCu
 
                     if ( NET_ECID_CPICH_ECNO_UNDEFINED != temp8bitUVal )
                         {
-                        tempECIDInfo.iCellInfo.iWcdmaCellInfo.
+                        iECIDInfo.iCellInfo.iWcdmaCellInfo.
                             iNwkMeasureReport[i].iCellMeasuredResult[f].
                                 iFddInfo.iCpichEcN0 = temp8bitUVal;
                         }
                     // No else.
 
                     // Set CPICH RSCP.
-                    tempECIDInfo.iCellInfo.iWcdmaCellInfo.
+                    iECIDInfo.iCellInfo.iWcdmaCellInfo.
                         iNwkMeasureReport[i].iCellMeasuredResult[f].
                             iFddInfo.iCpichRscp = aIsiMessage.Get8bit(
                                 nmrListOffset +
@@ -4741,7 +4749,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCu
 
                     if ( NET_ECID_PATHLOSS_UNDEFINED != temp8bitUVal )
                         {
-                        tempECIDInfo.iCellInfo.iWcdmaCellInfo.
+                        iECIDInfo.iCellInfo.iWcdmaCellInfo.
                             iNwkMeasureReport[i].iCellMeasuredResult[f].
                                 iFddInfo.iPathloss = temp8bitUVal;
                         }
@@ -4756,14 +4764,14 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCu
         else
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::NetNeighbourCellsResp - No ECID data found");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCustomMessHandler::NetNeighbourCellsResp - No ECID data found" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP_TD, "CMmCustomMessHandler::NetNeighbourCellsResp - No ECID data found" );
             ret = KErrNotFound;
             }
         }
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::NetNeighbourCellsResp - NET Server Error, Success Code: %d", successCode);
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CMmCustomMessHandler::NetNeighbourCellsResp;NET Server Error, Success Code=%hhu", successCode );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP_TD, "CMmCustomMessHandler::NetNeighbourCellsResp;NET Server Error, Success Code=%hhu", successCode );
 
         // Map cause to symbian error value.
         ret = CMmStaticUtility::CSCauseToEpocError(
@@ -4779,7 +4787,7 @@ OstTraceExt1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CM
 
         // Complete with packed parameter.
         CMmDataPackage dataPackage;
-        dataPackage.PackData( &tempECIDInfo.iCellInfo );
+        dataPackage.PackData( &iECIDInfo.iCellInfo );
 
         iMessageRouter->Complete(
             ECustomGetCellInfoIPC,
@@ -4789,27 +4797,16 @@ OstTraceExt1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_NETNEIGHBOURCELLSRESP, "CM
     // No else.
 
     // If info received, save and complete change notification.
-    if ( KErrNone == ret )
+    if ( KErrNone == ret && triggerNotify )
         {
-        if ( iECIDInfo.iCellInfo.iMode != tempECIDInfo.iCellInfo.iMode ||
-            iECIDInfo.iMCC != tempECIDInfo.iMCC ||
-            iECIDInfo.iMNC != tempECIDInfo.iMNC ||
-            iECIDInfo.iCID != tempECIDInfo.iCID ||
-            iECIDInfo.iLAC != tempECIDInfo.iLAC )
-            {
-            // Complete with packed parameter.
-            CMmDataPackage dataPackage;
-            dataPackage.PackData( &tempECIDInfo.iCellInfo );
+        // Complete with packed parameter.
+        CMmDataPackage dataPackage;
+        dataPackage.PackData( &iECIDInfo.iCellInfo );
 
-            iMessageRouter->Complete(
-                ECustomNotifyCellInfoChangeIPC,
-                &dataPackage,
-                KErrNone );
-            }
-        // No else.
-
-        // Save ECID information.
-        iECIDInfo = tempECIDInfo;
+        iMessageRouter->Complete(
+            ECustomNotifyCellInfoChangeIPC,
+            &dataPackage,
+            KErrNone );
         }
     // No else.
     }
@@ -4826,7 +4823,7 @@ void CMmCustomMessHandler::CheckECIDInfo(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::CheckECIDInfo");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CHECKECIDINFO, "CMmCustomMessHandler::CheckECIDInfo" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_CHECKECIDINFO_TD, "CMmCustomMessHandler::CheckECIDInfo" );
 
     TUint8 msgId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
@@ -4837,7 +4834,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_CHECKECIDINFO, "CMmCustomMessHandl
         TBool isNetRetStatusInd( NET_MODEM_REG_STATUS_IND == msgId );
 
 TFLOGSTRING("TSY:CMmCustomMessHandler::CheckECIDInfo - Find NET_MODEM_CURRENT_CELL_INFO SubBlock");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_CHECKECIDINFO, "CMmCustomMessHandler::CheckECIDInfo - Find NET_MODEM_CURRENT_CELL_INFO SubBlock" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_CHECKECIDINFO_TD, "CMmCustomMessHandler::CheckECIDInfo - Find NET_MODEM_CURRENT_CELL_INFO SubBlock" );
         // Get NET_MODEM_CURRENT_CELL_INFO sub block
         // (should be always used when exists (coming when in 3G/RRC
         // connected mode), otherwise NET_MODEM_GSM_REG_INFO is used).
@@ -4866,7 +4863,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_CHECKECIDINFO, "CMmCustomMess
         if ( KErrNone != retValue )
             {
 TFLOGSTRING("TSY:CMmCustomMessHandler::CheckECIDInfo - Find NET_MODEM_GSM_REG_INFO SubBlock");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_CHECKECIDINFO, "CMmCustomMessHandler::CheckECIDInfo - Find NET_MODEM_GSM_REG_INFO SubBlock" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_CHECKECIDINFO_TD, "CMmCustomMessHandler::CheckECIDInfo - Find NET_MODEM_GSM_REG_INFO SubBlock" );
 
             sbStartOffSet = 0;
 
@@ -4893,7 +4890,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_CHECKECIDINFO, "CMmCustomMess
         if ( KErrNone == retValue )
             {
 TFLOGSTRING("TSY:CMmCustomMessHandler::CheckECIDInfo - SubBlock Found");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_CHECKECIDINFO, "CMmCustomMessHandler::CheckECIDInfo, SubBlock Found" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_CHECKECIDINFO_TD, "CMmCustomMessHandler::CheckECIDInfo, SubBlock Found" );
             TUint tempMCC( 0 ); // Mobile Country Code.
             TUint tempMNC( 0 ); // Mobile Network Code.
             TUint tempCID( 0 ); // Cell identity.
@@ -4961,7 +4958,7 @@ void CMmCustomMessHandler::HandleError
       )
     {
     TFLOGSTRING2( "TSY: CMmCustomMessHandler::HandleError - Error: %d", aError );
-OstTrace1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_HANDLEERROR, "CMmCustomMessHandler::HandleError;aError=%d", aError );
+OstTrace1( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_HANDLEERROR_TD, "CMmCustomMessHandler::HandleError;aError=%d", aError );
 
     TInt resource( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_RESOURCEID ) );
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
@@ -4973,7 +4970,7 @@ OstTrace1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_HANDLEERROR, "CMmCustomMessHandler
         default:
             {
             TFLOGSTRING("TSY: CMmCustomMessHandler::HandleError, switch resource - default.\n" );
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_HANDLEERROR, "CMmCustomMessHandler::HandleError, switch resource - default" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_HANDLEERROR_TD, "CMmCustomMessHandler::HandleError, switch resource - default" );
             // Nothing to do here.
             break;
             }
@@ -4995,14 +4992,14 @@ TInt CMmCustomMessHandler::GssCsServiceSetBandReq( TUint8 aTransId, // transacti
         RMmCustomAPI::TBandSelection aBandSelection ) // band selection
     {
     TFLOGSTRING2( "TSY: CMmCustomMessHandler::GssCsServiceSetBandReq - aTransId: %d", aTransId );
-OstTraceExt1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICESETBANDREQ, "CMmCustomMessHandler::GssCsServiceSetBandReq;aTransId=%hhu", aTransId );
+OstTraceExt1( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_GSSCSSERVICESETBANDREQ_TD, "CMmCustomMessHandler::GssCsServiceSetBandReq;aTransId=%hhu", aTransId );
 
     if ( RMmCustomAPI::KCapsNetworkModeUmts == aNetworkModeCaps ||
          RMmCustomAPI::KCapsNetworkModeDual == aNetworkModeCaps )
         {
         TFLOGSTRING3( "TSY: CMmCustomMessHandler::GssCsServiceSetBandReq - NWModeCaps: %d - Band: %d",
             aNetworkModeCaps, aBandSelection );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICESETBANDREQ, "CMmCustomMessHandler::GssCsServiceSetBandReq; - NWModeCaps=%d - Band=%d", aNetworkModeCaps, aBandSelection );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICESETBANDREQ_TD, "CMmCustomMessHandler::GssCsServiceSetBandReq; - NWModeCaps=%d - Band=%d", aNetworkModeCaps, aBandSelection );
 
         // create message data buffer
         TBuf8< 20 > messageData;
@@ -5051,7 +5048,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GSSCSSERVICESETBANDREQ, "C
 TInt CMmCustomMessHandler::GssCsServiceGetBandReq( TUint8 aTransId ) //transaction Id
     {
     TFLOGSTRING2( "TSY: CMmCustomMessHandler::GssCsServiceGetBandReq - aTransId: %d", aTransId );
-OstTraceExt1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICEGETBANDREQ, "CMmCustomMessHandler::GssCsServiceGetBandReq;aTransId=%hhu", aTransId );
+OstTraceExt1( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_GSSCSSERVICEGETBANDREQ_TD, "CMmCustomMessHandler::GssCsServiceGetBandReq;aTransId=%hhu", aTransId );
 
     // create message data buffer
     TBuf8< 4 > messageData;
@@ -5070,7 +5067,7 @@ OstTraceExt1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GSSCSSERVICEGETBANDREQ, "CMmCus
 void CMmCustomMessHandler::CompleteGetBandSelection( const TIsiReceiveC& aIsiMessage )
     {
     TFLOGSTRING("TSY: CMmCustomMessHandler::CompleteGetBandSelection");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCustomMessHandler::CompleteGetBandSelection" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION_TD, "CMmCustomMessHandler::CompleteGetBandSelection" );
 
     RMmCustomAPI::TNetworkModeCaps nwModeCaps; // network mode caps
     RMmCustomAPI::TBandSelection bandSelection; // band selection
@@ -5086,7 +5083,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCust
     TUint8 firstSubblock ( aIsiMessage.Get8bit( sbOffset ) );
 
     TFLOGSTRING2("TSY: CMmCustomMessHandler::CompleteGetBandSelection - ECustomGetBandSelectionIPC. NrOfSubblocks:%d", nrOfSubblocks);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCustomMessHandler::CompleteGetBandSelection;nrOfSubblocks=%hhu", nrOfSubblocks );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION_TD, "CMmCustomMessHandler::CompleteGetBandSelection;nrOfSubblocks=%hhu", nrOfSubblocks );
 
     // In 2G only products only sub block GSS_SELECTED_GSM_BANDS_INFO is returned.
     if ( 1 == nrOfSubblocks && firstSubblock == GSS_SELECTED_GSM_BAND_INFO )
@@ -5103,7 +5100,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, 
         if ( GSS_SELECTED_GSM_BAND_INFO == firstSubblock )
             {
             TFLOGSTRING("TSY: CMmCustomMessHandler::CompleteGetBandSelection - 1st SB = GSM BAND INFO");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCustomMessHandler::CompleteGetBandSelection - 1st SB = GSM BAND INFO" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION_TD, "CMmCustomMessHandler::CompleteGetBandSelection - 1st SB = GSM BAND INFO" );
 
             // calculate offsets
             gsmBandInfoOffset = sbOffset +
@@ -5120,7 +5117,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CM
         else if ( GSS_SELECTED_UMTS_BAND_INFO == firstSubblock )
             {
             TFLOGSTRING("TSY: CMmCustomMessHandler::CompleteGetBandSelection - 1st SB = UMTS BAND INFO");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCustomMessHandler::CompleteGetBandSelection - 1st SB = UMTS BAND INFO" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION_TD, "CMmCustomMessHandler::CompleteGetBandSelection - 1st SB = UMTS BAND INFO" );
 
             // calculate offsets
             umtsBandInfoOffset = sbOffset +
@@ -5139,7 +5136,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CM
         if ( GSS_UMTS_NO_BANDS == aIsiMessage.Get32bit( umtsBandInfoOffset ) ) // forced GSM
             {
             TFLOGSTRING("TSY: CMmCustomMessHandler::CompleteGetBandSelection - umtsBandInfo==GSS_UMTS_NO_BANDS => Forced GSM");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCustomMessHandler::CompleteGetBandSelection - umtsBandInfo==GSS_UMTS_NO_BANDS => Forced GSM" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION_TD, "CMmCustomMessHandler::CompleteGetBandSelection - umtsBandInfo==GSS_UMTS_NO_BANDS => Forced GSM" );
             nwModeCaps = RMmCustomAPI::KCapsNetworkModeGsm;
             }
         else
@@ -5148,13 +5145,13 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CM
             if ( 0 < gsmBandInfoOffset && GSS_GSM_NO_BANDS == aIsiMessage.Get8bit( gsmBandInfoOffset ) ) // forced UMTS
                 {
                 TFLOGSTRING("TSY: CMmCustomMessHandler::CompleteGetBandSelection - gsmBandInfo==GSS_GSM_NO_BANDS => Forced UMTS");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCustomMessHandler::CompleteGetBandSelection - gsmBandInfo==GSS_GSM_NO_BANDS => Forced UMTS" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION_TD, "CMmCustomMessHandler::CompleteGetBandSelection - gsmBandInfo==GSS_GSM_NO_BANDS => Forced UMTS" );
                 nwModeCaps = RMmCustomAPI::KCapsNetworkModeUmts;
                 }
             else // dual mode
                 {
                 TFLOGSTRING("TSY: CMmCustomMessHandler::CompleteGetBandSelection - Dual mode");
-OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCustomMessHandler::CompleteGetBandSelection - Dual mode" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION_TD, "CMmCustomMessHandler::CompleteGetBandSelection - Dual mode" );
                 nwModeCaps = RMmCustomAPI::KCapsNetworkModeDual;
                 }
 
@@ -5162,13 +5159,13 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CM
             if ( GSS_UMTS_BAND_V_MASK == aIsiMessage.Get32bit( umtsBandInfoOffset ) )
                 {
                 TFLOGSTRING("TSY: CMmCustomMessHandler::CompleteGetBandSelection - UMTS850");
-OstTrace0( TRACE_NORMAL, DUP7_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCustomMessHandler::CompleteGetBandSelection - UMTS850" );
+OstTrace0( TRACE_NORMAL,  DUP7_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION_TD, "CMmCustomMessHandler::CompleteGetBandSelection - UMTS850" );
                 bandSelection = RMmCustomAPI::ENetworkBandUmts850;
                 }
             else if( GSS_UMTS_BAND_I_MASK == aIsiMessage.Get32bit( umtsBandInfoOffset ) )
                 {
                 TFLOGSTRING("TSY: CMmCustomMessHandler::CompleteGetBandSelection - UMTS2100");
-OstTrace0( TRACE_NORMAL, DUP8_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION, "CMmCustomMessHandler::CompleteGetBandSelection - UMTS2100" );
+OstTrace0( TRACE_NORMAL,  DUP8_CMMCUSTOMMESSHANDLER_COMPLETEGETBANDSELECTION_TD, "CMmCustomMessHandler::CompleteGetBandSelection - UMTS2100" );
                 bandSelection = RMmCustomAPI::ENetworkBandUmts2100;
                 }
             }
@@ -5193,7 +5190,7 @@ TInt CMmCustomMessHandler::ReadLifeTimerFromPermanentMemory
         )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ReadLifeTimerFromPermanentMemory.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_READLIFETIMERFROMPERMANENTMEMORY, "CMmCustomMessHandler::ReadLifeTimerFromPermanentMemory" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_READLIFETIMERFROMPERMANENTMEMORY_TD, "CMmCustomMessHandler::ReadLifeTimerFromPermanentMemory" );
 
     // Group ID 2 + Index 2 + Filler 2 + Offset 4 + Data amount to be read 4 = 14
     TBuf8<14> data;
@@ -5218,7 +5215,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_READLIFETIMERFROMPERMANENTMEMORY, 
     data.Append( static_cast<TUint8>( KCallLifeTimerDataAmount >> 8 ) );
     data.Append( static_cast<TUint8>( KCallLifeTimerDataAmount ) );
 
-    /* To be done in CPS
+    /*
     return iPhoNetSender->Send( PN_PERMANENT_DATA,
         aTransId,
         PERM_PM_RECORD_READ_REQ,
@@ -5231,14 +5228,14 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_READLIFETIMERFROMPERMANENTMEMORY, 
 // Breaks  PERM_PM_RECORD_READ_RESP message.
 // -----------------------------------------------------------------------------
 //
-/* To be done in CPS
+/* 
 void CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse
         (
         const TIsiReceiveC& aIsiMessage    // an ISI message
         )
     {
 TFLOGSTRING("TSY: CCMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE_TD, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse" );
 
     TInt ret( KErrNone );
 
@@ -5267,12 +5264,12 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRE
                 iCallLifeTimer = aIsiMessage.Get32bit( sbStartOffSet +
                                      PERM_SB_PM_DATA_OFFSET_DATA );
 TFLOGSTRING2( "TSY: CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - iCallLifeTimer: %d", iCallLifeTimer );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse;iCallLifeTimer=%d", iCallLifeTimer );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE_TD, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse;iCallLifeTimer=%d", iCallLifeTimer );
                 }
             else
                 {
 TFLOGSTRING2( "TSY: CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - Incorrect data size: %d", dataSize );
-OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - Incorrect data size=%u", dataSize );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE_TD, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - Incorrect data size=%u", dataSize );
                 TF_ASSERT( KCallLifeTimerDataAmount != dataSize );
                 ret = KErrGeneral;
                 }
@@ -5284,7 +5281,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYR
             {
             // Send request again max 3 times
 TFLOGSTRING("TSY: CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - PMM not ready. Send request again\n" );
-OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - PMM not ready. Send request again" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE_TD, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - PMM not ready. Send request again" );
             iPMMReadRetryCounter++;
             if ( KMaxPMMReadRequests > iPMMReadRetryCounter )
                 {
@@ -5295,13 +5292,13 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYR
             {
             // The first boot of the phone.
 TFLOGSTRING("TSY: CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - The first boot. Set iCallLifeTimer 0\n" );
-            OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - The first boot. Set iCallLifeTimer 0" );
+            OstTrace0( TRACE_NORMAL,  DUP5_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE_TD, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - The first boot. Set iCallLifeTimer 0" );
             iCallLifeTimer = 0;
             }
         else
             {
 TFLOGSTRING2( "TSY: CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - PMM Status NOT OK: %d", pmmStatus );
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - PMM Status NOT OK=%hhu", pmmStatus );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_LIFETIMERFROMPERMANENTMEMORYREADRESPONSE_TD, "CMmCustomMessHandler::LifeTimerFromPermanentMemoryReadResponse - PMM Status NOT OK=%hhu", pmmStatus );
             }
         }
     }*/
@@ -5319,7 +5316,7 @@ TInt CMmCustomMessHandler::WriteLifeTimerToPermanentMemory
         )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::WriteLifeTimerToPermanentMemory.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_WRITELIFETIMERTOPERMANENTMEMORY, "CMmCustomMessHandler::WriteLifeTimerToPermanentMemory" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_WRITELIFETIMERTOPERMANENTMEMORY_TD, "CMmCustomMessHandler::WriteLifeTimerToPermanentMemory" );
 
     // Group ID 2 + Index 2 + Filler 2 + Offset 4 + Data amount to be read 4 = 14
     TBuf8<14> data;
@@ -5345,8 +5342,8 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_WRITELIFETIMERTOPERMANENTMEMORY, "
         {
 TFLOGSTRING( "TSY: CMmCustomMessHandler::WriteLifeTimerToPermanentMemory - Call Life Timer is not set from PMM ret KErrNotReady\n" );
 TFLOGSTRING("TSY: CMmCustomMessHandler::WriteLifeTimerToPermanentMemory - PERM_PM_RECORD_WRITE_REQ is NOT send\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_WRITELIFETIMERTOPERMANENTMEMORY, "CMmCustomMessHandler::WriteLifeTimerToPermanentMemory - Call Life Timer is not set from PMM ret KErrNotReady" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_WRITELIFETIMERTOPERMANENTMEMORY, "CMmCustomMessHandler::WriteLifeTimerToPermanentMemory - PERM_PM_RECORD_WRITE_REQ is NOT send" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_WRITELIFETIMERTOPERMANENTMEMORY_TD, "CMmCustomMessHandler::WriteLifeTimerToPermanentMemory - Call Life Timer is not set from PMM ret KErrNotReady" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_WRITELIFETIMERTOPERMANENTMEMORY_TD, "CMmCustomMessHandler::WriteLifeTimerToPermanentMemory - PERM_PM_RECORD_WRITE_REQ is NOT send" );
 
         // Return request with KErrNotReady
         return ( KErrNotReady );
@@ -5362,7 +5359,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_WRITELIFETIMERTOPERMANENTMEMO
         data.Append( static_cast<TUint8>( iCallLifeTimer >> 8 ) );
         data.Append( static_cast<TUint8>( iCallLifeTimer ) );
 
-        /* To be done in CPS
+        /* 
         return iPhoNetSender->Send( PN_PERMANENT_DATA,
             aTransId,
             PERM_PM_RECORD_WRITE_REQ,
@@ -5376,14 +5373,14 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_WRITELIFETIMERTOPERMANENTMEMO
 // Breaks  PERM_PM_RECORD_WRITE_RESP message.
 // -----------------------------------------------------------------------------
 //
-/* To be done in CPS
+/* 
 void CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse
         (
         const TIsiReceiveC& aIsiMessage    // an ISI message
         )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_LIFETIMERTOPERMANENTMEMORYWRITERESPONSE, "CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_LIFETIMERTOPERMANENTMEMORYWRITERESPONSE_TD, "CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse" );
 
     TInt ret( KErrNone );
 
@@ -5391,14 +5388,14 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_LIFETIMERTOPERMANENTMEMORYWRITERES
                ISI_HEADER_SIZE +
                PERM_PM_RECORD_WRITE_RESP_OFFSET_PMMSTATUS );
 TFLOGSTRING2( "TSY: CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse - pmmStatus: %d", pmmStatus );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_LIFETIMERTOPERMANENTMEMORYWRITERESPONSE, "CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse;pmmStatus=%hhu", pmmStatus );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_LIFETIMERTOPERMANENTMEMORYWRITERESPONSE_TD, "CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse;pmmStatus=%hhu", pmmStatus );
 
     if ( PMM_OK != pmmStatus )
         {
         ret = KErrNotReady;
         TF_ASSERT( PMM_OK != pmmStatus );
 TFLOGSTRING2( "TSY: CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse - Call Life Timer is not updated / error from PMM ret: %d", ret );
-OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_LIFETIMERTOPERMANENTMEMORYWRITERESPONSE, "CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse - Call Life Timer is not updated / error from PMM ret=%d", ret );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_LIFETIMERTOPERMANENTMEMORYWRITERESPONSE_TD, "CMmCustomMessHandler::LifeTimerToPermanentMemoryWriteResponse - Call Life Timer is not updated / error from PMM ret=%d", ret );
         }
 
     return iMessageRouter->Complete( EMmTsyUpdateLifeTimeIPC, ret );
@@ -5414,7 +5411,7 @@ TInt CMmCustomMessHandler::GetTotalLifeTimerValue
         )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::GetTotalLifeTimerValue.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE, "CMmCustomMessHandler::GetTotalLifeTimerValue" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE_TD, "CMmCustomMessHandler::GetTotalLifeTimerValue" );
 
     TInt ret( KErrNone );
     RMmCustomAPI::TLifeTimeData timeInfo;
@@ -5426,7 +5423,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE, "CMmCustom
         {
         ret = KErrNotReady;
 TFLOGSTRING( "TSY: CMmCustomMessHandler::GetTotalLifeTimerValue - PMM has not been able to be read ret: KErrNotReady\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE, "CMmCustomMessHandler::GetTotalLifeTimerValue - PMM has not been able to be read ret: KErrNotReady" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE_TD, "CMmCustomMessHandler::GetTotalLifeTimerValue - PMM has not been able to be read ret: KErrNotReady" );
         }
     else
         {
@@ -5441,9 +5438,9 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE, "CMmC
 TFLOGSTRING2( "TSY: TSY: CMmCustomMessHandler::GetTotalLifeTimerValue - iCallLifeTimer: %d", iCallLifeTimer );
 TFLOGSTRING2( "TSY: TSY: CMmCustomMessHandler::GetTotalLifeTimerValue - timeInfo.iHours: %d", timeInfo.iHours );
 TFLOGSTRING2( "TSY: TSY: CMmCustomMessHandler::GetTotalLifeTimerValue - timeInfo.iMinutes: %d", timeInfo.iMinutes );
-OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE, "CMmCustomMessHandler::GetTotalLifeTimerValue;iCallLifeTimer=%d", iCallLifeTimer );
-OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE, "CMmCustomMessHandler::GetTotalLifeTimerValue;timeInfo.iHours=%u", timeInfo.iHours );
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE, "CMmCustomMessHandler::GetTotalLifeTimerValue;timeInfo.iMinutes=%hhu", timeInfo.iMinutes );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE_TD, "CMmCustomMessHandler::GetTotalLifeTimerValue;iCallLifeTimer=%d", iCallLifeTimer );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE_TD, "CMmCustomMessHandler::GetTotalLifeTimerValue;timeInfo.iHours=%u", timeInfo.iHours );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE_TD, "CMmCustomMessHandler::GetTotalLifeTimerValue;timeInfo.iMinutes=%hhu", timeInfo.iMinutes );
         }
 
     CMmDataPackage dataPackage;
@@ -5461,7 +5458,7 @@ OstTraceExt1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_GETTOTALLIFETIMERVALUE, "C
 TInt CMmCustomMessHandler::UiccSimPowerOffReq()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSimPowerOffReq.\n");
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMPOWEROFFREQ, "CMmCustomMessHandler::UiccSimPowerOffReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMPOWEROFFREQ_TD, "CMmCustomMessHandler::UiccSimPowerOffReq" );
 
     iSapApduIfState = EUiccSapIfStatus1;
     // Set parameters for UICC_CONNECTION_REQ message
@@ -5481,7 +5478,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMPOWEROFFREQ, "CMmCustomMess
 void CMmCustomMessHandler::UiccSimPowerOffResp( TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSimPowerOffResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMPOWEROFFRESP, "CMmCustomMessHandler::UiccSimPowerOffResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMPOWEROFFRESP_TD, "CMmCustomMessHandler::UiccSimPowerOffResp" );
 
     TInt err ( KErrNone );
 
@@ -5544,7 +5541,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMPOWEROFFRESP, "CMmCustomMes
 TInt CMmCustomMessHandler::UiccSimWarmResetReq()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSimWarmResetReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMWARMRESETREQ, "CMmCustomMessHandler::UiccSimWarmResetReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMWARMRESETREQ_TD, "CMmCustomMessHandler::UiccSimWarmResetReq" );
 
     TUiccParamsApduReq params;
     params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
@@ -5563,7 +5560,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMWARMRESETREQ, "CMmCustomMes
 void CMmCustomMessHandler::UiccSimWarmResetResp( TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSimWarmResetResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMWARMRESETRESP, "CMmCustomMessHandler::UiccSimWarmResetResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMWARMRESETRESP_TD, "CMmCustomMessHandler::UiccSimWarmResetResp" );
 
     TInt err ( KErrNone );
 
@@ -5591,7 +5588,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMWARMRESETRESP, "CMmCustomMe
 TInt CMmCustomMessHandler::UiccSimGetAtrReq()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSimGetAtrReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMGETATRREQ, "CMmCustomMessHandler::UiccSimGetAtrReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMGETATRREQ_TD, "CMmCustomMessHandler::UiccSimGetAtrReq" );
 
     TUiccParamsApduReq params;
     params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
@@ -5611,7 +5608,7 @@ void CMmCustomMessHandler::UiccSimGetAtrResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSimGetAtrResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMGETATRRESP, "CMmCustomMessHandler::UiccSimGetAtrResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMGETATRRESP_TD, "CMmCustomMessHandler::UiccSimGetAtrResp" );
 
     TInt err( KErrNone );
     const TDesC8* dataPtr = &aFileData;
@@ -5642,7 +5639,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMGETATRRESP, "CMmCustomMessH
 TInt CMmCustomMessHandler::UiccSimPowerOnReq()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSimPowerOnReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMPOWERONREQ, "CMmCustomMessHandler::UiccSimPowerOnReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMPOWERONREQ_TD, "CMmCustomMessHandler::UiccSimPowerOnReq" );
 
     //Set APDU interface state
     iSapApduIfState = EUiccSapIfStatus1;
@@ -5664,7 +5661,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMPOWERONREQ, "CMmCustomMessH
 void CMmCustomMessHandler::UiccSimPowerOnResp( TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSimPowerOnResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMPOWERONRESP, "CMmCustomMessHandler::UiccSimPowerOnResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMPOWERONRESP_TD, "CMmCustomMessHandler::UiccSimPowerOnResp" );
 
     TInt err( KErrNone );
 
@@ -5714,7 +5711,7 @@ TInt CMmCustomMessHandler::UiccSendAPDUReq(
     TInt aTraId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSimSendAPDUReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMSENAPDUREQ, "CMmCustomMessHandler::UiccSendAPDUReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMSENAPDUREQ_TD, "CMmCustomMessHandler::UiccSendAPDUReq" );
 
     TUiccParamsApduReq params;
     params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
@@ -5736,7 +5733,7 @@ void CMmCustomMessHandler::UiccSendAPDUResp(
     TInt aTraId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSendAPDUResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMSENAPDURESP, "CMmCustomMessHandler::UiccSendAPDUResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSIMSENAPDURESP_TD, "CMmCustomMessHandler::UiccSendAPDUResp" );
 
     TInt err( KErrNone );
     const TDesC8* dataPtr = &aFileData;
@@ -5781,7 +5778,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSIMSENAPDURESP, "CMmCustomMess
 TInt CMmCustomMessHandler::UiccCardReaderStatusReq()
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCardReaderStatusReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCARDREADERSTATUSREQ, "CMmCustomMessHandler::UiccCardReaderStatusReq" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCARDREADERSTATUSREQ_TD, "CMmCustomMessHandler::UiccCardReaderStatusReq" );
 
     TUiccParamsApduReq params;
     params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
@@ -5807,7 +5804,7 @@ void CMmCustomMessHandler::UiccCardReaderStatusResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCardReaderStatusResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCARDREADERSTATUSRESP, "CMmCustomMessHandler::UiccCardReaderStatusResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCARDREADERSTATUSRESP_TD, "CMmCustomMessHandler::UiccCardReaderStatusResp" );
 
     TInt err ( KErrNone );
     CMmDataPackage dataPackage;
@@ -5876,7 +5873,7 @@ void CMmCustomMessHandler::UiccCardInd( const TIsiReceiveC& aIsiMessage )
         ISI_HEADER_SIZE + UICC_IND_OFFSET_SERVICETYPE ) );
 
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccCardInd, service type: %d", serviceType );
-OstTraceExt1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCIND, "CMmCustomMessHandler::UiccCardInd;serviceType=%hhu", serviceType );
+OstTraceExt1( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCIND_TD, "CMmCustomMessHandler::UiccCardInd;serviceType=%hhu", serviceType );
 
     RMmCustomAPI::TSIMCardStatus returnStatus;
     returnStatus = RMmCustomAPI::SimCardUnknowError;
@@ -5917,7 +5914,7 @@ TInt CMmCustomMessHandler::UiccSendAuthenticateApdu(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCustomMessHandler::UiccSendAuthenticateApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::UiccSendAuthenticateApdu" );
 
     TInt ret( KErrNone );
     TBool apduSendNeeded( EFalse );
@@ -5999,7 +5996,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCust
                 {
                 // GBA not supported if card type is ICC or GBA not supported in EFust
 TFLOGSTRING3("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu: GBA not supported (card type: 0x%x, ss: 0x%x)\n", cardType, serviceStatus );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCustomMessHandler::UiccSendAuthenticateApdu: GBA not supported (card type: %x, ss: 0x%x)", cardType, serviceStatus );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::UiccSendAuthenticateApdu: GBA not supported (card type: %x, ss: 0x%x)", cardType, serviceStatus );
                 ret = KErrGeneral;
                 }
             break;
@@ -6017,7 +6014,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
                 {
                 // GBA not supported if card type is ICC or GBA not supported in EFust
 TFLOGSTRING3("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu: GBA not supported (card type: 0x%x, ss: 0x%x)\n", cardType, serviceStatus );
-OstTraceExt2( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCustomMessHandler::UiccSendAuthenticateApdu: GBA not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
+OstTraceExt2( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::UiccSendAuthenticateApdu: GBA not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
                 ret = KErrGeneral;
                 }
             break;
@@ -6036,7 +6033,7 @@ OstTraceExt2( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
                 {
                 // GBA not supported if card type is ICC or GBA not supported in EFust
 TFLOGSTRING3("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu: GBA not supported (card type: 0x%x, ss: 0x%x)\n", cardType, serviceStatus );
-OstTraceExt2( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCustomMessHandler::UiccSendAuthenticateApdu: GBA not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
+OstTraceExt2( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::UiccSendAuthenticateApdu: GBA not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
                 ret = KErrGeneral;
                 }
             break;
@@ -6055,7 +6052,7 @@ OstTraceExt2( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
                 {
                 // MBMS not supported if card type is ICC or MBMS not supported in EFust
 TFLOGSTRING3("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu: MBMS security not supported (card type: 0x%x, ss: 0x%x)\n", cardType, serviceStatus );
-OstTraceExt2( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCustomMessHandler::UiccSendAuthenticateApdu: MBMS security not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
+OstTraceExt2( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::UiccSendAuthenticateApdu: MBMS security not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
                 ret = KErrGeneral;
                 }
             break;
@@ -6074,7 +6071,7 @@ OstTraceExt2( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
                 {
                 // MBMS not supported if card type is ICC or MBMS not supported in EFust
 TFLOGSTRING3("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu: MBMS security not supported (card type: 0x%x, ss: 0x%x)\n", cardType, serviceStatus );
-OstTraceExt2( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCustomMessHandler::UiccSendAuthenticateApdu: MBMS security not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
+OstTraceExt2( TRACE_NORMAL,  DUP5_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::UiccSendAuthenticateApdu: MBMS security not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
                 ret = KErrGeneral;
                 }
             break;
@@ -6093,7 +6090,7 @@ OstTraceExt2( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
                 {
                 // MBMS not supported if card type is ICC or MBMS not supported in EFust
 TFLOGSTRING3("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu: MBMS security not supported (card type: 0x%x, ss: 0x%x)\n", cardType, serviceStatus );
-OstTraceExt2( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCustomMessHandler::UiccSendAuthenticateApdu: MBMS security not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
+OstTraceExt2( TRACE_NORMAL,  DUP6_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::UiccSendAuthenticateApdu: MBMS security not supported (card type: 0x%x, ss: 0x%x)", cardType, serviceStatus );
                 ret = KErrGeneral;
                 }
             break;
@@ -6101,7 +6098,7 @@ OstTraceExt2( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, 
         default:
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu: Unknown APDU\n" );
-OstTrace0( TRACE_NORMAL, DUP7_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCustomMessHandler::UiccSendAuthenticateApdu: Unknown APDU" );
+OstTrace0( TRACE_NORMAL,  DUP7_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::UiccSendAuthenticateApdu: Unknown APDU" );
             break;
             }
         }
@@ -6114,7 +6111,7 @@ OstTrace0( TRACE_NORMAL, DUP7_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CM
     else
         {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccSendAuthenticateApdu: APDU not sent\n" );
-OstTrace0( TRACE_NORMAL, DUP8_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU, "CMmCustomMessHandler::UiccSendAuthenticateApduu: APDU not sent" );
+OstTrace0( TRACE_NORMAL,  DUP8_CMMCUSTOMMESSHANDLER_UICCSENDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::UiccSendAuthenticateApduu: APDU not sent" );
         }
     return ret;
     }
@@ -6131,7 +6128,7 @@ void CMmCustomMessHandler::UiccCreateRunGsmAlgorithmApdu(
     TUiccTrId aTraId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateRunGsmAlgorithmApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATERUNGSMALGORITHMAPDU, "CMmCustomMessHandler::UiccCreateRunGsmAlgorithmApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCREATERUNGSMALGORITHMAPDU_TD, "CMmCustomMessHandler::UiccCreateRunGsmAlgorithmApdu" );
 
     aParams.trId = aTraId;
     aParams.apdu.Append( KClaIcc );              // CLA
@@ -6155,7 +6152,7 @@ void CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP_TD, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp" );
 
     TInt ret( KErrNone );
     TInt ipc( ETrIdRunGsmAlgorithmIms == aTraId ? EMobilePhoneIMSAuthenticate : ECustomGetSimAuthenticationDataIPC );
@@ -6213,14 +6210,14 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, "CMmC
             else
                 {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp. APDU validation fails\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp. APDU validation fails" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP_TD, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp. APDU validation fails" );
                 ret = KErrMMEtelAuthenticateFailed;
                 }
             }
         else if( KCmdNotAllowedSecurityStatusNotSatisfied == result )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp: Security conditions not satisfied\n" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp: Security conditions not satisfied" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP_TD, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp: Security conditions not satisfied" );
             ret = CMmStaticUtility::EpocErrorCode(
                 KErrAccessDenied,
                 KErrGsm0707SimPin1Required );
@@ -6228,14 +6225,14 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, 
         else
             {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp. unknown result: 0x%X\n", result );
-OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp. unknown result: 0x%x", result );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP_TD, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp. unknown result: 0x%x", result );
             ret = KErrMMEtelAuthenticateFailed;
             }
         }
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp: UICC status not ok: 0x%x\n", aStatus );
-OstTrace1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp: UICC status not ok: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_UICCRUNGSMALGORITHMAPDURESP_TD, "CMmCustomMessHandler::UiccRunGsmAlgorithmApduResp: UICC status not ok: 0x%x", aStatus );
         ret = KErrMMEtelAuthenticateFailed;
         }
 
@@ -6278,7 +6275,7 @@ void CMmCustomMessHandler::UiccCreateGsmSecurityContextApdu(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateGsmSecurityContextApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEGSMSECURITYCONTEXTAPDU, "CMmCustomMessHandler::UiccCreateGsmSecurityContextApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCREATEGSMSECURITYCONTEXTAPDU_TD, "CMmCustomMessHandler::UiccCreateGsmSecurityContextApdu" );
 
     RMmCustomAPI::TSimAuthenticationEapSim eapSim;
     aDataPackage.UnPackData( eapSim );
@@ -6305,7 +6302,7 @@ void CMmCustomMessHandler::UiccGsmSecurityContextApduResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGsmSecurityContextApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::UiccGsmSecurityContextApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::UiccGsmSecurityContextApduResp" );
 
     TInt ret( KErrNone );
     RMmCustomAPI::TSimAuthenticationEapSim eapSim;
@@ -6335,21 +6332,21 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURESP, "C
             else
                 {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGsmSecurityContextApduResp: APDU validation failed\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::UiccGsmSecurityContextApduResp: APDU validation failed" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::UiccGsmSecurityContextApduResp: APDU validation failed" );
                 ret = KErrMMEtelAuthenticateFailed;
                 }
             }
         else
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGsmSecurityContextApduResp: unknown result\n" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::UiccGsmSecurityContextApduResp: unknown result" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::UiccGsmSecurityContextApduResp: unknown result" );
             ret = KErrMMEtelAuthenticateFailed;
             }
         }
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccGsmSecurityContextApduResp: UICC status not ok: 0x%x\n", aStatus );
-OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::UiccGsmSecurityContextApduResp: UICC status not ok: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_UICCGSMSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::UiccGsmSecurityContextApduResp: UICC status not ok: 0x%x", aStatus );
         ret = KErrMMEtelAuthenticateFailed;
         }
 
@@ -6383,7 +6380,7 @@ void CMmCustomMessHandler::UiccCreate3GSecurityContextApdu(
     TUiccTrId aTraId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreate3GSecurityContextApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATE3GSECURITYCONTEXTAPDU, "CMmCustomMessHandler::UiccCreate3GSecurityContextApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCREATE3GSECURITYCONTEXTAPDU_TD, "CMmCustomMessHandler::UiccCreate3GSecurityContextApdu" );
 
     // len of data is sizeof RAND + sizeof AUTN + two length fields
     // (one for RAND len and one for AUTN len)
@@ -6413,7 +6410,7 @@ void CMmCustomMessHandler::Uicc3GSecurityContextApduResp(
          const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Uicc3GSecurityContextApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp" );
 
     TInt ret( KErrNone );
     TInt ipc( ETrIdEEapAkaAuthenticateIms == aTraId ? EMobilePhoneIMSAuthenticate : ECustomGetSimAuthenticationDataIPC );
@@ -6499,21 +6496,21 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CM
             else
                 {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Uicc3GSecurityContextApduResp: APDU validation failed\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: APDU validation failed" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: APDU validation failed" );
                 ret = KErrMMEtelAuthenticateFailed;
                 }
             }
         else if( KAppAuthErrorIncorrectMac == result )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Uicc3GSecurityContextApduResp: incorrect MAC\n" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: incorrect MAC" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: incorrect MAC" );
             // no parameters in this case
             ret = KErrMMEtelMacVerificationFailed;
             }
         else if( KCmdNotAllowedSecurityStatusNotSatisfied == result )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Uicc3GSecurityContextApduResp: Security conditions not satisfied\n" );
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: Security conditions not satisfied" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: Security conditions not satisfied" );
             ret = CMmStaticUtility::EpocErrorCode(
                 KErrAccessDenied,
                 KErrGsm0707SimPin1Required );
@@ -6521,14 +6518,14 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP
         else
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Uicc3GSecurityContextApduResp: unknown result\n" );
-OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: unknown result" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: unknown result" );
             ret = KErrMMEtelAuthenticateFailed;
             }
         }
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::Uicc3GSecurityContextApduResp: UICC status not ok: 0x%x\n", aStatus );
-OstTrace1( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: UICC status not ok: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMCUSTOMMESSHANDLER_UICC3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Uicc3GSecurityContextApduResp: UICC status not ok: 0x%x", aStatus );
         ret = ETrIdEEapAkaAuthenticateIms == aTraId ? KErrGeneral : KErrMMEtelAuthenticateFailed;
         }
 
@@ -6571,7 +6568,7 @@ void CMmCustomMessHandler::UiccCreateGBABootstrappingApdu(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateGBABootstrappingApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPPINGAPDU, "CMmCustomMessHandler::UiccCreateGBABootstrappingApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPPINGAPDU_TD, "CMmCustomMessHandler::UiccCreateGBABootstrappingApdu" );
 
     RMmCustomAPI::TSimAuthenticationGbaBootstrap gbaBootstrap;
     aDataPackage.UnPackData( gbaBootstrap );
@@ -6606,7 +6603,7 @@ void CMmCustomMessHandler::UiccGBABootstrappingApduResp(
      const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrappingApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP, "CMmCustomMessHandler::UiccGBABootstrappingApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP_TD, "CMmCustomMessHandler::UiccGBABootstrappingApduResp" );
 
     TInt ret( KErrNone );
     RMmCustomAPI::TSimAuthenticationGbaBootstrap gbaBootstrap;
@@ -6648,28 +6645,28 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP, "CMm
             else
                 {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrappingApduResp: APDU validation failed\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP, "CMmCustomMessHandler::UiccGBABootstrappingApduResp: APDU validation failed" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP_TD, "CMmCustomMessHandler::UiccGBABootstrappingApduResp: APDU validation failed" );
                 ret = KErrGeneral;
                 }
             }
         else if( KAppAuthErrorIncorrectMac == result )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrappingApduResp: incorrect MAC\n" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP, "CMmCustomMessHandler::UiccGBABootstrappingApduResp: incorrect MAC" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP_TD, "CMmCustomMessHandler::UiccGBABootstrappingApduResp: incorrect MAC" );
             // no parameters in this case
             ret = KErrMMEtelMacVerificationFailed;
             }
         else
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrappingApduResp: unknown result\n" );
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP, "CMmCustomMessHandler::UiccGBABootstrappingApduResp: unknown result" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP_TD, "CMmCustomMessHandler::UiccGBABootstrappingApduResp: unknown result" );
             ret = KErrGeneral;
             }
         }
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccGBABootstrappingApduResp: UICC status not ok: 0x%x\n", aStatus );
-OstTrace1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP, "CMmCustomMessHandler::UiccGBABootstrappingApduResp: UICC status not ok: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPPINGAPDURESP_TD, "CMmCustomMessHandler::UiccGBABootstrappingApduResp: UICC status not ok: 0x%x", aStatus );
         ret = KErrMMEtelAuthenticateFailed;
         }
 
@@ -6703,7 +6700,7 @@ void CMmCustomMessHandler::UiccGBABootstrapUpdate(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrapUpdate.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPUPDATE, "CMmCustomMessHandler::UiccGBABootstrapUpdate" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPUPDATE_TD, "CMmCustomMessHandler::UiccGBABootstrapUpdate" );
 
     // GBA bootstrap update is done by first reading of elementary file EFgba.
     // After that RAND is stored temporarily and B-Tid and keylifetime is written
@@ -6750,7 +6747,7 @@ void CMmCustomMessHandler::UiccGBABootstrapReadResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrapReadResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP, "CMmCustomMessHandler::UiccGBABootstrapReadResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP_TD, "CMmCustomMessHandler::UiccGBABootstrapReadResp" );
 
     iRandBuf.Zero();
 
@@ -6794,7 +6791,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP, "CMmCust
         else
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrapReadResp. File too small for update\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP, "CMmCustomMessHandler::UiccGBABootstrapReadResp. File too small for update" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP_TD, "CMmCustomMessHandler::UiccGBABootstrapReadResp. File too small for update" );
             iMessageRouter->Complete(
                 ECustomGetSimAuthenticationDataIPC,
                 KErrArgument );
@@ -6803,7 +6800,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP, "CM
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccGBABootstrapReadResp. EFgba reading failed (0x%x)\n", aStatus );
-OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP, "CMmCustomMessHandler::UiccGBABootstrapReadResp. EFgba reading failed (%x)", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP_TD, "CMmCustomMessHandler::UiccGBABootstrapReadResp. EFgba reading failed (%x)", aStatus );
         iMessageRouter->Complete(
             ECustomGetSimAuthenticationDataIPC,
             KErrMMEtelAuthenticateFailed );
@@ -6819,7 +6816,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPREADRESP, "CM
 void CMmCustomMessHandler::UiccGBABootstrapUpdateResp( TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrapUpdateResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPUPDATERESP, "CMmCustomMessHandler::UiccGBABootstrapUpdateResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCGBABOOTSTRAPUPDATERESP_TD, "CMmCustomMessHandler::UiccGBABootstrapUpdateResp" );
 
     TInt ret( KErrGeneral );
     RMmCustomAPI::TSimAuthenticationGbaBootstrapUpdate gbaBootstrapUpdate;
@@ -6861,7 +6858,7 @@ void CMmCustomMessHandler::UiccCreateGBABootstrapNafDerivationApdu(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateGBABootstrapNafDerivationApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPNAFDERIVATIONAPDU, "CMmCustomMessHandler::UiccCreateGBABootstrapNafDerivationApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCREATEGBABOOTSTRAPNAFDERIVATIONAPDU_TD, "CMmCustomMessHandler::UiccCreateGBABootstrapNafDerivationApdu" );
 
     RMmCustomAPI::TSimAuthenticationGbaNafDerivation gbaBootstrapNafDerivation;
     aDataPackage.UnPackData( gbaBootstrapNafDerivation );
@@ -6900,7 +6897,7 @@ void CMmCustomMessHandler::UiccGBANafDerivationApduResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrapNafDerivationApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP, "CMmCustomMessHandler::UiccGBANafDerivationApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP_TD, "CMmCustomMessHandler::UiccGBANafDerivationApduResp" );
 
     TInt ret( KErrNone );
     RMmCustomAPI::TSimAuthenticationGbaNafDerivation gbaNafDerivation;
@@ -6928,7 +6925,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP, "CMm
             else
                 {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrapNafDerivationApduResp: APDU validation failed\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP, "CMmCustomMessHandler::UiccGBANafDerivationApduResp: APDU validation failed" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP_TD, "CMmCustomMessHandler::UiccGBANafDerivationApduResp: APDU validation failed" );
                 ret = KErrGeneral;
                 }
             }
@@ -6939,14 +6936,14 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP,
         else
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccGBABootstrapNafDerivationApduResp: unknown result\n" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP, "CMmCustomMessHandler::UiccGBANafDerivationApduResp: unknown result" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP_TD, "CMmCustomMessHandler::UiccGBANafDerivationApduResp: unknown result" );
             ret = KErrGeneral;
             }
         }
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccGBABootstrapNafDerivationApduResp: UICC status not ok: 0x%x\n", aStatus );
-OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP, "CMmCustomMessHandler::UiccGBANafDerivationApduResp: UICC status not ok: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_UICCGBANAFDERIVATIONAPDURESP_TD, "CMmCustomMessHandler::UiccGBANafDerivationApduResp: UICC status not ok: 0x%x", aStatus );
         ret = KErrMMEtelAuthenticateFailed;
         }
 
@@ -6979,7 +6976,7 @@ void CMmCustomMessHandler::UiccCreateMbmsMskUpdateApdu(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateMbmsMskUpdateApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKUPDATEAPDU, "CMmCustomMessHandler::UiccCreateMbmsMskUpdateApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKUPDATEAPDU_TD, "CMmCustomMessHandler::UiccCreateMbmsMskUpdateApdu" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environmen
     //  because of there is no users for this authentication type. So this is implemented
@@ -7018,7 +7015,7 @@ void CMmCustomMessHandler::UiccMbmsMskUpdateApduResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMbmsMskUpdateApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMSKUPDATEAPDURESP, "CMmCustomMessHandler::UiccMbmsMskUpdateApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCMBMSMSKUPDATEAPDURESP_TD, "CMmCustomMessHandler::UiccMbmsMskUpdateApduResp" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environment
     // because of at the moment there is no users for this authentication type.
@@ -7101,7 +7098,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMSKUPDATEAPDURESP, "CMmCus
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccMbmsMskUpdateApduResp: UICC status not ok: 0x%x\n", aStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMSKUPDATEAPDURESP, "CMmCustomMessHandler::UiccMbmsMskUpdateApduResp: UICC status not ok: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMSKUPDATEAPDURESP_TD, "CMmCustomMessHandler::UiccMbmsMskUpdateApduResp: UICC status not ok: 0x%x", aStatus );
         ret = KErrMMEtelAuthenticateFailed;
         }
 
@@ -7137,7 +7134,7 @@ void CMmCustomMessHandler::UiccMskUpdateHandleMbmsOperationData(
     TDesC8& aMbmsData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMskUpdateHandleMbmsOperationData.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMSKUPDATEHANDLEMBMSOPERATIONDATA, "CMmCustomMessHandler::UiccMskUpdateHandleMbmsOperationData" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCMSKUPDATEHANDLEMBMSOPERATIONDATA_TD, "CMmCustomMessHandler::UiccMskUpdateHandleMbmsOperationData" );
 
     TUint8 index( 0 );
     TUint32 objLen( aMbmsData.Length() );
@@ -7170,7 +7167,7 @@ void CMmCustomMessHandler::UiccMskUpdateHandleOMABcastOperationData(
                 TDesC8& aMbmsData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMskUpdateHandleOMABcastOperationData.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMSKUPDATEHANDLEOMABCASTOPERATIONDATA, "CMmCustomMessHandler::UiccMskUpdateHandleOMABcastOperationData" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCMSKUPDATEHANDLEOMABCASTOPERATIONDATA_TD, "CMmCustomMessHandler::UiccMskUpdateHandleOMABcastOperationData" );
 
     TBuf8<KMaxApduSize> omaBcastData;
 
@@ -7212,7 +7209,7 @@ void CMmCustomMessHandler::UiccCreateMbmsMtkGenerationApdu(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateMbmsMtkGenerationApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMTKGENERATIONAPDU, "CMmCustomMessHandler::UiccCreateMbmsMtkGenerationApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMTKGENERATIONAPDU_TD, "CMmCustomMessHandler::UiccCreateMbmsMtkGenerationApdu" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environment
     // because of at the moment there is no users for this authentication type.
@@ -7251,7 +7248,7 @@ void CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMTKGENERATIONAPDURESP, "CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCMBMSMTKGENERATIONAPDURESP_TD, "CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environment
     // because of at the moment there is no users for this authentication type.
@@ -7328,7 +7325,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMTKGENERATIONAPDURESP, "CM
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp: UICC status not ok: 0x%x\n", aStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMTKGENERATIONAPDURESP, "CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp: UICC status not ok: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMTKGENERATIONAPDURESP_TD, "CMmCustomMessHandler::UiccMbmsMtkGenerationApduResp: UICC status not ok: 0x%x", aStatus );
         ret = KErrMMEtelAuthenticateFailed;
         }
 
@@ -7364,7 +7361,7 @@ void CMmCustomMessHandler::UiccMtkGenHandleMbmsOperationData(
     TDesC8& aMbmsData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMtkGenHandleMbmsOperationData.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMTKGENHANDLEMBMSOPERATIONDATA, "CMmCustomMessHandler::UiccMtkGenHandleMbmsOperationData" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCMTKGENHANDLEMBMSOPERATIONDATA_TD, "CMmCustomMessHandler::UiccMtkGenHandleMbmsOperationData" );
 
     TUint8 index( 0 );
     TUint32 objLen( aMbmsData.Length() );
@@ -7397,7 +7394,7 @@ void CMmCustomMessHandler::UiccMtkGenHandleOMABcastOperationData(
          TDesC8& aMbmsData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMtkGenHandleOMABcastOperationData.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMTKGENHANDLEOMABCASTOPERATIONDATA, "CMmCustomMessHandler::UiccMtkGenHandleOMABcastOperationData" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCMTKGENHANDLEOMABCASTOPERATIONDATA_TD, "CMmCustomMessHandler::UiccMtkGenHandleOMABcastOperationData" );
 
     TBuf8<KMaxApduSize> omaBcastData;
 
@@ -7443,7 +7440,7 @@ void CMmCustomMessHandler::UiccCreateMbmsMskDeletionApdu(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateMbmsMskDeletionApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKDELETIONAPDU, "CMmCustomMessHandler::UiccCreateMbmsMskDeletionApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCREATEMBMSMSKDELETIONAPDU_TD, "CMmCustomMessHandler::UiccCreateMbmsMskDeletionApdu" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environment
     // because of at the moment there is no users for this authentication type.
@@ -7495,7 +7492,7 @@ void CMmCustomMessHandler::UiccMbmsMskDeletionApduResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccMbmsMskDeletionApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMSKDELETIONAPDURESP, "CMmCustomMessHandler::UiccMbmsMskDeletionApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCMBMSMSKDELETIONAPDURESP_TD, "CMmCustomMessHandler::UiccMbmsMskDeletionApduResp" );
 
     // Note. MBMS functionality is not tested in real hardware and in real environment
     // because of at the moment there is no users for this authentication type.
@@ -7550,7 +7547,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCMBMSMSKDELETIONAPDURESP, "CMmC
     else
         {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccMbmsMskDeletionApduResp: UICC status not ok: 0x%x\n", aStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMSKDELETIONAPDURESP, "CMmCustomMessHandler::UiccMbmsMskDeletionApduResp: UICC status not ok: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMSKDELETIONAPDURESP_TD, "CMmCustomMessHandler::UiccMbmsMskDeletionApduResp: UICC status not ok: 0x%x", aStatus );
         ret = KErrMMEtelAuthenticateFailed;
         }
 
@@ -7584,7 +7581,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_UICCMBMSMSKDELETIONAPDURESP, 
 void CMmCustomMessHandler::UiccCreateFirstBlockOfAuthRespApdu( TUiccTrId aTrId )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccCreateFirstBlockOfAuthRespApdu.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEFIRSTBLOCKOFAUTHRESPAPDU, "CMmCustomMessHandler::UiccCreateFirstBlockOfAuthRespApdu" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCCREATEFIRSTBLOCKOFAUTHRESPAPDU_TD, "CMmCustomMessHandler::UiccCreateFirstBlockOfAuthRespApdu" );
 
     // Fill parameters to instance created from TUiccSendApdu
     // needed for APDU sending
@@ -7616,7 +7613,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCCREATEFIRSTBLOCKOFAUTHRESPAPDU
 TUint8 CMmCustomMessHandler::MapSw1Sw2ToAuthenticateResult( TUint8 sw1, TUint8 sw2 )
     {
 TFLOGSTRING3("TSY: CMmCustomMessHandler::MapSw1Sw2ToAuthenticateResult. sw1: 0x%x sw2: 0x%x\n", sw1, sw2 );
-OstTraceExt2( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_MAPSW1SW2TOAUTHENTICATERESULT, "CMmCustomMessHandler::MapSw1Sw2ToAuthenticateResult. sw1: 0x%x sw2: 0x%x", sw1, sw2 );
+OstTraceExt2( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_MAPSW1SW2TOAUTHENTICATERESULT_TD, "CMmCustomMessHandler::MapSw1Sw2ToAuthenticateResult. sw1: 0x%x sw2: 0x%x", sw1, sw2 );
 
     TUint8 ret( KUnknownCommandEnding );
 
@@ -7746,7 +7743,7 @@ TUint8 CMmCustomMessHandler::ValidateReceivedAuthenticateApdu(
         default:
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ValidateReceivedAuthenticateApdu: unknown APDU\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATERECEIVEDAUTHENTICATEAPDU, "CMmCustomMessHandler::ValidateReceivedAuthenticateApdu: unknown APDU" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_VALIDATERECEIVEDAUTHENTICATEAPDU_TD, "CMmCustomMessHandler::ValidateReceivedAuthenticateApdu: unknown APDU" );
             ret = KApduNok;
             break;
             }
@@ -7762,7 +7759,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATERECEIVEDAUTHENTICATEAPDU, 
 TUint8 CMmCustomMessHandler::ValidateGsmSecurityContextApduResp( const TDesC8& aApdu )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ValidateGsmSecurityContextApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGSMSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::ValidateGsmSecurityContextApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_VALIDATEGSMSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::ValidateGsmSecurityContextApduResp" );
     TUint8 ret( KApduNok );
 
     // apdu len is len of aApdu - 2 (because of
@@ -7789,7 +7786,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGSMSECURITYCONTEXTAPDURESP
 TUint8 CMmCustomMessHandler::Validate3GSecurityContextApduResp( const TDesC8& aApdu )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Validate3GSecurityContextApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Validate3GSecurityContextApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Validate3GSecurityContextApduResp" );
 
     TUint8 ret( KApduOk );
 
@@ -7806,7 +7803,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP,
         if( KMinLenOfRes > aApdu[index] || KMaxLenOfRes < aApdu[index] )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid RES\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid RES" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid RES" );
             ret = KApduNok;
             }
         else
@@ -7822,7 +7819,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDU
             if( KApduNok != ret )
                 {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid CK\n" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid CK" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid CK" );
                 ret = KApduNok;
                 }
             }
@@ -7839,7 +7836,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDU
             if( KApduNok != ret )
                 {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid IK\n" );
-OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid IK" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid IK" );
                 ret = KApduNok;
                 }
             }
@@ -7861,7 +7858,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDU
             if( KLenOfKc != aApdu[index] )
                 {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid Kc\n" );
-OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid Kc" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid Kc" );
                 ret = KApduNok;
                 }
             else
@@ -7876,7 +7873,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDU
         if( KApduOk == ret && index > apduLen - 1 )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Validate3GSecurityContextApduResp: error, APDU buffer overflow\n" );
-OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: error, APDU buffer overflow" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: error, APDU buffer overflow" );
             ret = KApduNok;
             }
         }
@@ -7887,7 +7884,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDU
         if( KLenOfAuts != aApdu[index])
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid AUTS\n" );
-OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid AUTS" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: invalid AUTS" );
             ret = KApduNok;
             }
         else
@@ -7901,14 +7898,14 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDU
         if( KApduOk == ret && index > apduLen - 1 )
             {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Validate3GSecurityContextApduResp: error, APDU buffer overflow\n" );
-OstTrace0( TRACE_NORMAL, DUP7_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: error, APDU buffer overflow" );
+OstTrace0( TRACE_NORMAL,  DUP7_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: error, APDU buffer overflow" );
             ret = KApduNok;
             }
         }
     else
         {
 TFLOGSTRING("TSY: CMmCustomMessHandler::Validate3GSecurityContextApduResp: error, unknown tag\n" );
-OstTrace0( TRACE_NORMAL, DUP8_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: error, unknown tag" );
+OstTrace0( TRACE_NORMAL,  DUP8_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDURESP_TD, "CMmCustomMessHandler::Validate3GSecurityContextApduResp: error, unknown tag" );
         ret = KApduNok;
         }
 
@@ -7923,7 +7920,7 @@ OstTrace0( TRACE_NORMAL, DUP8_CMMCUSTOMMESSHANDLER_VALIDATE3GSECURITYCONTEXTAPDU
 TUint8 CMmCustomMessHandler::ValidateGBABootstrappingApduResp( const TDesC8& aApdu )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ValidateGBABootstrappingApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGBABOOTSTRAPPINGAPDURESP, "CMmCustomMessHandler::ValidateGBABootstrappingApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_VALIDATEGBABOOTSTRAPPINGAPDURESP_TD, "CMmCustomMessHandler::ValidateGBABootstrappingApduResp" );
 
     TUint8 ret( KApduNok );
 
@@ -7957,7 +7954,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGBABOOTSTRAPPINGAPDURESP, 
 TUint8 CMmCustomMessHandler::ValidateGBANafDerivationApduResp( const TDesC8& aApdu )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ValidateGBANafDerivationApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGBANAFDERIVATIONAPDURESP, "CMmCustomMessHandler::ValidateGBANafDerivationApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_VALIDATEGBANAFDERIVATIONAPDURESP_TD, "CMmCustomMessHandler::ValidateGBANafDerivationApduResp" );
 
     TUint8 ret = KApduNok;
 
@@ -7994,7 +7991,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATEGBANAFDERIVATIONAPDURESP, 
 TUint8 CMmCustomMessHandler::ValidateRunGsmAlgorithmApduResp( const TDesC8& aApdu )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::ValidateRunGsmAlgorithmApduResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_VALIDATERUNGSMALGORITHMAPDURESP, "CMmCustomMessHandler::ValidateRunGsmAlgorithmApduResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_VALIDATERUNGSMALGORITHMAPDURESP_TD, "CMmCustomMessHandler::ValidateRunGsmAlgorithmApduResp" );
 
     TUint8 ret( KApduNok );
 
@@ -8017,7 +8014,7 @@ TBool CMmCustomMessHandler::FindTlvObject(
     TDes8& aTlvObject )
     {
 TFLOGSTRING2("TSY: CMmCustomMessHandler::FindTlvObject (tag: 0x%x)\n", aTlvTag );
-OstTrace1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_FINDTLVOBJECT, "CMmCustomMessHandler::FindTlvObject (tag: 0x%x)", aTlvTag );
+OstTrace1( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_FINDTLVOBJECT_TD, "CMmCustomMessHandler::FindTlvObject (tag: 0x%x)", aTlvTag );
 
     TBool ret( EFalse );
     TUint32 index( 0 );
@@ -8054,22 +8051,22 @@ OstTrace1( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_FINDTLVOBJECT, "CMmCustomMessHandl
                     {
                     // tlv object found
 TFLOGSTRING2("TSY: CMmCustomMessHandler::FindTlvObject: tag: 0x%x found\n", aTlvTag );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT, "CMmCustomMessHandler::FindTlvObject: tag: 0x%x found", aTlvTag );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT_TD, "CMmCustomMessHandler::FindTlvObject: tag: 0x%x found", aTlvTag );
                     aTlvObject.Copy( aBerTlv.Mid( index , tlvLength ) );
                     ret = ETrue;
                     }
                 else
                     {
 TFLOGSTRING3("TSY: CMmCustomMessHandler::FindTlvObject: length of aTlvObject is not enough, needed: %d max size: %d \n", tlvLength, aTlvObject.MaxSize() );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT, "CMmCustomMessHandler::FindTlvObject: length of aTlvObject is not enough" );
-OstTrace1( TRACE_NORMAL, DUP3_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT, "CMmCustomMessHandler::FindTlvObject: needed: %d", tlvLength );
-OstTrace1( TRACE_NORMAL, DUP4_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT, "CMmCustomMessHandler::FindTlvObject: max size: %d", aTlvObject.MaxSize() );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT_TD, "CMmCustomMessHandler::FindTlvObject: length of aTlvObject is not enough" );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT_TD, "CMmCustomMessHandler::FindTlvObject: needed: %d", tlvLength );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT_TD, "CMmCustomMessHandler::FindTlvObject: max size: %d", aTlvObject.MaxSize() );
                     }
                 }
             else
                 {
 TFLOGSTRING("TSY: CMmCustomMessHandler::FindTlvObject: buffer overflow \n" );
-OstTrace0( TRACE_NORMAL, DUP5_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT, "CMmCustomMessHandler::FindTlvObject: buffer overflow" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCUSTOMMESSHANDLER_FINDTLVOBJECT_TD, "CMmCustomMessHandler::FindTlvObject: buffer overflow" );
                 }
             break;
             }
@@ -8093,7 +8090,7 @@ void CMmCustomMessHandler::DeriveCkFromKc(
     const TDesC8& aKc )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::DeriveCkFromKc.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_DERIVECKFROMKC, "CMmCustomMessHandler::DeriveCkFromKc" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_DERIVECKFROMKC_TD, "CMmCustomMessHandler::DeriveCkFromKc" );
 
     /* This operation calculates the UMTS Ciphering Key (CK) from the GSM
        Ciphering Key (Kc). This is done by using the c4 algorithm defined in
@@ -8121,7 +8118,7 @@ void CMmCustomMessHandler::DeriveIkFromKc(
     const TDesC8& aKc )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::DeriveIkFromKc.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_DERIVEIKFROMKC, "CMmCustomMessHandler::DeriveIkFromKc" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_DERIVEIKFROMKC_TD, "CMmCustomMessHandler::DeriveIkFromKc" );
 
     /* This operation derives the UMTS Integrity Key (IK) from the GSM
        Ciphering Key (Kc). This is done by using the c5 algorithm defined in
@@ -8173,7 +8170,7 @@ TInt CMmCustomMessHandler::UiccHandleImsAuthentication(
     const CMmDataPackage& aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccHandleImsAuthentication.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCHANDLEIMSAUTHENTICATION, "CMmCustomMessHandler::UiccHandleImsAuthentication" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCHANDLEIMSAUTHENTICATION_TD, "CMmCustomMessHandler::UiccHandleImsAuthentication" );
     TInt ret( KErrNone );
 
     // IMS authentication:
@@ -8278,7 +8275,7 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCHANDLEIMSAUTHENTICATION, "CMmC
 void CMmCustomMessHandler::UiccHandleIsimActivationResp( TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmCustomMessHandler::UiccHandleIsimActivationResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCHANDLEISIMACTIVATIONRESP, "CMmCustomMessHandler::UiccHandleIsimActivationResp" );
+OstTrace0( TRACE_NORMAL,  CMMCUSTOMMESSHANDLER_UICCHANDLEISIMACTIVATIONRESP_TD, "CMmCustomMessHandler::UiccHandleIsimActivationResp" );
 
     TUiccSendApdu params;
     params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
@@ -8309,6 +8306,45 @@ OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_UICCHANDLEISIMACTIVATIONRESP, "CMm
         // to the USim application
         iMmUiccMessHandler->CreateUiccApplCmdReq( params );
         }
+    }
+
+// -----------------------------------------------------------------------------
+// CMmCustomMessHandler::CollectCbTopicIdsL
+// Collects cellbroadcast topic IDs into array. Leaves if nothig found
+// -----------------------------------------------------------------------------
+//
+CArrayFixFlat<RMmCustomAPI::TSimCbTopic>* CMmCustomMessHandler::CollectCbTopicIdsL(
+        const TDesC16& aTopicIds ) const
+    {
+TFLOGSTRING("TSY: CMmCustomMessHandler::CollectCbTopicIdsL");
+OstTrace0( TRACE_NORMAL, CMMCUSTOMMESSHANDLER_COLLECTCBTOPICIDSL, "CMmCustomMessHandler::CollectCbTopicIdsL" );
+
+    CArrayFixFlat<RMmCustomAPI::TSimCbTopic>* simCbTopics =
+        new ( ELeave ) CArrayFixFlat<RMmCustomAPI::TSimCbTopic> (
+        aTopicIds.Length() );
+    CleanupStack::PushL( simCbTopics );
+    for ( TInt i = 0; i < aTopicIds.Length(); i++ )
+        {
+        TUint16 cbId =
+        ( aTopicIds[i] >> 8 ) | ( aTopicIds[i] << 8 );
+        if ( KUnusedCbMsgId != cbId )
+            {
+            RMmCustomAPI::TSimCbTopic simCbTopic;
+            // CB ID
+            simCbTopic.iNumber = cbId;
+            // Topic names are not stored on the SIM
+            simCbTopic.iName.Zero();
+            // Add CB topic to array
+            simCbTopics->AppendL( simCbTopic );
+            }
+        }
+    simCbTopics->Compress();
+    // handle this like error case
+    __ASSERT_ALWAYS(
+        0 < simCbTopics->Count(), User::Leave( KErrNotFound ) );
+    CleanupStack::Pop( simCbTopics );
+
+    return simCbTopics;
     }
 
 // ========================== OTHER EXPORTED FUNCTIONS =========================

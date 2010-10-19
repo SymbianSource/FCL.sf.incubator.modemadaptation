@@ -188,6 +188,31 @@ class CSatMoSmsCtrl : public CBase
         */
         void FormSmsResourceReqSb( const TUint8 status,TDes8& data, const TDes8& address1, const TDes8& address2 );
 
+        /*
+        * Forms MO SMS Ctrl envelope to be sent to the SIM card
+        * @return void
+        */
+        void FormMoSmsCtrlEnvelope();
+
+        /*
+        * Constructs and sends SMS_RESOURCE_REQ to SMS server
+        * @param aResourceStatus resource status used in req
+        * @param aCauseType cause type used in req
+        * @param aCause cause used in req
+        * @return void
+        */
+        void SendSmsResourceReq( 
+            TUint8 aResourceStatus, 
+            TUint8 aCauseType, 
+            TUint8 aCause );
+
+        /*
+        * Fetches TP-DA contents from TPDU
+        * @param aTpdu input TPDU
+        * @param aTpda holds resulting Tpda
+        * @return TUint8 message type
+        */
+        static TUint8 FetchTpDa( const TDesC8& aTpdu, TPtrC8& aTpda );
 
     private: // Data
 

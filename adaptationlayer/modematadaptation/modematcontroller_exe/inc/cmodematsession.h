@@ -56,33 +56,46 @@ public:
 
     /**
      *  Called by CModemAtHandler, when signal ind is received  
+     * @param aCompleteCode
      */
-    void SignalIndReceived( );
+    void SignalIndReceived( const TInt aCompleteCode );
 
     /**
-      * Returns name of current session  
-      * @return Session name 
+     * Returns DteId of current session
+     *  @return DteID 
+     */    
+    TUint8 GetDteId();
+
+    /**
+      *  Sets DteID for this session
+      *  @param aDteId DteId
       */    
+    void SetDteId( const TUint8 aDteId );
+
+    /**
+     * Returns name of current session  
+     * @return Session name 
+     */    
     TDesC8& GetName();
 
     /**
-      * Returns plugin type (common/atext) 
-      *  @return Plugintype 
-      */    
+     * Returns plugin type (common/atext) 
+     * @return Plugintype 
+     */    
     TATPluginInterface GetPluginType();
 
     /**
-     *  Modem-Connected-callback. Called when modem is connected.
-     *  @param aDteId DteId
-     *  @param aErr Error code
-     *  @return 
+     * Modem-Connected-callback. Called when modem is connected.
+     * @param aDteId DteId
+     * @param aErr Error code
+     * @return void
      */
     void ModemConnected( const TInt aErr );
    
     /**
      *  CommandModeChanged. Called when pipe handle indicates that mode is changed.
      *  @param aMode TCommandMode aMode
-     *  @return 
+     *  @return void
      */
     void CommandModeChanged( TCommandMode aMode ) ;
     
@@ -109,6 +122,20 @@ public:
      *  @return ETrue if request is active, otherwise EFalse
      */
     TBool IsConnectReqActive();
+
+     /**
+     *  sets handler for this session
+     *  @param aHandler pointer to handler, which handles messages 
+     *                  for this session
+     *  @return void
+     */
+    void SetHandler( CModemAtHandler* aHandler );
+    
+    /**
+     *  gets handler for this session
+     *  @return pointer to handler, which handles messages for this session
+     */
+    CModemAtHandler* GetHandler();
 
 private:
 
@@ -142,9 +169,12 @@ private:
     RMessage2 iCommandModeReq;
 
     TVersion iVersion;
+    TUint8 iDteId;
     HBufC8* iClientName;
     TATPluginInterface iPluginType;
     TPtr8 iClientNamePtr;
+    TBuf8<KMaxBufferLength> iTemporaryUnsolicitedData;
+    CModemAtHandler* iHandler;
     };
 
 #endif  // CMODEMATSESSION_H

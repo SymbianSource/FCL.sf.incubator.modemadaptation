@@ -37,6 +37,9 @@
 const TUint8 KMaxCallModemDetailedCause = 248;
 const TUint8 KCallModemOriginCsAddressMaxLength = 246;
 const TUint8 KMSBMask = 0x80;
+const TUint8 KNbrIndexWithoutIndicatorInfo = 1;
+const TUint8 KNbrIndexWithIndicatorInfo = 2;
+const TUint8 KExtMask = 0x80;
 
 
 // ==================== MEMBER FUNCTIONS ====================================
@@ -61,7 +64,7 @@ CSatEventDownload::CSatEventDownload
         iLocationStatusEnvelopePending( EFalse ),
         iNetCellInfoIndReceived( EFalse )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_CSATEVENTDOWNLOAD, "CSatEventDownload::CSatEventDownload" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_CSATEVENTDOWNLOAD_TD, "CSatEventDownload::CSatEventDownload" );
     iLocInfo.iOperatorCode.FillZ( iLocInfo.iOperatorCode.MaxLength() );
     iLocInfo.iLac.FillZ( iLocInfo.iLac.MaxLength() );
     iLocInfo.iCellId.FillZ( iLocInfo.iCellId.MaxLength() );
@@ -75,7 +78,7 @@ CSatEventDownload::CSatEventDownload
 //
 void CSatEventDownload::ConstructL()
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_CONSTRUCTL, "CSatEventDownload::ConstructL" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_CONSTRUCTL_TD, "CSatEventDownload::ConstructL" );
     // None. Reserved for future use.
     }
 
@@ -91,7 +94,7 @@ CSatEventDownload* CSatEventDownload::NewL
         CTsySatMessaging*   aSatMessaging
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_NEWL, "CSatEventDownload::NewL" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_NEWL_TD, "CSatEventDownload::NewL" );
     TFLOGSTRING("TSY: CSatEventDownload::NewL");
 
     CSatEventDownload* self =
@@ -112,7 +115,7 @@ CSatEventDownload* CSatEventDownload::NewL
 //
 CSatEventDownload::~CSatEventDownload()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATEVENTDOWNLOAD_CSATEVENTDOWNLOAD, "CSatEventDownload::~CSatEventDownload" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATEVENTDOWNLOAD_CSATEVENTDOWNLOAD_TD, "CSatEventDownload::~CSatEventDownload" );
     TFLOGSTRING("TSY: CSatEventDownload::~CSatEventDownload");
     }
 
@@ -124,7 +127,7 @@ CSatEventDownload::~CSatEventDownload()
 //
 TUint8 CSatEventDownload::GetTransactionId()
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_GETTRANSACTIONID, "CSatEventDownload::GetTransactionId" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_GETTRANSACTIONID_TD, "CSatEventDownload::GetTransactionId" );
     TFLOGSTRING("TSY: CSatEventDownload::GetTransactionId");
     return iSatMessaging->GetTransactionId();
     }
@@ -139,7 +142,7 @@ void CSatEventDownload::SetUpEventList
         TUint32 aEvents        // bit mask of enabled events
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_SETUPEVENTLIST, "CSatEventDownload::SetUpEventList" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SETUPEVENTLIST_TD, "CSatEventDownload::SetUpEventList" );
     TFLOGSTRING("TSY: CSatEventDownload::SetUpEventList");
     iEventList.Set( aEvents );
 
@@ -167,7 +170,7 @@ TInt CSatEventDownload::SendMTCallEnvelope
         const TDesC8& aCalledPartySubAddress   // Calling Party Subaddress
         )
     {
-    OstTraceExt1( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDMTCALLENVELOPE, "CSatEventDownload::SendMTCallEnvelope (transactionId=%hhu)", aTransactionId );
+    OstTraceExt1( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDMTCALLENVELOPE_TD, "CSatEventDownload::SendMTCallEnvelope (transactionId=%hhu)", aTransactionId );
     TFLOGSTRING2("TSY: CSatEventDownload::SendMTCallEnvelope\
         (transactionId=%d)", TInt( aTransactionId ) );
 
@@ -221,7 +224,7 @@ TInt CSatEventDownload::SendCallConnectedEnvelope
         TBool aNearEnd
         )
     {
-    OstTraceExt1( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDCALLCONNECTEDENVELOPE, "CSatEventDownload::SendCallConnectedEnvelope (transactionId=%hhu)", aTransactionId );
+    OstTraceExt1( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDCALLCONNECTEDENVELOPE_TD, "CSatEventDownload::SendCallConnectedEnvelope (transactionId=%hhu)", aTransactionId );
     TFLOGSTRING2("TSY: CSatEventDownload::SendCallConnectedEnvelope\
         (transactionId=%d)", TInt( aTransactionId ) );
 
@@ -274,7 +277,7 @@ TInt CSatEventDownload::SendCallDisconnectedEnvelope
         const TDesC8& aCause
         )
     {
-    OstTraceExt1( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDCALLDISCONNECTEDENVELOPE, "CSatEventDownload::SendCallDisconnectedEnvelope (transactionId=%hhu)", aTransactionId );
+    OstTraceExt1( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDCALLDISCONNECTEDENVELOPE_TD, "CSatEventDownload::SendCallDisconnectedEnvelope (transactionId=%hhu)", aTransactionId );
     TFLOGSTRING2("TSY: CSatEventDownload::SendCallDisconnectedEnvelope\
         (transactionId=%d)", TInt( aTransactionId ) );
 
@@ -321,7 +324,7 @@ TInt CSatEventDownload::SendLocationStatusEnvelope
         const CSatMessHandler::TLocationInfo& aNewLocInfo
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDLOCATIONSTATUSENVELOPE, "CSatEventDownload::SendLocationStatusEnvelope locationStatus = %d", aNewLocInfo.iRegStatus );
+    OstTrace1( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDLOCATIONSTATUSENVELOPE_TD, "CSatEventDownload::SendLocationStatusEnvelope locationStatus = %d", aNewLocInfo.iRegStatus );
     TFLOGSTRING2("TSY: CSatEventDownload::SendLocationStatusEnvelope \
         locationStatus = %d", TInt( aNewLocInfo.iRegStatus ) );
 
@@ -337,7 +340,7 @@ TInt CSatEventDownload::SendLocationStatusEnvelope
         {
         TFLOGSTRING("TSY: CSatEventDownload::SendLocationStatusEnvelope \
             Saving and sending");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATEVENTDOWNLOAD_SENDLOCATIONSTATUSENVELOPE, "CSatEventDownload::SendLocationStatusEnvelope Saving and sending" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATEVENTDOWNLOAD_SENDLOCATIONSTATUSENVELOPE_TD, "CSatEventDownload::SendLocationStatusEnvelope Saving and sending" );
 
         // Cache values
         iLocInfo = aNewLocInfo;
@@ -397,7 +400,7 @@ TInt CSatEventDownload::SendLocationStatusEnvelope
         {
         TFLOGSTRING("TSY: CSatEventDownload::SendLocationStatusEnvelope \
             Location Info already received, envelope sending omitted.");
-        OstTrace0( TRACE_NORMAL, DUP2_CSATEVENTDOWNLOAD_SENDLOCATIONSTATUSENVELOPE, "CSatEventDownload::SendLocationStatusEnvelope Location Info already received, envelope sending omitted." );
+        OstTrace0( TRACE_NORMAL,  DUP2_CSATEVENTDOWNLOAD_SENDLOCATIONSTATUSENVELOPE_TD, "CSatEventDownload::SendLocationStatusEnvelope Location Info already received, envelope sending omitted." );
 
         }
 
@@ -413,7 +416,7 @@ TInt CSatEventDownload::SendLocationStatusEnvelope
 //
 TInt CSatEventDownload::SendUserActivityEnvelope()
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDUSERACTIVITYENVELOPE, "CSatEventDownload::SendUserActivityEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDUSERACTIVITYENVELOPE_TD, "CSatEventDownload::SendUserActivityEnvelope" );
     TFLOGSTRING("TSY: CSatEventDownload::SendUserActivityEnvelope");
 
     TInt ret = KErrNone;
@@ -451,7 +454,7 @@ TInt CSatEventDownload::SendUserActivityEnvelope()
 //
 TInt CSatEventDownload::SendIdleScreenAvailableEnvelope()
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDIDLESCREENAVAILABLEENVELOPE, "CSatEventDownload::SendIdleScreenAvailableEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDIDLESCREENAVAILABLEENVELOPE_TD, "CSatEventDownload::SendIdleScreenAvailableEnvelope" );
     TFLOGSTRING("TSY: CSatEventDownload::SendIdleScreenAvailableEnvelope");
 
     TInt ret = KErrNone;
@@ -495,7 +498,7 @@ TInt CSatEventDownload::SendBrowserTerminationEnvelope
         RSat::TBrowserTerminationCause aCause
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDBROWSERTERMINATIONENVELOPE, "CSatEventDownload::SendBrowserTerminationEnvelope (cause=%d)", TInt(aCause) );
+    OstTrace1( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDBROWSERTERMINATIONENVELOPE_TD, "CSatEventDownload::SendBrowserTerminationEnvelope (cause=%d)", TInt(aCause) );
     TFLOGSTRING2("TSY: CSatEventDownload::SendBrowserTerminationEnvelope\
         (cause=%d)", TInt( aCause ) );
 
@@ -540,7 +543,7 @@ TInt CSatEventDownload::SendLanguageSelectionEnvelope
         TUint16 aLanguage
         )
     {
-    OstTraceExt1( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDLANGUAGESELECTIONENVELOPE, "CSatEventDownload::SendLanguageSelectionEnvelope (language=%hu)", aLanguage );
+    OstTraceExt1( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDLANGUAGESELECTIONENVELOPE_TD, "CSatEventDownload::SendLanguageSelectionEnvelope (language=%hu)", aLanguage );
     TFLOGSTRING2("TSY: CSatEventDownload::SendLanguageSelectionEnvelope\
         (language=%d)", TInt ( aLanguage ) );
 
@@ -585,7 +588,7 @@ TInt CSatEventDownload::ExtFunc
         const TDataPackage& aPackage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_EXTFUNC, "CSatEventDownload::ExtFunc" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_EXTFUNC_TD, "CSatEventDownload::ExtFunc" );
     TFLOGSTRING("TSY: CSatEventDownload::ExtFunc");
 
     TInt ret ( KErrNotSupported );
@@ -681,7 +684,7 @@ TInt CSatEventDownload::Cancel
         const TTsyReqHandle /*aTsyReqHandle*/
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_CANCEL, "CSatEventDownload::Cancel" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_CANCEL_TD, "CSatEventDownload::Cancel" );
     TFLOGSTRING("TSY: CSatEventDownload::Cancel");
     // since event download is served at once.
     // we don't have anything to do here
@@ -699,7 +702,7 @@ void CSatEventDownload::CallModemMessageIndReceived
         )
     {
 TFLOGSTRING("TSY: CSatEventDownload::CallModemMessageIndReceived");
-OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEventDownload::CallModemMessageIndReceived" );
+OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED_TD, "CSatEventDownload::CallModemMessageIndReceived" );
 
     // CALL_MODEM_SB_DETAILED_CAUSE length max value is 248
     TBuf8<KMaxCallModemDetailedCause> cause;
@@ -753,16 +756,33 @@ OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEve
                                 sbStartOffset +
                                 CALL_MODEM_SB_ORIGIN_CS_ADDRESS_OFFSET_ADDRLEN ) );
 
-                            // Set address type (TON/NPI) in correct form
-                            BCDAddress.Append( aIsiMessage.Get8bit( 
+                            // According to 24.008, chapter 10.5.4.9, octet containing
+                            // TON/NPI info contains also ext bit (bit8). If ext bit
+                            // is 0, next octet after TON/NPI contains different
+                            // kind of indicator info and it must be skipped when address
+                            // data is copied. If ext is 1, address data starts right
+                            // after TON/NPI octet.
+                            TUint8 tonNpi( aIsiMessage.Get8bit( 
                                 sbStartOffset +
-                                CALL_MODEM_SB_ORIGIN_CS_ADDRESS_OFFSET_ADDR )
-                                | KMSBMask );
-                            // Append BCD address. Skip TON/NPI
+                                CALL_MODEM_SB_ORIGIN_CS_ADDRESS_OFFSET_ADDR ) );
+                            TUint8 addrIndex( KNbrIndexWithIndicatorInfo );
+
+                            if( KExtMask == ( tonNpi & KExtMask ) )
+                                {
+                                // ext bit is 1, so address data starts rigth after
+                                // TON/NPI
+                                addrIndex = KNbrIndexWithoutIndicatorInfo;
+                                }
+
+                            // Set address type (TON/NPI) in correct form
+                            BCDAddress.Append( tonNpi | KMSBMask );
+
+                            // Append BCD address. Skip TON/NPI and possible
+                            // indicator information
                             BCDAddress.Append( aIsiMessage.GetData(
                                 sbStartOffset +
-                                CALL_MODEM_SB_ORIGIN_CS_ADDRESS_OFFSET_ADDR + 1,
-                                addressLength - 1 ) );
+                                CALL_MODEM_SB_ORIGIN_CS_ADDRESS_OFFSET_ADDR + addrIndex,
+                                addressLength - addrIndex ) );
                             }
                         // Extract subaddress
                         retValue = aIsiMessage.FindSubBlockOffsetById(
@@ -782,7 +802,7 @@ OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEve
                                 subAddressLength ) );
                             }
 TFLOGSTRING( "CSatEventDownload::CallModemMessageIndReceived Send MT call event" );
-OstTrace0( TRACE_NORMAL, DUP1_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEventDownload::CallModemMessageIndReceived Send MT call event" );
+OstTrace0( TRACE_NORMAL,  DUP1_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED_TD, "CSatEventDownload::CallModemMessageIndReceived Send MT call event" );
 
                         SendMTCallEnvelope( 
                             transactionId,
@@ -799,7 +819,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CS
                     if ( CALL_MODEM_MSG_DIRECT_RECEIVED == messageDirection )
                         {
 TFLOGSTRING("CSatEventDownload::CallModemMessageIndReceived Creating a call");
-OstTrace0( TRACE_NORMAL, DUP2_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEventDownload::CallModemMessageIndReceived Creating a call" );
+OstTrace0( TRACE_NORMAL,  DUP2_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED_TD, "CSatEventDownload::CallModemMessageIndReceived Creating a call" );
 
                         SendCallConnectedEnvelope(
                             transactionId,
@@ -808,7 +828,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CS
                     else if ( CALL_MODEM_MSG_DIRECT_SENT == messageDirection )
                         {
 TFLOGSTRING("CSatEventDownload::CallModemMessageIndReceived Incoming call arrives");
-OstTrace0( TRACE_NORMAL, DUP3_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEventDownload::CallModemMessageIndReceived Incoming call arrives" );
+OstTrace0( TRACE_NORMAL,  DUP3_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED_TD, "CSatEventDownload::CallModemMessageIndReceived Incoming call arrives" );
 
                         SendCallConnectedEnvelope(
                             transactionId,
@@ -843,7 +863,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CS
                         // 2.33.11 Event Indications on Mobile Originated Call
                         // Clearing (GSM)
 TFLOGSTRING( "CSatEventDownload::CallModemMessageIndReceived MO call clearing ");
-OstTrace0( TRACE_NORMAL, DUP4_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEventDownload::CallModemMessageIndReceived MO call clearing" );
+OstTrace0( TRACE_NORMAL,  DUP4_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED_TD, "CSatEventDownload::CallModemMessageIndReceived MO call clearing" );
 
                         SendCallDisconnectedEnvelope(
                             transactionId,
@@ -856,7 +876,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CS
                         // 2.33.12 Event indications on Mobile Terminated Call
                         // Clearing (GSM)
 TFLOGSTRING( "CSatEventDownload::CallModemMessageIndReceived MT call clearing");
-OstTrace0( TRACE_NORMAL, DUP7_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEventDownload::CallModemMessageIndReceived MT call clearing" );
+OstTrace0( TRACE_NORMAL,  DUP7_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED_TD, "CSatEventDownload::CallModemMessageIndReceived MT call clearing" );
 
                         SendCallDisconnectedEnvelope(
                             transactionId,
@@ -868,7 +888,7 @@ OstTrace0( TRACE_NORMAL, DUP7_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CS
                         {
                         // 2.33.13 Event indications on radio link failure
 TFLOGSTRING( "CSatEventDownload::CallModemMessageIndReceived radiolink failure");
-OstTrace0( TRACE_NORMAL, DUP5_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEventDownload::CallModemMessageIndReceived Radiolink failure" );
+OstTrace0( TRACE_NORMAL,  DUP5_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED_TD, "CSatEventDownload::CallModemMessageIndReceived Radiolink failure" );
                         // In the case of a radio link timeout, the Cause data
                         // object shall be included, with a value part of zero
                         // length.
@@ -886,7 +906,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CS
             default:
                 {
 TFLOGSTRING( "CSatEventDownload::CallModemMessageIndReceived UNKNOWN" );
-OstTrace0( TRACE_NORMAL, DUP6_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED, "CSatEventDownload::CallModemMessageIndReceived UNKNOWN" );
+OstTrace0( TRACE_NORMAL,  DUP6_CSATEVENTDOWNLOAD_CALLMODEMMESSAGEINDRECEIVED_TD, "CSatEventDownload::CallModemMessageIndReceived UNKNOWN" );
                 // do nothing
                 break;
                 }
@@ -905,7 +925,7 @@ TInt CSatEventDownload::SendDataAvailableEnvelope
         TInt8                 aLength     // Channel data length
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDDATAAVAILABLEENVELOPE, "CSatEventDownload::SendDataAvailableEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDDATAAVAILABLEENVELOPE_TD, "CSatEventDownload::SendDataAvailableEnvelope" );
     TFLOGSTRING( "TSY: CSatEventDownload::SendDataAvailableEnvelope" );
 
     TInt ret = KErrNone;
@@ -951,7 +971,7 @@ TInt CSatEventDownload::SendChannelStatusEnvelope
         RSat::TChannelStatus aStatus    // Status of the channel
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDCHANNELSTATUSENVELOPE, "CSatEventDownload::SendChannelStatusEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDCHANNELSTATUSENVELOPE_TD, "CSatEventDownload::SendChannelStatusEnvelope" );
     TFLOGSTRING("TSY: CSatEventDownload::SendChannelStatusEnvelope");
 
     TInt ret = KErrNone;
@@ -996,7 +1016,7 @@ TInt CSatEventDownload::MessageReceived
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_MESSAGERECEIVED, "CSatEventDownload::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_MESSAGERECEIVED_TD, "CSatEventDownload::MessageReceived" );
     TFLOGSTRING("TSY: CSatEventDownload::MessageReceived");
     // Get resource and message id's
     TInt resource( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_RESOURCEID ) );
@@ -1099,7 +1119,7 @@ void CSatEventDownload::SetSetUpCallStatus
         const TBool aStatus // SetUpCall status
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_SETSETUPCALLSTATUS, "CSatEventDownload::SetSetUpCallStatus" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SETSETUPCALLSTATUS_TD, "CSatEventDownload::SetSetUpCallStatus" );
     TFLOGSTRING("TSY: CSatEventDownload::SetSetUpCallStatus");
     iSetUpCallOngoing = aStatus;
     }
@@ -1114,7 +1134,7 @@ TInt CSatEventDownload::SendAccessTechnologyChangeEnvelope
         TUint8  accTechChange //Acc Tech
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_SENDACCESSTECHNOLOGYCHANGEENVELOPE, "CSatEventDownload::SendAccessTechnologyChangeEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_SENDACCESSTECHNOLOGYCHANGEENVELOPE_TD, "CSatEventDownload::SendAccessTechnologyChangeEnvelope" );
     TFLOGSTRING("TSY: CSatEventDownload::SendAccessTechnologyChangeEnvelope");
 
     TInt ret = KErrNone;
@@ -1123,7 +1143,7 @@ TInt CSatEventDownload::SendAccessTechnologyChangeEnvelope
         {
         TFLOGSTRING("TSY: CSatEventDownload::SendAccessTechnologyChangeEnvelope\
         - Event enabled: sending envelope");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATEVENTDOWNLOAD_SENDACCESSTECHNOLOGYCHANGEENVELOPE, "CSatEventDownload::SendAccessTechnologyChangeEnvelope - Event enabled: sending envelope" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATEVENTDOWNLOAD_SENDACCESSTECHNOLOGYCHANGEENVELOPE_TD, "CSatEventDownload::SendAccessTechnologyChangeEnvelope - Event enabled: sending envelope" );
         // create envelope
         TTlv envelope;
         envelope.Begin  ( KBerTlvEventDownloadTag );
@@ -1159,7 +1179,7 @@ TInt CSatEventDownload::SendAccessTechnologyChangeEnvelope
 TInt CSatEventDownload::ForceLocationStatusEnvelope()
     {
     TFLOGSTRING("TSY: CSatEventDownload::ForceLocationStatusEnvelope");
-    OstTrace0( TRACE_NORMAL, CSATEVENTDOWNLOAD_FORCELOCATIONSTATUSENVELOPE, "CSatEventDownload::ForceLocationStatusEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATEVENTDOWNLOAD_FORCELOCATIONSTATUSENVELOPE_TD, "CSatEventDownload::ForceLocationStatusEnvelope" );
 
     TInt ret( KErrNone );
     if ( iEventList.IsEnabled( RSat::KLocationStatus )
@@ -1167,7 +1187,7 @@ TInt CSatEventDownload::ForceLocationStatusEnvelope()
         && iNetCellInfoIndReceived )
         {
         TFLOGSTRING("TSY: CSatEventDownload::ForceLocationStatusEnvelope, Event list includes Location status and ENS is supported in PP");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATEVENTDOWNLOAD_FORCELOCATIONSTATUSENVELOPE, "CSatEventDownload::ForceLocationStatusEnvelope, Event list includes Location status and ENS is supported in PP" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATEVENTDOWNLOAD_FORCELOCATIONSTATUSENVELOPE_TD, "CSatEventDownload::ForceLocationStatusEnvelope, Event list includes Location status and ENS is supported in PP" );
         ret = SendLocationStatusEnvelope( 
             iSatMessHandler->LocationInfo() );
         }

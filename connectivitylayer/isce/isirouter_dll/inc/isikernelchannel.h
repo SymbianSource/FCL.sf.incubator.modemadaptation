@@ -23,18 +23,18 @@
 #include <e32def.h>                 // For TInt, TAny
 #include <e32cmn.h>                 // For TDesC8
 #include <kernel.h>                 // For TMessageQue
-#include "misirouterchannelif.h"    // For MISIRouterChannelIf
+#include "misirouterobjectif.h"    // For MISIRouterObjectIf
 #include "isiinternaldefs.h"        // For TISIAsyncRequest
 
 
 // Forward declarations
 class DISIMsgQueue;
-class MISIChannelRouterIf;
+class MISIObjectRouterIf;
 
 /*
 * Kernel side ISI channel.
 */
-NONSHARABLE_CLASS( DISIKernelChannel ) : public DBase, public MISIRouterChannelIf
+NONSHARABLE_CLASS( DISIKernelChannel ) : public DBase, public MISIRouterObjectIf
     {
 
     public:
@@ -57,19 +57,19 @@ NONSHARABLE_CLASS( DISIKernelChannel ) : public DBase, public MISIRouterChannelI
         */
         TInt HandleRequest( TThreadMessage& aMsg );
 
-        // From MISIRouterChannelIf start
+        // From MISIRouterObjectIf start
         
         /*
-        * See comments from MISIRouterChannelIf.
+        * See comments from MISIRouterObjectIf.
         */
-        void ReceiveMsg( const TDesC8& aMessage );
+        void Receive( const TDesC8& aMessage );
 
         /*
-        * See comments from MISIRouterChannelIf.
+        * See comments from MISIRouterObjectIf.
         */
         void EnqueChannelRequestCompleteDfc( TInt aRequest, TInt aStatusToComplete );
         
-        // From MISIRouterChannelIf end
+        // From MISIRouterObjectIf end
 
         /*
         * iKernelChMsgQue callback function in p2p router
@@ -154,7 +154,7 @@ NONSHARABLE_CLASS( DISIKernelChannel ) : public DBase, public MISIRouterChannelI
         // Only acccessed from ISI Router thread.
         TMessageQue               iKernelChMsgQue;
         TDes8**                   iPtrPtrToRxBuf;
-        MISIChannelRouterIf*      iRouterIf;
+        MISIObjectRouterIf*       iRouterIf;
         // Owned
         TDfc*                     iEmptyRxDfc;
         TDfcQue*                  iMainThread;

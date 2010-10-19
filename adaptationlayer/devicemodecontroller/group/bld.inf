@@ -29,7 +29,8 @@ BASEDEFAULT
 
 PRJ_EXPORTS
 
-../rom/devicemodecontroller.iby NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(devicemodecontroller.iby) 
+../dmc_ext/inc/dmc_kernel_if.h    NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(dmc_kernel_if.h)
+../rom/devicemodecontroller.iby   NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(devicemodecontroller.iby) 
 
 PRJ_MMPFILES
 ../dmc_ext/group/dmc.mmp

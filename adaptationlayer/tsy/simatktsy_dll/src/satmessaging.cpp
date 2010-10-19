@@ -103,7 +103,7 @@ CTsySatMessaging::CTsySatMessaging
         iSatAppName( aName ),
         iSendSmsTsyReqHandle( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_CTSYSATMESSAGING, "CTsySatMessaging::CTsySatMessaging" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_CTSYSATMESSAGING_TD, "CTsySatMessaging::CTsySatMessaging" );
     TFLOGSTRING("TSY: CTsySatMessaging::CTsySatMessaging");
     /* None */
     }
@@ -116,7 +116,7 @@ CTsySatMessaging::CTsySatMessaging
         )
 
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_CTSYSATMESSAGING, "CTsySatMessaging::CTsySatMessaging" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_CTSYSATMESSAGING_TD, "CTsySatMessaging::CTsySatMessaging" );
 
         iPnSend = aPnSend;
         iPnReceive = aPnReceive;
@@ -136,7 +136,7 @@ CTsySatMessaging::CTsySatMessaging
 //
 void CTsySatMessaging::ConstructL()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_CONSTRUCTL, "CTsySatMessaging::ConstructL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_CONSTRUCTL_TD, "CTsySatMessaging::ConstructL" );
     TFLOGSTRING("TSY: CTsySatMessaging::ConstructL");
 
     // Create message handler object, to receive ISI messages from ISA CellMo
@@ -230,12 +230,12 @@ void CTsySatMessaging::ConstructL()
     iSatIcon = CSatIcon::NewL( iSatMessHandler, this );
 
     // Request IMEI code. Needed in provide local info proactive command.
-    iSatMessHandler->InfoSerialNumberReadReq(
-        GetTransactionId(), INFO_SB_SN_IMEI_PLAIN );
+    /*iSatMessHandler->InfoSerialNumberReadReq(
+        GetTransactionId(), INFO_SB_SN_IMEI_PLAIN );*/
 
     // Request IMEI-SV code. Needed in provide local info proactive command.
-    iSatMessHandler->InfoSerialNumberReadReq(
-        GetTransactionId(), INFO_SN_IMEI_SV_TO_NET );
+    /*iSatMessHandler->InfoSerialNumberReadReq(
+        GetTransactionId(), INFO_SN_IMEI_SV_TO_NET );*/
 
     // Request Network status
     iSatMessHandler->NetCellInfoGetReq(
@@ -246,7 +246,7 @@ void CTsySatMessaging::ConstructL()
 
 
 
-#ifdef INFO_PP_SIM_OLD_POLL_INTERVAL
+/*#ifdef INFO_PP_SIM_OLD_POLL_INTERVAL
     // Check old poll interval is supported by ME's Product Profile
     iSatMessHandler->InfoPpReadReq( INFO_PP_SIM_OLD_POLL_INTERVAL );
 #endif
@@ -254,7 +254,7 @@ void CTsySatMessaging::ConstructL()
 #ifdef INFO_PP_ENHANCED_NETWORK_SELECTION
     // Check INFO_PP_ENHANCED_NETWORK_SELECTION status in product profile
     iSatMessHandler->InfoPpReadReq( INFO_PP_ENHANCED_NETWORK_SELECTION );
-#endif
+#endif*/
     }
 
 // -----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ EXPORT_C CTsySatMessaging* CTsySatMessaging::NewL
         TName                   aName
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_NEWL, "CTsySatMessaging::NewL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_NEWL_TD, "CTsySatMessaging::NewL" );
 
     TFLOGSTRING("TSY: CTsySatMessaging::NewL");
     // First check that given arguments are not NULL pointers
@@ -278,7 +278,7 @@ EXPORT_C CTsySatMessaging* CTsySatMessaging::NewL
         {
         TFLOGSTRING("TSY: CTsySatMessaging::NewL, NULL pointers were given \
             leaving!");
-        OstTrace0( TRACE_NORMAL, DUP2_CTSYSATMESSAGING_NEWL, "CTsySatMessaging::NewL, NULL pointers were given leaving!" );
+        OstTrace0( TRACE_NORMAL,  DUP2_CTSYSATMESSAGING_NEWL_TD, "CTsySatMessaging::NewL, NULL pointers were given leaving!" );
 
         User::Leave( KErrArgument );
         }
@@ -298,7 +298,7 @@ EXPORT_C CTsySatMessaging* CTsySatMessaging::NewL
         // This may happen if LicenseeTSY stub is used with real SIM_ATK_TSY
         TFLOGSTRING("TSY: CTsySatMessaging::NewL, Construction failed \
             PhoNet is not initialized, leaving!");
-        OstTrace0( TRACE_NORMAL, DUP5_CTSYSATMESSAGING_NEWL, "CTsySatMessaging::NewL, Construction failed PhoNet is not initialized, leaving!" );
+        OstTrace0( TRACE_NORMAL,  DUP5_CTSYSATMESSAGING_NEWL_TD, "CTsySatMessaging::NewL, Construction failed PhoNet is not initialized, leaving!" );
 
         User::Leave( KErrArgument );
         }
@@ -316,7 +316,7 @@ EXPORT_C CTsySatMessaging* CTsySatMessaging::NewL
         CMmMessageRouter*   aRouter
         )
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_NEWL, "CTsySatMessaging::NewL" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_NEWL_TD, "CTsySatMessaging::NewL" );
 
     TFLOGSTRING("TSY: CTsySatMessaging::NewL");
     // First check that given arguments are not NULL pointers
@@ -324,7 +324,7 @@ EXPORT_C CTsySatMessaging* CTsySatMessaging::NewL
         {
         TFLOGSTRING("TSY: CTsySatMessaging::NewL, NULL pointers were given \
             leaving!");
-        OstTrace0( TRACE_NORMAL, DUP3_CTSYSATMESSAGING_NEWL, "CTsySatMessaging::NewL, NULL pointers were given leaving!" );
+        OstTrace0( TRACE_NORMAL,  DUP3_CTSYSATMESSAGING_NEWL_TD, "CTsySatMessaging::NewL, NULL pointers were given leaving!" );
 
         User::Leave( KErrArgument );
         }
@@ -343,7 +343,7 @@ EXPORT_C CTsySatMessaging* CTsySatMessaging::NewL
         // This may happen if LicenseeTSY stub is used with real SIM_ATK_TSY
         TFLOGSTRING("TSY: CTsySatMessaging::NewL, Construction failed \
             PhoNet is not initialized, leaving!");
-        OstTrace0( TRACE_NORMAL, DUP4_CTSYSATMESSAGING_NEWL, "CTsySatMessaging::NewL, Construction failed PhoNet is not initialized, leaving!" );
+        OstTrace0( TRACE_NORMAL,  DUP4_CTSYSATMESSAGING_NEWL_TD, "CTsySatMessaging::NewL, Construction failed PhoNet is not initialized, leaving!" );
 
         User::Leave( KErrArgument );
         }
@@ -364,7 +364,7 @@ EXPORT_C CTsySatMessaging* CTsySatMessaging::NewL
 //
 CTsySatMessaging::~CTsySatMessaging()
     {
-    OstTrace0( TRACE_NORMAL, DUP2_CTSYSATMESSAGING_CTSYSATMESSAGING, "CTsySatMessaging::~CTsySatMessaging" );
+    OstTrace0( TRACE_NORMAL,  DUP2_CTSYSATMESSAGING_CTSYSATMESSAGING_TD, "CTsySatMessaging::~CTsySatMessaging" );
     TFLOGSTRING("TSY: CTsySatMessaging::~CTsySatMessaging");
 
     // Delete message handler object, SAT SMS sending
@@ -429,7 +429,7 @@ CTelObject* CTsySatMessaging::OpenNewObjectByNameL
         const TDesC& /* aName */    // Name of the object
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_OPENNEWOBJECTBYNAMEL, "CTsySatMessaging::OpenNewObjectByNameL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_OPENNEWOBJECTBYNAMEL_TD, "CTsySatMessaging::OpenNewObjectByNameL" );
     TFLOGSTRING("TSY: CTsySatMessaging::OpenNewObjectByNameL");
     User::Leave( KErrNotSupported );
     return NULL;
@@ -446,7 +446,7 @@ CTelObject* CTsySatMessaging::OpenNewObjectL
         TDes& /*aNewName*/  // Name of the new object
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_OPENNEWOBJECTL, "CTsySatMessaging::OpenNewObjectL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_OPENNEWOBJECTL_TD, "CTsySatMessaging::OpenNewObjectL" );
     TFLOGSTRING("TSY: CTsySatMessaging::OpenNewObjectL");
     User::Leave( KErrNotSupported );
     return NULL;
@@ -466,7 +466,7 @@ TInt CTsySatMessaging::ExtFunc
         const TDataPackage& aPackage        // Contains parameters for request
         )
     {
-    OstTraceExt2( TRACE_NORMAL, CTSYSATMESSAGING_EXTFUNC, "CTsySatMessaging::ExtFunc ReqHandle: %d IPC: %d", TInt(aTsyReqHandle), aIpc );
+    OstTraceExt2( TRACE_NORMAL,  CTSYSATMESSAGING_EXTFUNC_TD, "CTsySatMessaging::ExtFunc ReqHandle: %d IPC: %d", TInt(aTsyReqHandle), aIpc );
 
     TFLOGSTRING3("TSY: CTsySatMessaging::ExtFunc ReqHandle=%d IPC=%d",
         aTsyReqHandle, aIpc);
@@ -499,7 +499,7 @@ TInt CTsySatMessaging::DoExtFuncL
         const TDataPackage& aPackage        // Contains parameters for request
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_DOEXTFUNCL, "CTsySatMessaging::DoExtFuncL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_DOEXTFUNCL_TD, "CTsySatMessaging::DoExtFuncL" );
     TFLOGSTRING("TSY: CTsySatMessaging::DoExtFuncL");
     TAny* dataPtr=aPackage.Ptr1();
     TAny* dataPtr2=aPackage.Ptr2();
@@ -711,7 +711,7 @@ TInt CTsySatMessaging::DoExtFuncL
         default:
             {
             TFLOGSTRING2("TSY: CTsySatMessaging::DoExtFuncL unsupported IPC %d", aIpc);
-            OstTrace1( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_DOEXTFUNCL, "CTsySatMessaging::DoExtFuncL unsupported IPC %d", aIpc );
+            OstTrace1( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_DOEXTFUNCL_TD, "CTsySatMessaging::DoExtFuncL unsupported IPC %d", aIpc );
 
             ReqCompleted( aTsyReqHandle, KErrNotSupported );
             break;
@@ -732,7 +732,7 @@ TInt CTsySatMessaging::CancelService
         const TTsyReqHandle aTsyReqHandle   // Request handle
         )
     {
-    OstTraceExt2( TRACE_NORMAL, CTSYSATMESSAGING_CANCELSERVICE, "CTsySatMessaging::CancelService ReqHandle=%d, IPC=%d", TInt(aTsyReqHandle), aIpc );
+    OstTraceExt2( TRACE_NORMAL,  CTSYSATMESSAGING_CANCELSERVICE_TD, "CTsySatMessaging::CancelService ReqHandle=%d, IPC=%d", TInt(aTsyReqHandle), aIpc );
     TFLOGSTRING3("TSY: CTsySatMessaging::CancelService ReqHandle=%d IPC=%d",aTsyReqHandle, aIpc);
     TInt ret( KErrNone );
     switch ( aIpc )
@@ -898,7 +898,7 @@ TInt CTsySatMessaging::CancelService
         default:
             {
             TFLOGSTRING2("TSY: CTsySatMessaging::CancelService invalid IPC %d",aIpc);
-            OstTrace1( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_CANCELSERVICE, "CTsySatMessaging::CancelService invalid IPC %d", aIpc );
+            OstTrace1( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_CANCELSERVICE_TD, "CTsySatMessaging::CancelService invalid IPC %d", aIpc );
 
             ret = KErrGeneral;
             break;
@@ -918,7 +918,7 @@ CTelObject::TReqMode CTsySatMessaging::ReqModeL
         const TInt aIpc     // IPC number of request
         )
     {
-    OstTrace1( TRACE_NORMAL, CTSYSATMESSAGING_REQMODEL, "CTsySatMessaging::ReqModeL, IPC=%d", aIpc );
+    OstTrace1( TRACE_NORMAL,  CTSYSATMESSAGING_REQMODEL_TD, "CTsySatMessaging::ReqModeL, IPC=%d", aIpc );
     TFLOGSTRING2("TSY: CTsySatMessaging::ReqModeL, IPC = %d",aIpc);
     CTelObject::TReqMode ret = 0;
     switch ( aIpc )
@@ -974,7 +974,7 @@ CTelObject::TReqMode CTsySatMessaging::ReqModeL
         default:
             {
             TFLOGSTRING2( "TSY: CTsySatMessaging::ReqModeL unsupported IPC %d", aIpc );
-            OstTrace1( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_REQMODEL, "CTsySatMessaging::ReqModeL unsupported IPC %d", aIpc );
+            OstTrace1( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_REQMODEL_TD, "CTsySatMessaging::ReqModeL unsupported IPC %d", aIpc );
 
             User::Leave( KErrNotSupported );
             break;
@@ -991,7 +991,7 @@ CTelObject::TReqMode CTsySatMessaging::ReqModeL
 //
 void CTsySatMessaging::Init()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_INIT, "CTsySatMessaging::Init" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_INIT_TD, "CTsySatMessaging::Init" );
     TFLOGSTRING("TSY: CTsySatMessaging::Init");
     // none
     }
@@ -1007,7 +1007,7 @@ TInt CTsySatMessaging::RegisterNotification
         const TInt aIpc     // IPC number of request
         )
     {
-    OstTrace1( TRACE_NORMAL, CTSYSATMESSAGING_REGISTERNOTIFICATION, "CTsySatMessaging::RegisterNotification, IPC = %d", aIpc );
+    OstTrace1( TRACE_NORMAL,  CTSYSATMESSAGING_REGISTERNOTIFICATION_TD, "CTsySatMessaging::RegisterNotification, IPC = %d", aIpc );
     TFLOGSTRING2("TSY: CTsySatMessaging::RegisterNotification, IPC = %d",aIpc);
     // Initialize return value
     TInt ret( KErrNone );
@@ -1049,7 +1049,7 @@ TInt CTsySatMessaging::RegisterNotification
             {
             // Unknown or invalid IPC
             TFLOGSTRING2("TSY: CTsySatMessaging::RegisterNotification, unsupported IPC %d", aIpc);
-            OstTrace1( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_REGISTERNOTIFICATION, "CTsySatMessaging::RegisterNotification unsupported IPC %d", aIpc );
+            OstTrace1( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_REGISTERNOTIFICATION_TD, "CTsySatMessaging::RegisterNotification unsupported IPC %d", aIpc );
 
             ret = KErrNotSupported;
             break;
@@ -1070,7 +1070,7 @@ TInt CTsySatMessaging::DeregisterNotification
         const TInt aIpc     // IPC number of request
         )
     {
-    OstTrace1( TRACE_NORMAL, CTSYSATMESSAGING_DEREGISTERNOTIFICATION, "CTsySatMessaging::DeregisterNotification, IPC = %d", aIpc );
+    OstTrace1( TRACE_NORMAL,  CTSYSATMESSAGING_DEREGISTERNOTIFICATION_TD, "CTsySatMessaging::DeregisterNotification, IPC = %d", aIpc );
     TFLOGSTRING2( "TSY: CTsySatMessaging::DeregisterNotification\
         IPC = %d", aIpc );
     // Initialize return value
@@ -1114,7 +1114,7 @@ TInt CTsySatMessaging::DeregisterNotification
             // Unknown or invalid IPC
             TFLOGSTRING2("TSY: CTsySatMessaging::DeregisterNotification \
             unsupported IPC %d", aIpc);
-            OstTrace1( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_DEREGISTERNOTIFICATION, "CTsySatMessaging::DeregisterNotification unsupported IPC %d", aIpc );
+            OstTrace1( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_DEREGISTERNOTIFICATION_TD, "CTsySatMessaging::DeregisterNotification unsupported IPC %d", aIpc );
 
             ret = KErrNotSupported;
             break;
@@ -1134,7 +1134,7 @@ TInt CTsySatMessaging::NumberOfSlotsL
         const TInt aIpc        // IPC number of request
         )
     {
-    OstTrace1( TRACE_NORMAL, CTSYSATMESSAGING_NUMBEROFSLOTSL, "CTsySatMessaging::NumberOfSlotsL IPC %d", aIpc );
+    OstTrace1( TRACE_NORMAL,  CTSYSATMESSAGING_NUMBEROFSLOTSL_TD, "CTsySatMessaging::NumberOfSlotsL IPC %d", aIpc );
     TFLOGSTRING2("TSY: CTsySatMessaging::NumberOfSlotsL IPC %d", aIpc);
     TInt numberOfSlots( 1 );
     switch ( aIpc )
@@ -1215,7 +1215,7 @@ TInt CTsySatMessaging::NumberOfSlotsL
             // Unknown or invalid IPC
             TFLOGSTRING2( "TSY: CTsySatMessaging::NumberOfSlotsL\
                 unsupported IPC %d", aIpc );
-            OstTrace1( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_NUMBEROFSLOTSL, "CTsySatMessaging::NumberOfSlotsL unsupported IPC %d", aIpc );
+            OstTrace1( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_NUMBEROFSLOTSL_TD, "CTsySatMessaging::NumberOfSlotsL unsupported IPC %d", aIpc );
 
             User::Leave( KErrNotSupported );
             break;
@@ -1232,7 +1232,7 @@ TInt CTsySatMessaging::NumberOfSlotsL
 //
 CSatMessHandler* CTsySatMessaging::GetSatMessHandler()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETSATMESSHANDLER, "CTsySatMessaging::GetSatMessHandler" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETSATMESSHANDLER_TD, "CTsySatMessaging::GetSatMessHandler" );
     TFLOGSTRING("TSY:CTsySatMessaging::GetSatMessHandler");
     // Pointer to SAT message handler
     return iSatMessHandler;
@@ -1246,7 +1246,7 @@ CSatMessHandler* CTsySatMessaging::GetSatMessHandler()
 //
 CSatFlightModeStatus* CTsySatMessaging::GetSatFlightModeStatus()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETSATFLIGHTMODESTATUS, "CTsySatMessaging::GetSatFlightModeStatus" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETSATFLIGHTMODESTATUS_TD, "CTsySatMessaging::GetSatFlightModeStatus" );
     TFLOGSTRING("TSY:CTsySatMessaging::GetSatFlightModeStatus");
     // Pointer to SAT flight mode status
     return iSatFlightModeStatus;
@@ -1264,7 +1264,7 @@ TInt CTsySatMessaging::CompleteSendSmsMessage
         TInt aStatus  // Message sending status from MMSMS
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_COMPLETESENDSMSMESSAGE, "CTsySatMessaging::CompleteSendSmsMessage" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_COMPLETESENDSMSMESSAGE_TD, "CTsySatMessaging::CompleteSendSmsMessage" );
     TFLOGSTRING("TSY: CTsySatMessaging::CompleteSendSmsMessage, entered");
     if ( iSendSmsTsyReqHandle )
         {
@@ -1286,7 +1286,7 @@ TInt CTsySatMessaging::MenuSelection
         TTsyReqHandle   aTsyReqHandle   // Request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_MENUSELECTION, "CTsySatMessaging::MenuSelection" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_MENUSELECTION_TD, "CTsySatMessaging::MenuSelection" );
     TFLOGSTRING("TSY:CTsySatMessaging::MenuSelection");
     TInt ret( KErrNone );
     RSat::TMenuSelectionV1Pckg* aPckg =
@@ -1294,8 +1294,8 @@ TInt CTsySatMessaging::MenuSelection
     RSat::TMenuSelectionV1& selectionV1 = ( *aPckg ) ();
     TFLOGSTRING3("TSY:CTsySatMessaging::MenuSelection, iItemId %x, Help: %c",
         selectionV1.iItemId, selectionV1.iHelp );
-    OstTraceExt1( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_MENUSELECTION, "CTsySatMessaging::MenuSelection iItemId: %hhu", selectionV1.iItemId );
-    OstTrace1( TRACE_NORMAL, DUP2_CTSYSATMESSAGING_MENUSELECTION, "CTsySatMessaging::MenuSelection Help: %{THelpRequest}", selectionV1.iHelp );
+    OstTraceExt1( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_MENUSELECTION_TD, "CTsySatMessaging::MenuSelection iItemId: %hhu", selectionV1.iItemId );
+    OstTrace1( TRACE_NORMAL,  DUP2_CTSYSATMESSAGING_MENUSELECTION_TD, "CTsySatMessaging::MenuSelection Help: %{THelpRequest}", selectionV1.iHelp );
 
     // Creating the menu selection message
     if ( selectionV1.iHelp == RSat::EHelpRequested )
@@ -1329,7 +1329,7 @@ TInt CTsySatMessaging::NotifyCbDownload
         TTsyReqHandle   aTsyReqHandle     //tsy request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_NOTIFYCBDOWNLOAD, "CTsySatMessaging::NotifyCbDownload" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_NOTIFYCBDOWNLOAD_TD, "CTsySatMessaging::NotifyCbDownload" );
     TFLOGSTRING("TSY:CTsySatMessaging::NotifyCbDownload");
     TInt ret( KErrNone );
     ReqCompleted( aTsyReqHandle, ret );
@@ -1349,7 +1349,7 @@ TInt CTsySatMessaging::NotifySmsPpDownload
         TTsyReqHandle   aTsyReqHandle   //tsy request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_NOTIFYSMSPPDOWNLOAD, "CTsySatMessaging::NotifySmsPpDownload" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_NOTIFYSMSPPDOWNLOAD_TD, "CTsySatMessaging::NotifySmsPpDownload" );
     TFLOGSTRING("TSY:CTsySatMessaging::NotifySmsPpDownload");
     TInt ret( KErrNone );
     ReqCompleted( aTsyReqHandle, ret );
@@ -1369,7 +1369,7 @@ TInt CTsySatMessaging::SendMessageNoLoggingL
         TTsyReqHandle   aTsyReqHandle   // Request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL, "CTsySatMessaging::SendMessageNoLoggingL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL_TD, "CTsySatMessaging::SendMessageNoLoggingL" );
     TFLOGSTRING("TSY: CTsySatMessaging::SendMessageNoLoggingL");
     TInt ret( KErrNone );
     // Save Reqhandle for CompleteSendSmsMessage
@@ -1448,7 +1448,7 @@ TInt CTsySatMessaging::SendMessageNoLoggingL
         CMmSmsTsy* mmSmsTsy = iMmPhone->SmsSession();
         TFLOGSTRING2("TSY: CTsySatMessaging::SendMessageNoLoggingL, \
             mmSmsTsy: %x", mmSmsTsy );
-        OstTrace1( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL, "CTsySatMessaging::SendMessageNoLoggingL, mmSmsTsy: %x", mmSmsTsy );
+        OstTrace1( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL_TD, "CTsySatMessaging::SendMessageNoLoggingL, mmSmsTsy: %x", mmSmsTsy );
 
         if ( mmSmsTsy ) // Check that SMS session exist
             {
@@ -1457,7 +1457,7 @@ TInt CTsySatMessaging::SendMessageNoLoggingL
                 &numberPlan, EFalse, aTsyReqHandle );
             TFLOGSTRING2("TSY: CTsySatMessaging::SendMessageNoLoggingL, \
                 SendSmsMessage done, ret: %x", ret );
-            OstTrace1( TRACE_NORMAL, DUP2_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL, "CTsySatMessaging::SendMessageNoLoggingL, SendSmsMessage done, ret: %d", ret );
+            OstTrace1( TRACE_NORMAL,  DUP2_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL_TD, "CTsySatMessaging::SendMessageNoLoggingL, SendSmsMessage done, ret: %d", ret );
             }
         else
             {
@@ -1465,7 +1465,7 @@ TInt CTsySatMessaging::SendMessageNoLoggingL
             ret = KErrNotReady;
             TFLOGSTRING("TSY: CTsySatMessaging::SendMessageNoLoggingL, \
             no SMS session!");
-            OstTrace0( TRACE_NORMAL, DUP3_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL, "CTsySatMessaging::SendMessageNoLoggingL, no SMS session!" );
+            OstTrace0( TRACE_NORMAL,  DUP3_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL_TD, "CTsySatMessaging::SendMessageNoLoggingL, no SMS session!" );
             }
         #else //NCP_COMMON_S60_VERSION_SUPPORT
         // Deliver attributes to message handler by using
@@ -1513,7 +1513,7 @@ TInt CTsySatMessaging::SendMessageNoLoggingL
         ret = KErrGeneral;
         TFLOGSTRING("TSY: CTsySatMessaging::SendMessageNoLoggingL, \
         SCA missing");
-        OstTrace0( TRACE_NORMAL, DUP4_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL, "CTsySatMessaging::SendMessageNoLoggingL, SCA missing" );
+        OstTrace0( TRACE_NORMAL,  DUP4_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL_TD, "CTsySatMessaging::SendMessageNoLoggingL, SCA missing" );
 
         }
     // Failure in sending of SAT SMS, call complete method
@@ -1522,7 +1522,7 @@ TInt CTsySatMessaging::SendMessageNoLoggingL
         CompleteSendSmsMessage( ret );
         TFLOGSTRING("TSY: CTsySatMessaging::SendMessageNoLoggingL, \
         failure sending SAT SMS, complete");
-        OstTrace0( TRACE_NORMAL, DUP5_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL, "CTsySatMessaging::SendMessageNoLoggingL, failure sending SAT SMS, complete" );
+        OstTrace0( TRACE_NORMAL,  DUP5_CTSYSATMESSAGING_SENDMESSAGENOLOGGINGL_TD, "CTsySatMessaging::SendMessageNoLoggingL, failure sending SAT SMS, complete" );
 
         }
     return ret;
@@ -1542,7 +1542,7 @@ TInt CTsySatMessaging::TerminalResponse
         TTsyReqHandle   aTsyReqHandle   // Request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_TERMINALRESPONSE, "CTsySatMessaging::TerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_TERMINALRESPONSE_TD, "CTsySatMessaging::TerminalResponse" );
     TFLOGSTRING("TSY: CTsySatMessaging::TerminalResponse");
     TInt ret( KErrNone );
     switch ( *aPCmd )
@@ -1618,7 +1618,7 @@ TInt CTsySatMessaging::TerminalResponse
         default:
             TFLOGSTRING("TSY: CTsySatMessaging::TerminalResponse, \
             PCmd not supported");
-            OstTrace0( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_TERMINALRESPONSE, "CTsySatMessaging::TerminalResponse, PCmd not supported" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_TERMINALRESPONSE_TD, "CTsySatMessaging::TerminalResponse, PCmd not supported" );
 
             ret =  KErrGeneral;
             break;
@@ -1637,7 +1637,7 @@ TInt CTsySatMessaging::TerminalResponse
 //
 void CTsySatMessaging::PCmdReceivedL( const TIsiReceiveC& aIsiMessage )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_PCMDRECEIVEDL, "CTsySatMessaging::PCmdReceivedL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_PCMDRECEIVEDL_TD, "CTsySatMessaging::PCmdReceivedL" );
     TFLOGSTRING("TSY: CTsySatMessaging::PCmdReceivedL");
     CBerTlv berTlv;
     berTlv.BerTlv( aIsiMessage );
@@ -1730,7 +1730,7 @@ void CTsySatMessaging::PCmdReceivedL( const TIsiReceiveC& aIsiMessage )
         default:
             {
             TFLOGSTRING("TSY: CTsySatMessaging::PCmdReceivedL, PCmd not supported");
-            OstTrace0( TRACE_NORMAL, DUP1_CTSYSATMESSAGING_PCMDRECEIVEDL, "CTsySatMessaging::PCmdReceivedL, PCmd not supported" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CTSYSATMESSAGING_PCMDRECEIVEDL_TD, "CTsySatMessaging::PCmdReceivedL, PCmd not supported" );
 
             // If proactive command is not supported, terminal response
             // with "Command is beyond ME's capabilities" information
@@ -1764,7 +1764,7 @@ TInt CTsySatMessaging::TimerExpiration
         TUint32 aTimerValue
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_TIMEREXPIRATION, "CTsySatMessaging::TimerExpiration" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_TIMEREXPIRATION_TD, "CTsySatMessaging::TimerExpiration" );
     TFLOGSTRING("TSY: CTsySatMessaging::TimerExpiration");
     TUint8 time[3] = {0, 0, 0};
     TInt num[3];
@@ -1791,7 +1791,7 @@ TInt CTsySatMessaging::TimerExpiration
 //
 CSatTimer* CTsySatMessaging::GetSatTimer()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETSATTIMER, "CTsySatMessaging::GetSatTimer" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETSATTIMER_TD, "CTsySatMessaging::GetSatTimer" );
     // Pointer to SAT timer
     return iSatTimer;
     }
@@ -1804,7 +1804,7 @@ CSatTimer* CTsySatMessaging::GetSatTimer()
 //
 CSatNotifyRefresh* CTsySatMessaging::GetNotifyRefresh()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETNOTIFYREFRESH, "CTsySatMessaging::GetNotifyRefresh" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETNOTIFYREFRESH_TD, "CTsySatMessaging::GetNotifyRefresh" );
     return iNotifyRefresh;
     }
 
@@ -1816,7 +1816,7 @@ CSatNotifyRefresh* CTsySatMessaging::GetNotifyRefresh()
 //
 CSatDataDownload* CTsySatMessaging::GetDataDownload()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETDATADOWNLOAD, "CTsySatMessaging::GetDataDownload" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETDATADOWNLOAD_TD, "CTsySatMessaging::GetDataDownload" );
     return iSatDataDownload;
     }
 
@@ -1828,7 +1828,7 @@ CSatDataDownload* CTsySatMessaging::GetDataDownload()
 //
 CSatNotifyPollInterval* CTsySatMessaging::GetNotifyPollInterval()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETNOTIFYPOLLINTERVAL, "CTsySatMessaging::GetNotifyPollInterval" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETNOTIFYPOLLINTERVAL_TD, "CTsySatMessaging::GetNotifyPollInterval" );
     return iNotifyPollInterval;
     }
 
@@ -1840,7 +1840,7 @@ CSatNotifyPollInterval* CTsySatMessaging::GetNotifyPollInterval()
 //
 CSatMoSmsCtrl* CTsySatMessaging::GetMoSmsCtrl()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETMOSMSCTRL, "CTsySatMessaging::GetMoSmsCtrl" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETMOSMSCTRL_TD, "CTsySatMessaging::GetMoSmsCtrl" );
     return iSatMoSmsCtrl;
     }
 
@@ -1852,7 +1852,7 @@ CSatMoSmsCtrl* CTsySatMessaging::GetMoSmsCtrl()
 //
 CSatEventDownload* CTsySatMessaging::GetEventDownload()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETEVENTDOWNLOAD, "CTsySatMessaging::GetEventDownload" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETEVENTDOWNLOAD_TD, "CTsySatMessaging::GetEventDownload" );
     return iEventDownload;
     }
 
@@ -1864,7 +1864,7 @@ CSatEventDownload* CTsySatMessaging::GetEventDownload()
 //
 CSatNotifyPollingOff* CTsySatMessaging::GetNotifyPollingOff()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETNOTIFYPOLLINGOFF, "CTsySatMessaging::GetNotifyPollingOff" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETNOTIFYPOLLINGOFF_TD, "CTsySatMessaging::GetNotifyPollingOff" );
     return iNotifyPollingOff;
     }
 
@@ -1876,7 +1876,7 @@ CSatNotifyPollingOff* CTsySatMessaging::GetNotifyPollingOff()
 //
 CSatNotifyLocalInfo* CTsySatMessaging::GetNotifyLocalInfo()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETNOTIFYLOCALINFO, "CTsySatMessaging::GetNotifyLocalInfo" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETNOTIFYLOCALINFO_TD, "CTsySatMessaging::GetNotifyLocalInfo" );
     return iNotifyLocalInfo;
     }
 
@@ -1891,7 +1891,7 @@ void CTsySatMessaging::EventDownloadReceived
         const TIsiReceiveC& aIsiMessage //Event download message
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_EVENTDOWNLOADRECEIVED, "CTsySatMessaging::EventDownloadReceived" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_EVENTDOWNLOADRECEIVED_TD, "CTsySatMessaging::EventDownloadReceived" );
     iEventDownload->MessageReceived( aIsiMessage );
     }
 
@@ -1906,7 +1906,7 @@ void CTsySatMessaging::SetUpEventList
         TUint32 aEvents //events to be monitored
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_SETUPEVENTLIST, "CTsySatMessaging::SetUpEventList" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_SETUPEVENTLIST_TD, "CTsySatMessaging::SetUpEventList" );
     iEventDownload->SetUpEventList( aEvents );
     }
 
@@ -1921,7 +1921,7 @@ void CTsySatMessaging::SessionEnd
         const TIsiReceiveC& aIsiMessage //message ending session
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_SESSIONEND, "CTsySatMessaging::SessionEnd" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_SESSIONEND_TD, "CTsySatMessaging::SessionEnd" );
     iNotifySimSessionEnd->MessageReceived( aIsiMessage );
     }
 
@@ -1937,7 +1937,7 @@ void CTsySatMessaging::NotifyClientAboutCallControlEvent
         RSat::TControlResult    aResult
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_NOTIFYCLIENTABOUTCALLCONTROLEVENT, "CTsySatMessaging::NotifyClientAboutCallControlEvent" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_NOTIFYCLIENTABOUTCALLCONTROLEVENT_TD, "CTsySatMessaging::NotifyClientAboutCallControlEvent" );
     iNotifyCallControlRequest->CompleteNotification( aAlphaId, aResult );
     }
 
@@ -1953,7 +1953,7 @@ void CTsySatMessaging::NotifyClientAboutCallControlEventL
         TPtrC8 aEnvelopeResponse
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_NOTIFYCLIENTABOUTCALLCONTROLEVENTL, "CTsySatMessaging::NotifyClientAboutCallControlEventL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_NOTIFYCLIENTABOUTCALLCONTROLEVENTL_TD, "CTsySatMessaging::NotifyClientAboutCallControlEventL" );
     iNotifyCallControlRequest->CompleteNotificationL( aCcResult, aEnvelopeResponse );
     }
 
@@ -1969,7 +1969,7 @@ void CTsySatMessaging::NotifyClientAboutGprsCallControlEvent
         const RSat::TControlResult  aResult
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_NOTIFYCLIENTABOUTGPRSCALLCONTROLEVENT, "CTsySatMessaging::NotifyClientAboutGprsCallControlEvent" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_NOTIFYCLIENTABOUTGPRSCALLCONTROLEVENT_TD, "CTsySatMessaging::NotifyClientAboutGprsCallControlEvent" );
     iNotifyCallControlRequest->CompleteNotification(
         aAlphaId,
         aResult );
@@ -1987,7 +1987,7 @@ void CTsySatMessaging::NotifyClientAboutMoSmControlEvent
         RSat::TControlResult    aResult
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_NOTIFYCLIENTABOUTMOSMCONTROLEVENT, "CTsySatMessaging::NotifyClientAboutMoSmControlEvent" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_NOTIFYCLIENTABOUTMOSMCONTROLEVENT_TD, "CTsySatMessaging::NotifyClientAboutMoSmControlEvent" );
     iNotifyMoSmControlRequest->CompleteNotification( aAlphaId, aResult );
     }
 
@@ -1999,7 +1999,7 @@ void CTsySatMessaging::NotifyClientAboutMoSmControlEvent
 //
 TUint8 CTsySatMessaging::GetTransactionId()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETTRANSACTIONID, "CTsySatMessaging::GetTransactionId" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETTRANSACTIONID_TD, "CTsySatMessaging::GetTransactionId" );
     return iTransIdMsg->GetTransactionId( );
     }
 
@@ -2014,7 +2014,7 @@ TInt CTsySatMessaging::SatReady
         TUint8 aMsg // Message to be retrieved
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_SATREADY, "CTsySatMessaging::SatReady" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_SATREADY_TD, "CTsySatMessaging::SatReady" );
     return iPnReceive->SatReady( aMsg );
     }
 
@@ -2027,7 +2027,7 @@ TInt CTsySatMessaging::SatReady
 //
 void CTsySatMessaging::ClearCCArrays()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_CLEARCCARRAYS, "CTsySatMessaging::ClearCCArrays" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_CLEARCCARRAYS_TD, "CTsySatMessaging::ClearCCArrays" );
     iSatCC->ClearArraysForRefresh();
     }
 
@@ -2042,7 +2042,7 @@ void CTsySatMessaging::CallControlReceivedL
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_CALLCONTROLRECEIVEDL, "CTsySatMessaging::CallControlReceivedL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_CALLCONTROLRECEIVEDL_TD, "CTsySatMessaging::CallControlReceivedL" );
     iSatCC->MessageReceivedL( aIsiMessage );
     }
 
@@ -2057,7 +2057,7 @@ void CTsySatMessaging::DataDownloadReceivedL
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_DATADOWNLOADRECEIVEDL, "CTsySatMessaging::DataDownloadReceivedL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_DATADOWNLOADRECEIVEDL_TD, "CTsySatMessaging::DataDownloadReceivedL" );
     iSatDataDownload->MessageReceivedL( aIsiMessage );
     }
 
@@ -2073,7 +2073,7 @@ void CTsySatMessaging::MoSmsControlReceivedL
         )
     {
     TFLOGSTRING("TSY: CTsySatMessaging::MoSmsControlReceivedL");
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_MOSMSCONTROLRECEIVEDL, "CTsySatMessaging::MoSmsControlReceivedL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_MOSMSCONTROLRECEIVEDL_TD, "CTsySatMessaging::MoSmsControlReceivedL" );
     if ( iSatMoSmsCtrl->IsActivated() )
         {
         iSatMoSmsCtrl->MessageReceivedL( aIsiMessage );
@@ -2089,7 +2089,7 @@ void CTsySatMessaging::MoSmsControlReceivedL
 //
 TBool CTsySatMessaging::IsMoSmControlBySimActivated()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_ISMOSMCONTROLBYSIMACTIVATED, "CTsySatMessaging::IsMoSmControlBySimActivated" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_ISMOSMCONTROLBYSIMACTIVATED_TD, "CTsySatMessaging::IsMoSmControlBySimActivated" );
     return iSatMoSmsCtrl->IsActivated();
     }
 
@@ -2101,7 +2101,7 @@ TBool CTsySatMessaging::IsMoSmControlBySimActivated()
 //
 CSatIcon* CTsySatMessaging::GetSatIcon()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETSATICON, "CTsySatMessaging::GetSatIcon" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETSATICON_TD, "CTsySatMessaging::GetSatIcon" );
     // Pointer to SAT timer
     return iSatIcon;
     }
@@ -2117,7 +2117,7 @@ void CTsySatMessaging::StoreCallConnectedEvent
         const TDesC8& aEnvelope
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_STORECALLCONNECTEDEVENT, "CTsySatMessaging::StoreCallConnectedEvent" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_STORECALLCONNECTEDEVENT_TD, "CTsySatMessaging::StoreCallConnectedEvent" );
     iNotifySetUpCall->StoreCallConnectedEvent( aEnvelope );
     }
 
@@ -2132,7 +2132,7 @@ void CTsySatMessaging::SetSetUpCallStatus
         const TBool aStatus
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_SETSETUPCALLSTATUS, "CTsySatMessaging::SetSetUpCallStatus" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_SETSETUPCALLSTATUS_TD, "CTsySatMessaging::SetSetUpCallStatus" );
     iEventDownload->SetSetUpCallStatus( aStatus );
     }
 
@@ -2147,7 +2147,7 @@ void CTsySatMessaging::SetStatusOfUssdSupport
         const TBool aStatus
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_SETSTATUSOFUSSDSUPPORT, "CTsySatMessaging::SetStatusOfUssdSupport" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_SETSTATUSOFUSSDSUPPORT_TD, "CTsySatMessaging::SetStatusOfUssdSupport" );
     iSatCC->SetStatusOfUssdSupport( aStatus );
     }
 
@@ -2162,7 +2162,7 @@ void CTsySatMessaging::SetTonNpi
         const TUint8 aTonNpi
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_SETTONNPI, "CTsySatMessaging::SetTonNpi" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_SETTONNPI_TD, "CTsySatMessaging::SetTonNpi" );
     iSatCC->SetTonNpi( aTonNpi );
     }
 
@@ -2177,7 +2177,7 @@ TInt CTsySatMessaging::StoreSmsL
         RMobileSmsStore::TMobileGsmSmsEntryV1& aSmsEntry
         )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_STORESMSL, "CTsySatMessaging::StoreSmsL" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_STORESMSL_TD, "CTsySatMessaging::StoreSmsL" );
     #if ( NCP_COMMON_S60_VERSION_SUPPORT == S60_VERSION_32 )
     RMobileSmsStore::TMobileGsmSmsEntryV1Pckg smsPckg( aSmsEntry );
 
@@ -2218,7 +2218,7 @@ TInt CTsySatMessaging::StoreSmsL
 //
 void CTsySatMessaging::UsatClientReadyIndication( TTsyReqHandle aTsyReqHandle )
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_USATCLIENTREADYINDICATION, "CTsySatMessaging::UsatClientReadyIndication" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_USATCLIENTREADYINDICATION_TD, "CTsySatMessaging::UsatClientReadyIndication" );
     TFLOGSTRING("TSY: CTsySatMessaging::UsatClientReadyIndication");
 
     // Set SAT ready flag in satmesshandler
@@ -2252,7 +2252,7 @@ void CTsySatMessaging::UsatClientReadyIndication( TTsyReqHandle aTsyReqHandle )
 //
 CMmMessageRouter* CTsySatMessaging::GetMessageRouter()
     {
-    OstTrace0( TRACE_NORMAL, CTSYSATMESSAGING_GETMESSAGEROUTER, "CTsySatMessaging::GetMessageRouter" );
+    OstTrace0( TRACE_NORMAL,  CTSYSATMESSAGING_GETMESSAGEROUTER_TD, "CTsySatMessaging::GetMessageRouter" );
     return iRouter;
     }
 #endif

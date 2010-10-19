@@ -37,7 +37,7 @@
 TSsParser::TSsParser()
     {
 TFLOGSTRING( "TSY: TSsParser::TSsParser" );
-OstTrace0( TRACE_NORMAL, TSSPARSER_TSSPARSER, "TSsParser::TSsParser" );
+OstTrace0( TRACE_NORMAL,  TSSPARSER_TSSPARSER_TD, "TSsParser::TSsParser" );
     iSsOperation = SS_OPERATION_UNDEFINED;
     iServiceCode = SS_UNKNOWN_SERVICE;
     }
@@ -52,7 +52,7 @@ OstTrace0( TRACE_NORMAL, TSSPARSER_TSSPARSER, "TSsParser::TSsParser" );
 TInt TSsParser::Parse( const TDesC& aServiceString )
     {
 TFLOGSTRING2( "TSY: TSsParser::Parse, servicestring: %S", &aServiceString );
-OstTraceExt1( TRACE_NORMAL, TSSPARSER_PARSE, "TSsParser::Parse;aServiceString=%S", aServiceString );
+OstTraceExt1( TRACE_NORMAL,  TSSPARSER_PARSE_TD, "TSsParser::Parse;aServiceString=%S", aServiceString );
 
     TInt error( KErrNone );
 
@@ -61,7 +61,7 @@ OstTraceExt1( TRACE_NORMAL, TSSPARSER_PARSE, "TSsParser::Parse;aServiceString=%S
          0 >= aServiceString.Length( ) )
         {
 TFLOGSTRING( "TSY: TSsParser::Parse, error: service string too long or does not exist!" );
-OstTrace0( TRACE_NORMAL, DUP1_TSSPARSER_PARSE, "TSsParser::Parse, error: service string too long or does not exist!" );
+OstTrace0( TRACE_NORMAL,  DUP1_TSSPARSER_PARSE_TD, "TSsParser::Parse, error: service string too long or does not exist!" );
         error = KErrArgument;
         }
 
@@ -82,13 +82,13 @@ OstTrace0( TRACE_NORMAL, DUP1_TSSPARSER_PARSE, "TSsParser::Parse, error: service
         // convert service code to integer
         iServiceCode = GetInt( tempBuffer );
 TFLOGSTRING2( "TSY: TSsParser::Parse, service code: %d", iServiceCode );
-OstTraceExt1( TRACE_NORMAL, DUP2_TSSPARSER_PARSE, "TSsParser::Parse;iServiceCode=%hu", iServiceCode );
+OstTraceExt1( TRACE_NORMAL,  DUP2_TSSPARSER_PARSE_TD, "TSsParser::Parse;iServiceCode=%hu", iServiceCode );
 
         if( SS_UNKNOWN_SERVICE == iServiceCode )
             {
             error = KErrArgument;
 TFLOGSTRING( "TSY: TSsParser::Parse, error: illegal sevice code!" );
-OstTrace0( TRACE_NORMAL, DUP3_TSSPARSER_PARSE, "TSsParser::Parse, error: illegal sevice code!" );
+OstTrace0( TRACE_NORMAL,  DUP3_TSSPARSER_PARSE_TD, "TSsParser::Parse, error: illegal sevice code!" );
             }
         }
 
@@ -121,7 +121,7 @@ OstTrace0( TRACE_NORMAL, DUP3_TSSPARSER_PARSE, "TSsParser::Parse, error: illegal
                 {
                 error = KErrArgument;
 TFLOGSTRING( "TSY: TSsParser::Parse, error: illegal end mark!" );
-OstTrace0( TRACE_NORMAL, DUP4_TSSPARSER_PARSE, "TSsParser::Parse, error: illegal end mark!" );
+OstTrace0( TRACE_NORMAL,  DUP4_TSSPARSER_PARSE_TD, "TSsParser::Parse, error: illegal end mark!" );
                 break;
                 }
             }
@@ -131,17 +131,17 @@ OstTrace0( TRACE_NORMAL, DUP4_TSSPARSER_PARSE, "TSsParser::Parse, error: illegal
         }
 
 TFLOGSTRING2( "TSY: TSsParser::Parse, SS code: %d", iSsOperation );
-OstTraceExt1( TRACE_NORMAL, DUP5_TSSPARSER_PARSE, "TSsParser::Parse;iSsOperation=%hhu", iSsOperation );
+OstTraceExt1( TRACE_NORMAL,  DUP5_TSSPARSER_PARSE_TD, "TSsParser::Parse;iSsOperation=%hhu", iSsOperation );
 TFLOGSTRING2( "TSY: TSsParser::Parse, SS code: %d", iServiceCode );
-OstTraceExt1( TRACE_NORMAL, DUP6_TSSPARSER_PARSE, "TSsParser::Parse;iServiceCode=%hu", iServiceCode );
+OstTraceExt1( TRACE_NORMAL,  DUP6_TSSPARSER_PARSE_TD, "TSsParser::Parse;iServiceCode=%hu", iServiceCode );
 TFLOGSTRING2( "TSY: TSsParser::Parse, SS info A: %S", &iSupplementaryInfoA );
-OstTraceExt1( TRACE_NORMAL, DUP7_TSSPARSER_PARSE, "TSsParser::Parse;iSupplementaryInfoA=%S", iSupplementaryInfoA );
+OstTraceExt1( TRACE_NORMAL,  DUP7_TSSPARSER_PARSE_TD, "TSsParser::Parse;iSupplementaryInfoA=%S", iSupplementaryInfoA );
 TFLOGSTRING2( "TSY: TSsParser::Parse, SS info B: %S", &iSupplementaryInfoB );
-OstTraceExt1( TRACE_NORMAL, DUP8_TSSPARSER_PARSE, "TSsParser::Parse;iSupplementaryInfoB=%S", iSupplementaryInfoB );
+OstTraceExt1( TRACE_NORMAL,  DUP8_TSSPARSER_PARSE_TD, "TSsParser::Parse;iSupplementaryInfoB=%S", iSupplementaryInfoB );
 TFLOGSTRING2( "TSY: TSsParser::Parse, SS info C: %S", &iSupplementaryInfoC );
-OstTraceExt1( TRACE_NORMAL, DUP9_TSSPARSER_PARSE, "TSsParser::Parse;iSupplementaryInfoC=%S", iSupplementaryInfoC );
+OstTraceExt1( TRACE_NORMAL,  DUP9_TSSPARSER_PARSE_TD, "TSsParser::Parse;iSupplementaryInfoC=%S", iSupplementaryInfoC );
 TFLOGSTRING2( "TSY: TSsParser::Parse, SS string left: %S", &iServiceString );
-OstTraceExt1( TRACE_NORMAL, DUP10_TSSPARSER_PARSE, "TSsParser::Parse;iServiceString=%S", iServiceString );
+OstTraceExt1( TRACE_NORMAL,  DUP10_TSSPARSER_PARSE_TD, "TSsParser::Parse;iServiceString=%S", iServiceString );
 
     return error;
     }
@@ -156,7 +156,7 @@ OstTraceExt1( TRACE_NORMAL, DUP10_TSSPARSER_PARSE, "TSsParser::Parse;iServiceStr
 void TSsParser::GetSsOperation( TUint8& aSsOperation ) const
     {
 TFLOGSTRING( "TSY: TSsParser::GetSsOperation" );
-OstTrace0( TRACE_NORMAL, TSSPARSER_GETSSOPERATION, "TSsParser::GetSsOperation" );
+OstTrace0( TRACE_NORMAL,  TSSPARSER_GETSSOPERATION_TD, "TSsParser::GetSsOperation" );
     aSsOperation = iSsOperation;
     }
 
@@ -170,7 +170,7 @@ OstTrace0( TRACE_NORMAL, TSSPARSER_GETSSOPERATION, "TSsParser::GetSsOperation" )
 void TSsParser::GetServiceCode( TUint16& aServiceCode ) const
     {
 TFLOGSTRING("TSY: TSsParser::GetServiceCode" );
-OstTrace0( TRACE_NORMAL, TSSPARSER_GETSERVICECODE, "TSsParser::GetServiceCode" );
+OstTrace0( TRACE_NORMAL,  TSSPARSER_GETSERVICECODE_TD, "TSsParser::GetServiceCode" );
     aServiceCode = iServiceCode;
     }
 
@@ -187,7 +187,7 @@ void TSsParser::GetServiceInfo(
     TPtrC& aSupplementaryInfoC ) const
     {
 TFLOGSTRING( "TSY: TSsParser::GetServiceInfo" );
-OstTrace0( TRACE_NORMAL, TSSPARSER_GETSERVICEINFO, "TSsParser::GetServiceInfo" );
+OstTrace0( TRACE_NORMAL,  TSSPARSER_GETSERVICEINFO_TD, "TSsParser::GetServiceInfo" );
     aSupplementaryInfoA.Set( iSupplementaryInfoA );
     aSupplementaryInfoB.Set( iSupplementaryInfoB );
     aSupplementaryInfoC.Set( iSupplementaryInfoC );
@@ -203,7 +203,7 @@ OstTrace0( TRACE_NORMAL, TSSPARSER_GETSERVICEINFO, "TSsParser::GetServiceInfo" )
 TUint8 TSsParser::ExtractSsOperation( )
     {
 TFLOGSTRING( "TSY: TSsParser::ExtractSsOperation" );
-OstTrace0( TRACE_NORMAL, TSSPARSER_EXTRACTSSOPERATION, "TSsParser::ExtractSsOperation" );
+OstTrace0( TRACE_NORMAL,  TSSPARSER_EXTRACTSSOPERATION_TD, "TSsParser::ExtractSsOperation" );
     TInt error( KErrNone );
 
     // SS operation is one or two first characters in the service string
@@ -212,41 +212,41 @@ OstTrace0( TRACE_NORMAL, TSSPARSER_EXTRACTSSOPERATION, "TSsParser::ExtractSsOper
         iSsOperation = SS_ERASURE; // unregister and deactivate
         iServiceString.Set( iServiceString.Mid( 2 ) ); // extract remaining part
 TFLOGSTRING2( "TSY: TSsParser::ExtractSsOperation, SS operation: erasure (%d)", iSsOperation );
-OstTraceExt1( TRACE_NORMAL, DUP1_TSSPARSER_EXTRACTSSOPERATION, "TSsParser::ExtractSsOperation;SS operation: erasure (%hhu)", iSsOperation );
+OstTraceExt1( TRACE_NORMAL,  DUP1_TSSPARSER_EXTRACTSSOPERATION_TD, "TSsParser::ExtractSsOperation;SS operation: erasure (%hhu)", iSsOperation );
         }
     else if( iServiceString.Left( 2 ) == KSsOperationInterrogation )
         {
         iSsOperation = SS_INTERROGATION; // check status
         iServiceString.Set( iServiceString.Mid ( 2 ) );
 TFLOGSTRING2( "TSY: TSsParser::ExtractSsOperation, SS operation: interrogation (%d)", iSsOperation );
-OstTraceExt1( TRACE_NORMAL, DUP2_TSSPARSER_EXTRACTSSOPERATION, "TSsParser::ExtractSsOperation;SS operation: interrogation (%hhu)", iSsOperation );
+OstTraceExt1( TRACE_NORMAL,  DUP2_TSSPARSER_EXTRACTSSOPERATION_TD, "TSsParser::ExtractSsOperation;SS operation: interrogation (%hhu)", iSsOperation );
         }
     else if( iServiceString.Left( 2 ) == KSsOperationRegistration )
         {
         iSsOperation = SS_REGISTRATION; // register and activate
         iServiceString.Set( iServiceString.Mid( 2 ) );
 TFLOGSTRING2( "TSY: TSsParser::ExtractSsOperation, SS operation: registration (%d)", iSsOperation );
-OstTraceExt1( TRACE_NORMAL, DUP3_TSSPARSER_EXTRACTSSOPERATION, "TSsParser::ExtractSsOperation;SS operation: registration (%hhu)", iSsOperation );
+OstTraceExt1( TRACE_NORMAL,  DUP3_TSSPARSER_EXTRACTSSOPERATION_TD, "TSsParser::ExtractSsOperation;SS operation: registration (%hhu)", iSsOperation );
         }
     else if( iServiceString.Left( 1 ) == KSsOperationActivation )
         {
         iSsOperation = SS_ACTIVATION; // activate
         iServiceString.Set( iServiceString.Mid( 1 ) );
 TFLOGSTRING2( "TSY: TSsParser::ExtractSsOperation, SS operation: activation (%d)", iSsOperation );
-OstTraceExt1( TRACE_NORMAL, DUP4_TSSPARSER_EXTRACTSSOPERATION, "TSsParser::ExtractSsOperation;SS operation: activation (%hhu)", iSsOperation );
+OstTraceExt1( TRACE_NORMAL,  DUP4_TSSPARSER_EXTRACTSSOPERATION_TD, "TSsParser::ExtractSsOperation;SS operation: activation (%hhu)", iSsOperation );
         }
     else if( iServiceString.Left( 1 ) == KSsOperationDeactivation )
         {
         iSsOperation = SS_DEACTIVATION; // unregister
         iServiceString.Set( iServiceString.Mid( 1 ) );
 TFLOGSTRING2( "TSY: TSsParser::ExtractSsOperation, SS operation: deactivation (%d)", iSsOperation );
-OstTraceExt1( TRACE_NORMAL, DUP5_TSSPARSER_EXTRACTSSOPERATION, "TSsParser::ExtractSsOperation;SS operation: deactivation (%hhu)", iSsOperation );
+OstTraceExt1( TRACE_NORMAL,  DUP5_TSSPARSER_EXTRACTSSOPERATION_TD, "TSsParser::ExtractSsOperation;SS operation: deactivation (%hhu)", iSsOperation );
         }
     else
         {
         iSsOperation = SS_OPERATION_UNDEFINED;
 TFLOGSTRING2( "TSY: TSsParser::ExtractSsOperation, SS operation: undefined (%d)", iSsOperation );
-OstTraceExt1( TRACE_NORMAL, DUP6_TSSPARSER_EXTRACTSSOPERATION, "TSsParser::ExtractSsOperation;SS operation: undefined (%hhu)", iSsOperation );
+OstTraceExt1( TRACE_NORMAL,  DUP6_TSSPARSER_EXTRACTSSOPERATION_TD, "TSsParser::ExtractSsOperation;SS operation: undefined (%hhu)", iSsOperation );
         error = KErrArgument;
         }
 
@@ -263,7 +263,7 @@ OstTraceExt1( TRACE_NORMAL, DUP6_TSSPARSER_EXTRACTSSOPERATION, "TSsParser::Extra
 void TSsParser::ExtractPart( TPtrC& aPart )
     {
 TFLOGSTRING( "TSY: TSsParser::ExtractPart" );
-OstTrace0( TRACE_NORMAL, TSSPARSER_EXTRACTPART, "TSsParser::ExtractPart" );
+OstTrace0( TRACE_NORMAL,  TSSPARSER_EXTRACTPART_TD, "TSsParser::ExtractPart" );
     TUint i( 0 );
     // service code and supplementary info ends to '*' or '#'
     // if there is no data to be extracted, empty buffer is returned.
@@ -276,7 +276,7 @@ OstTrace0( TRACE_NORMAL, TSSPARSER_EXTRACTPART, "TSsParser::ExtractPart" );
     // extracted part is returned as reference variable
     aPart.Set( iServiceString.Left( i ) );
 TFLOGSTRING2( "TSY: TSsParser::ExtractPart, extracted string: %S", &aPart );
-OstTraceExt1( TRACE_NORMAL, DUP1_TSSPARSER_EXTRACTPART, "TSsParser::ExtractPart;aPart=%S", aPart );
+OstTraceExt1( TRACE_NORMAL,  DUP1_TSSPARSER_EXTRACTPART_TD, "TSsParser::ExtractPart;aPart=%S", aPart );
     // set remaining part of service string
     iServiceString.Set( iServiceString.Mid( i ) );
     }
@@ -291,7 +291,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_TSSPARSER_EXTRACTPART, "TSsParser::ExtractPart;
 TCharacter TSsParser::ExtractSeparator( )
     {
 TFLOGSTRING( "TSY: TSsParser::ExtractSeparator" );
-OstTrace0( TRACE_NORMAL, TSSPARSER_EXTRACTSEPARATOR, "TSsParser::ExtractSeparator" );
+OstTrace0( TRACE_NORMAL,  TSSPARSER_EXTRACTSEPARATOR_TD, "TSsParser::ExtractSeparator" );
     TCharacter mark( ECharacterIllegal );
     // There should be at least the end mark '#' left in string
     if( iServiceString.Length() > 0 )
@@ -299,13 +299,13 @@ OstTrace0( TRACE_NORMAL, TSSPARSER_EXTRACTSEPARATOR, "TSsParser::ExtractSeparato
         if( '#' == iServiceString[0] )
             {
 TFLOGSTRING( "TSY: TSsParser::ExtractSeparator: end mark '#'" );
-OstTrace0( TRACE_NORMAL, DUP1_TSSPARSER_EXTRACTSEPARATOR, "TSsParser::ExtractSeparator, end mark '#'" );
+OstTrace0( TRACE_NORMAL,  DUP1_TSSPARSER_EXTRACTSEPARATOR_TD, "TSsParser::ExtractSeparator, end mark '#'" );
             mark = ECharacterEndMark;
             }
         else if( '*' == iServiceString[0] )
             {
 TFLOGSTRING( "TSY: TSsParser::ExtractSeparator: separator mark '*'" );
-OstTrace0( TRACE_NORMAL, DUP2_TSSPARSER_EXTRACTSEPARATOR, "TSsParser::ExtractSeparator, separator mark '*'" );
+OstTrace0( TRACE_NORMAL,  DUP2_TSSPARSER_EXTRACTSEPARATOR_TD, "TSsParser::ExtractSeparator, separator mark '*'" );
             mark = ECharacterSeparator;
             }
         // no else
@@ -314,7 +314,7 @@ OstTrace0( TRACE_NORMAL, DUP2_TSSPARSER_EXTRACTSEPARATOR, "TSsParser::ExtractSep
     else // end mark was missing
         {
 TFLOGSTRING( "TSY: TSsParser::ExtractSeparator: illegal ss string, no end mark!" );
-OstTrace0( TRACE_NORMAL, DUP3_TSSPARSER_EXTRACTSEPARATOR, "TSsParser::ExtractSeparator, illegal ss string, no end mark!" );
+OstTrace0( TRACE_NORMAL,  DUP3_TSSPARSER_EXTRACTSEPARATOR_TD, "TSsParser::ExtractSeparator, illegal ss string, no end mark!" );
         }
     return mark;
     }
@@ -329,7 +329,7 @@ OstTrace0( TRACE_NORMAL, DUP3_TSSPARSER_EXTRACTSEPARATOR, "TSsParser::ExtractSep
 TInt TSsParser::GetInt( const TDesC& aString )
     {
 TFLOGSTRING( "TSY: TSsParser::GetInt" );
-OstTrace0( TRACE_NORMAL, TSSPARSER_GETINT, "TSsParser::GetInt" );
+OstTrace0( TRACE_NORMAL,  TSSPARSER_GETINT_TD, "TSsParser::GetInt" );
     TInt code;
 
     if( TLex( aString ).Val( code ) != KErrNone)

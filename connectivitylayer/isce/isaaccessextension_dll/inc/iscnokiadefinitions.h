@@ -51,7 +51,7 @@ enum TIscNokiaUserChannels
     EIscNokiaNifPep10,                  //0x17
     EIscNokiaTest2,                     //0x18
     EIscNokiaReserved8,                 //0x19
-    EIscNokiaReserved9,                 //0x1a
+    EIscNokiaReserved7,                 //0x1a
     EIscNokiaPsy,                       //0x1b
     EIscNokiaNtm,                       //0x1c
     EIscNokiaNtmLicensee,               //0x1d
@@ -86,8 +86,8 @@ enum TIscNokiaUserChannels
     EIscNokiaUpdateServerApplication,   //0x3a
     EIscNokiaReserved3,                 //0x3b
     EIscNokiaReserved4,                 //0x3c  //60
-    EIscNokiaReserved5,                 //0x3d
-    EIscNokiaReserved6,                 //0x3e
+    EIscNokiaAtController3,             //0x3d
+    EIscNokiaAtController2,             //0x3e
     EIscNokiaAtController,              //0x3f  //63
     EIscNokiaLastUserChannel            // This is actually first kernel side channel
     };
@@ -111,7 +111,8 @@ enum TIscNokiaKernelChannels
     EIscNokiaUsbAudioDriver,            //0x4e
     EIscNokiaDMC,                       //0x4f
     EIscNokiaReservedKern2,             //0x50
-    EIscNokiaLastKernelChannel          //0x51    //81
+    EIscNokiaMTC,                       //0x51
+    EIscNokiaLastKernelChannel          //0x52    //82
     };
 
 // MACROS
@@ -140,29 +141,23 @@ enum TIscCancelAsyncCustomOperations
     };
 
 #ifndef PN_DEV_PC
-#define PN_DEV_PC 0x10 // Not in pn_const.h at the moment TODO: Remove when possible
+#define PN_DEV_PC 0x10 // Not in pn_const.h at the moment  Remove when possible
 #endif
 #ifndef PN_APE_COMMGR
-#define PN_APE_COMMGR 0x11 //TODO remove when defined in pn_const.h
+#define PN_APE_COMMGR 0x11 // remove when defined in pn_const.h
 #endif
 #ifndef THIS_DEVICE
     #if !defined (__WINS__) && !defined(NCP_COMMON_PLATFORM_SIMULATOR)
-            // Device IDs
-            #define THIS_DEVICE PN_DEV_HOST
-            #define OTHER_DEVICE_1 PN_DEV_MODEM
-            #define PN_DEV_OWN                                                  0x6c
-            #define PN_DEV_DONT_CARE OTHER_DEVICE_1
-            // Media IDs
-            #define PN_MEDIA_SOS                                                PN_MEDIA_MODEM_HOST_IF
-            // Internals CLIENT OF ISC API OR ISA KERNEL API - DO NOT USE! ->
-            #define PN_MEDIA_NOT_USED                                           0xfe
-            #define PN_NO_ROUTING                                               0xff
-            #define PN_OBJ_ROUTER PN_OBJ_ROUTING_REQ
-            // To be removed when pipe changes are done.
-            #define PNS_PIPE_DATA_OFFSET_DATA                                   3
-            // <- Internals CLIENT OF ISC API OR ISA KERNEL API - DO NOT USE!
+        #ifndef PN_DEV_OWN
+            #define PN_DEV_OWN 0 // PN_DEV_HOST
+        #endif // PN_DEV_OWN
+
+            #define THIS_DEVICE PN_DEV_OWN
     #else
-        #define THIS_DEVICE PN_DEV_PC
+        #ifndef PN_DEV_OWN
+            #define PN_DEV_OWN PN_DEV_PC 
+        #endif // PN_DEV_OWN
+            #define THIS_DEVICE  PN_DEV_OWN
     #endif
 #endif
 

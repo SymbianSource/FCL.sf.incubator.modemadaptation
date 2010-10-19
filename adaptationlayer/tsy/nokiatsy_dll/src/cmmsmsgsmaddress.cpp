@@ -64,7 +64,7 @@ CMmSmsGsmAddress::CMmSmsGsmAddress
         )
     {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::CMmSmsGsmAddress");
-OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_CMMSMSGSMADDRESS, "CMmSmsGsmAddress::CMmSmsGsmAddress" );
+OstTrace0( TRACE_NORMAL,  CMMSMSGSMADDRESS_CMMSMSGSMADDRESS_TD, "CMmSmsGsmAddress::CMmSmsGsmAddress" );
     //none
     }
 
@@ -84,7 +84,7 @@ void CMmSmsGsmAddress::GsmConvUnicodeTo0340Addr
         )    
     {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmConvUnicodeTo0340Addr");
-OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMCONVUNICODETO0340ADDR, "CMmSmsGsmAddress::GsmConvUnicodeTo0340Addr" );
+OstTrace0( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMCONVUNICODETO0340ADDR_TD, "CMmSmsGsmAddress::GsmConvUnicodeTo0340Addr" );
     
     if ( 0 != aSource.Length() )
         {
@@ -115,7 +115,7 @@ void CMmSmsGsmAddress::GsmConv0340AddrToUnicode
         )
     {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmConv0340AddrToUnicode");
-OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMCONV0340ADDRTOUNICODE, "CMmSmsGsmAddress::GsmConv0340AddrToUnicode" );
+OstTrace0( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMCONV0340ADDRTOUNICODE_TD, "CMmSmsGsmAddress::GsmConv0340AddrToUnicode" );
     
     if ( KAddressMinLength <= aSource.Length() ) 
         {
@@ -147,7 +147,7 @@ void CMmSmsGsmAddress::GsmConvUnicodeTo0411Addr
         )
     { 
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmConvUnicodeTo0411Addr");
-OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMCONVUNICODETO0411ADDR, "CMmSmsGsmAddress::GsmConvUnicodeTo0411Addr" );
+OstTrace0( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMCONVUNICODETO0411ADDR_TD, "CMmSmsGsmAddress::GsmConvUnicodeTo0411Addr" );
     
     if ( 0 != aSource.Length() )
         {
@@ -175,7 +175,7 @@ void CMmSmsGsmAddress::GsmConv0411AddrToUnicode
         )
     {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmConv0411AddrToUnicode");
-OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMCONV0411ADDRTOUNICODE, "CMmSmsGsmAddress::GsmConv0411AddrToUnicode" );
+OstTrace0( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMCONV0411ADDRTOUNICODE_TD, "CMmSmsGsmAddress::GsmConv0411AddrToUnicode" );
     
     if ( KAddressMinLength <= aSource.Length() )
         {
@@ -208,9 +208,9 @@ void CMmSmsGsmAddress::GsmConvUnicodeToAddr
         )
     { 
 TFLOGSTRING4("TSY: CMmSmsGsmAddress::GsmConvUnicodeToAddr - number type: %d, numbering plan: %d, number: %S", aTon, aNpi, &aSource);
-OstTraceExt3( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMCONVUNICODETOADDR, "CMmSmsGsmAddress::GsmConvUnicodeToAddr;aTon=%hhu;aNpi=%hhu;aSource=%S", aTon, aNpi, aSource );
+OstTraceExt3( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMCONVUNICODETOADDR_TD, "CMmSmsGsmAddress::GsmConvUnicodeToAddr;aTon=%hhu;aNpi=%hhu;aSource=%S", aTon, aNpi, aSource );
 TFLOGSTRING2("TSY: CMmSmsGsmAddress::GsmConvUnicodeToAddr - GSM 03.40 address: %d", a0340Address);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSMSGSMADDRESS_GSMCONVUNICODETOADDR, "CMmSmsGsmAddress::GsmConvUnicodeToAddr;a0340Address=%hhu", a0340Address );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSMSGSMADDRESS_GSMCONVUNICODETOADDR_TD, "CMmSmsGsmAddress::GsmConvUnicodeToAddr;a0340Address=%hhu", a0340Address );
     
     //get address length (always < 255)
     TUint8 numberLength( static_cast< TUint8 >( aSource.Length() ) );
@@ -357,7 +357,7 @@ void CMmSmsGsmAddress::GsmConvAddrToUnicode
         )
     {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmConvAddrToUnicode");
-OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMCONVADDRTOUNICODE, "CMmSmsGsmAddress::GsmConvAddrToUnicode" );
+OstTrace0( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMCONVADDRTOUNICODE_TD, "CMmSmsGsmAddress::GsmConvAddrToUnicode" );
     
     TUint8  addrDataLength( 0 );
     TBool   halfs( ETrue );
@@ -452,9 +452,9 @@ OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMCONVADDRTOUNICODE, "CMmSmsGsmAddres
             } // while
         }
 TFLOGSTRING4("TSY: CMmSmsGsmAddress::GsmConvAddrToUnicode - result: number type: %d, numbering plan: %d, number: %S", aTon, aNpi, &aDest);
-OstTraceExt3( TRACE_NORMAL, DUP1_CMMSMSGSMADDRESS_GSMCONVADDRTOUNICODE, "CMmSmsGsmAddress::GsmConvAddrToUnicode;aTon=%d;aNpi=%d;aDest=%S", aTon, aNpi, aDest );
+OstTraceExt3( TRACE_NORMAL,  DUP1_CMMSMSGSMADDRESS_GSMCONVADDRTOUNICODE_TD, "CMmSmsGsmAddress::GsmConvAddrToUnicode;aTon=%d;aNpi=%d;aDest=%S", aTon, aNpi, aDest );
 TFLOGSTRING2("TSY: CMmSmsGsmAddress::GsmConvAddrToUnicode - GSM 03.40 address", a0340Address);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMSMSGSMADDRESS_GSMCONVADDRTOUNICODE, "CMmSmsGsmAddress::GsmConvAddrToUnicode;a0340Address=%hhu", a0340Address );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMSMSGSMADDRESS_GSMCONVADDRTOUNICODE_TD, "CMmSmsGsmAddress::GsmConvAddrToUnicode;a0340Address=%hhu", a0340Address );
     }
 
 // -----------------------------------------------------------------------------
@@ -472,7 +472,7 @@ void CMmSmsGsmAddress::GsmFindOutTonAndNpi
         )     
     {
 TFLOGSTRING2("TSY: CMmSmsGsmAddress::GsmFindOutTonAndNpi - address type: %d", typeOfAddress);
-OstTraceExt1( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMFINDOUTTONANDNPI, "CMmSmsGsmAddress::GsmFindOutTonAndNpi;typeOfAddress=%hhu", typeOfAddress );
+OstTraceExt1( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMFINDOUTTONANDNPI_TD, "CMmSmsGsmAddress::GsmFindOutTonAndNpi;typeOfAddress=%hhu", typeOfAddress );
     
     TUint8 numberingPlanIdentification( static_cast< TUint8 >( 
         typeOfAddress & 0x0F ) );
@@ -515,7 +515,7 @@ OstTraceExt1( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMFINDOUTTONANDNPI, "CMmSmsGsmAddr
         default:
             {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmFindOutTonAndNpi - unknown type of number");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSMSGSMADDRESS_GSMFINDOUTTONANDNPI, "CMmSmsGsmAddress::GsmFindOutTonAndNpi, unknown type of number" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSMSGSMADDRESS_GSMFINDOUTTONANDNPI_TD, "CMmSmsGsmAddress::GsmFindOutTonAndNpi, unknown type of number" );
             *ton = RMobilePhone::EUnknownNumber;
             break;
             }
@@ -567,7 +567,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMSMSGSMADDRESS_GSMFINDOUTTONANDNPI, "CMmSmsGsmAd
         default:
             {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmFindOutTonAndNpi - unknown numbering plan");
-OstTrace0( TRACE_NORMAL, DUP2_CMMSMSGSMADDRESS_GSMFINDOUTTONANDNPI, "CMmSmsGsmAddress::GsmFindOutTonAndNpi, unknown numbering plan" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSMSGSMADDRESS_GSMFINDOUTTONANDNPI_TD, "CMmSmsGsmAddress::GsmFindOutTonAndNpi, unknown numbering plan" );
             *npi = RMobilePhone::EUnknownNumberingPlan;
             break;
             }
@@ -586,7 +586,7 @@ TUint8 CMmSmsGsmAddress::GsmMapTonToTUint8
         )
     {
 TFLOGSTRING2("TSY: CMmSmsGsmAddress::GsmMapTonToTUint8 - type of number: %d", aTon);
-OstTrace1( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMMAPTONTOTUINT8, "CMmSmsGsmAddress::GsmMapTonToTUint8;aTon=%d", aTon );
+OstTrace1( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMMAPTONTOTUINT8_TD, "CMmSmsGsmAddress::GsmMapTonToTUint8;aTon=%d", aTon );
     TUint8 typeOfNumber( 0 );
 
     switch ( aTon )
@@ -625,7 +625,7 @@ OstTrace1( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMMAPTONTOTUINT8, "CMmSmsGsmAddress::
         default:
             {
 TFLOGSTRING2("TSY: CMmSmsGsmAddress::GsmMapTonToTUint8 - unknown type of number: %d", aTon);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSMSGSMADDRESS_GSMMAPTONTOTUINT8, "CMmSmsGsmAddress::GsmMapTonToTUint8;unknown type of number aTon=%d", aTon );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSMSGSMADDRESS_GSMMAPTONTOTUINT8_TD, "CMmSmsGsmAddress::GsmMapTonToTUint8;unknown type of number aTon=%d", aTon );
             typeOfNumber = KTonUnknown;
             } 
         }
@@ -645,7 +645,7 @@ TUint8 CMmSmsGsmAddress::GsmMapNpiToTUint8
         )
     {
 TFLOGSTRING2("TSY: CMmSmsGsmAddress::GsmMapNpiToTUint8 - numbering plan identification: %d", aNpi);
-OstTrace1( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMMAPNPITOTUINT8, "CMmSmsGsmAddress::GsmMapNpiToTUint8;aNpi=%d", aNpi );
+OstTrace1( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMMAPNPITOTUINT8_TD, "CMmSmsGsmAddress::GsmMapNpiToTUint8;aNpi=%d", aNpi );
     
     TUint8 numPlanIdentification( 0 );
 
@@ -695,7 +695,7 @@ OstTrace1( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMMAPNPITOTUINT8, "CMmSmsGsmAddress::
         default:
             {
 TFLOGSTRING2("TSY: CMmSmsGsmAddress::GsmMapNpiToTUint8 - unknown numbering plan identification: %d", aNpi);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSMSGSMADDRESS_GSMMAPNPITOTUINT8, "CMmSmsGsmAddress::GsmMapNpiToTUint8;unknown numbering plan identification aNpi=%d", aNpi );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSMSGSMADDRESS_GSMMAPNPITOTUINT8_TD, "CMmSmsGsmAddress::GsmMapNpiToTUint8;unknown numbering plan identification aNpi=%d", aNpi );
             numPlanIdentification = KNpiUnknown;
             } 
         }
@@ -727,7 +727,7 @@ void CMmSmsGsmAddress::GsmUnicodeAddrToAlphanumericAddr
     {
     
 TFLOGSTRING2("TSY: CMmSmsGsmAddress::GsmUnicodeAddrToAlphanumericAddr - source address: %S", &aSource);
-OstTraceExt1( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMUNICODEADDRTOALPHANUMERICADDR, "CMmSmsGsmAddress::GsmUnicodeAddrToAlphanumericAddr;aSource=%S", aSource );
+OstTraceExt1( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMUNICODEADDRTOALPHANUMERICADDR_TD, "CMmSmsGsmAddress::GsmUnicodeAddrToAlphanumericAddr;aSource=%S", aSource );
     
     TUint16 j( 0 );
     TUint16 i( 0 );
@@ -824,7 +824,7 @@ void CMmSmsGsmAddress::GsmAlphanumericAddrToUnicodeAddr
         )
     {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmAlphanumericAddrToUnicodeAddr");
-OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMALPHANUMERICADDRTOUNICODEADDR, "CMmSmsGsmAddress::GsmAlphanumericAddrToUnicodeAddr" );
+OstTrace0( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMALPHANUMERICADDRTOUNICODEADDR_TD, "CMmSmsGsmAddress::GsmAlphanumericAddrToUnicodeAddr" );
     
     //Maximum length of address data is 10 bytes. These bytes can contain
     //11 packed 7-bit characters.
@@ -926,7 +926,7 @@ TUint8 CMmSmsGsmAddress::GsmLibPackAlphanumericAddress
         )
     {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmLibPackAlphanumericAddress");
-OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMLIBPACKALPHANUMERICADDRESS, "CMmSmsGsmAddress::GsmLibPackAlphanumericAddress" );
+OstTrace0( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMLIBPACKALPHANUMERICADDRESS_TD, "CMmSmsGsmAddress::GsmLibPackAlphanumericAddress" );
     TUint8 si( 0 );
     TUint8 di( 0 );
     TUint tempModulo( 0 );
@@ -998,7 +998,7 @@ void CMmSmsGsmAddress::GsmLibUnpackAlphanumericAddress
         )
     {
 TFLOGSTRING("TSY: CMmSmsGsmAddress::GsmLibUnpackAlphanumericAddress");
-OstTrace0( TRACE_NORMAL, CMMSMSGSMADDRESS_GSMLIBUNPACKALPHANUMERICADDRESS, "CMmSmsGsmAddress::GsmLibUnpackAlphanumericAddress" );
+OstTrace0( TRACE_NORMAL,  CMMSMSGSMADDRESS_GSMLIBUNPACKALPHANUMERICADDRESS_TD, "CMmSmsGsmAddress::GsmLibUnpackAlphanumericAddress" );
     TUint8 di( 0 );
     TUint8 si( 0 );  
     TUint tempModulo( 0 );

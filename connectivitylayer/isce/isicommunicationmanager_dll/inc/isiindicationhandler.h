@@ -74,18 +74,20 @@ NONSHARABLE_CLASS( DISIIndicationHandler ) : public DBase
         ~DISIIndicationHandler();
 
         /*
-        * Multicast and Subscribe must be called in same DFC thread.
+        * NOTE! Multicast and Subscribe must be called in same DFC thread.
         * If not then take a deep look at synchronization.
+        * Assumption: executed in a thread safe manner.
+        * @param aIndication, indication to be multicasted
         */
-        void Multicast( TDes8& aIndication );
+        void Multicast( const TDesC8& aIndication );
 
         /*
-        * Multicast and Subscribe must be called in same DFC thread.
+        * NOTE! Multicast and Subscribe must be called in same DFC thread.
         * If not then take a deep look at synchronization.
+        * Assumption: executed in a thread safe manner.
+        * @param aSubscriptionReq, subscription message
         */
-        void Subscribe( TDes8& aSubscriptionReq );
-
-
+        void Subscribe( const TDesC8& aSubscriptionMessage );
 
     private:
 
@@ -120,6 +122,7 @@ NONSHARABLE_CLASS( DISIIndicationHandler ) : public DBase
         SDblQue         iExternalDeviceQ;
         // Not owned
         MISIObjectRouterIf* iRouter;
+        TBool           iSubscriberIsAnExternalDevice;
 
     };
 

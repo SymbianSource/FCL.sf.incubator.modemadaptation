@@ -51,6 +51,16 @@ class MISIRouterLinkIf
         */
         virtual TBool Send( TDes8& aMsg ) = 0;
 
+        /*
+        * Ask state of the link.
+        * Called with FM held, no blocking nor trace etc..
+        * @return ETrue if connected, EFalse if disconnected
+        */
+        virtual TBool StateConnected() = 0;
+        
+        //  add comments
+        virtual TUint8 GetTrxId() = 0;
+
     };
 
 #endif /* __ISIROUTERLINKIF_H__ */

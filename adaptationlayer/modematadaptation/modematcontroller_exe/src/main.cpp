@@ -56,7 +56,7 @@ static void RunServerL()
     if ( find.Next(name) == KErrNone )
         {
         // Server is already up
-        C_TRACE((_L("ext srv already running.")));
+        C_TRACE((_L("modematcontroller.exe already running.")));
         return;
         }
 

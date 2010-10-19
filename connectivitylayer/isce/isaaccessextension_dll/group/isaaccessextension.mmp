@@ -15,72 +15,48 @@
 *
 */
 
-// NOTE! MISSING SUPPORT >
-//
-// Missing support for NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT, NCP_COMMON_BRIDGE_FAMILY_NAME_SERVICE_SUPPORT
-// Using legacy indicationhandler
-//
-// NOTE! MISSING SUPPORT <
-
 #include <non_foundation_paths.hrh>
 #include <platform_paths.hrh>
-#include        "kernel/kern_ext.mmh"
+#include "kernel/kern_ext.mmh"
 
-
+FEATUREVARIANT
 TARGET          isaaccessextension.dll
-TARGETTYPE      kext    
+TARGETTYPE      kext
 linkas          isaaccessextension.dll
 UID             0x20012481 // UID: 536945793    
 VENDORID        VID_DEFAULT
 CAPABILITY      ALL
-FEATUREVARIANT
+
 
 EPOCALLOWDLLDATA
 
 SMPSAFE
 
-SOURCEPATH      ../src
-SOURCE          isakernelapi.cpp
-SOURCE          iadtrace.cpp
-SOURCE          isaaccessextension.cpp
-SOURCE          isakernelchannel.cpp
-SOURCE          queue.cpp
-SOURCE          router.cpp
-
-#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
-SOURCE            pep.cpp
-SOURCE            peptransceiver.cpp
-SOURCE            pipehandler.cpp
-#endif
-// ISCE
-SOURCE            isilink.cpp
-// ISCE
-
 USERINCLUDE     ../inc
-USERINCLUDE     ../../ismpmultiplexer_dll/inc
-// ISCE
-USERINCLUDE     ../../memmanager_dll/inc
-USERINCLUDE     ../../isicommunicationmanager_dll/inc
-// ISCE
-// ISI
-USERINCLUDE    ../../isirouter_dll/inc
-//ISI
 USERINCLUDE     ../traces
 
-OS_LAYER_SYSTEMINCLUDE
-NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE      // FOR isakernelapi.h
-SYSTEMINCLUDE     /epoc32/include/kernel
-SYSTEMINCLUDE     /epoc32/include/nkern
+SOURCEPATH      ../src
 
-#if (NCP_COMMON_SOS_VERSION_SUPPORT >= SOS_VERSION_95)
-DEFFILE         isakernelapi.def
-#else
-// TODO NOTE BC DEFFILE         old_isakernelapi.def
-#endif
-// ISCE
+USERINCLUDE     ../../isirouter_dll/inc
+USERINCLUDE     ../../isicommunicationmanager_dll/inc
+USERINCLUDE     ../../memmanager_dll/inc
+
+
+SOURCE          common_wrapper.cpp
+SOURCE          isakernelapi_wrapper.cpp
+SOURCE          isaaccessextension_wrapper.cpp
+SOURCE          queue_wrapper.cpp
+SOURCE          router_wrapper.cpp
+
+LIBRARY         isirouter.lib
 LIBRARY         memmanager.lib
-LIBRARY         ismpmultiplexer.lib
-// ISCE
+
+OS_LAYER_SYSTEMINCLUDE
+NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE   /epoc32/include/kernel
+SYSTEMINCLUDE   /epoc32/include/nkern
+
+DEFFILE         isakernelapi.def
 START WINS
 win32_library kernel32.lib
 END
@@ -96,3 +72,4 @@ MACRO   DATA_DUMP
 //MACRO   FULL_DATA_DUMP
 
 
+MACRO ISCE_INTERNAL_WIDER_NAME_SERVICE_IN_USE

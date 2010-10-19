@@ -38,7 +38,6 @@ SOURCE          isiindicationhandler.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../isirouter_dll/inc
-USERINCLUDE     ../../isaaccessextension_dll/inc
 USERINCLUDE     ../../memmanager_dll/inc
 USERINCLUDE     ../../isinameservice_dll/inc
 
@@ -49,7 +48,7 @@ SYSTEMINCLUDE     /epoc32/include/nkern
 
 
 LIBRARY         memmanager.lib
-LIBRARY         isaaccessextension.lib
+LIBRARY         isirouter.lib
 LIBRARY         isinameservice.lib
 
 NOEXPORTLIBRARY
@@ -61,4 +60,6 @@ END
 
 // flag to enable normal trace inside component
 MACRO   COMPONENT_TRACE_FLAG
+//MACRO   COMPONENT_TRACE_FLAG_EXTEND
 
+MACRO ISCE_INTERNAL_WIDER_NAME_SERVICE_IN_USE

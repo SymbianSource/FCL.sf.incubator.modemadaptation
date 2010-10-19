@@ -102,7 +102,7 @@ enum TICCType
 CMmSecurityMessHandler::CMmSecurityMessHandler()
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::CMmSecurityMessHandler");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_CMMSECURITYMESSHANDLER, "CMmSecurityMessHandler::CMmSecurityMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_CMMSECURITYMESSHANDLER_TD, "CMmSecurityMessHandler::CMmSecurityMessHandler" );
     //none
     }
 
@@ -120,7 +120,7 @@ CMmSecurityMessHandler* CMmSecurityMessHandler::NewL(
     CMmUiccMessHandler* aUiccMessHandler )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::NewL");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_NEWL, "CMmSecurityMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_NEWL_TD, "CMmSecurityMessHandler::NewL" );
     CMmSecurityMessHandler* const securityMessHandler =
         new ( ELeave ) CMmSecurityMessHandler();
 
@@ -170,7 +170,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_NEWL, "CMmSecurityMessHandler::N
 void CMmSecurityMessHandler::ConstructL()
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_CONSTRUCTL, "CMmSecurityMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_CONSTRUCTL_TD, "CMmSecurityMessHandler::ConstructL" );
 
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     // Initialize the current MTC state to poweroff, and do the first state query
@@ -194,7 +194,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_CONSTRUCTL, "CMmSecurityMessHand
     // This flags indicates if lock state query in case
     iLockStateQuery = EFalse;
     iCodeType = RMobilePhone::ESecurityCodePin1;
-    
+
     iFdnSetting = RMobilePhone::EFdnSetOff;
     }
 
@@ -206,7 +206,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_CONSTRUCTL, "CMmSecurityMessHand
 CMmSecurityMessHandler::~CMmSecurityMessHandler()
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::~CMmSecurityMessHandler");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_CMMSECURITYMESSHANDLER, "CMmSecurityMessHandler::~CMmSecurityMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_CMMSECURITYMESSHANDLER_TD, "CMmSecurityMessHandler::~CMmSecurityMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ TInt CMmSecurityMessHandler::ExtFuncL(
     const CMmDataPackage* aDataPackage )
     {
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::ExtFuncL, aIpc: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_EXTFUNCL_TD, "CMmSecurityMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     TInt ret( KErrNone );
 
@@ -371,7 +371,21 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessH
             }
         case EMmTsyBootNotifySimStatusReadyIPC:
             {
-            UiccReq();
+            // In case of UICC server has started before TSY, application
+            // activation might not be done and in that case it is started now
+            if ( UICC_STATUS_APPL_ACTIVE != 
+                iMmUiccMessHandler->GetUiccApplicationStatus() )
+                {
+                iMmUiccMessHandler->CreateUiccReq();
+                }
+            else
+                {
+                // Application activation was already done
+                iMessageRouter->Complete(
+                    EMmTsyBootNotifySimStatusReadyIPC,
+                    KErrNone );
+                }
+
             break;
             }
         case EMmTsySimGetICCType:
@@ -392,7 +406,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessH
             RMobilePhone::TMobilePhoneFdnSetting* fdnSetting( NULL );
             aDataPackage->UnPackData( &fdnSetting );
             iFdnSetting = *fdnSetting;
-            
+
             if( UICC_CARD_TYPE_UICC == cardType )
                 {
                 ret = ReadEfEst( ETrIdSetFdnStateReadEst );
@@ -404,7 +418,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessH
             else
                 {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::ExtFuncL: unknown card type, FDN state not set");
-OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessHandler::ExtFuncL: unknown card type, FDN state not set" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMSECURITYMESSHANDLER_EXTFUNCL_TD, "CMmSecurityMessHandler::ExtFuncL: unknown card type, FDN state not set" );
                 ret = KErrGeneral;
                 }
             break;
@@ -425,7 +439,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessH
             else
                 {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::ExtFuncL: unknown card type, FDN state cannot be solved");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessHandler::ExtFuncL: unknown card type, FDN state cannot be solved" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_EXTFUNCL_TD, "CMmSecurityMessHandler::ExtFuncL: unknown card type, FDN state cannot be solved" );
                 ret = KErrGeneral;
                 }
             break;
@@ -440,7 +454,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessHandle
             {
             //This should not be in any use at the moment
 TFLOGSTRING("TSY: CMmSecurityMessHandler::ExtFuncL - EMmTsyBootGetRFStatusIPC (NOT IN USE!!!)");
-OstTrace0( TRACE_NORMAL, DUP5_CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessHandler::ExtFuncL, EMmTsyBootGetRFStatusIPC (NOT IN USE!!!)" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMSECURITYMESSHANDLER_EXTFUNCL_TD, "CMmSecurityMessHandler::ExtFuncL, EMmTsyBootGetRFStatusIPC (NOT IN USE!!!)" );
             ret = MtcRfStatusQueryReq( transId );
             break;
             }
@@ -448,7 +462,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessH
         default:
             {
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP6_CMMSECURITYMESSHANDLER_EXTFUNCL, "CMmSecurityMessHandler::ExtFuncL;Unknown aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP6_CMMSECURITYMESSHANDLER_EXTFUNCL_TD, "CMmSecurityMessHandler::ExtFuncL;Unknown aIpc=%d", aIpc );
             ret = KErrNotSupported;
             break;
             }
@@ -470,7 +484,7 @@ void CMmSecurityMessHandler::ReceiveMessageL(
     TInt messageId(aIsiMessage.Get8bit(ISI_HEADER_OFFSET_MESSAGEID));
 
 TFLOGSTRING3("TSY: CMmSecurityMessHandler::ReceiveMessageL - resource: %d, msgId: %d", resource, messageId);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL, "CMmSecurityMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmSecurityMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
 
     switch ( resource )
         {
@@ -497,7 +511,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL, "CMmSec
                 default:
                     {
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::ReceiveMessageL - PN_MTC - unknown msgId: %d", messageId);
-//OstTrace1( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL, "CMmSecurityMessHandler::ReceiveMessageL;PN_MTC - unknown messageId=%d", messageId );
+//OstTrace1( TRACE_NORMAL,  DUP3_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmSecurityMessHandler::ReceiveMessageL;PN_MTC - unknown messageId=%d", messageId );
                     break;
                     }
                 } // end switch ( messageId )
@@ -526,7 +540,7 @@ TFLOGSTRING2("TSY: CMmSecurityMessHandler::ReceiveMessageL - PN_MTC - unknown ms
                 default:
                     {
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::ReceiveMessageL - PN_MTC - unknown msgId: %d", messageId);
-OstTrace1( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL, "CMmSecurityMessHandler::ReceiveMessageL;PN_MTC - unknown messageId=%d", messageId );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmSecurityMessHandler::ReceiveMessageL;PN_MTC - unknown messageId=%d", messageId );
                     break;
                     }
                 } // end switch ( messageId )
@@ -537,16 +551,6 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL, "CMmSecuri
             {
             switch( messageId )
                 {
-                case UICC_RESP:
-                    {
-                    UiccResp( aIsiMessage );
-                    break;
-                    }
-                case UICC_IND:
-                    {
-                    UiccInd( aIsiMessage );
-                    break;
-                    }
                 case UICC_CARD_IND:
                     {
                     UiccCardInd( aIsiMessage );
@@ -572,7 +576,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL, "CMmSecuri
         default:
             {
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::ReceiveMessageL - unknown resource: %d", resource);
-OstTrace1( TRACE_NORMAL, DUP5_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL, "CMmSecurityMessHandler::ReceiveMessageL;resource=%d", resource );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMSECURITYMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmSecurityMessHandler::ReceiveMessageL;resource=%d", resource );
             break; // server not known
             }
         } // end of switch
@@ -592,7 +596,9 @@ TInt CMmSecurityMessHandler::VerifySecurityCode(
     RMobilePhone::TMobilePassword unblockCode( aCodes->iUnblockCode );
 
 TFLOGSTRING4("TSY: CMmSecurityMessHandler::VerifySecurityCode - code type: %d, code: %S, unblock code: %S",*aType, &code, &unblockCode);
-OstTraceExt3( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_SECCODEVERIFYREQ, "CMmSecurityMessHandler::VerifySecurityCode;code=%S;unblockCode=%S;aType=%hhu", code, unblockCode, *aType );
+OstTraceExt3( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_SECCODEVERIFYREQ_TD, "CMmSecurityMessHandler::VerifySecurityCode;code=%S;unblockCode=%S;aType=%hhu", code, unblockCode, *aType );
+
+    iSecurityCode = *aType;
 
     switch( *aType )
         {
@@ -636,11 +642,11 @@ TInt CMmSecurityMessHandler::SecCodeChangeReq(
     RMobilePhone::TMobilePhonePasswordChangeV1* aChange ) // Old&new password
     {
 TFLOGSTRING3("TSY: CMmSecurityMessHandler::SecCodeChangeReq - traId: %d, type: %d", aTransactionId, *aType);
-OstTraceExt2( TRACE_NORMAL, CMMSECURITYMESSHANDLER_SECCODECHANGEREQ, "CMmSecurityMessHandler::SecCodeChangeReq;aTransactionId=%hhu;aType=%d", aTransactionId, *aType );
+OstTraceExt2( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_SECCODECHANGEREQ_TD, "CMmSecurityMessHandler::SecCodeChangeReq;aTransactionId=%hhu;aType=%d", aTransactionId, *aType );
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::SecCodeChangeReq - old password: %S", &(aChange->iOldPassword));
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_SECCODECHANGEREQ, "CMmSecurityMessHandler::SecCodeChangeReq;aChange->iOldPassword=%S", aChange->iOldPassword );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_SECCODECHANGEREQ_TD, "CMmSecurityMessHandler::SecCodeChangeReq;aChange->iOldPassword=%S", aChange->iOldPassword );
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::SecCodeChangeReq - new password: %S", &(aChange->iNewPassword));
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_SECCODECHANGEREQ, "CMmSecurityMessHandler::SecCodeChangeReq;aChange->iNewPassword=%S", aChange->iNewPassword );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMSECURITYMESSHANDLER_SECCODECHANGEREQ_TD, "CMmSecurityMessHandler::SecCodeChangeReq;aChange->iNewPassword=%S", aChange->iNewPassword );
 
     TInt ret( KErrNone );
 
@@ -660,85 +666,6 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_SECCODECHANGEREQ, "CMmSe
     return ret;
     }
 
-// -----------------------------------------------------------------------------
-// CMmSecurityMessHandler::UiccReq
-// Builds UICC_REQ ISI message and sends it via phonet
-// -----------------------------------------------------------------------------
-//
-TInt CMmSecurityMessHandler::UiccReq() const
-    {
-TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccReq");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCREQ, "CMmSecurityMessHandler::UiccReq" );
-
-    // Create UICC_REQ message for querying card status
-    TIsiSend isiMsg( iPhoNetSender->SendBufferDes() );
-    isiMsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_UICC );
-    isiMsg.Set8bit( ISI_HEADER_OFFSET_TRANSID, KSecurityTransId );
-    isiMsg.Set8bit( ISI_HEADER_OFFSET_MESSAGEID, UICC_REQ );
-    isiMsg.Set8bit( ISI_HEADER_SIZE + UICC_REQ_OFFSET_SERVICETYPE,
-        UICC_STATUS_GET );
-
-    return iPhoNetSender->Send( isiMsg.Complete() );
-    }
-
-// -----------------------------------------------------------------------------
-// CMmSecurityMessHandler::UiccResp
-// Breaks UICC_RESP ISI-message and completes "notify SIM ready"
-// to CommonTSY.
-// -----------------------------------------------------------------------------
-//
-void CMmSecurityMessHandler::UiccResp( const TIsiReceiveC& aIsiMessage )
-    {
-    // Get service type
-    TUint8 serviceType( aIsiMessage.Get8bit(
-        ISI_HEADER_SIZE + UICC_RESP_OFFSET_SERVICETYPE ) );
-
-    // Get status
-    TUint8 status( aIsiMessage.Get8bit(
-        ISI_HEADER_SIZE + UICC_RESP_OFFSET_STATUS ) );
-
-TFLOGSTRING3("TSY: CMmSecurityMessHandler::UiccResp, service type: %d, status: %d", serviceType, status );
-OstTraceExt2( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCRESP, "CMmSecurityMessHandler::UiccResp;serviceType=%d;status=%d", serviceType, status );
-
-    if ( UICC_STATUS_GET == serviceType && UICC_STATUS_OK == status )
-        {
-        if ( !iBootState.iSIMReady )
-            {
-            // Set UICC as ready so that initialization can start
-            iBootState.iSIMReady = ETrue;
-
-            // let's cache service table and CPHS information table
-            iMmUiccMessHandler->InitializeSimServiceTableCache();
-            iMmUiccMessHandler->InitializeCphsInformationCache();
-            }
-        }
-    }
-
-// -----------------------------------------------------------------------------
-// CMmSecurityMessHandler::UiccInd
-// Breaks UICC_IND ISI-message and completes "notify SIM ready"
-// to CommonTSY.
-// -----------------------------------------------------------------------------
-//
-void CMmSecurityMessHandler::UiccInd( const TIsiReceiveC& aIsiMessage )
-    {
-    // Get service type
-    TUint8 serviceType( aIsiMessage.Get8bit(
-        ISI_HEADER_SIZE + UICC_IND_OFFSET_SERVICETYPE ) );
-
-TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccInd, service type: %d", serviceType );
-OstTraceExt1( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCIND, "CMmSecurityMessHandler::UiccInd;serviceType=%hhu", serviceType );
-
-    if ( UICC_START_UP_COMPLETE == serviceType )
-        {
-        // Set UICC state to ready
-        iBootState.iSIMReady = ETrue;
-
-        // let's cache service table and CPHS information table
-        iMmUiccMessHandler->InitializeSimServiceTableCache();
-        iMmUiccMessHandler->InitializeCphsInformationCache();
-        }
-   }
 
 // -----------------------------------------------------------------------------
 // CMmSecurityMessHandler::UiccCardInd
@@ -752,12 +679,12 @@ void CMmSecurityMessHandler::UiccCardInd( const TIsiReceiveC& aIsiMessage )
         ISI_HEADER_SIZE + UICC_CARD_IND_OFFSET_SERVICETYPE ) );
 
 TFLOGSTRING2("TSY: CMmCustomMessHandler::UiccCardInd, service type: %d", serviceType );
-OstTraceExt1( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCCARDIND, "CMmSecurityMessHandler::UiccCardInd;serviceType=%hhu", serviceType );
+OstTraceExt1( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_UICCCARDIND_TD, "CMmSecurityMessHandler::UiccCardInd;serviceType=%hhu", serviceType );
 
     if ( UICC_CARD_REMOVED == serviceType )
         {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccCardInd - SIM Removed!");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_UICCCARDIND, "CMmSecurityMessHandler::UiccCardInd - SIM Removed!" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_UICCCARDIND_TD, "CMmSecurityMessHandler::UiccCardInd - SIM Removed!" );
         // Change old boot state from TSY to not ready
         iBootState.iSecReady = EFalse;
         iBootState.iPinRequired = EFalse;
@@ -775,13 +702,13 @@ void CMmSecurityMessHandler::MtcStateInfoIndL(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::MtcStateInfoIndL");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL, "CMmSecurityMessHandler::MtcStateInfoIndL" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL_TD, "CMmSecurityMessHandler::MtcStateInfoIndL" );
 
     TUint8 state( aIsiMessage.Get8bit( ISI_HEADER_SIZE + MTC_STATE_INFO_IND_OFFSET_STATE ) );
     TUint8 action( aIsiMessage.Get8bit( ISI_HEADER_SIZE + MTC_STATE_INFO_IND_OFFSET_ACTION ) );
 
 TFLOGSTRING3("TSY: CMmSecurityMessHandler::MtcStateInfoIndL action: 0x%02x, state: 0x%02x", action, state);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL, "CMmSecurityMessHandler::MtcStateInfoIndL;action=%hhx;state=%hhx", action, state );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL_TD, "CMmSecurityMessHandler::MtcStateInfoIndL;action=%hhx;state=%hhx", action, state );
 
     //1. CMT_STATE_READY _AND_ CURRENT_STATE_NEW
     if ( ( MTC_NOS_READY == action || MTC_READY == action ) &&
@@ -790,11 +717,11 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL, "CMmSe
         iBootState.iMtcCurrentState = state;
 
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MtcStateInfoIndL - CMT state transition occurred");
-OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL, "CMmSecurityMessHandler::MtcStateInfoIndL, CMT state transition occurred" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL_TD, "CMmSecurityMessHandler::MtcStateInfoIndL, CMT state transition occurred" );
         if ( MTC_NORMAL == state )
             {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::MtcStateInfoIndL - MTC_NORMAL");
-OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL, "CMmSecurityMessHandler::MtcStateInfoIndL, MTC_NORMAL" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL_TD, "CMmSecurityMessHandler::MtcStateInfoIndL, MTC_NORMAL" );
             iMessageRouter->Complete( EMmTsyBootNotifyModemStatusReadyIPC,
                            KErrNone );
             }
@@ -817,7 +744,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL, "CMmSecur
     else if( ( MTC_NOS_READY == action || MTC_READY == action ) )
         {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::MtcStateInfoIndL - CMT state already active");
-OstTrace0( TRACE_NORMAL, DUP4_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL, "CMmSecurityMessHandler::MtcStateInfoIndL, CMT state already active" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMSECURITYMESSHANDLER_MTCSTATEINFOINDL_TD, "CMmSecurityMessHandler::MtcStateInfoIndL, CMT state already active" );
         }
     //no else //3. CMT_STATE_NOT_READY  - no action done in between state transition
     }
@@ -832,7 +759,7 @@ TInt CMmSecurityMessHandler::MtcRfStatusQueryReq(
     TUint8 aTransactionId ) const
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::MtcRfStatusQueryReq");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MTCRFSTATUSQUERYREQ, "CMmSecurityMessHandler::MtcRfStatusQueryReq" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MTCRFSTATUSQUERYREQ_TD, "CMmSecurityMessHandler::MtcRfStatusQueryReq" );
 
     TBuf8<2> fillerData;
     fillerData.AppendFill( KSecPadding, 2 );        // Padding bytes
@@ -853,7 +780,7 @@ void CMmSecurityMessHandler::MtcRfStatusQueryResp(
     const TIsiReceiveC& aIsiMessage )  const
     {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MtcRfStatusQueryResp" );
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MTCRFSTATUSQUERYRESP, "CMmSecurityMessHandler::MtcRfStatusQueryResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MTCRFSTATUSQUERYRESP_TD, "CMmSecurityMessHandler::MtcRfStatusQueryResp" );
 
     TUint8 currentRfState = aIsiMessage.Get8bit( ISI_HEADER_SIZE +
         MTC_RF_STATUS_QUERY_RESP_OFFSET_CURRENT );
@@ -865,11 +792,11 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MTCRFSTATUSQUERYRESP, "CMmSecuri
     if( MTC_RF_OFF == currentRfState )
         {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MtcRfStatusQueryResp - RF OFF" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MTCRFSTATUSQUERYRESP, "CMmSecurityMessHandler::MtcRfStatusQueryResp, RF OFF" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_MTCRFSTATUSQUERYRESP_TD, "CMmSecurityMessHandler::MtcRfStatusQueryResp, RF OFF" );
         statusInfo = ERfsStateInfoInactive;
         }
 TFLOGSTRING2("TSY: OFFLINE MODE IS: %d", statusInfo );
-OstTrace1( TRACE_NORMAL, DUP4_CMMSECURITYMESSHANDLER_MTCRFSTATUSQUERYRESP, "CMmSecurityMessHandler::MtcRfStatusQueryResp;statusInfo=%d", statusInfo );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMSECURITYMESSHANDLER_MTCRFSTATUSQUERYRESP_TD, "CMmSecurityMessHandler::MtcRfStatusQueryResp;statusInfo=%d", statusInfo );
 
     CMmDataPackage dataPackage;
     dataPackage.PackData ( &statusInfo );
@@ -890,7 +817,7 @@ TInt CMmSecurityMessHandler::MtcStateQueryReq(
     {
 
 TFLOGSTRING("TSY: CMmSecurityMessHandler::MtcStateQueryReq called" );
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MTCSTATEQUERYREQ, "CMmSecurityMessHandler::MtcStateQueryReq" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MTCSTATEQUERYREQ_TD, "CMmSecurityMessHandler::MtcStateQueryReq" );
 
     TBuf8<2> fillerData;
     fillerData.AppendFill( KSecPadding, 2 );        // Padding bytes
@@ -910,13 +837,13 @@ void CMmSecurityMessHandler::MtcStateQueryRespL(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MtcStateQueryRespL");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL, "CMmSecurityMessHandler::MtcStateQueryRespL" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL_TD, "CMmSecurityMessHandler::MtcStateQueryRespL" );
 
     TUint8 currentState = aIsiMessage.Get8bit(ISI_HEADER_SIZE + MTC_STATE_QUERY_RESP_OFFSET_CURRENT);
     TUint8 nextState    = aIsiMessage.Get8bit(ISI_HEADER_SIZE + MTC_STATE_QUERY_RESP_OFFSET_TARGET);
 
 TFLOGSTRING3("NTSY: CMmSecurityMessHandler::MtcStateQueryRespL - (current: 0x%02x, next: 0x%02x)",currentState, nextState );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL, "CMmSecurityMessHandler::MtcStateQueryRespL;currentState=%hhx;nextState=%hhx", currentState, nextState );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL_TD, "CMmSecurityMessHandler::MtcStateQueryRespL;currentState=%hhx;nextState=%hhx", currentState, nextState );
 
     //CMT side is ready when state transistion is completed (in all normal cases this should be the case)
 
@@ -924,13 +851,13 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL, "CMm
     if( currentState == nextState && iBootState.iMtcCurrentState != currentState )
         {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MtcStateQueryRespL - CMT ready." );
-OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL, "CMmSecurityMessHandler::MtcStateQueryRespL, CMT ready" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL_TD, "CMmSecurityMessHandler::MtcStateQueryRespL, CMT ready" );
         iBootState.iMtcCurrentState = currentState;
 
-        if( MTC_NORMAL == currentState )
+        if( MTC_NORMAL == currentState || MTC_RF_INACTIVE == currentState )
             {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MtcStateQueryRespL - EMmTsyBootNotifyModemStatusReadyIPC");
-OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL, "CMmSecurityMessHandler::MtcStateQueryRespL, EMmTsyBootNotifyModemStatusReadyIPC" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL_TD, "CMmSecurityMessHandler::MtcStateQueryRespL, EMmTsyBootNotifyModemStatusReadyIPC" );
             iMessageRouter->Complete( EMmTsyBootNotifyModemStatusReadyIPC, KErrNone );
             }
         //to complete EMmTsyBootGetRFStatusIPC
@@ -940,7 +867,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL, "CMmSec
     else if ( currentState != nextState )
         {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MtcStateQueryRespL - CMT state transition not ready.");
-OstTrace0( TRACE_NORMAL, DUP4_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL, "CMmSecurityMessHandler::MtcStateQueryRespL, CMT state transition not ready" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMSECURITYMESSHANDLER_MTCSTATEQUERYRESPL_TD, "CMmSecurityMessHandler::MtcStateQueryRespL, CMT state transition not ready" );
         MtcStateQueryReq( KSecurityTransId );
         }
     //no else //3. CMT_STATE_READY _AND_ CURRENT_STATE_OLD - no action needed if state already active
@@ -971,7 +898,7 @@ void CMmSecurityMessHandler::MceModemStateInd( const TIsiReceiveC& aIsiMessage )
         ISI_HEADER_SIZE + MCE_MODEM_STATE_IND_OFFSET_ACTION ) );
 
 TFLOGSTRING3("TSY: CMmSecurityMessHandler::MceModemStateInd action: 0x%02x, state: 0x%02x", action, state);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MCEMODEMSTATEIND, "CMmSecurityMessHandler::MceModemStateInd;state=%hhx;action=%hhx", state, action );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_MCEMODEMSTATEIND_TD, "CMmSecurityMessHandler::MceModemStateInd;state=%hhx;action=%hhx", state, action );
 
     // Modem is ready and CMT status has been changed
     if ( MCE_READY == action && iBootState.iMceCurrentState != state )
@@ -979,7 +906,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MCEMODEMSTATEIND, "CMmSe
         iBootState.iMceCurrentState = state;
 
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MceModemStateInd - CMT state transition occurred - MCE_NORMAL");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MCEMODEMSTATEIND, "CMmSecurityMessHandler::MceModemStateInd - CMT state transition occurred - MCE_NORMAL" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MCEMODEMSTATEIND_TD, "CMmSecurityMessHandler::MceModemStateInd - CMT state transition occurred - MCE_NORMAL" );
 
         iMessageRouter->Complete(
             EMmTsyBootNotifyModemStatusReadyIPC,
@@ -996,7 +923,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MCEMODEMSTATEIND, "CMmSecurityMe
     else if( MCE_READY == action && iBootState.iMceCurrentState == state )
         {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::MceModemStateInd - CMT state mot changed");
-OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_MCEMODEMSTATEIND, "CMmSecurityMessHandler::MceModemStateInd - CMT state not changed" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSECURITYMESSHANDLER_MCEMODEMSTATEIND_TD, "CMmSecurityMessHandler::MceModemStateInd - CMT state not changed" );
         }
     // No else, modem state not ready - no action needed
     }
@@ -1009,7 +936,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_MCEMODEMSTATEIND, "CMmSecur
 TInt CMmSecurityMessHandler::MceRfStateQueryReq() const
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::MceRfStateQueryReq");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MCERFSTATEQUERYREQ, "CMmSecurityMessHandler::MceRfStateQueryReq" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MCERFSTATEQUERYREQ_TD, "CMmSecurityMessHandler::MceRfStateQueryReq" );
 
     // Create MCE_RF_STATE_QUERY_REQ message for querying modem state
     TIsiSend isiMsg( iPhoNetSender->SendBufferDes() );
@@ -1032,7 +959,7 @@ void CMmSecurityMessHandler::MceRfStateQueryResp(
     const TIsiReceiveC& aIsiMessage ) const
     {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MceRfStateQueryResp" );
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MCERFSTATEQUERYRESP, "CMmSecurityMessHandler::MceRfStateQueryResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MCERFSTATEQUERYRESP_TD, "CMmSecurityMessHandler::MceRfStateQueryResp" );
 
     TUint8 currentRfState( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + MCE_RF_STATE_QUERY_RESP_OFFSET_CURRENT ) );
@@ -1046,7 +973,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MCERFSTATEQUERYRESP, "CMmSecurit
         }
 
 TFLOGSTRING2("NTSY: CMmSecurityMessHandler::MceRfStateQueryResp: RF State is: %d", statusInfo );
-OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MCERFSTATEQUERYRESP, "CMmSecurityMessHandler::MceRfStateQueryResp;statusInfo=%d", statusInfo );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_MCERFSTATEQUERYRESP_TD, "CMmSecurityMessHandler::MceRfStateQueryResp;statusInfo=%d", statusInfo );
 
     CMmDataPackage dataPackage;
     dataPackage.PackData ( &statusInfo );
@@ -1066,7 +993,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MCERFSTATEQUERYRESP, "CMmSe
 TInt CMmSecurityMessHandler::MceModemStateQueryReq() const
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::MceModemStateQueryReq" );
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYREQ, "CMmSecurityMessHandler::MceModemStateQueryReq" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYREQ_TD, "CMmSecurityMessHandler::MceModemStateQueryReq" );
 
     // Create MCE_MODEM_STATE_QUERY_REQ message for querying modem state
     TIsiSend isiMsg( iPhoNetSender->SendBufferDes() );
@@ -1091,7 +1018,7 @@ void CMmSecurityMessHandler::MceModemStateQueryResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MceModemStateQueryResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP, "CMmSecurityMessHandler::MceModemStateQueryResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP_TD, "CMmSecurityMessHandler::MceModemStateQueryResp" );
 
     TUint8 currentState( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + MCE_MODEM_STATE_QUERY_RESP_OFFSET_CURRENT ) );
@@ -1099,7 +1026,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP, "CMmSecu
         ISI_HEADER_SIZE + MCE_MODEM_STATE_QUERY_RESP_OFFSET_TARGET ) );
 
 TFLOGSTRING3("NTSY: CMmSecurityMessHandler::MceModemStateQueryResp - (current: 0x%02x, next: 0x%02x)",currentState, nextState );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP, "CMmSecurityMessHandler::MceModemStateQueryResp;currentState=%hhx;nextState=%hhx", currentState, nextState );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP_TD, "CMmSecurityMessHandler::MceModemStateQueryResp;currentState=%hhx;nextState=%hhx", currentState, nextState );
 
     // CMT side is ready when state transistion is completed
     // (in all normal cases this should be the case)
@@ -1109,14 +1036,14 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP, 
         iBootState.iMceCurrentState != currentState )
         {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MceModemStateQueryResp - CMT ready." );
-OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP, "CMmSecurityMessHandler::MceModemStateQueryResp - CMT ready" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP_TD, "CMmSecurityMessHandler::MceModemStateQueryResp - CMT ready" );
 
         iBootState.iMceCurrentState = currentState;
 
         if( MCE_NORMAL == currentState )
             {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MceModemStateQueryResp - EMmTsyBootNotifyModemStatusReadyIPC");
-OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP, "CMmSecurityMessHandler::MceModemStateQueryResp- EMmTsyBootNotifyModemStatusReadyIPC" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP_TD, "CMmSecurityMessHandler::MceModemStateQueryResp- EMmTsyBootNotifyModemStatusReadyIPC" );
             iMessageRouter->Complete(
                 EMmTsyBootNotifyModemStatusReadyIPC,
                 KErrNone );
@@ -1130,7 +1057,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP, "CM
     else if ( currentState != nextState )
         {
 TFLOGSTRING("NTSY: CMmSecurityMessHandler::MceModemStateQueryResp - CMT state transition not ready.");
-OstTrace0( TRACE_NORMAL, DUP4_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP, "CMmSecurityMessHandler::MceModemStateQueryResp -- CMT state transition not ready" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP_TD, "CMmSecurityMessHandler::MceModemStateQueryResp -- CMT state transition not ready" );
         MceModemStateQueryReq();
         }
     }
@@ -1143,7 +1070,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMSECURITYMESSHANDLER_MCEMODEMSTATEQUERYRESP, "CM
 //
 void CMmSecurityMessHandler::UiccPinInd( const TIsiReceiveC& aIsiMessage )
     {
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCPININD, "CMmSecurityMessHandler::UiccPinInd" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_UICCPININD_TD, "CMmSecurityMessHandler::UiccPinInd" );
 TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccPinInd");
 
     // Event to be completed
@@ -1224,7 +1151,7 @@ TInt CMmSecurityMessHandler::UiccPinReqVerify(
     const RMobilePhone::TMobilePassword& aUnblockCode )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccPinReqVerify");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCPINREQ, "CMmSecurityMessHandler::UiccPinReqVerify" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_UICCPINREQ_TD, "CMmSecurityMessHandler::UiccPinReqVerify" );
 
     TUint8 numOfSubblocks( 1 ); // in case of PIN verify
     TUint8 pinQualifier( UICC_PIN_OLD ); // in case of PIN verify
@@ -1310,7 +1237,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCPINREQ, "CMmSecurityMessHand
 //
 void CMmSecurityMessHandler::UiccPinResp( const TIsiReceiveC& aIsiMessage )
     {
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCPINRESP, "CMmSecurityMessHandler::UiccPinResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_UICCPINRESP_TD, "CMmSecurityMessHandler::UiccPinResp" );
 TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccPinResp");
 
     // Get service type and status
@@ -1325,6 +1252,7 @@ TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccPinResp");
         case UICC_PIN_UNBLOCK:
             {
             HandleUiccPinVerifyResp( status, aIsiMessage );
+            CompleteIfCodeVerified( status );
             break;
             }
         case UICC_PIN_INFO:
@@ -1352,6 +1280,74 @@ TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccPinResp");
     }
 
 // -----------------------------------------------------------------------------
+// CMmSecurityMessHandler::CompleteIfCodeVerified
+// Breaks a UICC_PIN_RESP ISI-message.
+// -----------------------------------------------------------------------------
+//
+void CMmSecurityMessHandler::CompleteIfCodeVerified( const TUint8 aStatus )
+    {
+TFLOGSTRING("TSY: CMmSecurityMessHandler::CompleteIfCodeVerified");
+OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_COMPLETEIFCODEVERIFIED_TD, "CMmSecurityMessHandler::CompleteIfCodeVerified" );
+
+    RMobilePhone::TMobilePhoneSecurityEvent event( RMobilePhone::ENoICCFound );
+
+    if ( UICC_STATUS_OK == aStatus )
+        {
+        switch ( iSecurityCode )
+            {
+            case RMobilePhone::ESecurityUniversalPin:
+                {
+                event = RMobilePhone::EUniversalPinVerified;
+                break;
+                }
+            case RMobilePhone::ESecurityCodePin1:
+                {
+                event = RMobilePhone::EPin1Verified;
+                break;
+                }
+            case RMobilePhone::ESecurityCodePin2:
+                {
+                event = RMobilePhone::EPin2Verified;
+                break;
+                }
+            case RMobilePhone::ESecurityUniversalPuk:
+                {
+                event = RMobilePhone::EUniversalPukVerified;
+                break;
+                }
+            case RMobilePhone::ESecurityCodePuk1:
+                {
+                event = RMobilePhone::EPuk1Verified;
+                break;
+                }
+            case RMobilePhone::ESecurityCodePuk2:
+                {
+                event = RMobilePhone::EPuk2Verified;
+                break;
+                }
+            default:
+                {
+OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_COMPLETEIFCODEVERIFIED_TD, "CMmSecurityMessHandler::CompleteIfCodeVerified - Default" );
+TFLOGSTRING("TSY: CMmSecurityMessHandler::CompleteIfCodeVerified - Default!");
+                break;
+                }
+
+            } //end of switch
+        }
+    if ( RMobilePhone::ENoICCFound != event )
+        {
+        // Complete notify security event
+        CMmDataPackage dataPackage;
+        dataPackage.PackData( &event );
+
+        iMessageRouter->Complete(
+            EMobilePhoneNotifySecurityEvent,
+            &dataPackage,
+            KErrNone );
+        }
+    }
+
+// -----------------------------------------------------------------------------
 // CMmSecurityMessHandler::UiccPinReqStateQuery
 // Creates and sends UICC_PIN_REQ ISI message.
 // -----------------------------------------------------------------------------
@@ -1360,7 +1356,7 @@ TInt CMmSecurityMessHandler::UiccPinReqStateQuery(
     const RMobilePhone::TMobilePhoneLock aLock )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccPinReqStateQuery");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCPINREQSTATEQUERY, "CMmSecurityMessHandler::UiccPinReqStateQuery" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_UICCPINREQSTATEQUERY_TD, "CMmSecurityMessHandler::UiccPinReqStateQuery" );
 
     TUint8 pinId( 0 );
 
@@ -1433,7 +1429,7 @@ TInt CMmSecurityMessHandler::UiccPinReqChange(
     const RMobilePhone::TMobilePassword& aNewCode )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccPinReqChange");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCPINREQCHANGE, "CMmSecurityMessHandler::UiccPinReqChange" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_UICCPINREQCHANGE_TD, "CMmSecurityMessHandler::UiccPinReqChange" );
 
     TUint8 pinId( 0 );
     if ( RMobilePhone::ESecurityCodePin1 == aType )
@@ -1527,7 +1523,7 @@ TInt CMmSecurityMessHandler::UiccPinReqChangeState(
     const RMobilePhone::TMobilePassword& aCode )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::UiccPinReqChangeState");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_UICCPINREQCHANGESTATE, "CMmSecurityMessHandler::UiccPinReqChangeState" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_UICCPINREQCHANGESTATE_TD, "CMmSecurityMessHandler::UiccPinReqChangeState" );
 
     TInt ret( KErrNone );
     TUint8 pinId( KUniversalPinKeyReference );
@@ -1644,7 +1640,7 @@ void CMmSecurityMessHandler::HandleUiccPinVerifyResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::HandleUiccPinVerifyResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_HANDLEUICCPINVERIFYRESP, "CMmSecurityMessHandler::HandleUiccPinVerifyResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_HANDLEUICCPINVERIFYRESP_TD, "CMmSecurityMessHandler::HandleUiccPinVerifyResp" );
 
     TInt ret( KErrNone );
 
@@ -1702,7 +1698,7 @@ void CMmSecurityMessHandler::HandleUiccPinInfoResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::HandleUiccPinInfoResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_HANDLEUICCPININFORESP, "CMmSecurityMessHandler::HandleUiccPinInfoResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_HANDLEUICCPININFORESP_TD, "CMmSecurityMessHandler::HandleUiccPinInfoResp" );
 
     TInt ret( KErrNone );
     CMmDataPackage dataPackage;
@@ -1809,7 +1805,7 @@ void CMmSecurityMessHandler::HandleUiccPinChangeResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::HandleUiccPinChangeResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_HANDLEUICCPINCHANGERESP, "CMmSecurityMessHandler::HandleUiccPinChangeResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_HANDLEUICCPINCHANGERESP_TD, "CMmSecurityMessHandler::HandleUiccPinChangeResp" );
 
     TInt ret( KErrNone );
     if ( UICC_STATUS_OK != aStatus )
@@ -1871,7 +1867,7 @@ void CMmSecurityMessHandler::HandleUiccPinStateChangeResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::HandleUiccPinStateChangeResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_HANDLEUICCPINSTATECHANGERESP, "CMmSecurityMessHandler::HandleUiccPinStateChangeResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_HANDLEUICCPINSTATECHANGERESP_TD, "CMmSecurityMessHandler::HandleUiccPinStateChangeResp" );
 
     TInt ret( KErrNone );
     // Status and setting values are not used in CTSY, set to 'unknown'
@@ -1946,7 +1942,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_HANDLEUICCPINSTATECHANGERESP, "C
 void CMmSecurityMessHandler::GetIccType()
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::GetIccType");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_GETICCTYPE, "CMmSecurityMessHandler::GetIccType" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_GETICCTYPE_TD, "CMmSecurityMessHandler::GetIccType" );
 
     TInt ret( KErrNone );
     TICCType type ( EICCTypeSimUnknown );
@@ -1980,7 +1976,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_GETICCTYPE, "CMmSecurityMessHand
 void CMmSecurityMessHandler::GetActivePin()
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::GetActivePin");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_GETACTIVEPIN, "CMmSecurityMessHandler::GetActivePin" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_GETACTIVEPIN_TD, "CMmSecurityMessHandler::GetActivePin" );
     RMobilePhone::TMobilePhoneSecurityCode activePin(
         iMmUiccMessHandler->GetActivePin());
     CMmDataPackage dataPackage;
@@ -1999,7 +1995,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_GETACTIVEPIN, "CMmSecurityMessHa
 void CMmSecurityMessHandler::GetActiveUsimApplication()
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::GetActiveUsimApplication");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_GETACTIVEUSIMAPPLICATION, "CMmSecurityMessHandler::GetActiveUsimApplication" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_GETACTIVEUSIMAPPLICATION_TD, "CMmSecurityMessHandler::GetActiveUsimApplication" );
 
     RMobilePhone::TAID aid( iMmUiccMessHandler->GetAid() );
     CMmDataPackage dataPackage;
@@ -2018,7 +2014,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_GETACTIVEUSIMAPPLICATION, "CMmSe
 TInt CMmSecurityMessHandler::GetPukCodeReq()
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::GetPukCodeReq");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_GETPUKCODEREQ, "CMmSecurityMessHandler::GetPukCodeReq" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_GETPUKCODEREQ_TD, "CMmSecurityMessHandler::GetPukCodeReq" );
     return iPukCodeRequired;
     }
 
@@ -2030,7 +2026,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_GETPUKCODEREQ, "CMmSecurity
 TInt CMmSecurityMessHandler::ReadEfEst( TUiccTrId aTraId )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::ReadEfEst");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_READEFEST, "CMmSecurityMessHandler::ReadEfEst" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_READEFEST_TD, "CMmSecurityMessHandler::ReadEfEst" );
 
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccReadTransparent params;
@@ -2062,7 +2058,7 @@ TInt CMmSecurityMessHandler::ProcessUiccMsg(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::ProcessUiccMsg");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_PROCESSUICCMSG, "CMmSecurityMessHandler::ProcessUiccMsg" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_PROCESSUICCMSG_TD, "CMmSecurityMessHandler::ProcessUiccMsg" );
 
     TInt ret( KErrNone );
 
@@ -2101,7 +2097,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_PROCESSUICCMSG, "CMmSecurityMess
         default:
             {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::ProcessUiccMsg - unknown transaction ID" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_PROCESSUICCMSG, "CMmSecurityMessHandler::ProcessUiccMsg - unknown transaction ID" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_PROCESSUICCMSG_TD, "CMmSecurityMessHandler::ProcessUiccMsg - unknown transaction ID" );
             break;
             }
         }
@@ -2118,7 +2114,7 @@ void CMmSecurityMessHandler::FdnSetReadEfEstResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::FdnSetReadEfEstResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP, "CMmSecurityMessHandler::FdnSetReadEfEstResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP_TD, "CMmSecurityMessHandler::FdnSetReadEfEstResp" );
 
     if( UICC_STATUS_OK == aStatus )
         {
@@ -2163,14 +2159,14 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP, "CMmSecurit
                 {
                 // state is already correct, let's just complete the request
 TFLOGSTRING("TSY: CMmSecurityMessHandler::FdnSetReadEfEstResp: FDN state already correct, let's complete");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP, "CMmSecurityMessHandler::FdnSetReadEfEstResp: FDN state already correct, let's complete" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP_TD, "CMmSecurityMessHandler::FdnSetReadEfEstResp: FDN state already correct, let's complete" );
                 iMessageRouter->Complete( EMobilePhoneSetFdnSetting, KErrNone );
                 }
             }
         else
             {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::FdnSetReadEfEstResp: FDN state not supported in EFust");
-OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP, "CMmSecurityMessHandler::FdnSetReadEfEstResp: FDN state not supported in EFust" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP_TD, "CMmSecurityMessHandler::FdnSetReadEfEstResp: FDN state not supported in EFust" );
             iMessageRouter->Complete( EMobilePhoneSetFdnSetting, KErrNotSupported );
             }
         }
@@ -2178,7 +2174,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP, "CMmSe
         {
         // error in reading EFest, let's complete the request
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::FdnSetReadEfEstResp: reading failed, 0x%x", aStatus);
-OstTrace1( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP, "CMmSecurityMessHandler::FdnSetReadEfEstResp: reading failed, 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMSECURITYMESSHANDLER_FDNSETREADEFESTRESP_TD, "CMmSecurityMessHandler::FdnSetReadEfEstResp: reading failed, 0x%x", aStatus );
 
         // compete setting of FDN state 
         iMessageRouter->Complete( EMobilePhoneSetFdnSetting, KErrGeneral );
@@ -2195,7 +2191,7 @@ void CMmSecurityMessHandler::FdnGetReadEfEstResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::FdnGetReadEfEstResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNGETREADEFESTRESP, "CMmSecurityMessHandler::FdnGetReadEfEstResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_FDNGETREADEFESTRESP_TD, "CMmSecurityMessHandler::FdnGetReadEfEstResp" );
 
     RMobilePhone::TMobilePhoneFdnStatus fdnSetting( RMobilePhone::EFdnNotActive );
 
@@ -2227,7 +2223,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNGETREADEFESTRESP, "CMmSecurit
         {
         // error in reading EFest, let's complete the request
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::FdnGetReadEfEstResp: reading failed, 0x%x", aStatus);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_FDNGETREADEFESTRESP, "CMmSecurityMessHandler::FdnGetReadEfEstResp: reading failed, 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_FDNGETREADEFESTRESP_TD, "CMmSecurityMessHandler::FdnGetReadEfEstResp: reading failed, 0x%x", aStatus );
 
         fdnSetting  = RMobilePhone::EFdnNotSupported;
         CMmDataPackage dataPackage;
@@ -2245,18 +2241,18 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_FDNGETREADEFESTRESP, "CMmSe
 void CMmSecurityMessHandler::WriteEfEstResp( const TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::WriteEfEstResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_WRITEEFESTRESP, "CMmSecurityMessHandler::WriteEfEstResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_WRITEEFESTRESP_TD, "CMmSecurityMessHandler::WriteEfEstResp" );
 
     if( UICC_STATUS_OK == aStatus )
         {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::WriteEfEstResp: FDN state set succesfully");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_WRITEEFESTRESP, "CMmSecurityMessHandler::WriteEfEstResp: FDN state set succesfully" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_WRITEEFESTRESP_TD, "CMmSecurityMessHandler::WriteEfEstResp: FDN state set succesfully" );
         iMessageRouter->Complete( EMobilePhoneSetFdnSetting, KErrNone );
         }
     else
         {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::WriteEfEstResp: FDN state set failed");
-OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_WRITEEFESTRESP, "CMmSecurityMessHandler::WriteEfEstResp: FDN state set failed" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSECURITYMESSHANDLER_WRITEEFESTRESP_TD, "CMmSecurityMessHandler::WriteEfEstResp: FDN state set failed" );
         iMessageRouter->Complete( EMobilePhoneSetFdnSetting, KErrGeneral );
         }
     }
@@ -2270,7 +2266,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_WRITEEFESTRESP, "CMmSecurit
 TInt CMmSecurityMessHandler::SendFdnStateCommand()
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::SendFdnStateCommand");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_SENDFDNSTATECOMMAND, "CMmSecurityMessHandler::SendFdnStateCommand" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_SENDFDNSTATECOMMAND_TD, "CMmSecurityMessHandler::SendFdnStateCommand" );
 
     TInt ret( 0 );
     TUiccSendApdu params;
@@ -2309,7 +2305,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_SENDFDNSTATECOMMAND, "CMmSecurit
     else
         {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::SendFdnStateCommand: unknown FDN state");
-        OstTrace0( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_SENDFDNSTATECOMMAND, "CMmSecurityMessHandler::SendFdnStateCommand: unknown FDN state" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_SENDFDNSTATECOMMAND_TD, "CMmSecurityMessHandler::SendFdnStateCommand: unknown FDN state" );
         ret = KErrArgument;
         }
 
@@ -2326,7 +2322,7 @@ void CMmSecurityMessHandler::FdnStateCommandResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::SendFdnStateCommand");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNSTATECOMMANDRESP, "CMmSecurityMessHandler::FdnStateCommandResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_FDNSTATECOMMANDRESP_TD, "CMmSecurityMessHandler::FdnStateCommandResp" );
 
     if( UICC_STATUS_OK == aStatus )
         {
@@ -2335,7 +2331,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNSTATECOMMANDRESP, "CMmSecurit
         TUint8 sw2( aFileData[aFileData.Length() - KSw2Position] );
 
 TFLOGSTRING3("TSY: CMmSecurityMessHandler::SendFdnStateCommand: sw1: 0x%x, sw2: 0x%x", sw1, sw2);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_FDNSTATECOMMANDRESP, "CMmSecurityMessHandler::FdnStateCommandResp: sw1: 0x%x, sw2: 0x%x", sw1, sw2 );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_FDNSTATECOMMANDRESP_TD, "CMmSecurityMessHandler::FdnStateCommandResp: sw1: 0x%x, sw2: 0x%x", sw1, sw2 );
 
         TInt ret( KErrGeneral );
 
@@ -2353,7 +2349,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_FDNSTATECOMMANDRESP, "CM
     else
         {
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::SendFdnStateCommand, Fdn state set failed: 0x%x", aStatus);
-OstTrace1( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_FDNSTATECOMMANDRESP, "CMmSecurityMessHandler::FdnStateCommandResp, Fdn state set failed: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMSECURITYMESSHANDLER_FDNSTATECOMMANDRESP_TD, "CMmSecurityMessHandler::FdnStateCommandResp, Fdn state set failed: 0x%x", aStatus );
         iMessageRouter->Complete( EMobilePhoneSetFdnSetting, KErrGeneral );
         }
     }
@@ -2366,7 +2362,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_FDNSTATECOMMANDRESP, "CMmSe
 TInt CMmSecurityMessHandler::ReadEfAdnFileInfo( TUiccTrId aTraId )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::ReadEfAdnFileInfo");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_READEFADNFILEINFO, "CMmSecurityMessHandler::ReadEfAdnFileInfo" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_READEFADNFILEINFO_TD, "CMmSecurityMessHandler::ReadEfAdnFileInfo" );
 
     TUiccApplFileInfo params;
     params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
@@ -2392,7 +2388,7 @@ void CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP, "CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP_TD, "CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp" );
 
     if( UICC_STATUS_OK == aStatus )
         {
@@ -2414,7 +2410,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP, "CM
                 // Current FDN state is already correct, so we can 
                 // complete the request
 TFLOGSTRING("TSY: CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp: FDN state already correct, let's complete");
-OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP, "CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp: FDN state already correct, let's complete" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP_TD, "CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp: FDN state already correct, let's complete" );
                 iMessageRouter->Complete( EMobilePhoneSetFdnSetting, KErrNone );
                 }
             else
@@ -2426,7 +2422,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP
         else
             {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp: FDN or ADN not supported in EFsst");
-OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP, "CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp: FDN or ADN not supported in EFsst" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP_TD, "CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp: FDN or ADN not supported in EFsst" );
 
                 iMessageRouter->Complete( EMobilePhoneSetFdnSetting, KErrNotSupported );
             }
@@ -2434,7 +2430,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP
     else
         {
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp: reading failed: 0x%x", aStatus);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP, "CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp: reading failed: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_FDNSETREADEFADNFILEINFORESP_TD, "CMmSecurityMessHandler::FdnSetReadEfAdnFileInfoResp: reading failed: 0x%x", aStatus );
 
         iMessageRouter->Complete( EMobilePhoneSetFdnSetting, KErrNotSupported );
         }
@@ -2451,7 +2447,7 @@ void CMmSecurityMessHandler::FdnGetReadEfAdnFileInfoResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmSecurityMessHandler::FdnGetReadEfAdnFileInfoResp");
-OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNGETREADEFADNFILEINFORESP, "CMmSecurityMessHandler::FdnGetReadEfAdnFileInfoResp" );
+OstTrace0( TRACE_NORMAL,  CMMSECURITYMESSHANDLER_FDNGETREADEFADNFILEINFORESP_TD, "CMmSecurityMessHandler::FdnGetReadEfAdnFileInfoResp" );
 
     RMobilePhone::TMobilePhoneFdnStatus fdnSetting( RMobilePhone::EFdnNotActive );
 
@@ -2483,7 +2479,7 @@ OstTrace0( TRACE_NORMAL, CMMSECURITYMESSHANDLER_FDNGETREADEFADNFILEINFORESP, "CM
     else
         {
 TFLOGSTRING2("TSY: CMmSecurityMessHandler::FdnGetReadEfAdnFileInfoResp: reading failed: 0x%x", aStatus);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSECURITYMESSHANDLER_FDNGETREADEFADNFILEINFORESP, "CMmSecurityMessHandler::FdnGetReadEfAdnFileInfoResp: reading failed: 0x%x", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSECURITYMESSHANDLER_FDNGETREADEFADNFILEINFORESP_TD, "CMmSecurityMessHandler::FdnGetReadEfAdnFileInfoResp: reading failed: 0x%x", aStatus );
 
         fdnSetting = RMobilePhone::EFdnNotSupported;
         CMmDataPackage dataPackage;

@@ -39,10 +39,11 @@ enum TISIAsyncRequest
 
 _LIT( KISIDriverName, "ISIDriver" );
 
-const TUint8 KNotInitializedId( 0x00 );
+const TUint8 KNotInitializedId( 0xff );
 const TInt32 KNotInitializedUID( 0x00 );
 const TInt KNotInitializedStatus( 0xff );
 const TInt KISILddRxQueueSize( 50 );
+const TInt KISIMainRxQueueSize( 200 );
 const TInt KMaxISIMsgSize( 65536 );
 const TInt KMaxAmountOfObjId( 256 );
 const TInt KFirstAllowedObjId( 1 );

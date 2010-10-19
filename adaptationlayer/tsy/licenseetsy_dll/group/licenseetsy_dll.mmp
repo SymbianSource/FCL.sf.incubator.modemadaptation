@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -41,8 +41,7 @@ SOURCE        licenseetsy.cpp
 CAPABILITY CAP_GENERAL_DLL
 USERINCLUDE     ../inc
 USERINCLUDE     ../traces
-// Temporarily removed for Bridge camp!
-//USERINCLUDE     ../../simatktsy_dll/inc
+USERINCLUDE     ../../simatktsy_dll/inc
 USERINCLUDE     ../../nokiatsy_dll/inc
 
 // Dependencies from other components
@@ -56,8 +55,7 @@ LIBRARY       euser.lib    // EPOC basics
 LIBRARY       flogger.lib  // Logging
 
 // Telephonyadaptation
-// Temporarily removed for Bridge camp!
-// LIBRARY       simatktsy.lib
+LIBRARY       simatktsy.lib
 LIBRARY       nokiatsy.lib
 
 #if defined(WINSCW)

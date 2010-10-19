@@ -70,7 +70,7 @@ const TUint8 KDigitMask = 0x0F;
 CMmENStoreMessHandler::CMmENStoreMessHandler()
     {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::CMmENStoreMessHandler() - Start");
-OstTrace0( TRACE_NORMAL, CMMENSTOREMESSHANDLER_CMMENSTOREMESSHANDLER, "CMmENStoreMessHandler::CMmENStoreMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_CMMENSTOREMESSHANDLER_TD, "CMmENStoreMessHandler::CMmENStoreMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ OstTrace0( TRACE_NORMAL, CMMENSTOREMESSHANDLER_CMMENSTOREMESSHANDLER, "CMmENStor
 CMmENStoreMessHandler::~CMmENStoreMessHandler()
     {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::~CMmENStoreMessHandler() - End");
-OstTrace0( TRACE_NORMAL, DUP1_CMMENSTOREMESSHANDLER_CMMENSTOREMESSHANDLER, "CMmENStoreMessHandler::~CMmENStoreMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMENSTOREMESSHANDLER_CMMENSTOREMESSHANDLER_TD, "CMmENStoreMessHandler::~CMmENStoreMessHandler" );
 
     if( iEnNumberArray )
         {
@@ -104,7 +104,7 @@ CMmENStoreMessHandler* CMmENStoreMessHandler::NewL(
     )
     {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::NewL");
-OstTrace0( TRACE_NORMAL, CMMENSTOREMESSHANDLER_NEWL, "CMmENStoreMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_NEWL_TD, "CMmENStoreMessHandler::NewL" );
 
     // Create EN store message handler
     CMmENStoreMessHandler* enStoreMessHandler =
@@ -130,7 +130,7 @@ OstTrace0( TRACE_NORMAL, CMMENSTOREMESSHANDLER_NEWL, "CMmENStoreMessHandler::New
 void CMmENStoreMessHandler::ConstructL()
     {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::ConstructL()");
-OstTrace0( TRACE_NORMAL, CMMENSTOREMESSHANDLER_CONSTRUCTL, "CMmENStoreMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_CONSTRUCTL_TD, "CMmENStoreMessHandler::ConstructL" );
 
     iEnNumberArray = new ( ELeave ) CArrayPtrFlat<TENStoreResponse>( 1 );
     }
@@ -147,7 +147,7 @@ TInt CMmENStoreMessHandler::ProcessUiccMsg(
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY:CMmENStoreMessHandler::ProcessUiccMsg, aTraId: %d, status: %d", aTraId, aStatus );
-OstTraceExt2( TRACE_NORMAL, DUP2_CMMENSTOREMESSHANDLER_PROCESSUICCMSG, "CMmENStoreMessHandler::ProcessUiccMsg;aTraId=%d;aStatus=%d", aTraId, aStatus );
+OstTraceExt2( TRACE_NORMAL,  DUP2_CMMENSTOREMESSHANDLER_PROCESSUICCMSG_TD, "CMmENStoreMessHandler::ProcessUiccMsg;aTraId=%d;aStatus=%d", aTraId, aStatus );
 
 
     TInt ret( KErrNone );
@@ -167,7 +167,7 @@ OstTraceExt2( TRACE_NORMAL, DUP2_CMMENSTOREMESSHANDLER_PROCESSUICCMSG, "CMmENSto
         default:
             {
 TFLOGSTRING("TSY:CMmENStoreMessHandler::ProcessUiccMsg - unknown transaction ID" );
-OstTrace0( TRACE_NORMAL, CMMENSTOREMESSHANDLER_PROCESSUICCMSG, "CMmENStoreMessHandler::ProcessUiccMsg - unknown transaction ID" );
+OstTrace0( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_PROCESSUICCMSG_TD, "CMmENStoreMessHandler::ProcessUiccMsg - unknown transaction ID" );
             break;
             }
         }
@@ -186,7 +186,7 @@ TInt CMmENStoreMessHandler::UiccReadEmergCodesResp
         )
     {
 TFLOGSTRING2("TSY:CMmENStoreMessHandler::UiccReadEmergCodesResp, status: %d", aStatus );
-OstTrace1( TRACE_NORMAL, DUP2_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP, "CMmENStoreMessHandler::UiccReadEmergCodesResp;aStatus=%d", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP_TD, "CMmENStoreMessHandler::UiccReadEmergCodesResp;aStatus=%d", aStatus );
 
     TInt ret( KErrNone );
     // Create data package
@@ -269,7 +269,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP, "CMm
                         TBuf8< KEmergencyNbrLenInBytes > readIn;
 
 TFLOGSTRING3("TSY: CMmENStoreMessHandler::UiccReadEmergCodesResp. length:%d, index:%d", aFileData.Length(), index);
-OstTraceExt2( TRACE_NORMAL, DUP4_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP, "CMmENStoreMessHandler::UiccReadEmergCodesResp;aFileData.Length()=%d;index=%d", aFileData.Length(), index );
+OstTraceExt2( TRACE_NORMAL,  DUP4_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP_TD, "CMmENStoreMessHandler::UiccReadEmergCodesResp;aFileData.Length()=%d;index=%d", aFileData.Length(), index );
 
                         readIn.Copy(aFileData.Mid(
                             ((index * KEmergencyNbrLenInBytes ) - 3),
@@ -356,7 +356,7 @@ OstTraceExt2( TRACE_NORMAL, DUP4_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP, "
                     // Location index is not valid. Complete request with error.
 TFLOGSTRING2("TSY: CMmENStoreMessHandler::UiccReadEmergCodesResp\
               - Invalid index: %d", iReadECCLocation);
-OstTrace1( TRACE_NORMAL, DUP1_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP, "CMmENStoreMessHandler::UiccReadEmergCodesResp - Invalid index:;iReadECCLocation=%d", iReadECCLocation );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP_TD, "CMmENStoreMessHandler::UiccReadEmergCodesResp - Invalid index:;iReadECCLocation=%d", iReadECCLocation );
 
                     ret = KErrArgument;
                     }
@@ -397,7 +397,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP, "CMm
                     {
                     // Location index is not valid. Complete request with error.
 TFLOGSTRING2("TSY: CMmENStoreMessHandler::UiccReadEmergCodesResp - Invalid index: %d", iReadECCLocation);
-OstTrace1( TRACE_NORMAL, CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP, "CMmENStoreMessHandler::UiccReadEmergCodesResp - Invalid index:;iReadECCLocation=%d", iReadECCLocation );
+OstTrace1( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP_TD, "CMmENStoreMessHandler::UiccReadEmergCodesResp - Invalid index:;iReadECCLocation=%d", iReadECCLocation );
                     ret = KErrArgument;
                     }
                 }
@@ -494,7 +494,7 @@ OstTrace1( TRACE_NORMAL, CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP, "CMmENSto
             if ( 0 == iEntryCount )
                 {
 TFLOGSTRING2("TSY: CMmENStoreMessHandler::UiccReadEmergCodesResp. iUsedEntries:%d", iUsedEntries);
-OstTrace1( TRACE_NORMAL, DUP3_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP, "CMmENStoreMessHandler::UiccReadEmergCodesResp;iUsedEntries=%d", iUsedEntries );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESRESP_TD, "CMmENStoreMessHandler::UiccReadEmergCodesResp;iUsedEntries=%d", iUsedEntries );
 
                 // Complete response with ret
                 // Pack the data for sending to the manager
@@ -525,7 +525,7 @@ void CMmENStoreMessHandler::GetEmergencyNumberDigits(
         TDes8& aNumberBuf)
     {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::GetEmergencyNumberDigits" );
-OstTrace0( TRACE_NORMAL, CMMENSTOREMESSHANDLER_GETEMERGENCYNUMBERDIGITS, "CMmENStoreMessHandler::GetEmergencyNumberDigits" );
+OstTrace0( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_GETEMERGENCYNUMBERDIGITS_TD, "CMmENStoreMessHandler::GetEmergencyNumberDigits" );
 
     TUint8 read_value = 0;
     TBuf8<( RMobileENStore::KEmergencyNumberSize )> numberBuf;
@@ -568,7 +568,7 @@ TInt CMmENStoreMessHandler::UiccENStoreGetInfoResp
         )
     {
 TFLOGSTRING2("TSY:CMmENStoreMessHandler::UiccENStoreGetInfoResp, status: %d", aStatus );
-OstTrace1( TRACE_NORMAL, CMMENSTOREMESSHANDLER_UICCENSTOREGETINFORESP, "CMmENStoreMessHandler::UiccENStoreGetInfoResp;aStatus=%d", aStatus );
+OstTrace1( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_UICCENSTOREGETINFORESP_TD, "CMmENStoreMessHandler::UiccENStoreGetInfoResp;aStatus=%d", aStatus );
 
     TInt ret( KErrNone );
 
@@ -631,7 +631,7 @@ TInt CMmENStoreMessHandler::UiccReadEmergCodesReq
         )
     {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::UiccReadEmergCodesReq");
-OstTrace0( TRACE_NORMAL, DUP1_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESREQ, "CMmENStoreMessHandler::UiccReadEmergCodesReq" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESREQ_TD, "CMmENStoreMessHandler::UiccReadEmergCodesReq" );
 
     TInt ret( KErrNone );
 
@@ -684,11 +684,11 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESREQ, "CMmE
     else
         {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::SimReadEmergCodesReq: unknown card type.");
-OstTrace0( TRACE_NORMAL, CMMENSTOREMESSHANDLER_UICCREADEMERGCODESREQ, "CMmENStoreMessHandler::UiccReadEmergCodesReq - Unknown card type." );
+OstTrace0( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_UICCREADEMERGCODESREQ_TD, "CMmENStoreMessHandler::UiccReadEmergCodesReq - Unknown card type." );
         ret = KErrGeneral;
         }
 TFLOGSTRING2("TSY: CMmENStoreMessHandler::UiccReadEmergCodesReq ret: %d", ret);
-OstTrace1( TRACE_NORMAL, DUP2_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESREQ, "CMmENStoreMessHandler::UiccReadEmergCodesReq;ret=%d", ret );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESREQ_TD, "CMmENStoreMessHandler::UiccReadEmergCodesReq;ret=%d", ret );
     return ret;
     }
 
@@ -700,7 +700,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMENSTOREMESSHANDLER_UICCREADEMERGCODESREQ, "CMmE
 TInt CMmENStoreMessHandler::ReadEfEccFileInfo( TUiccTrId aTraId )
     {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::ReadEfEccFileInfo");
-OstTrace0( TRACE_NORMAL, DUP3_CMMENSTOREMESSHANDLER_READEFECCFILEINFO, "CMmENStoreMessHandler::ReadEfEccFileInfo" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMENSTOREMESSHANDLER_READEFECCFILEINFO_TD, "CMmENStoreMessHandler::ReadEfEccFileInfo" );
 
     TInt ret( KErrNone );
 
@@ -717,7 +717,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMENSTOREMESSHANDLER_READEFECCFILEINFO, "CMmENSto
     ret = iMmUiccMessHandler->CreateUiccApplCmdReq( params );
 
 TFLOGSTRING2("TSY: CMmENStoreMessHandler::ReadEfEccFileInfo ret %d", ret);
-OstTrace1( TRACE_NORMAL, CMMENSTOREMESSHANDLER_READEFECCFILEINFO, "CMmENStoreMessHandler::ReadEfEccFileInfo;ret=%d", ret );
+OstTrace1( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_READEFECCFILEINFO_TD, "CMmENStoreMessHandler::ReadEfEccFileInfo;ret=%d", ret );
     return ret;
     }
 
@@ -732,7 +732,7 @@ TInt CMmENStoreMessHandler::ExtFuncL
         )
     {
 TFLOGSTRING2("TSY: CMmENStoreMessHandler::ExtFuncL - Ipc: %d", aIpc);
-OstTrace1( TRACE_NORMAL, CMMENSTOREMESSHANDLER_EXTFUNCL, "CMmENStoreMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_EXTFUNCL_TD, "CMmENStoreMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     // Unpack parameters
     TInt index( 0 );
@@ -781,7 +781,7 @@ OstTrace1( TRACE_NORMAL, CMMENSTOREMESSHANDLER_EXTFUNCL, "CMmENStoreMessHandler:
             else
                 {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::ExtFuncL: unknown card type.");
-OstTrace0( TRACE_NORMAL, DUP1_CMMENSTOREMESSHANDLER_EXTFUNCL, "CMmENStoreMessHandler::ExtFuncL - unknown card type." );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMENSTOREMESSHANDLER_EXTFUNCL_TD, "CMmENStoreMessHandler::ExtFuncL - unknown card type." );
                ret = KErrGeneral;
                 }
             break;
@@ -789,7 +789,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMENSTOREMESSHANDLER_EXTFUNCL, "CMmENStoreMessHan
         default:
             {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::SimReadEmergCodesRespL. Switch aIpc case default");
-OstTrace0( TRACE_NORMAL, DUP2_CMMENSTOREMESSHANDLER_EXTFUNCL, "CMmENStoreMessHandler::ExtFuncL - Switch aIpc case default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMENSTOREMESSHANDLER_EXTFUNCL_TD, "CMmENStoreMessHandler::ExtFuncL - Switch aIpc case default" );
            // Do nothing
             break;
             }
@@ -812,7 +812,7 @@ void CMmENStoreMessHandler::HandleError
         )
     {
 TFLOGSTRING("TSY: CMmENStoreMessHandler::HandleError");
-OstTrace0( TRACE_NORMAL, CMMENSTOREMESSHANDLER_HANDLEERROR, "CMmENStoreMessHandler::HandleError" );
+OstTrace0( TRACE_NORMAL,  CMMENSTOREMESSHANDLER_HANDLEERROR_TD, "CMmENStoreMessHandler::HandleError" );
     }
 
 // ================= OTHER EXPORTED FUNCTIONS ==================================

@@ -8460,28 +8460,28 @@
 			tool       	"VC++"
 			name       	"ClassMethods"
 			value      	(value Text 
-|*_body=// ToDo: Add your specialized code here and/or call the base class
+|*_body=//  Add your specialized code here and/or call the base class
 |cm1=$NAME()
 |cm2=$NAME(orig:const $NAME&)
 |cm3=<<virtual>> ~$NAME()
 |cm4=operator=(rhs:$NAME&):$NAME&
-|cm4_body=// ToDo: Add your specialized code here and/or call the base class||return rhs;
+|cm4_body=//  Add your specialized code here and/or call the base class||return rhs;
 |cm5=<<const>> operator==(rhs:const $NAME&):bool
-|cm5_body=// ToDo: Add your specialized code here and/or call the base class||return false;
+|cm5_body=//  Add your specialized code here and/or call the base class||return false;
 |cm6=<<const>> operator!=(rhs:$NAME&):bool
-|cm6_body=// ToDo: Add your specialized code here and/or call the base class||return false;
+|cm6_body=//  Add your specialized code here and/or call the base class||return false;
 |cm7=<<const>> operator<(rhs:$NAME&):bool
-|cm7_body=// ToDo: Add your specialized code here and/or call the base class||return false;
+|cm7_body=//  Add your specialized code here and/or call the base class||return false;
 |cm8=<<const>> operator>(rhs:$NAME&):bool
-|cm8_body=// ToDo: Add your specialized code here and/or call the base class||return false;
+|cm8_body=//  Add your specialized code here and/or call the base class||return false;
 |cm9=<<const>> operator<=(rhs:$NAME&):bool
-|cm9_body=// ToDo: Add your specialized code here and/or call the base class||return false;
+|cm9_body=//  Add your specialized code here and/or call the base class||return false;
 |cm10=<<const>> operator>=(rhs:$NAME&):bool
-|cm10_body=// ToDo: Add your specialized code here and/or call the base class||return false;
+|cm10_body=//  Add your specialized code here and/or call the base class||return false;
 |cm11=<<friend>> operator>>(i:istream&, rhs:$NAME&):istream&
-|cm11_body=// ToDo: Add your specialized code here and/or call the base class||return i;
+|cm11_body=//  Add your specialized code here and/or call the base class||return i;
 |cm12=<<friend>> operator<<(o:ostream&, rhs:const $NAME&):ostream&
-|cm12_body=// ToDo: Add your specialized code here and/or call the base class||return o;
+|cm12_body=//  Add your specialized code here and/or call the base class||return o;
 			))
 		    (object Attribute
 			tool       	"VC++"

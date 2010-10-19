@@ -13,7 +13,7 @@
 * 
 * Description:
 * Name      : PN_SS [ 0x06 ] Resource Supplementary Services Server
-* Version   : 014.000
+* Version   : 014.001
 *
 * Documentation: www.wirelessmodemapi.com
 *
@@ -24,7 +24,7 @@
 #define _SYMBIAN_ISI_SS_WMISI_H_
 
 #define SUPPLEMENTARY_SERVICES_SERVER_ISI_VERSION_Z	 14
-#define SUPPLEMENTARY_SERVICES_SERVER_ISI_VERSION_Y	 0
+#define SUPPLEMENTARY_SERVICES_SERVER_ISI_VERSION_Y	 1
 
 
 //CONSTANTS
@@ -190,6 +190,7 @@
 #define SS_GSM_CLI_DEFAULT_ALLOWED                        	0x02                                                 	
 #define SS_GSM_OVERRIDE_ENABLED                           	0x03                                                 	
 #define SS_GSM_OVERRIDE_DISABLED                          	0x04                                                 	
+#define SS_PARAMETER_NOT_AVAILABLE                          0xFF
 
 //ConstantTable for SS_GSM_GUIDANCE_INFO
 #define SS_GSM_BAD_PASSWORD                               	0x01                                                 	
@@ -227,7 +228,7 @@
 
 //ConstantTable for SS_MISC_SS_ERRORS
 #define SS_SERVICE_BUSY                                   	0x00                                                 	
-#define SS_GSM_MM_RELEASE                                 	0x01                                                 	
+#define SS_GSM_MM_RELEASE                                 	0x01                     //Obsolete error code
 #define SS_GSM_DATA_ERROR                                 	0x02                                                 	
 #define SS_GSM_REQUEST_CANCELLED                          	0x04                                                 	
 #define SS_GSM_INDICATE_DEVICE_PASSWORD                   	0x05                                                 	

@@ -19,7 +19,6 @@
 #include        <platform_paths.hrh>
 #include        "kernel/kern_ext.mmh"
 
-
 TARGET          isirouter.dll
 TARGETTYPE      kext
 linkas          isirouter.dll
@@ -27,6 +26,7 @@ UID             0x100000AF 0x20026FE7
 VENDORID        VID_DEFAULT
 CAPABILITY      ALL
 FEATUREVARIANT
+
 
 EPOCALLOWDLLDATA
 
@@ -41,10 +41,15 @@ SOURCE          isimsgqueue.cpp
 SOURCE          isicltransceiver.cpp
 SOURCE          isithreadcontainer.cpp
 
+SOURCE          isirouterservice.cpp
+SOURCE          isicommonpepkernel.cpp
+SOURCE          isiroutertrace.cpp
+
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../ismpmultiplexer_dll/inc
 USERINCLUDE     ../../memmanager_dll/inc
+USERINCLUDE     ../../isaaccessextension_dll/inc
 
 NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE     /epoc32/include/kernel
@@ -63,4 +68,7 @@ END
 
 // flag to enable normal trace inside component
 MACRO   COMPONENT_TRACE_FLAG
+MACRO   ISIMESSAGE_TRACE_FLAG
+MACRO   ISIMESSAGE_DUMP_TRACE_FLAG
 
+MACRO ISCE_INTERNAL_WIDER_NAME_SERVICE_IN_USE

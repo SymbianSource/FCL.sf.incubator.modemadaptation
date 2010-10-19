@@ -58,7 +58,7 @@ CSatIcon::CSatIcon
         iRecordNumber( KZero ),
         iImageInstanceNoInRecord( KZero )
     {
-    OstTrace0( TRACE_NORMAL, CSATICON_CSATICON, "CSatIcon::CSatIcon" );
+    OstTrace0( TRACE_NORMAL,  CSATICON_CSATICON_TD, "CSatIcon::CSatIcon" );
     iRecordData.Zero();
     }
 
@@ -70,7 +70,7 @@ CSatIcon::CSatIcon
 //
 void CSatIcon::ConstructL()
     {
-    OstTrace0( TRACE_NORMAL, CSATICON_CONSTRUCTL, "CSatIcon::ConstructL" );
+    OstTrace0( TRACE_NORMAL,  CSATICON_CONSTRUCTL_TD, "CSatIcon::ConstructL" );
     // None. Reserved for future use.
     }
 
@@ -86,7 +86,7 @@ CSatIcon* CSatIcon::NewL
         CTsySatMessaging*   aSatMessaging
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATICON_NEWL, "CSatIcon::NewL" );
+    OstTrace0( TRACE_NORMAL,  CSATICON_NEWL_TD, "CSatIcon::NewL" );
     TFLOGSTRING("TSY: CSatIcon::NewL");
 
     CSatIcon* self = new( ELeave ) CSatIcon( aSatMessHandler, aSatMessaging );
@@ -106,7 +106,7 @@ CSatIcon* CSatIcon::NewL
 //
 CSatIcon::~CSatIcon()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATICON_CSATICON, "CSatIcon::~CSatIcon" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATICON_CSATICON_TD, "CSatIcon::~CSatIcon" );
     TFLOGSTRING("TSY: CSatIcon::~CSatIcon");
     }
 
@@ -124,7 +124,7 @@ TInt CSatIcon::GetIcon
         TTsyReqHandle   aTsyReqHandle      // Request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATICON_GETICON, "CSatIcon::GetIcon" );
+    OstTrace0( TRACE_NORMAL,  CSATICON_GETICON_TD, "CSatIcon::GetIcon" );
     TFLOGSTRING("TSY: CSatIcon::GetIcon");
     iImageInstanceNoInRecord = 0;
 
@@ -133,7 +133,7 @@ TInt CSatIcon::GetIcon
     if ( iIconTsyReqHandle )
         {
         TFLOGSTRING("TSY: CSatIcon::GetIcon : KErrServerBusy");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATICON_GETICON, "CSatIcon::GetIcon : KErrServerBusy" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATICON_GETICON_TD, "CSatIcon::GetIcon : KErrServerBusy" );
 
         iSatMessaging->ReqCompleted( aTsyReqHandle, KErrServerBusy);
         }
@@ -152,7 +152,7 @@ TInt CSatIcon::GetIcon
         }
 
     TFLOGSTRING2("TSY: CSatIcon::GetIcon, ret: %d", ret );
-    OstTrace1( TRACE_NORMAL, DUP3_CSATICON_GETICON, "CSatIcon::GetIcon, ret: %d", ret );
+    OstTrace1( TRACE_NORMAL,  DUP3_CSATICON_GETICON_TD, "CSatIcon::GetIcon, ret: %d", ret );
 
     return ret;
 
@@ -170,7 +170,7 @@ void CSatIcon::CompleteIconRequest
         const TDesC8& aInfo // Icon info block
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATICON_COMPLETEICONREQUEST, "CSatIcon::CompleteIconRequest" );
+    OstTrace0( TRACE_NORMAL,  CSATICON_COMPLETEICONREQUEST_TD, "CSatIcon::CompleteIconRequest" );
     TFLOGSTRING("TSY: CSatIcon::CompleteIconRequest, entered");
 
     if ( iIconTsyReqHandle )
@@ -232,7 +232,7 @@ void CSatIcon::CompleteIconRequest
         iIconData = NULL;
         iGetIconFlag = EFalse;
         TFLOGSTRING2("TSY: CSatIcon::CompleteIconRequest, aStatus: %d", aStatus );
-        OstTrace1( TRACE_NORMAL, DUP1_CSATICON_COMPLETEICONREQUEST, "CSatIcon::CompleteIconRequest, aStatus: %d", aStatus );
+        OstTrace1( TRACE_NORMAL,  DUP1_CSATICON_COMPLETEICONREQUEST_TD, "CSatIcon::CompleteIconRequest, aStatus: %d", aStatus );
 
         iSatMessaging->ReqCompleted( iIconTsyReqHandle, aStatus );
         iIconTsyReqHandle = NULL;
@@ -253,7 +253,7 @@ TInt CSatIcon::GetImageInstance
         TTsyReqHandle aTsyReqHandle    // request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATICON_GETIMAGEINSTANCE, "CSatIcon::GetImageInstance" );
+    OstTrace0( TRACE_NORMAL,  CSATICON_GETIMAGEINSTANCE_TD, "CSatIcon::GetImageInstance" );
     TFLOGSTRING("TSY: CSatIcon::GetImageInstance");
 
     TInt ret( KErrNotFound );
@@ -261,7 +261,7 @@ TInt CSatIcon::GetImageInstance
     if( iIconTsyReqHandle )
         {
         TFLOGSTRING("TSY: CSatIcon::GetImageInstance : KErrServerBusy");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATICON_GETIMAGEINSTANCE, "CSatIcon::GetImageInstance : KErrServerBusy" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATICON_GETIMAGEINSTANCE_TD, "CSatIcon::GetImageInstance : KErrServerBusy" );
 
         iSatMessaging->ReqCompleted( aTsyReqHandle, KErrServerBusy);
         }
@@ -313,7 +313,7 @@ TInt CSatIcon::GetImageInstance
             }
         }
     TFLOGSTRING2("TSY: CSatIcon::GetImageInstance, ret: %d", ret );
-    OstTrace1( TRACE_NORMAL, DUP3_CSATICON_GETIMAGEINSTANCE, "CSatIcon::GetImageInstance, ret: %d", ret );
+    OstTrace1( TRACE_NORMAL,  DUP3_CSATICON_GETIMAGEINSTANCE_TD, "CSatIcon::GetImageInstance, ret: %d", ret );
 
     return ret;
     }
@@ -332,14 +332,14 @@ TInt CSatIcon::GetClut
         TTsyReqHandle  aTsyReqHandle       // Request handle
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATICON_GETCLUT, "CSatIcon::GetClut" );
+    OstTrace0( TRACE_NORMAL,  CSATICON_GETCLUT_TD, "CSatIcon::GetClut" );
     TFLOGSTRING("TSY: CSatIcon::GetClut");
      TInt ret( KErrNotFound );
 
     if( iIconTsyReqHandle )
         {
         TFLOGSTRING("TSY: CSatIcon::GetClut : KErrServerBusy");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATICON_GETCLUT, "CSatIcon::GetClut : KErrServerBusy" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATICON_GETCLUT_TD, "CSatIcon::GetClut : KErrServerBusy" );
 
         iSatMessaging->ReqCompleted( aTsyReqHandle, KErrServerBusy);
         }
@@ -359,7 +359,7 @@ TInt CSatIcon::GetClut
             }
         }
     TFLOGSTRING2("TSY: CSatIcon::GetClut, ret: %d", ret );
-    OstTrace1( TRACE_NORMAL, DUP3_CSATICON_GETCLUT, "CSatIcon::GetClut, ret: %d", ret );
+    OstTrace1( TRACE_NORMAL,  DUP3_CSATICON_GETCLUT_TD, "CSatIcon::GetClut, ret: %d", ret );
 
     iImageInstanceNoInRecord = 0;
     return ret;

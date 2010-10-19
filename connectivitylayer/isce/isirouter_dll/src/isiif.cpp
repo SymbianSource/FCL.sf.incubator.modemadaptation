@@ -70,7 +70,7 @@ DISIIf::DISIIf( const TInt32 aUID, TUint8& aObjId )
     ASSERT_THREAD_CONTEXT_ALWAYS( ( EISIIfNotThreadContext | EDISIIfTraceId << KClassIdentifierShift ) );
     iKernelChannel = new DISIKernelChannel( aObjId );
     ASSERT_RESET_ALWAYS( iKernelChannel, ( EISIIfMemAllocFailure2 | EDISIIfTraceId << KClassIdentifierShift ) );
-    TAny* params[ KTwoParams ];  //TODO should probably take process identifier into this to identify binary
+    TAny* params[ KTwoParams ];  // should probably take process identifier into this to identify binary
     params[ KFirstParam ] = reinterpret_cast<TAny*>( aUID );
     params[ KSecondParam ] = reinterpret_cast<TAny*>( &aObjId );
     // Get's the current thread's thread message.
@@ -89,13 +89,15 @@ DISIIf::~DISIIf()
     TThreadMessage& m = Kern::Message();
     m.iValue = EISIDisconnect;
     m.iArg[ KFirstParam ] = NULL;
-    // Other asserts in kernel channel.
-    ASSERT_RESET_ALWAYS( ( KErrNone == iKernelChannel->HandleRequest( m ) ), ( EISIIfWrongResponseToRequest | EDISIIfTraceId << KClassIdentifierShift ) );
+        
     if( iKernelChannel )
         {
+        // Other asserts in kernel channel.
+        ASSERT_RESET_ALWAYS( ( KErrNone == iKernelChannel->HandleRequest( m ) ), ( EISIIfWrongResponseToRequest | EDISIIfTraceId << KClassIdentifierShift ) );
         delete iKernelChannel;
         iKernelChannel = NULL;
         }
+        
     C_TRACE( ( _T( "DISIIf::~DISIIf 0x%x<" ), this ) );
     }
 
@@ -119,7 +121,7 @@ TDes8& DISIIf::AllocateMsgBlock( const TUint16 aSize )
     
 void DISIIf::DeallocateMsgBlock( TDes8& aMsgBlock )
     {
-    C_TRACE( ( _T( "DISIIf::DeallocateMsgBlock 0x%x s %d>" ), this, &aMsgBlock ) );
+    C_TRACE( ( _T( "DISIIf::DeallocateMsgBlock 0x%x s 0x%x>" ), this, &aMsgBlock ) );
     TAny* params[ KOneParam ];
     params[ KFirstParam ] = reinterpret_cast<TAny*>( &aMsgBlock );
     // Get's the current thread's thread message.
@@ -127,12 +129,12 @@ void DISIIf::DeallocateMsgBlock( TDes8& aMsgBlock )
     m.iValue = EISIDeallocateBlock;
     m.iArg[ KFirstParam ] = params;
     ASSERT_RESET_ALWAYS( ( KErrNone == iKernelChannel->HandleRequest( m ) ), ( EISIIfWrongResponseToRequest4 | EDISIIfTraceId << KClassIdentifierShift ) );
-    C_TRACE( ( _T( "DISIIf::DeallocateMsgBlock 0x%x s %d<" ), this, &aMsgBlock ) );
+    C_TRACE( ( _T( "DISIIf::DeallocateMsgBlock 0x%x s 0x%x<" ), this, &aMsgBlock ) );
     }
   
 void DISIIf::Receive( TRequestStatus& aRxStatus, TDes8*& aRxMsg, const TDfc& aRxCompletedDfc )
     {
-    C_TRACE( ( _T( "DISIIf::Receive 0x%x s %d b 0x%x d 0x%x>" ), this, &aRxStatus, &aRxMsg, &aRxCompletedDfc ) );
+    C_TRACE( ( _T( "DISIIf::Receive 0x%x %d 0x%x 0x%x>" ), this, &aRxStatus, &aRxMsg, &aRxCompletedDfc ) );
     ASSERT_RESET_ALWAYS( !aRxMsg, ( EISIIfNotNullPtr | EDISIIfTraceId << KClassIdentifierShift ) );
     aRxStatus = KRequestPending;
     TAny* params[ KThreeParams ];
@@ -144,7 +146,7 @@ void DISIIf::Receive( TRequestStatus& aRxStatus, TDes8*& aRxMsg, const TDfc& aRx
     m.iValue = EISIAsyncReceive;
     m.iArg[ KFirstParam ] = params;
     ASSERT_RESET_ALWAYS( ( KErrNone == iKernelChannel->HandleRequest( m ) ), ( EISIIfWrongResponseToRequest5 | EDISIIfTraceId << KClassIdentifierShift ) );
-    C_TRACE( ( _T( "DISIIf::Receive 0x%x s %d b 0x%x d 0x%x<" ), this, &aRxStatus, &aRxMsg, &aRxCompletedDfc ) );
+    C_TRACE( ( _T( "DISIIf::Receive 0x%x %d 0x%x 0x%x<" ), this, &aRxStatus, &aRxMsg, &aRxCompletedDfc ) );
     }
 void DISIIf::ReceiveCancel()
     {
@@ -168,7 +170,7 @@ TInt DISIIf::Send( const TDesC8& aTxMsg )
     {
     C_TRACE( ( _T( "DISIIf::Send 0x%x m 0x%x>" ), this, &aTxMsg ) );
     TAny* params[ KOneParam ];
-    params[ KFirstParam ] = reinterpret_cast<TAny*>( const_cast<TDesC8*>( &aTxMsg )); //TODO need const?
+    params[ KFirstParam ] = reinterpret_cast<TAny*>( const_cast<TDesC8*>( &aTxMsg )); // need const?
     // Get's the current thread's thread message.
     TThreadMessage& m = Kern::Message();
     m.iValue = EISISend;

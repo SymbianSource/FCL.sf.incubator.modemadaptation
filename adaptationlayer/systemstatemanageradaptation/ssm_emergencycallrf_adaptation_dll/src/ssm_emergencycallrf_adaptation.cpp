@@ -4,8 +4,8 @@
 *  Part of:        SSMA EmergencyCallRfAdaptation
 *  Interface:      N/A
 *  Description:    Declaration of CEmergencyCallRfAdaptation class
-*  %version:       3 %
-*  %date_modified: Fri Feb 12 10:59:11 2010 %
+*  %version:       4 %
+*  %date_modified: Tue May 04 09:25:04 2010 %
 *
 * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -87,7 +87,7 @@ CEmergencyCallRfAdaptation* CEmergencyCallRfAdaptation::NewL()
     self->ConstructL();
     CleanupStack::Pop( self );
 
-    OstTrace1( TRACE_API, CEMERGENCYCALLRFADAPTATION_NEWL_2,
+    OstTrace1( TRACE_BORDER, CEMERGENCYCALLRFADAPTATION_NEWL_2,
                "SSMA # CEmergencyCallRfAdaptation::NewL - return 0x%08x", self );
     API_TRACE((_L("SSMA # CEmergencyCallRfAdaptation::NewL - return 0x%08x"), self ));
     return self;
@@ -110,7 +110,7 @@ CEmergencyCallRfAdaptation::~CEmergencyCallRfAdaptation()
     /* Delete iCSACommonIscServicePtr */
     if ( iCSACommonIscServicePtr )
         {
-        OstTrace0( TRACE_API, CEMERGENCYCALLRFADAPTATION_CEMERGENCYCALLRFADAPTATION_D2,
+        OstTrace0( TRACE_BORDER, CEMERGENCYCALLRFADAPTATION_CEMERGENCYCALLRFADAPTATION_D2,
                    "SSMA - CEmergencyCallRfAdaptation::~CEmergencyCallRfAdaptation - Delete iCSACommonIscServicePtr" );
         API_TRACE((_L( "SSMA - CEmergencyCallRfAdaptation::~CEmergencyCallRfAdaptation - Delete iCSACommonIscServicePtr" )));
 

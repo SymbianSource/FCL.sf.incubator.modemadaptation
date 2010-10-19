@@ -241,7 +241,7 @@ EXPORT_C TInt RIscApi::Loan(
 
     C_TRACE( ( _T( "RIscApi::Loan 0x%x ->" ), iChannelNumber ) );
     OstTraceExt1( TRACE_NORMAL, RISCAPI_LOAN_ENTRY, ">RIscApi::Loan;iChannelNumber=%hx", iChannelNumber );
-    // TODO: panic if open?
+    //  panic if open?
     //    PanicIfNotOpen();
     // Driver is tried to load everytime.
     TInt loadStatus( User::LoadLogicalDevice( KNameOfIsaAccessDriverLdd ) );
@@ -355,7 +355,7 @@ EXPORT_C void RIscApi::Close(
         {
         C_TRACE((_T("RIscApi::Close error: channel number out of range")));
         OstTrace0( TRACE_NORMAL, DUP1_RISCAPI_CLOSE, "RIscApi::Close channelnumber out of range" );
-//        TRACE_ASSERT_ALWAYS;        TODO: Trace assert?
+//        TRACE_ASSERT_ALWAYS;         Trace assert?
         }
     C_TRACE( ( _T( "RIscApi::Close 0x%x <-" ), iChannelNumber ) );
 
@@ -946,7 +946,7 @@ EXPORT_C TInt RIscApi::MaximumDataSize(
     PanicIfNotOpen();
     TInt returnCode( DoControl( EIADGetMaxDataSize ) );
     // If positive the maximum amount of data in ISI or data message to be send
-    // If negative, one of the error codes. TODO: add to documentation, check possible error codes.
+    // If negative, one of the error codes.  add to documentation, check possible error codes.
     C_TRACE( ( _T( "RIscApi::MaximumDataSize 0x%x %d <-" ), iChannelNumber, returnCode ) );
 
     OstTrace1( TRACE_NORMAL, RISCAPI_MAXIMUMDATASIZE_EXIT, "<RIscApi::MaximumDataSize;return=%d", returnCode );
@@ -970,9 +970,9 @@ EXPORT_C TInt RIscApi::GetChannelInfo(
     PanicIfNotOpen();
     const TInt KChannelInfoMax( 2 );
     TInt error( aInfo.MaxLength() >= KChannelInfoMax ? KErrNone : KErrArgument );
-    // TODO: Returns information of user channels only, not possible to get information
+    //  Returns information of user channels only, not possible to get information
     // about kernel channels at the moment.
-    // TODO: error if channel is out of range?
+    //  error if channel is out of range?
     if( KErrArgument != error )
         {
         aInfo.SetLength( KChannelInfoMax );

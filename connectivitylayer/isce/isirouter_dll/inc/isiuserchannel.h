@@ -22,17 +22,17 @@
 
 // Includes
 #include <kernel.h>                 // For DLogicalChannel
-#include "misirouterchannelif.h"    // For MISIRouterChannelIf
+#include "misirouterobjectif.h"    // For MISIRouterObjectIf
 #include "isiinternaldefs.h"        // For TISIAsyncRequest
 
 // Forward declaration
 class DISIMsgQueue;
-class MISIChannelRouterIf;
+class MISIObjectRouterIf;
 
 /**
 * Provides channel for user side ISI API
 */
-NONSHARABLE_CLASS( DISIUserChannel ) : public DLogicalChannel, public MISIRouterChannelIf
+NONSHARABLE_CLASS( DISIUserChannel ) : public DLogicalChannel, public MISIRouterObjectIf
     {
 
     public: 
@@ -74,19 +74,19 @@ NONSHARABLE_CLASS( DISIUserChannel ) : public DLogicalChannel, public MISIRouter
 
         ///// Functions from base class DLogicalChannel end
 
-        ///// Functions from MISIRouterChannelIf start
+        ///// Functions from MISIRouterObjectIf start
         
         /**
-        * See comments from MISIRouterChannelIf.
+        * See comments from MISIRouterObjectIf.
         */
         void EnqueChannelRequestCompleteDfc( TInt aRequest, TInt aStatusToComplete );
         
         /*
-        * See comments from MISIRouterChannelIf.
+        * See comments from MISIRouterObjectIf.
         */
-        void ReceiveMsg( const TDesC8& aMessage );
+        void Receive( const TDesC8& aMessage );
 
-        ///// Functions from MISIRouterChannelIf end
+        ///// Functions from MISIRouterObjectIf end
 
     private:
 
@@ -206,7 +206,7 @@ NONSHARABLE_CLASS( DISIUserChannel ) : public DLogicalChannel, public MISIRouter
         // Not owned, no need to guard open/close in one thread in construction and desctruction.
         DThread*               iThread;
         // Not owned, no need to guard only written in one thread in construction and desctruction.
-        MISIChannelRouterIf*   iRouterIf;
+        MISIObjectRouterIf*    iRouterIf;
         // Pointers to client message buffer, not owned
         TAny*                  iReceiveBufPtr;
         // not owned

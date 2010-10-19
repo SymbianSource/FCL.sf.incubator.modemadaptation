@@ -249,7 +249,7 @@ NONSHARABLE_CLASS( DP2PUserChannel ) : public DLogicalChannel, public MP2PRouter
             TUint8          iSize;
             // Guards internal states of this class.
             NFastMutex*     iQueueMutex;
-            // Ring buffer must be as big as we have request. TODO: is there a danger to get more request..?
+            // Ring buffer must be as big as we have request.  is there a danger to get more request..?
             TP2PReq         iShReqRingBuffer[ EP2PLastAsyncRequest ];
             // Active / Deactive requests are kept in list to make finding easier.
             TRequestStatus* iShReqList[ EP2PLastAsyncRequest ];

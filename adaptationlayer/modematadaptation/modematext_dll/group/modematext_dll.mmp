@@ -37,6 +37,7 @@ SOURCE      modemat_atext.cpp
 USERINCLUDE ../inc
 USERINCLUDE ../../modematcontroller_dll/inc
 USERINCLUDE ../../modematcontroller_exe/inc
+USERINCLUDE ../traces
 
 OS_LAYER_SYSTEMINCLUDE
 NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE

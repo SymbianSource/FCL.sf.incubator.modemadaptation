@@ -24,7 +24,7 @@
 #define _SYMBIAN_ISI_GPDSISI_H_
 
 #define GENERAL_PACKET_DATA_SERVER_ISI_VERSION_Z	 19
-#define GENERAL_PACKET_DATA_SERVER_ISI_VERSION_Y	 1
+#define GENERAL_PACKET_DATA_SERVER_ISI_VERSION_Y	 3
 
 
 //CONSTANTS
@@ -40,6 +40,7 @@
 #define GPDS_ANY_SIZE                                     	0x01                                                 	
 #define GPDS_CID_VOID                                     	0xFF                                              	
 #define GPDS_CID_ALL                                      	0xFE                                              	
+#define GPDS_DISABLE                                      	0x00                                                 	
 
 
 //TABLES
@@ -267,6 +268,7 @@
 #define GPDS_AOL_CTX_HPLMN_ACTIVE                         	0x01                                                 	
 #define GPDS_AOL_CTX_VPLMN_ACTIVE                         	0x02                                                 	
 #define GPDS_AOL_CTX_ACTIVE                               	0x03                                                 	
+#define GPDS_AOL_CTX_DEFAULT                              	0xFF                                              	
 
 //ConstantTable for GPDS_RESOURCE_CONTROL_RESULT
 #define GPDS_ALLOWED                                      	0x01                                                 	
@@ -289,6 +291,13 @@
 
 //BitmaskTables for GPDS_RESOURCE_IDS_CONF_REQ
 #define GPDS_RES_ID_CONF_CC_FOR_GPRS                      	0x01                                                 	
+
+//ConstantTable for GPDS_DATA_COUNTER_SETTINGS
+#define GPDS_DATA_COUNTER_SETTING_DEFAULT                 	0x00                                                 	
+#define GPDS_DATA_COUNTER_SETTING_TIME                    	0x01                                                 	
+#define GPDS_DATA_COUNTER_SETTING_TRANSFER                	0x02                                                 	
+#define GPDS_DATA_COUNTER_SETTING_BOTH                    	0x03                                                 	
+
 
 //ConstantTable for FtdTable
 #define FTD_SB_GPDS_ATT_AND_PDP                           	0x10                                              	
@@ -1053,6 +1062,18 @@
 #define SIZE_GPDS_RESOURCE_CONF_REQUIRED                  	4
 
 
+//Definition for GPDS_DATA_COUNTER_INFO
+#define GPDS_DATA_COUNTER_INFO                            	0xA8                                              	
+#define GPDS_DATA_COUNTER_INFO_OFFSET_ID                  	0 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_INFO_OFFSET_LENGTH              	1 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_INFO_OFFSET_CID                 	2 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_INFO_OFFSET_FILLERBYTE1         	3 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_INFO_OFFSET_RXCOUNT             	4 //size 8 byte(s)
+#define GPDS_DATA_COUNTER_INFO_OFFSET_TXCOUNT             	12 //size 8 byte(s)
+#define SIZE_GPDS_DATA_COUNTER_INFO                       	20
+//NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
+
+
 //MESSAGES
 
 
@@ -1598,5 +1619,44 @@
 #define GPDS_RESOURCE_CONF_IND_OFFSET_CONFSTATUS          	2 //size 1 byte(s)
 #define GPDS_RESOURCE_CONF_IND_OFFSET_SUBBLOCKS           	3 //size 1 byte(s)
 #define SIZE_GPDS_RESOURCE_CONF_IND                       	4
+
+
+//Definition for GPDS_DATA_COUNTER_REQ
+#define GPDS_DATA_COUNTER_REQ                             	0x58                                              	
+#define GPDS_DATA_COUNTER_REQ_OFFSET_TRANSID              	0 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_REQ_OFFSET_MESSAGEID            	1 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_REQ_OFFSET_CONFSTATUS           	2 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_REQ_OFFSET_FILLERBYTE1          	3 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_REQ_OFFSET_UPDATEINTERVALTIME   	4 //size 4 byte(s)
+#define GPDS_DATA_COUNTER_REQ_OFFSET_UPDATEINTERVALDATACOUNT	8 //size 4 byte(s)
+#define SIZE_GPDS_DATA_COUNTER_REQ                        	12
+
+
+//Definition for GPDS_DATA_COUNTER_RESP
+#define GPDS_DATA_COUNTER_RESP                            	0x59                                              	
+#define GPDS_DATA_COUNTER_RESP_OFFSET_TRANSID             	0 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_RESP_OFFSET_MESSAGEID           	1 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_RESP_OFFSET_FILLERBYTE1         	2 //size 2 byte(s)
+#define GPDS_DATA_COUNTER_RESP_OFFSET_TOTALRXCOUNT        	4 //size 8 byte(s)
+#define GPDS_DATA_COUNTER_RESP_OFFSET_TOTALTXCOUNT        	12 //size 8 byte(s)
+#define GPDS_DATA_COUNTER_RESP_OFFSET_FILLERBYTE2         	20 //size 2 byte(s)
+#define GPDS_DATA_COUNTER_RESP_OFFSET_FILLERBYTE3         	22 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_RESP_OFFSET_SUBBLOCKCOUNT       	23 //size 1 byte(s)
+#define SIZE_GPDS_DATA_COUNTER_RESP                       	24
+//NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
+
+
+//Definition for GPDS_DATA_COUNTER_IND
+#define GPDS_DATA_COUNTER_IND                             	0x5A                                              	
+#define GPDS_DATA_COUNTER_IND_OFFSET_TRANSID              	0 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_IND_OFFSET_MESSAGEID            	1 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_IND_OFFSET_FILLERBYTE1          	2 //size 2 byte(s)
+#define GPDS_DATA_COUNTER_IND_OFFSET_TOTALRXCOUNT         	4 //size 8 byte(s)
+#define GPDS_DATA_COUNTER_IND_OFFSET_TOTALTXCOUNT         	12 //size 8 byte(s)
+#define GPDS_DATA_COUNTER_IND_OFFSET_FILLERBYTE2          	20 //size 2 byte(s)
+#define GPDS_DATA_COUNTER_IND_OFFSET_FILLERBYTE3          	22 //size 1 byte(s)
+#define GPDS_DATA_COUNTER_IND_OFFSET_SUBBLOCKCOUNT        	23 //size 1 byte(s)
+#define SIZE_GPDS_DATA_COUNTER_IND                        	24
+//NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
 
 #endif

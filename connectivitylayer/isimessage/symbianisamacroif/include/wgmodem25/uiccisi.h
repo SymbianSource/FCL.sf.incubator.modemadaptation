@@ -13,7 +13,7 @@
 * 
 * Description:
 * Name      : PN_UICC [ 0x8C ] Resource UICC Server
-* Version   : 003.000
+* Version   : 004.001
 *
 * Documentation: www.wirelessmodemapi.com
 *
@@ -23,8 +23,8 @@
 #ifndef _SYMBIAN_ISI_UICCISI_H_
 #define _SYMBIAN_ISI_UICCISI_H_
 
-#define UICC_SERVER_ISI_VERSION_Z	 3
-#define UICC_SERVER_ISI_VERSION_Y	 0
+#define UICC_SERVER_ISI_VERSION_Z	 4
+#define UICC_SERVER_ISI_VERSION_Y	 1
 
 
 //CONSTANTS
@@ -32,6 +32,7 @@
 #define UICC_SFI_NOT_PRESENT                              	0x00                                                 	
 #define UICC_APPL_ID_UNKNOWN                              	0x00                                                 	
 #define UICC_APPL_LAST                                    	0xFF                                              	
+#define UICC_APPL_ID_NOT_USED                             	0x00                                                 	
 #define UICC_SESSION_ID_NOT_USED                          	0x00                                                 	
 #define UICC_ANY_SIZE                                     	0x01                                                 	
 
@@ -49,6 +50,7 @@
 #define UICC_STATUS_CARD_READY                            	0x21                                              	
 #define UICC_STATUS_CARD_DISCONNECTED                     	0x22                                              	
 #define UICC_STATUS_CARD_NOT_PRESENT                      	0x23                                              	
+#define UICC_STATUS_CARD_REJECTED                         	0x24                                              	
 #define UICC_STATUS_APPL_ACTIVE                           	0x30                                              	
 #define UICC_STATUS_APPL_NOT_ACTIVE                       	0x31                                              	
 #define UICC_STATUS_PIN_ENABLED                           	0x40                                              	
@@ -63,8 +65,6 @@
 #define UICC_CARD_ERROR                                   	0x05                                                 	
 #define UICC_SERVICE_NOT_SUPPORTED                        	0x06                                                 	
 #define UICC_SESSION_EXPIRED                              	0x07                                                 	
-#define UICC_PIN_INVALID                                  	0x08                                                 	
-#define UICC_PIN_BLOCKED                                  	0x09                                                 	
 
 //ConstantTable for UICC_APPL_TYPE_TABLE
 #define UICC_APPL_TYPE_UNKNOWN                            	0x00                                                 	
@@ -86,6 +86,7 @@
 #define UICC_CARD_TYPE_UNKNOWN                            	0x00                                                 	
 #define UICC_CARD_TYPE_ICC                                	0x01                                                 	
 #define UICC_CARD_TYPE_UICC                               	0x02                                                 	
+#define UICC_CARD_TYPE_USB                                	0x03                                                 	
 
 //ConstantTable for UICC_PIN_STATUS_TABLE
 
@@ -139,7 +140,8 @@
 #define UICC_APPL_CLEAR_CACHE                             	0x27                                              	
 #define UICC_APPL_SESSION_START                           	0x28                                              	
 #define UICC_APPL_SESSION_END                             	0x29                                              	
-#define UICC_APPL_CACHE_UPDATED                           	0x30                                              	
+#define UICC_APPL_READ_CYCLIC                             	0x2A                                              	
+#define UICC_APPL_UPDATE_CYCLIC                           	0x2B                                              	
 #define UICC_CONNECT                                      	0x31                                              	
 #define UICC_DISCONNECT                                   	0x32                                              	
 #define UICC_RECONNECT                                    	0x33                                              	
@@ -164,6 +166,7 @@
 #define UICC_CAT_FETCHED_CMD                              	0x91                                              	
 #define UICC_CAT_NOT_SUPPORTED                            	0x92                                              	
 #define UICC_CAT_REG_FAILED                               	0x93                                              	
+#define UICC_CAT_REG_OK                                   	0x94                                              	
 #define UICC_REFRESH_PERMISSION                           	0xA1                                              	
 #define UICC_REFRESH_STARTING                             	0xA2                                              	
 #define UICC_REFRESH_CANCELLED                            	0xA3                                              	
@@ -173,13 +176,22 @@
 #define UICC_READY                                        	0xB2                                              	
 #define UICC_INITIALIZED                                  	0xB4                                              	
 #define UICC_SHUTTING_DOWN                                	0xB5                                              	
+#define UICC_SHUT_DOWN_CONFIG                             	0xB6                                              	
+#define UICC_ERROR                                        	0xB7                                              	
 #define UICC_CARD_DISCONNECTED                            	0xC0                                              	
 #define UICC_CARD_REMOVED                                 	0xC1                                              	
 #define UICC_CARD_NOT_PRESENT                             	0xC2                                              	
-#define UICC_CARD_RESET                                   	0xC3                                              	
 #define UICC_CARD_READY                                   	0xC4                                              	
 #define UICC_CARD_STATUS_GET                              	0xC5                                              	
-#define UICC_SIMLOCK_ACTIVE                               	0xD0                                              	
+#define UICC_CARD_REJECTED                                	0xC8                                              	
+#define UICC_CARD_INFO_GET                                	0xC9                                              	
+#define UICC_APDU_SAP_ACTIVATE                            	0xE1                                              	
+#define UICC_APDU_SAP_DEACTIVATE                          	0xE2                                              	
+#define UICC_APDU_SAP_ATR_GET                             	0xE3                                              	
+#define UICC_APDU_SAP_COLD_RESET                          	0xE4                                              	
+#define UICC_APDU_SAP_WARM_RESET                          	0xE5                                              	
+#define UICC_APDU_SAP_APDU_SEND                           	0xE6                                              	
+#define UICC_APDU_SAP_RECOVERY                            	0xE7                                              	
 
 //ConstantTable for UICC_REFRESH_STATUS_TABLE
 #define UICC_REFRESH_OK                                   	0x01                                                 	
@@ -187,11 +199,49 @@
 #define UICC_REFRESH_DONE                                 	0x03                                                 	
 
 //ConstantTable for UICC_SIMLOCK_STATUS_TABLE
-#define UICC_SIMLOCK_STATUS_ACTIVE                        	0x01                                                 	
-#define UICC_SIMLOCK_STATUS_INACTIVE                      	0x02                                                 	
+
+//ConstantTable for UICC_APDU_SAP_STATUS_TABLE
+#define UICC_APDU_SAP_OK                                  	0x01                                                 	
+#define UICC_APDU_SAP_FAIL                                	0x02                                                 	
+#define UICC_APDU_SAP_CARD_ERROR                          	0x03                                                 	
+
+//ConstantTable for UICC_POWER_MODE_TABLE
+#define UICC_POWER_MODE_LOW                               	0x01                                                 	
+#define UICC_POWER_MODE_FULL                              	0x02                                                 	
+
+//ConstantTable for UICC_VOLTAGE_CLASS_TABLE
+#define UICC_VOLTAGE_CLASS_NOT_AVAILABLE                  	0x00                                                 	
+#define UICC_VOLTAGE_CLASS_A                              	0x50                                              	
+#define UICC_VOLTAGE_CLASS_B                              	0x30                                              	
+#define UICC_VOLTAGE_CLASS_C                              	0x18                                              	
+
+//ConstantTable for UICC_CLF_IF_SUPPORT_TABLE
+#define UICC_CLF_IF_NOT_SUPPORTED                         	0x01                                                 	
+#define UICC_CLF_IF_SUPPORTED                             	0x02                                                 	
+
+//ConstantTable for UICC_CARD_REJECT_CAUSE_TABLE
+#define UICC_CARD_REJECT_CAUSE_NOT_AVAILABLE              	0x00                                                 	
+#define UICC_CARD_REJECT_CAUSE_SIMLOCK                    	0x01                                                 	
+#define UICC_CARD_REJECT_CAUSE_SW_6F00                    	0x02                                                 	
+
+//ConstantTable for UICC_PROTOCOL_TABLE
+#define UICC_PROTOCOL_NOT_USED                            	0x00                                                 	
+#define UICC_PROTOCOL_NO_PREFERENCE                       	0x01                                                 	
+#define UICC_PROTOCOL_T0                                  	0x02                                                 	
+#define UICC_PROTOCOL_T1                                  	0x03                                                 	
 
 
 //SUBBLOCKS
+
+
+//Definition for UICC_SB_SHUT_DOWN_CONFIG
+#define UICC_SB_SHUT_DOWN_CONFIG                          	0x23                                              	
+#define UICC_SB_SHUT_DOWN_CONFIG_OFFSET_SBID              	0 //size 2 byte(s)
+#define UICC_SB_SHUT_DOWN_CONFIG_OFFSET_SBLEN             	2 //size 2 byte(s)
+#define UICC_SB_SHUT_DOWN_CONFIG_OFFSET_FILLERBYTE1       	4 //size 2 byte(s)
+#define UICC_SB_SHUT_DOWN_CONFIG_OFFSET_POWERMODE         	6 //size 1 byte(s)
+#define UICC_SB_SHUT_DOWN_CONFIG_OFFSET_VOLTAGECLASS      	7 //size 1 byte(s)
+#define SIZE_UICC_SB_SHUT_DOWN_CONFIG                     	8
 
 
 //Definition for UICC_SB_CARD_STATUS
@@ -201,6 +251,25 @@
 #define UICC_SB_CARD_STATUS_OFFSET_FILLERBYTE1            	4 //size 3 byte(s)
 #define UICC_SB_CARD_STATUS_OFFSET_CARDSTATUS             	7 //size 1 byte(s)
 #define SIZE_UICC_SB_CARD_STATUS                          	8
+
+
+//Definition for UICC_SB_CARD_INFO
+#define UICC_SB_CARD_INFO                                 	0x24                                              	
+#define UICC_SB_CARD_INFO_OFFSET_SBID                     	0 //size 2 byte(s)
+#define UICC_SB_CARD_INFO_OFFSET_SBLEN                    	2 //size 2 byte(s)
+#define UICC_SB_CARD_INFO_OFFSET_FILLERBYTE1              	4 //size 2 byte(s)
+#define UICC_SB_CARD_INFO_OFFSET_VOLTAGECLASS             	6 //size 1 byte(s)
+#define UICC_SB_CARD_INFO_OFFSET_CLFSUPPORT               	7 //size 1 byte(s)
+#define SIZE_UICC_SB_CARD_INFO                            	8
+
+
+//Definition for UICC_SB_CARD_REJECT_CAUSE
+#define UICC_SB_CARD_REJECT_CAUSE                         	0x25                                              	
+#define UICC_SB_CARD_REJECT_CAUSE_OFFSET_SBID             	0 //size 2 byte(s)
+#define UICC_SB_CARD_REJECT_CAUSE_OFFSET_SBLEN            	2 //size 2 byte(s)
+#define UICC_SB_CARD_REJECT_CAUSE_OFFSET_FILLERBYTE1      	4 //size 3 byte(s)
+#define UICC_SB_CARD_REJECT_CAUSE_OFFSET_REJECTCAUSE      	7 //size 1 byte(s)
+#define SIZE_UICC_SB_CARD_REJECT_CAUSE                    	8
 
 
 //Definition for UICC_SB_CLIENT
@@ -288,13 +357,10 @@
 #define UICC_SB_PIN_OFFSET_SBLEN                          	2 //size 2 byte(s)
 #define UICC_SB_PIN_OFFSET_PINID                          	4 //size 1 byte(s)
 #define UICC_SB_PIN_OFFSET_PINQUALIFIER                   	5 //size 1 byte(s)
-#define UICC_SB_PIN_OFFSET_FILLERBYTE1                    	6 //size 1 byte(s)
-#define UICC_SB_PIN_OFFSET_LENGTH                         	7 //size 1 byte(s)
-#define UICC_SB_PIN_OFFSET_PINCODE                        	8 //size 1 byte(s)
-#define UICC_SB_PIN_OFFSET_FILLERBYTE2                    	9 //size 1 byte(s)
-#define UICC_SB_PIN_OFFSET_FILLERBYTE3                    	10 //size 1 byte(s)
-#define UICC_SB_PIN_OFFSET_FILLERBYTE4                    	11 //size 1 byte(s)
-#define SIZE_UICC_SB_PIN                                  	12
+#define UICC_SB_PIN_OFFSET_LENGTH                         	6 //size 1 byte(s)
+#define UICC_SB_PIN_OFFSET_PINCODE                        	7 //size 8 byte(s)
+#define UICC_SB_PIN_OFFSET_FILLERBYTE1                    	15 //size 1 byte(s)
+#define SIZE_UICC_SB_PIN                                  	16
 //NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
 
 
@@ -312,13 +378,10 @@
 #define UICC_SB_PUK_OFFSET_SBID                           	0 //size 2 byte(s)
 #define UICC_SB_PUK_OFFSET_SBLEN                          	2 //size 2 byte(s)
 #define UICC_SB_PUK_OFFSET_PINID                          	4 //size 1 byte(s)
-#define UICC_SB_PUK_OFFSET_FILLERBYTE1                    	5 //size 2 byte(s)
-#define UICC_SB_PUK_OFFSET_PUKLENGTH                      	7 //size 1 byte(s)
-#define UICC_SB_PUK_OFFSET_PUKCODE                        	8 //size 1 byte(s)
-#define UICC_SB_PUK_OFFSET_FILLERBYTE2                    	9 //size 1 byte(s)
-#define UICC_SB_PUK_OFFSET_FILLERBYTE3                    	10 //size 1 byte(s)
-#define UICC_SB_PUK_OFFSET_FILLERBYTE4                    	11 //size 1 byte(s)
-#define SIZE_UICC_SB_PUK                                  	12
+#define UICC_SB_PUK_OFFSET_PUKLENGTH                      	5 //size 1 byte(s)
+#define UICC_SB_PUK_OFFSET_PUKCODE                        	6 //size 8 byte(s)
+#define UICC_SB_PUK_OFFSET_FILLERBYTE1                    	14 //size 2 byte(s)
+#define SIZE_UICC_SB_PUK                                  	16
 //NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
 
 
@@ -418,6 +481,17 @@
 #define SIZE_UICC_SB_LINEAR_FIXED                         	8
 
 
+//Definition for UICC_SB_CYCLIC
+#define UICC_SB_CYCLIC                                    	0x26                                              	
+#define UICC_SB_CYCLIC_OFFSET_SBID                        	0 //size 2 byte(s)
+#define UICC_SB_CYCLIC_OFFSET_SBLEN                       	2 //size 2 byte(s)
+#define UICC_SB_CYCLIC_OFFSET_RECORD                      	4 //size 1 byte(s)
+#define UICC_SB_CYCLIC_OFFSET_OFFSET                      	5 //size 1 byte(s)
+#define UICC_SB_CYCLIC_OFFSET_AMOUNT                      	6 //size 1 byte(s)
+#define UICC_SB_CYCLIC_OFFSET_FILLERBYTE1                 	7 //size 1 byte(s)
+#define SIZE_UICC_SB_CYCLIC                               	8
+
+
 //Definition for UICC_SB_TERMINAL_PROFILE
 #define UICC_SB_TERMINAL_PROFILE                          	0x15                                              	
 #define UICC_SB_TERMINAL_PROFILE_OFFSET_SBID              	0 //size 2 byte(s)
@@ -433,15 +507,6 @@
 //NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
 
 
-//Definition for UICC_SB_TERMINAL_SUPPORT_TABLE
-#define UICC_SB_TERMINAL_SUPPORT_TABLE                    	0x1E                                              	
-#define UICC_SB_TERMINAL_SUPPORT_TABLE_OFFSET_SBID        	0 //size 2 byte(s)
-#define UICC_SB_TERMINAL_SUPPORT_TABLE_OFFSET_SBLEN       	2 //size 2 byte(s)
-#define UICC_SB_TERMINAL_SUPPORT_TABLE_OFFSET_FILLERBYTE1 	4 //size 3 byte(s)
-#define UICC_SB_TERMINAL_SUPPORT_TABLE_OFFSET_NSB         	7 //size 1 byte(s)
-#define SIZE_UICC_SB_TERMINAL_SUPPORT_TABLE               	8
-
-
 //Definition for UICC_SB_TERMINAL_RESPONSE
 #define UICC_SB_TERMINAL_RESPONSE                         	0x1D                                              	
 #define UICC_SB_TERMINAL_RESPONSE_OFFSET_SBID             	0 //size 2 byte(s)
@@ -453,6 +518,21 @@
 #define UICC_SB_TERMINAL_RESPONSE_OFFSET_FILLERBYTE3      	10 //size 1 byte(s)
 #define UICC_SB_TERMINAL_RESPONSE_OFFSET_FILLERBYTE4      	11 //size 1 byte(s)
 #define SIZE_UICC_SB_TERMINAL_RESPONSE                    	12
+//NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
+//NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
+
+
+//Definition for UICC_SB_ENVELOPE
+#define UICC_SB_ENVELOPE                                  	0x21                                              	
+#define UICC_SB_ENVELOPE_OFFSET_SBID                      	0 //size 2 byte(s)
+#define UICC_SB_ENVELOPE_OFFSET_SBLEN                     	2 //size 2 byte(s)
+#define UICC_SB_ENVELOPE_OFFSET_FILLERBYTE1               	4 //size 2 byte(s)
+#define UICC_SB_ENVELOPE_OFFSET_ENVELOPELENGTH            	6 //size 2 byte(s)
+#define UICC_SB_ENVELOPE_OFFSET_ENVELOPE                  	8 //size 1 byte(s)
+#define UICC_SB_ENVELOPE_OFFSET_FILLERBYTE2               	9 //size 1 byte(s)
+#define UICC_SB_ENVELOPE_OFFSET_FILLERBYTE3               	10 //size 1 byte(s)
+#define UICC_SB_ENVELOPE_OFFSET_FILLERBYTE4               	11 //size 1 byte(s)
+#define SIZE_UICC_SB_ENVELOPE                             	12
 //NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
 //NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
 
@@ -493,8 +573,12 @@
 #define UICC_SB_REFRESH_RESULT_OFFSET_SBID                	0 //size 2 byte(s)
 #define UICC_SB_REFRESH_RESULT_OFFSET_SBLEN               	2 //size 2 byte(s)
 #define UICC_SB_REFRESH_RESULT_OFFSET_REFRESHSTATUS       	4 //size 1 byte(s)
-#define UICC_SB_REFRESH_RESULT_OFFSET_FILLERBYTE1         	5 //size 3 byte(s)
+#define UICC_SB_REFRESH_RESULT_OFFSET_FILLERBYTE1         	5 //size 1 byte(s)
+#define UICC_SB_REFRESH_RESULT_OFFSET_ADDITIONALINFOLENGTH	6 //size 1 byte(s)
+#define UICC_SB_REFRESH_RESULT_OFFSET_ADDITIONALINFO      	7 //size 1 byte(s)
 #define SIZE_UICC_SB_REFRESH_RESULT                       	8
+//NOTE: Definition contains variable size field(s). SIZE_ and offsets following variable field cannot be defined correctly.
+//NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
 
 
 //Definition for UICC_SB_APDU_ACTIONS
@@ -502,21 +586,28 @@
 #define UICC_SB_APDU_ACTIONS_OFFSET_SBID                  	0 //size 2 byte(s)
 #define UICC_SB_APDU_ACTIONS_OFFSET_SBLEN                 	2 //size 2 byte(s)
 #define UICC_SB_APDU_ACTIONS_OFFSET_ACTION                	4 //size 1 byte(s)
-#define UICC_SB_APDU_ACTIONS_OFFSET_FILLERBYTE1           	5 //size 3 byte(s)
+#define UICC_SB_APDU_ACTIONS_OFFSET_PROTOCOL              	5 //size 1 byte(s)
+#define UICC_SB_APDU_ACTIONS_OFFSET_FILLERBYTE1           	6 //size 2 byte(s)
 #define SIZE_UICC_SB_APDU_ACTIONS                         	8
 
-#define UICC_SB_STATUS_WORD                                 0x0020
+
+//Definition for UICC_SB_STATUS_WORD
+#define UICC_SB_STATUS_WORD                               	0x20                                              	
+#define UICC_SB_STATUS_WORD_OFFSET_SBID                   	0 //size 2 byte(s)
+#define UICC_SB_STATUS_WORD_OFFSET_SBLEN                  	2 //size 2 byte(s)
+#define UICC_SB_STATUS_WORD_OFFSET_FILLERBYTE1            	4 //size 2 byte(s)
 #define UICC_SB_STATUS_WORD_OFFSET_SW1                    	6 //size 1 byte(s)
 #define UICC_SB_STATUS_WORD_OFFSET_SW2                    	7 //size 1 byte(s)
+#define SIZE_UICC_SB_STATUS_WORD                          	8
 
-//Definition for UICC_SB_OBJECT_ID
-#define UICC_SB_OBJECT_ID                                 	0x1A                                              	
-#define UICC_SB_OBJECT_ID_OFFSET_SBID                     	0 //size 2 byte(s)
-#define UICC_SB_OBJECT_ID_OFFSET_SBLEN                    	2 //size 2 byte(s)
-#define UICC_SB_OBJECT_ID_OFFSET_OBJID                    	4 //size 2 byte(s)
-#define UICC_SB_OBJECT_ID_OFFSET_DEVICEID                 	6 //size 1 byte(s)
-#define UICC_SB_OBJECT_ID_OFFSET_FILLERBYTE1              	7 //size 1 byte(s)
-#define SIZE_UICC_SB_OBJECT_ID                            	8
+
+//Definition for UICC_SB_APDU_SAP_INFO
+#define UICC_SB_APDU_SAP_INFO                             	0x22                                              	
+#define UICC_SB_APDU_SAP_INFO_OFFSET_SBID                 	0 //size 2 byte(s)
+#define UICC_SB_APDU_SAP_INFO_OFFSET_SBLEN                	2 //size 2 byte(s)
+#define UICC_SB_APDU_SAP_INFO_OFFSET_APDUSAPID            	4 //size 1 byte(s)
+#define UICC_SB_APDU_SAP_INFO_OFFSET_FILLERBYTE1          	5 //size 3 byte(s)
+#define SIZE_UICC_SB_APDU_SAP_INFO                        	8
 
 
 //MESSAGES
@@ -527,7 +618,8 @@
 #define UICC_REQ_OFFSET_TRANSID                           	0 //size 1 byte(s)
 #define UICC_REQ_OFFSET_MESSAGEID                         	1 //size 1 byte(s)
 #define UICC_REQ_OFFSET_SERVICETYPE                       	2 //size 1 byte(s)
-#define SIZE_UICC_REQ                                     	3
+#define UICC_REQ_OFFSET_NSB                               	3 //size 1 byte(s)
+#define SIZE_UICC_REQ                                     	4
 
 
 //Definition for UICC_RESP
@@ -719,23 +811,25 @@
 #define SIZE_UICC_REFRESH_RESP                            	5
 
 
-//Definition for UICC_SIMLOCK_REQ
-#define UICC_SIMLOCK_REQ                                  	0x1B                                              	
-#define UICC_SIMLOCK_REQ_OFFSET_TRANSID                   	0 //size 1 byte(s)
-#define UICC_SIMLOCK_REQ_OFFSET_MESSAGEID                 	1 //size 1 byte(s)
-#define UICC_SIMLOCK_REQ_OFFSET_SERVICETYPE               	2 //size 1 byte(s)
-#define SIZE_UICC_SIMLOCK_REQ                             	3
+//Definition for UICC_APDU_SAP_REQ
+#define UICC_APDU_SAP_REQ                                 	0x1E                                              	
+#define UICC_APDU_SAP_REQ_OFFSET_TRANSID                  	0 //size 1 byte(s)
+#define UICC_APDU_SAP_REQ_OFFSET_MESSAGEID                	1 //size 1 byte(s)
+#define UICC_APDU_SAP_REQ_OFFSET_SERVICETYPE              	2 //size 1 byte(s)
+#define UICC_APDU_SAP_REQ_OFFSET_STATUS                   	3 //size 1 byte(s)
+#define UICC_APDU_SAP_REQ_OFFSET_FILLERBYTE1              	4 //size 3 byte(s)
+#define UICC_APDU_SAP_REQ_OFFSET_NSB                      	7 //size 1 byte(s)
+#define SIZE_UICC_APDU_SAP_REQ                            	8
 
 
-//Definition for UICC_SIMLOCK_RESP
-#define UICC_SIMLOCK_RESP                                 	0x1C                                              	
-#define UICC_SIMLOCK_RESP_OFFSET_TRANSID                  	0 //size 1 byte(s)
-#define UICC_SIMLOCK_RESP_OFFSET_MESSAGEID                	1 //size 1 byte(s)
-#define UICC_SIMLOCK_RESP_OFFSET_SERVICETYPE              	2 //size 1 byte(s)
-#define UICC_SIMLOCK_RESP_OFFSET_STATUS                   	3 //size 1 byte(s)
-#define UICC_SIMLOCK_RESP_OFFSET_DETAILS                  	4 //size 1 byte(s)
-#define UICC_SIMLOCK_RESP_OFFSET_SIMLOCKSTATUS            	5 //size 1 byte(s)
-#define SIZE_UICC_SIMLOCK_RESP                            	6
+//Definition for UICC_APDU_SAP_RESP
+#define UICC_APDU_SAP_RESP                                	0x1F                                              	
+#define UICC_APDU_SAP_RESP_OFFSET_TRANSID                 	0 //size 1 byte(s)
+#define UICC_APDU_SAP_RESP_OFFSET_MESSAGEID               	1 //size 1 byte(s)
+#define UICC_APDU_SAP_RESP_OFFSET_SERVICETYPE             	2 //size 1 byte(s)
+#define UICC_APDU_SAP_RESP_OFFSET_STATUS                  	3 //size 1 byte(s)
+#define UICC_APDU_SAP_RESP_OFFSET_DETAILS                 	4 //size 1 byte(s)
+#define SIZE_UICC_APDU_SAP_RESP                           	5
 
 
 //Definition for UICC_APPLICATION_IND
@@ -775,7 +869,9 @@
 #define UICC_CARD_IND_OFFSET_MESSAGEID                    	1 //size 1 byte(s)
 #define UICC_CARD_IND_OFFSET_SERVICETYPE                  	2 //size 1 byte(s)
 #define UICC_CARD_IND_OFFSET_CARDTYPE                     	3 //size 1 byte(s)
-#define SIZE_UICC_CARD_IND                                	4
+#define UICC_CARD_IND_OFFSET_FILLERBYTE1                  	4 //size 3 byte(s)
+#define UICC_CARD_IND_OFFSET_NSB                          	7 //size 1 byte(s)
+#define SIZE_UICC_CARD_IND                                	8
 
 
 //Definition for UICC_PIN_IND
@@ -789,25 +885,13 @@
 #define SIZE_UICC_PIN_IND                                 	8
 
 
-//Definition for UICC_APPL_CMD_IND
-#define UICC_APPL_CMD_IND                                 	0x0E                                                 	
-#define UICC_APPL_CMD_IND_OFFSET_TRANSID                  	0 //size 1 byte(s)
-#define UICC_APPL_CMD_IND_OFFSET_MESSAGEID                	1 //size 1 byte(s)
-#define UICC_APPL_CMD_IND_OFFSET_SERVICETYPE              	2 //size 1 byte(s)
-#define UICC_APPL_CMD_IND_OFFSET_APPLID                   	3 //size 1 byte(s)
-#define UICC_APPL_CMD_IND_OFFSET_FILLERBYTE1              	4 //size 3 byte(s)
-#define UICC_APPL_CMD_IND_OFFSET_NSB                      	7 //size 1 byte(s)
-#define SIZE_UICC_APPL_CMD_IND                            	8
-
-
 //Definition for UICC_CAT_IND
 #define UICC_CAT_IND                                      	0x14                                              	
 #define UICC_CAT_IND_OFFSET_TRANSID                       	0 //size 1 byte(s)
 #define UICC_CAT_IND_OFFSET_MESSAGEID                     	1 //size 1 byte(s)
 #define UICC_CAT_IND_OFFSET_SERVICETYPE                   	2 //size 1 byte(s)
 #define UICC_CAT_IND_OFFSET_CARDTYPE                      	3 //size 1 byte(s)
-#define UICC_CAT_IND_OFFSET_APPLID                        	4 //size 1 byte(s)
-#define UICC_CAT_IND_OFFSET_FILLERBYTE1                   	5 //size 2 byte(s)
+#define UICC_CAT_IND_OFFSET_FILLERBYTE1                   	4 //size 3 byte(s)
 #define UICC_CAT_IND_OFFSET_NSB                           	7 //size 1 byte(s)
 #define SIZE_UICC_CAT_IND                                 	8
 
@@ -819,5 +903,16 @@
 #define UICC_APDU_RESET_IND_OFFSET_SERVICETYPE            	2 //size 1 byte(s)
 #define UICC_APDU_RESET_IND_OFFSET_FILLERBYTE1            	3 //size 1 byte(s)
 #define SIZE_UICC_APDU_RESET_IND                          	4
+
+
+//Definition for UICC_APDU_SAP_IND
+#define UICC_APDU_SAP_IND                                 	0x20                                              	
+#define UICC_APDU_SAP_IND_OFFSET_TRANSID                  	0 //size 1 byte(s)
+#define UICC_APDU_SAP_IND_OFFSET_MESSAGEID                	1 //size 1 byte(s)
+#define UICC_APDU_SAP_IND_OFFSET_SERVICETYPE              	2 //size 1 byte(s)
+#define UICC_APDU_SAP_IND_OFFSET_APDUSAPID                	3 //size 1 byte(s)
+#define UICC_APDU_SAP_IND_OFFSET_FILLERBYTE1              	4 //size 3 byte(s)
+#define UICC_APDU_SAP_IND_OFFSET_NSB                      	7 //size 1 byte(s)
+#define SIZE_UICC_APDU_SAP_IND                            	8
 
 #endif

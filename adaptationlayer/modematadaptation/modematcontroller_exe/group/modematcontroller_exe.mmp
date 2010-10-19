@@ -40,12 +40,12 @@ SOURCE                  cmodemathandler.cpp
 SOURCE                  cmodematpipecontroller.cpp
 SOURCE                  catmessage.cpp
 
-
+macro PIPECAMP_UNSUBSCRIBE_PNS_PEP_STATUS_IND
 
 OS_LAYER_SYSTEMINCLUDE
 NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
 USERINCLUDE             ../inc ../../modematcontroller_dll/inc
-
+USERINCLUDE             ../traces
 
 LIBRARY                 euser.lib
 LIBRARY                 iscapi.lib

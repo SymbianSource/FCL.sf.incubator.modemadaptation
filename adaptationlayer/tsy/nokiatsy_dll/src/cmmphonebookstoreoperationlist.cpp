@@ -75,7 +75,7 @@ CMmPhoneBookStoreOperationList::CMmPhoneBookStoreOperationList()
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::\
         CMmPhoneBookStoreOperationList");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CMMPHONEBOOKSTOREOPERATIONLIST, "CMmPhoneBookStoreOperationList::CMmPhoneBookStoreOperationList" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONLIST_CMMPHONEBOOKSTOREOPERATIONLIST_TD, "CMmPhoneBookStoreOperationList::CMmPhoneBookStoreOperationList" );
     }
 
 // ---------------------------------------------------------------------------
@@ -87,7 +87,7 @@ CMmPhoneBookStoreOperationList::~CMmPhoneBookStoreOperationList()
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::\
         ~CMmPhoneBookStoreOperationList");
-    OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONLIST_CMMPHONEBOOKSTOREOPERATIONLIST, "CMmPhoneBookStoreOperationList::~CMmPhoneBookStoreOperationList" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKSTOREOPERATIONLIST_CMMPHONEBOOKSTOREOPERATIONLIST_TD, "CMmPhoneBookStoreOperationList::~CMmPhoneBookStoreOperationList" );
 
     iPtrOperationArrayNew.DeleteAll();
     // resets all elements to 
@@ -107,7 +107,7 @@ CMmPhoneBookStoreOperationList* CMmPhoneBookStoreOperationList::NewL(
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::NewL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_NEWL, "CMmPhoneBookStoreOperationList::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONLIST_NEWL_TD, "CMmPhoneBookStoreOperationList::NewL" );
 
     CMmPhoneBookStoreOperationList* mmPhoneBookOperationList =
         new( ELeave ) CMmPhoneBookStoreOperationList();
@@ -128,7 +128,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_NEWL, "CMmPhoneBookStore
 void CMmPhoneBookStoreOperationList::ConstructL()
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CONSTRUCTL, "CMmPhoneBookStoreOperationList::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONLIST_CONSTRUCTL_TD, "CMmPhoneBookStoreOperationList::ConstructL" );
     }
 
 
@@ -142,7 +142,7 @@ void CMmPhoneBookStoreOperationList::AddOperation(
     CMmPhoneBookStoreOperationBase* aOperation )
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::AddOperation");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_ADDOPERATION, "CMmPhoneBookStoreOperationList::AddOperation" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONLIST_ADDOPERATION_TD, "CMmPhoneBookStoreOperationList::AddOperation" );
 
     if( (( aTrans - ETrIdPbOperationStart ) >= 0)&& ((aTrans - ETrIdPbOperationStart) < KMaxPbTrIdCount ))
         {
@@ -160,7 +160,7 @@ CMmPhoneBookStoreOperationBase* CMmPhoneBookStoreOperationList::Find(
     TUint8 aTrans )
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::Find");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_FIND, "CMmPhoneBookStoreOperationList::Find" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONLIST_FIND_TD, "CMmPhoneBookStoreOperationList::Find" );
 
     CMmPhoneBookStoreOperationBase* basePointer( NULL );
     //transaction id is basically just an index to operation array + start offset
@@ -184,7 +184,7 @@ void CMmPhoneBookStoreOperationList::RemoveOperationFromList(
     TUint8 aTrans )  // transactionId
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::RemoveOperationFromList");
-    OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONLIST_REMOVEOPERATIONFROMLIST, "CMmPhoneBookStoreOperationList::RemoveOperationFromList" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKSTOREOPERATIONLIST_REMOVEOPERATIONFROMLIST_TD, "CMmPhoneBookStoreOperationList::RemoveOperationFromList" );
     
 
     delete iPtrOperationArrayNew[aTrans - ETrIdPbOperationStart];
@@ -205,7 +205,7 @@ void CMmPhoneBookStoreOperationList::RemoveOperationFromList(
 TInt CMmPhoneBookStoreOperationList::FindEmptyIndexTransId()
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::FindEmptyIndexTransId");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_FINDEMPTYINDEXTRANSID, "CMmPhoneBookStoreOperationList::FindEmptyIndexTransId" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONLIST_FINDEMPTYINDEXTRANSID_TD, "CMmPhoneBookStoreOperationList::FindEmptyIndexTransId" );
     
     TInt transId = -1;
     for( TInt count = 0 ; count < KMaxPbTrIdCount ; count++)
@@ -228,7 +228,7 @@ TInt CMmPhoneBookStoreOperationList::FindEmptyIndexTransId()
 void CMmPhoneBookStoreOperationList::CancelOperation( TName &aPhoneBook)
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::CancelOperation");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CANCELOPERATION, "CMmPhoneBookStoreOperationList::CancelOperation" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONLIST_CANCELOPERATION_TD, "CMmPhoneBookStoreOperationList::CancelOperation" );
   
     // Chekc for all operation which have the same phonebook name
     for( TInt count = 0 ; count < KMaxPbTrIdCount ; count++)

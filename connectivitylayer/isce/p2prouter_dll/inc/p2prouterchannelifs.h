@@ -104,7 +104,7 @@ class MP2PChRouterIf
         * @param aProtocolId, channels unique P2P identifier
         * @param aCallback, pointer to channel interface
         */
-        virtual void Open( const TUint8 aProtocolId, MP2PRouterChIf* aCallback ) = 0;
+        virtual void Connect( const TUint8 aProtocolId, MP2PRouterChIf* aCallback ) = 0;
 
         /*
         * Sends a message to router.

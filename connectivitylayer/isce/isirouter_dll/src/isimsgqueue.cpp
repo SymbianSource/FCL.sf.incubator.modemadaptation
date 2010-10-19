@@ -66,6 +66,7 @@ DISIMsgQueue::~DISIMsgQueue(
     C_TRACE( ( _T( "DISIMsgQueue::~DISIMsgQueue 0x%x %d>" ), this, iShCount ) );
     ASSERT_RESET_ALWAYS( iShCount == 0, ( EISIMsgQueueNotEmpty | EDISIMsgQueueTraceId << KClassIdentifierShift ) );
     // NOTE! This does not deallocate the blocks from the allocated memory just the pointers!
+    // Take each individual pointer from the array and free delete them.
     for( TInt i( 0 ); i < iSize; ++i )
         {
         TDes8* temp = iShRingBuffer[ i ];
@@ -79,8 +80,9 @@ DISIMsgQueue::~DISIMsgQueue(
     if( iShRingBuffer )
         {
         C_TRACE( ( _T( "DISIMsgQueue::~DISIMsgQueue iShRingBuffer 0x%x iShRingBuffer[0] 0x%x" ), iShRingBuffer, iShRingBuffer[0] ) );
+        // Delete the space reserved for the array. Marks it as non-used do not set to NULL.
         delete [] iShRingBuffer;
-        iShRingBuffer = NULL;
+//        iShRingBuffer = NULL;
         }
 
     iSize = 0;

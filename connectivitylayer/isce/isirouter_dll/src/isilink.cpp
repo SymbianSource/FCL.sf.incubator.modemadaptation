@@ -17,13 +17,13 @@
 
 
 #include <kernel.h>             // For Kern
+#include <phonetisi.h>          // // For ISI_HEADER_OFFSET_MEDIA
+
 #include "isilink.h"            // For DISILink
 #include "iscedefs.h"           // For EMuxISI...
 #include "mlinkmuxif.h"         // For MLinkMuxIf
 #include "isiroutertrace.h"     // For C_TRACE, ASSERT_RESET.. and fault codes
 #include "misilinkrouterif.h"   // For MISILinkRouterIf
-#include "isihelpers.h"         // For ISI_HEADER_OFFSET_MEDIA
-
 
 // Faults
 enum TISILinkFaults
@@ -44,11 +44,11 @@ MISIRouterLinkIf* MISIRouterLinkIf::CreateLinkF(
         const TUint8 aTrxId
         )
     {
-    C_TRACE( ( _T( "MISIRouterLinkIf::CreateLinkF 0x%x %d %d>" ), aRouter, aMediaId, aTrxId ) );
+    C_TRACE( ( _T( "MISIRouterLinkIf::CreateLinkF 0x%x 0x%x 0x%x>" ), aRouter, aMediaId, aTrxId ) );
     ASSERT_RESET_ALWAYS( aRouter, ( EISILinkNullPtr | EDISILinkTraceId << KClassIdentifierShift ) );
     DISILink* link = new DISILink( aRouter, aMediaId, aTrxId );
     ASSERT_RESET_ALWAYS( link, ( EISILinkMemAllocFailed | EDISILinkTraceId << KClassIdentifierShift ) );
-    C_TRACE( ( _T( "MISIRouterLinkIf::CreateLinkF 0x%x %d %d created 0x%x<" ), aRouter, aMediaId, aTrxId, link ) );
+    C_TRACE( ( _T( "MISIRouterLinkIf::CreateLinkF 0x%x 0x%x 0x%x created 0x%x<" ), aRouter, aMediaId, aTrxId, link ) );
     return link;
     }
 
@@ -58,7 +58,7 @@ DISILink::DISILink(
             iTrxPresent( EFalse )
     {
     C_TRACE( ( _T( "DISILink::DISILink 0x%x>" ), this ) );
-    iMediaId = 0; // TODO change to PN_MEDIA_NOT_USED when bridge supports this
+    iMediaId = 0; 
     C_TRACE( ( _T( "DISILink::DISILink 0x%x<" ), this ) );
     }
 
@@ -70,11 +70,11 @@ DISILink::DISILink(
             iMediaId( aMediaId ),
             iTrxId( aTrxId )
     {
-    C_TRACE( ( _T( "DISILink::DISILink 0x%x mediaid %d trxid %d>" ), this, aMediaId, aTrxId ) );
+    C_TRACE( ( _T( "DISILink::DISILink 0x%x mediaid 0x%x trxid 0x%x>" ), this, aMediaId, aTrxId ) );
     // ISI Media
     iMux = MLinkMuxIf::Register( this, aTrxId, EMuxISI );
     ASSERT_RESET_ALWAYS( aRouter, ( EISILinkRegisterFailed | EDISILinkTraceId << KClassIdentifierShift ) );
-    C_TRACE( ( _T( "DISILink::DISILink 0x%x mediaid %d trxid %d<" ), this, iMediaId, iTrxId ) );
+    C_TRACE( ( _T( "DISILink::DISILink 0x%x mediaid 0x%x trxid 0x%x<" ), this, iMediaId, iTrxId ) );
     }
 
 DISILink::~DISILink()
@@ -93,7 +93,7 @@ void DISILink::Receive(
     C_TRACE( ( _T( "DISILink::Receive 0x%x 0x%x>" ), this, &aMsg ) );
     ASSERT_RESET_ALWAYS( iMux, ( EISILinkInitFailed | EDISILinkTraceId << KClassIdentifierShift ) );
     ASSERT_RESET_ALWAYS( aMsg.Ptr()[ ISI_HEADER_OFFSET_MEDIA ] == iMediaId, ( EISILinkWrongMedia | aMsg.Ptr()[ 0 ] << KMediaIdShift | EDISILinkTraceId << KClassIdentifierShift ) );
-    iRouter->RouteISIMessage( aMsg );
+    iRouter->ReceiveISIMessage( aMsg, iTrxId );
     C_TRACE( ( _T( "DISILink::Receive 0x%x 0x%x<" ), this, &aMsg ) );
     }
 
@@ -107,6 +107,7 @@ void DISILink::EnqueTrxPresenceChangedDfc(
     // No traces allowed due to not allowed to block.
     ASSERT_RESET_ALWAYS( ( iTrxPresent != aPresent ), ( EISILinkTrxPresenceSyncFailed | EDISILinkTraceId << KClassIdentifierShift ) );
     iTrxPresent = aPresent;
+    iRouter->StateChanged();
     }
 // From MMuxLinkIf end
 
@@ -124,7 +125,7 @@ TBool DISILink::Send(
         TDes8& aMsg
         )
     {
-    C_TRACE( ( _T( "DISILink::Send 0x%x 0x%x>" ), this, &aMsg  ) );
+    C_TRACE( ( _T( "DISILink::Send 0x%x 0x%x iMediaId 0x%x >" ), this, &aMsg, iMediaId  ) );
     ASSERT_RESET_ALWAYS( iMux, ( EISILinkInitFailed2 | EDISILinkTraceId << KClassIdentifierShift ) );
     if( iTrxPresent )
         {
@@ -132,10 +133,18 @@ TBool DISILink::Send(
         msgPtr[ ISI_HEADER_OFFSET_MEDIA ] = iMediaId;
         // Send with default prio.
         iMux->Send( aMsg, EMuxISI );
-        C_TRACE( ( _T( "DISILink::Send ok 0x%x %d 0x%x<" ), this, iTrxPresent, &aMsg) );
+        C_TRACE( ( _T( "DISILink::Send ok 0x%x 0x%x 0x%x<" ), this, iTrxPresent, &aMsg) );
         return ETrue;
         }
-    C_TRACE( ( _T( "DISILink::Send failed 0x%x %d 0x%x<" ), this, iTrxPresent, &aMsg) );
+    // No need for else, by default false
+    C_TRACE( ( _T( "DISILink::Send failed 0x%x 0x%x 0x%x<" ), this, iTrxPresent, &aMsg) );
     return EFalse;
+    }
+    
+TUint8 DISILink::GetTrxId()
+    {
+    //C_TRACE( ( _T( "DISILink::GetTrxId return %d <>" ), this, iTrxId ) );
+    return iTrxId;
+    
     }
 // From MISIRouterLinkIf end

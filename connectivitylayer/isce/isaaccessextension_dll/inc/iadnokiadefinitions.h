@@ -42,7 +42,7 @@ enum TIADNokiaKernelChannels
 // MACROS
 
 // DATA TYPES
-// For BC reasons see (iscnokiadefinitions.h). // TODO: change to here!
+// For BC reasons see (iscnokiadefinitions.h). //  change to here!
 enum TIADCustomFunctions
     {
     EIADCustomAsyncSubscribeIndications = EIscNokiaAsyncEventSubscribe,

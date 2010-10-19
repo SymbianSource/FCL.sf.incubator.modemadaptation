@@ -259,11 +259,11 @@ void MceIsi::McePowerOffResp(const TUint8* const aMsgPtr)
                  "DMC:MCE_ISIMSG: McePowerOff() - trId: %d, status: 0x%x",
                  TUint8(aMsgPtr[ISI_MSG(MTC_POWER_OFF_RESP_OFFSET_TRANSID)]), 
 				 TUint8(aMsgPtr[ISI_MSG(MTC_POWER_OFF_RESP_OFFSET_STATUS)]));
-    DMC_TRACE(("DMC:MCE_ISIMSG: McePowerOff() - trId: %d, status: 0x%x"),
+    DMC_TRACE((("DMC:MCE_ISIMSG: McePowerOff() - trId: %d, status: 0x%x"),
                  TUint8(aMsgPtr[ISI_MSG(MTC_POWER_OFF_RESP_OFFSET_TRANSID)]), 
-				 TUint8(aMsgPtr[ISI_MSG(MTC_POWER_OFF_RESP_OFFSET_STATUS)]));
+				 TUint8(aMsgPtr[ISI_MSG(MTC_POWER_OFF_RESP_OFFSET_STATUS)])));
 #else // USE_MTC_SERVER
-   OstTraceExt2(TRACE_FLOW, DMC_MCE_ISI_MCE_POWER_OFF_RESP_1,
+   OstTraceExt2(TRACE_FLOW, DMC_MCE_ISI_MCE_POWER_OFF_RESP_2,
                  "DMC:MCE_ISIMSG: McePowerOff() - trId: %d, status: 0x%x",
                  TUint8((aMsgPtr[ISI_MSG(MCE_RESET_RESP_OFFSET_TRANSID)])), 
 				 TUint8(aMsgPtr[ISI_MSG(MCE_RESET_RESP_OFFSET_STATUS)]));
@@ -330,15 +330,15 @@ void MceIsi::MceResetResp(const TUint8* const aMsgPtr)
        received information. */
 
 #if USE_MTC_SERVER
-    OstTraceExt2(TRACE_FLOW, DMC_MCE_ISI_MCE_POWER_OFF_RESP_1,
+    OstTraceExt2(TRACE_FLOW, DMC_MCE_ISI_MCE_POWER_OFF_RESP_3,
                  "DMC:MCE_ISIMSG: MceResetResp() - trId: %d, status: 0x%x",
                  TUint8(aMsgPtr[ISI_MSG(MTC_RESET_GENERATE_RESP_OFFSET_TRANSID)]), 
 				 TUint8(aMsgPtr[ISI_MSG(MTC_RESET_GENERATE_RESP_OFFSET_STATUS)]));
-    DMC_TRACE(("DMC:MCE_ISIMSG: MceResetResp() - trId: %d, status: 0x%x"),
+    DMC_TRACE((("DMC:MCE_ISIMSG: MceResetResp() - trId: %d, status: 0x%x"),
                  TUint8(aMsgPtr[ISI_MSG(MTC_RESET_GENERATE_RESP_OFFSET_TRANSID)]), 
-				 TUint8(aMsgPtr[ISI_MSG(MTC_RESET_GENERATE_RESP_OFFSET_STATUS)]));
+				 TUint8(aMsgPtr[ISI_MSG(MTC_RESET_GENERATE_RESP_OFFSET_STATUS)])));
 #else // USE_MTC_SERVER
-   OstTraceExt2(TRACE_FLOW, DMC_MCE_ISI_MCE_POWER_OFF_RESP_1,
+   OstTraceExt2(TRACE_FLOW, DMC_MCE_ISI_MCE_POWER_OFF_RESP_4,
                  "DMC:MCE_ISIMSG: MceResetResp() - trId: %d, status: 0x%x",
                  TUint8((aMsgPtr[ISI_MSG(MCE_RESET_RESP_OFFSET_TRANSID)])), 
 				 TUint8(aMsgPtr[ISI_MSG(MCE_RESET_RESP_OFFSET_STATUS)]));
@@ -376,7 +376,7 @@ void MceIsi::MceModemStateInd(const TUint8* const aMsgPtr, TUint8& aModemState, 
 #else // USE_MTC_SERVER
     aModemState  = aMsgPtr[ISI_MSG(MCE_MODEM_STATE_IND_OFFSET_STATE)];
     aModemAction = aMsgPtr[ISI_MSG(MCE_MODEM_STATE_IND_OFFSET_ACTION)];
-    OstTraceExt3(TRACE_FLOW, DMC_MCE_ISI_MCE_STATE_IND_1,
+    OstTraceExt3(TRACE_FLOW, DMC_MCE_ISI_MCE_STATE_IND_2,
                 "DMC:MCE_ISIMSG: MceModemStateInd() - trId: %d, aModemState: 0x%x, aModemAction: 0x%x",
                 TUint8(aMsgPtr[ISI_MSG(MCE_MODEM_STATE_IND_OFFSET_TRANSID)]), 
 				aModemState, aModemAction);

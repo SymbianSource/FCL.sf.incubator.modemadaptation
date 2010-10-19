@@ -3,8 +3,8 @@
 *  Name:           sa_common_isc_service.cpp
 *  Part of:        System adaptation
 *  Description:    Implementation of CSACommonIscService class
-*  %version:       1 %
-*  %date_modified: Tue Dec 29 15:59:32 2009 %
+*  %version:       2 %
+*  %date_modified: Tue May 04 09:25:00 2010 %
 *
 * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
@@ -107,7 +107,7 @@ void CSACommonIscService::ConstructL( TDes8* aEvents )
     TRequestStatus status;
 
     /* Open ISC channel */
-    OstTrace0( TRACE_API, SA_COMMON_ISC_SERVICE_AUTOMATED_4, 
+    OstTrace0( TRACE_BORDER, SA_COMMON_ISC_SERVICE_AUTOMATED_4, 
         "ISCSERVICE - CSACommonIscService::ConstructL() - Opening ISC channel" );
     API_TRACE( ( _L( "ISCSERVICE - CSACommonIscService::ConstructL() - Opening ISC channel" ) ) );
     iIscApi.Open( iChannelNumber, status );
@@ -196,7 +196,7 @@ CSACommonIscService::~CSACommonIscService()
     iSACommonIscServiceChannelListener = NULL;
 
     /* Close ISC channel */
-    OstTrace0( TRACE_API, SA_COMMON_ISC_SERVICE_AUTOMATED_10, 
+    OstTrace0( TRACE_BORDER, SA_COMMON_ISC_SERVICE_AUTOMATED_10, 
         "ISCSERVICE - CSACommonIscService::~CSACommonIscService - Close ISC channel" );
     API_TRACE( ( _L( "ISCSERVICE - CSACommonIscService::~CSACommonIscService - Close ISC channel" ) ) );
     iIscApi.Close();
@@ -219,7 +219,7 @@ void CSACommonIscService::SendMessageL(
         "ISCSERVICE # CSACommonIscService::SendMessageL(0x%x)", (TUint)&aMessage );
     INTERNAL_TRACE( ( _L( "ISCSERVICE # CSACommonIscService::SendMessageL(0x%x)" ), (TUint)&aMessage ) );
 
-    OstTrace1( TRACE_API, SA_COMMON_ISC_SERVICE_AUTOMATED_13, 
+    OstTrace1( TRACE_BORDER, SA_COMMON_ISC_SERVICE_AUTOMATED_13, 
         "ISCSERVICE - CSACommonIscService::SendMessageL() - Sending ISI Message;aData=%x",
         (TUint)&aMessage );
     ISIMSG_API_TRACE( _L("ISCSERVICE # CSACommonIscService::SendMessageL() - Sending ISI Message: "), aMessage);
@@ -247,7 +247,7 @@ void CSACommonIscService::ReceiveMessageL( TUint16 aMessageLength )
     if ( !IsActive() )
         {
 
-        OstTrace0( TRACE_API, SA_COMMON_ISC_SERVICE_AUTOMATED_17, 
+        OstTrace0( TRACE_BORDER, SA_COMMON_ISC_SERVICE_AUTOMATED_17, 
             "ISCSERVICE - CSACommonIscService::ReceiveMessageL() - Receiving message" );
         API_TRACE( ( _L( "ISCSERVICE - CSACommonIscService::ReceiveMessageL() - Receiving message" ) ) );
 
@@ -294,7 +294,7 @@ void CSACommonIscService::RunL()
             if ( iBufferPtr.Length() >= KSASMinIscMessageLength )
                 {
                 /* Forward receive message to System Adaptation proxy */
-                OstTrace1( TRACE_API, SA_COMMON_ISC_SERVICE_AUTOMATED_20, 
+                OstTrace1( TRACE_BORDER, SA_COMMON_ISC_SERVICE_AUTOMATED_20, 
                     "ISCSERVICE - CSACommonIscService::RunL() - Receive ISI Message;iBufferPtr=%x", 
                     (TUint)&(iBufferPtr) );
                 ISIMSG_API_TRACE( _L("ISCSERVICE - CSACommonIscService::RunL() - Receive ISI Message: " ), 

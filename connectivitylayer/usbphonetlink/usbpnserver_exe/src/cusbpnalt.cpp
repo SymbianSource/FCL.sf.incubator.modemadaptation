@@ -148,7 +148,7 @@ void CUsbPnAlt::DoCancel( )
 //
 void CUsbPnAlt::RunL( )
     {
-    OstTrace1( TRACE_API, CUSBPNALT_RUNL_ENTRY, "CUsbPnAlt::RunL;iStatus=%d", iStatus.Int() );
+    OstTrace1( TRACE_BORDER, CUSBPNALT_RUNL_ENTRY, "CUsbPnAlt::RunL;iStatus=%d", iStatus.Int() );
     A_TRACE( ( _T( "CUsbPnAlt::RunL() iStatus:%d" ), iStatus.Int() ) );
 
     User::LeaveIfError( iStatus.Int() );
@@ -160,21 +160,21 @@ void CUsbPnAlt::RunL( )
             {
             case EUsbcDeviceStateAddress:
                 {
-                OstTrace0( TRACE_API, CUSBPNALT_RUNL_DUP1, "CUsbPnAlt::RunL - EUsbcDeviceStateAddress" );
+                OstTrace0( TRACE_BORDER, CUSBPNALT_RUNL_DUP1, "CUsbPnAlt::RunL - EUsbcDeviceStateAddress" );
                 A_TRACE( ( _T( "CUsbPnAlt::RunL - EUsbcDeviceStateAddress")));
                 SendControlMessage( PNS_USB_CABLE_PLUGGED );
                 break;
                 }
             case EUsbcDeviceStateConfigured:
                 {
-                OstTrace0( TRACE_API, CUSBPNALT_RUNL_DUP2, "CUsbPnAlt::RunL - EUsbcDeviceStateConfigured" );
+                OstTrace0( TRACE_BORDER, CUSBPNALT_RUNL_DUP2, "CUsbPnAlt::RunL - EUsbcDeviceStateConfigured" );
                 A_TRACE( ( _T( "CUsbPnAlt::RunL - EUsbcDeviceStateConfigured")));
                 SendControlMessage( PNS_USB_CONNECTED );
                 break;
                 }
             case EUsbcDeviceStateUndefined:
                 {
-                OstTrace0( TRACE_API, CUSBPNALT_RUNL_DUP3, "CUsbPnAlt::RunL - EUsbcDeviceStateUndefined" );
+                OstTrace0( TRACE_BORDER, CUSBPNALT_RUNL_DUP3, "CUsbPnAlt::RunL - EUsbcDeviceStateUndefined" );
                 A_TRACE( ( _T( "CUsbPnAlt::RunL - EUsbcDeviceStateUndefined")));
                 SendControlMessage( PNS_USB_CABLE_UNPLUGGED );
                 break;
@@ -187,7 +187,7 @@ void CUsbPnAlt::RunL( )
     iLdd.AlternateDeviceStatusNotify( iStatus, iState );
     SetActive();
 
-    OstTrace0( TRACE_API, CUSBPNALT_RUNL_EXIT, "CUsbPnAlt::RunL - return void");
+    OstTrace0( TRACE_BORDER, CUSBPNALT_RUNL_EXIT, "CUsbPnAlt::RunL - return void");
     A_TRACE( ( _T( "CUsbPnAlt::RunL() - return void" ) ) );
     }
 
@@ -218,7 +218,7 @@ TInt CUsbPnAlt::RunError( TInt aError )
 void CUsbPnAlt::SendControlMessage( const TUint8 aId ) const
     {
     C_TRACE( ( _T( "CUsbPnAlt::SendControlMessage( aId:%d )" ), aId ) );
-    OstTrace0( TRACE_API, CUSBPNALT_SENDCONTROLMESSAGE_DUP1, "CUsbPnAlt::SendControlMessage( aId )" );
+    OstTrace0( TRACE_BORDER, CUSBPNALT_SENDCONTROLMESSAGE_DUP1, "CUsbPnAlt::SendControlMessage( aId )" );
 
     TBuf8< SIZE_PNS_MEDIA_SPECIFIC_REQ > buf;
     TIsiSend ctrlMsg(buf, 12 );
@@ -232,11 +232,11 @@ void CUsbPnAlt::SendControlMessage( const TUint8 aId ) const
     ctrlMsg.Complete();
 
     C_TRACE( ( _T( "CUsbPnAlt::SendControlMessage() - Sending...") ) );
-    OstTrace0( TRACE_API, CUSBPNALT_SENDCONTROLMESSAGE_DUP2, "CUsbPnAlt::SendControlMessage() - Sending..." );
+    OstTrace0( TRACE_BORDER, CUSBPNALT_SENDCONTROLMESSAGE_DUP2, "CUsbPnAlt::SendControlMessage() - Sending..." );
     iIscApi.Send( buf );
 
     C_TRACE( ( _T( "CUsbPnAlt::SendControlMessage() - return void") ) );
-    OstTrace0( TRACE_API, CUSBPNALT_SENDCONTROLMESSAGE_DUP3, "CUsbPnAlt::SendControlMessage() - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNALT_SENDCONTROLMESSAGE_DUP3, "CUsbPnAlt::SendControlMessage() - return void" );
     }
 
 #endif /* NCP_COMMON_BRIDGE_FAMILY */

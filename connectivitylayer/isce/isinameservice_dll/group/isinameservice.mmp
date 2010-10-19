@@ -39,7 +39,6 @@ SOURCE          namerecords.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../isirouter_dll/inc
-USERINCLUDE     ../../isaaccessextension_dll/inc
 USERINCLUDE     ../../memmanager_dll/inc
 
 
@@ -51,7 +50,7 @@ SYSTEMINCLUDE     /epoc32/include/nkern
 DEFFILE         isinameservice.def
 
 LIBRARY         memmanager.lib
-LIBRARY         isaaccessextension.lib
+LIBRARY         isirouter.lib
 
 START WINS
 win32_library kernel32.lib
@@ -60,4 +59,6 @@ END
 
 // flag to enable normal trace inside component
 MACRO   COMPONENT_TRACE_FLAG
+//MACRO   COMPONENT_TRACE_FLAG_EXTEND
 
+MACRO ISCE_INTERNAL_WIDER_NAME_SERVICE_IN_USE

@@ -13,7 +13,7 @@
 * 
 * Description:
 * Name      : PN_GSS [ 0x32 ] Resource GSM Stack Server
-* Version   : 008.002
+* Version   : 008.005
 *
 * Documentation: www.wirelessmodemapi.com
 *
@@ -23,16 +23,12 @@
 #ifndef _SYMBIAN_ISI_GSSISI_H_
 #define _SYMBIAN_ISI_GSSISI_H_
 
-#define GSM_STACK_SERVER_ISI_VERSION_Z	 8
-#define GSM_STACK_SERVER_ISI_VERSION_Y	 2
+#define GSM_STACK_SERVER_ISI_VERSION_Z	 9
+#define GSM_STACK_SERVER_ISI_VERSION_Y	 0
 
 
 //CONSTANTS
 #define GSS_FILL                                          	0x00                                                 	
-#define GSS_FTD_FIRST_SUB_BLOCK                           	0x3200                                            	
-#define GSS_FTD_FIRST_WORD_SUB_BLOCK                      	0x3400                                            	
-#define GSS_FTD_FIRST_DWORD_SUB_BLOCK                     	0x3600                                            	
-#define GSS_FTD_FIRST_STRING_SUB_BLOCK                    	0x3800                                            	
 #define GSS_GENERAL_ISI_DATA_HDR_LEN                      	0x02                                                 	
 #define GSS_DATA_IND_LENGTH                               	0x04                                                 	
 #define GSS_SUBBLOCK_HEADER_LENGTH                        	0x04                                                 	
@@ -42,343 +38,11 @@
 #define GSS_SGW_IP_ADDRESS_LENGTH                         	0x10                                              	
 #define GSS_UNC_IP_ADDRESS_LENGTH                         	0x10                                              	
 #define GSS_SRV_NO_FQDN                                   	0x00                                                 	
+#define GSS_ENV_INFO_STATUS_UNKNOWN                       	0x00                                                 	
 #define GSS_ANY_SIZE                                      	0x01                                                 	
 
 
 //TABLES
-
-//ConstantTable for FtdTable
-#define FTD_SB_RX_LEVEL                                   	0x3200                                            	
-#define FTD_SB_TIME_SLOT                                  	0x3201                                            	
-#define FTD_SB_TIMING_ADV                                 	0x3202                                            	
-#define FTD_SB_RX_QUALITY                                 	0x3203                                            	
-#define FTD_SB_RADIO_LINK_TIMEOUT                         	0x3204                                            	
-#define FTD_SB_MAX_RAND_ACC_TRA                           	0x3205                                            	
-#define FTD_SB_BSIC                                       	0x3206                                            	
-#define FTD_SB_LAST_CALL_REL_REAS                         	0x3207                                            	
-#define FTD_SB_CELL_RESEL_OFFSET                          	0x3208                                            	
-#define FTD_SB_TEMP_OFFSET                                	0x3209                                            	
-#define FTD_SB_HOPP_CH                                    	0x320A                                            	
-#define FTD_SB_MOB_ALLOC_INDEX                            	0x320B                                            	
-#define FTD_SB_HSN                                        	0x320C                                            	
-#define FTD_SB_RX_LEVEL_1_NEIGH                           	0x320D                                            	
-#define FTD_SB_RX_LEVEL_2_NEIGH                           	0x320E                                            	
-#define FTD_SB_RX_LEVEL_3_NEIGH                           	0x320F                                            	
-#define FTD_SB_RX_LEVEL_4_NEIGH                           	0x3210                                            	
-#define FTD_SB_RX_LEVEL_5_NEIGH                           	0x3211                                            	
-#define FTD_SB_RX_LEVEL_6_NEIGH                           	0x3212                                            	
-#define FTD_SB_RX_LEVEL_7_NEIGH                           	0x3213                                            	
-#define FTD_SB_RX_LEVEL_8_NEIGH                           	0x3214                                            	
-#define FTD_SB_T3212                                      	0x3215                                            	
-#define FTD_SB_T3212_TIMEOUT                              	0x3216                                            	
-#define FTD_SB_PRP                                        	0x3217                                            	
-#define FTD_SB_LAST_NORMAL_LOC_UP_REASON                  	0x3218                                            	
-#define FTD_SB_LAST_IMSI_ATT_FAIL_REASON                  	0x3219                                            	
-#define FTD_SB_RESET_HANDOVERS                            	0x321A                                            	
-#define FTD_SB_RESET_TEST_COUNTERS                        	0x321B                                            	
-#define FTD_SB_LAST_MO_SMS_FAIL                           	0x321C                                            	
-#define FTD_SB_LAST_MT_SMS_FAIL                           	0x321D                                            	
-#define FTD_SB_DTX_STATUS_CHANGE                          	0x321E                                            	
-#define FTD_SB_CELL_BARR_IND_STATUS_CHANGE                	0x321F                                            	
-#define FTD_SB_RESET_TEST_TIMERS                          	0x3220                                            	
-#define FTD_SB_MAIN_CH_PLACE                              	0x3221                                            	
-#define FTD_SB_MAIN_CH_PWR_CONTROL                        	0x3222                                            	
-#define FTD_SB_PWR_CONTROL_TS_0                           	0x3223                                            	
-#define FTD_SB_PWR_CONTROL_TS_1                           	0x3224                                            	
-#define FTD_SB_PWR_CONTROL_TS_2                           	0x3225                                            	
-#define FTD_SB_PWR_CONTROL_TS_3                           	0x3226                                            	
-#define FTD_SB_PWR_CONTROL_TS_4                           	0x3227                                            	
-#define FTD_SB_PWR_CONTROL_TS_5                           	0x3228                                            	
-#define FTD_SB_PWR_CONTROL_TS_6                           	0x3229                                            	
-#define FTD_SB_PWR_CONTROL_TS_7                           	0x322A                                            	
-#define FTD_SB_PH_TAI                                     	0x322B                                            	
-#define FTD_SB_SAME_RA_AS_SRV_CELL_1_NEIGH                	0x322C                                            	
-#define FTD_SB_SAME_RA_AS_SRV_CELL_2_NEIGH                	0x322D                                            	
-#define FTD_SB_SAME_RA_AS_SRV_CELL_3_NEIGH                	0x322E                                            	
-#define FTD_SB_SAME_RA_AS_SRV_CELL_4_NEIGH                	0x322F                                            	
-#define FTD_SB_SAME_RA_AS_SRV_CELL_5_NEIGH                	0x3230                                            	
-#define FTD_SB_SAME_RA_AS_SRV_CELL_6_NEIGH                	0x3231                                            	
-#define FTD_SB_CELL_BAR_ACC_2_1_NEIGH                     	0x3232                                            	
-#define FTD_SB_CELL_BAR_ACC_2_2_NEIGH                     	0x3233                                            	
-#define FTD_SB_CELL_BAR_ACC_2_3_NEIGH                     	0x3234                                            	
-#define FTD_SB_CELL_BAR_ACC_2_4_NEIGH                     	0x3235                                            	
-#define FTD_SB_CELL_BAR_ACC_2_5_NEIGH                     	0x3236                                            	
-#define FTD_SB_CELL_BAR_ACC_2_6_NEIGH                     	0x3237                                            	
-#define FTD_SB_EXC_ACC_1_NEIGH                            	0x3238                                            	
-#define FTD_SB_EXC_ACC_2_NEIGH                            	0x3239                                            	
-#define FTD_SB_EXC_ACC_3_NEIGH                            	0x323A                                            	
-#define FTD_SB_EXC_ACC_4_NEIGH                            	0x323B                                            	
-#define FTD_SB_EXC_ACC_5_NEIGH                            	0x323C                                            	
-#define FTD_SB_EXC_ACC_6_NEIGH                            	0x323D                                            	
-#define FTD_SB_CELL_BAR_ACC_2                             	0x323E                                            	
-#define FTD_SB_EXC_ACC                                    	0x323F                                            	
-#define FTD_SB_GPRS_TIMING_ADV                            	0x3240                                            	
-#define FTD_SB_GPRS_RXLEV_ACC_MIN                         	0x3241                                            	
-#define FTD_SB_GPRS_CELL_RESEL_HYST                       	0x3242                                            	
-#define FTD_SB_RA_RESEL_HYST                              	0x3243                                            	
-#define FTD_SB_C31_HYST                                   	0x3244                                            	
-#define FTD_SB_C32_QUAL                                   	0x3245                                            	
-#define FTD_SB_RAND_ACC_RETRY                             	0x3246                                            	
-#define FTD_SB_GPRS_RX_LEVEL_SERV                         	0x3247                                            	
-#define FTD_SB_GPRS_RX_LEVEL_1_NEIGH                      	0x3248                                            	
-#define FTD_SB_GPRS_RX_LEVEL_2_NEIGH                      	0x3249                                            	
-#define FTD_SB_GPRS_RX_LEVEL_3_NEIGH                      	0x324A                                            	
-#define FTD_SB_GPRS_RX_LEVEL_4_NEIGH                      	0x324B                                            	
-#define FTD_SB_GPRS_RX_LEVEL_5_NEIGH                      	0x324C                                            	
-#define FTD_SB_GPRS_RX_LEVEL_6_NEIGH                      	0x324D                                            	
-#define FTD_SB_EGPRS_SUPPORT                              	0x324E                                            	
-#define FTD_SB_EGPRS_PACKET_CHANNEL_REQUEST               	0x324F                                            	
-#define FTD_SB_EGPRS_BEP_PER                              	0x3250                                            	
-#define FTD_SB_PH_MSCR                                    	0x3251                                            	
-#define FTD_SB_PH_SGSNR                                   	0x3252                                            	
-#define FTD_SB_SMS_SEND_FAIL_CAUSE_GPRS                   	0x3253                                            	
-#define FTD_SB_SMS_REC_FAIL_CAUSE_GPRS                    	0x3254                                            	
-#define FTD_SB_GPRS_SUPPORT                               	0x3255                                            	
-#define FTD_SB_PH_SI_STATUS_IND                           	0x3258                                            	
-#define FTD_SB_PH_EXT_UTBF                                	0x3259                                            	
-#define FTD_SB_PH_CCN_ACTIVE                              	0x325A                                            	
-#define FTD_SB_PH_PFC_FEATURE_MODE                        	0x325B                                            	
-#define FTD_SB_CURR_BAND                                  	0x325C                                            	
-#define FTD_SB_LAST_USED_BAND_READ                        	0x325D                                            	
-#define FTD_SB_SELECTED_RAT_READ                          	0x325E                                            	
-#define FTD_SB_GPRS_RX_LEVEL                              	0x325F                                            	
-#define FTD_SB_TOGGLE_TRANS_STATUS_CHANGE                 	0x3260                                            	
-#define FTD_SB_RX_LEVEL_FULL                              	0x3261                                            	
-#define FTD_SB_RX_LEVEL_SUB                               	0x3262                                            	
-#define FTD_SB_RX_QUALITY_FULL                            	0x3263                                            	
-#define FTD_SB_RX_QUALITY_SUB                             	0x3264                                            	
-#define FTD_SB_SYSTEM_INFO_BITS1                          	0x3265                                            	
-#define FTD_SB_SYSTEM_INFO_BITS2                          	0x3266                                            	
-#define FTD_SB_SYSTEM_INFO_BITS3                          	0x3267                                            	
-#define FTD_SB_SYSTEM_INFO_BITS4                          	0x3268                                            	
-#define FTD_SB_SYSTEM_INFO_BITS5                          	0x3269                                            	
-#define FTD_SB_SYSTEM_INFO_BITS6                          	0x326A                                            	
-#define FTD_SB_SYSTEM_INFO_BITS7                          	0x326B                                            	
-#define FTD_SB_SYSTEM_INFO_BITS8                          	0x326C                                            	
-#define FTD_SB_SYSTEM_INFO_BITS9                          	0x326D                                            	
-#define FTD_SB_SYSTEM_INFO_BITS10                         	0x326E                                            	
-#define FTD_SB_DTM_MAX_LAPDM                              	0x326F                                            	
-#define FTD_SB_UMA_PREF_MODE_SET                          	0x3270                                            	
-#define FTD_SB_UMA_PREF_MODE_NR_READ                      	0x3271                                            	
-#define GSS_FTD_LAST_BYTE_SUB_BLOCK                       	0x3272                                            	
-#define FTD_SB_PENALTY_TIME                               	0x3400                                            	
-#define FTD_SB_LAC                                        	0x3401                                            	
-#define FTD_SB_CELL_ID                                    	0x3402                                            	
-#define FTD_SB_T_RESEL                                    	0x3403                                            	
-#define FTD_SB_NEIGH_PSW_ATT                              	0x3405                                            	
-#define FTD_SB_NEIGH_SYNC_ATT                             	0x3406                                            	
-#define FTD_SB_NEIGH_BCCH_ATT                             	0x3407                                            	
-#define FTD_SB_NEIGH_BCCH_EXT_ATT                         	0x3408                                            	
-#define FTD_SB_NORMAL_LOC_UP_COUNT                        	0x3409                                            	
-#define FTD_SB_SUCC_LOC_UP_COUNT                          	0x340A                                            	
-#define FTD_SB_LOC_UP_COUNT_IMSI                          	0x340B                                            	
-#define FTD_SB_SUCC_LOC_UP_COUNT_IMSI                     	0x340C                                            	
-#define FTD_SB_HO_GSM_GSM                                 	0x340D                                            	
-#define FTD_SB_HO_DCS_DCS                                 	0x340E                                            	
-#define FTD_SB_HO_GSM_DCS                                 	0x340F                                            	
-#define FTD_SB_HO_DCS_GSM                                 	0x3410                                            	
-#define FTD_SB_FAILED_HO_GSM_GSM                          	0x3411                                            	
-#define FTD_SB_FAILED_HO_DCS_DCS                          	0x3412                                            	
-#define FTD_SB_FAILED_HO_GSM_DCS                          	0x3413                                            	
-#define FTD_SB_FAILED_HO_DCS_GSM                          	0x3414                                            	
-#define FTD_SB_BACK_TO_PREV_GSM_GSM                       	0x3415                                            	
-#define FTD_SB_BACK_TO_PREV_DCS_DCS                       	0x3416                                            	
-#define FTD_SB_BACK_TO_PREV_GSM_DCS                       	0x3417                                            	
-#define FTD_SB_BACK_TO_PREV_DCS_GSM                       	0x3418                                            	
-#define FTD_SB_INTRA_HO_GSM_GSM                           	0x3419                                            	
-#define FTD_SB_INTRA_HO_DCS_DCS                           	0x341A                                            	
-#define FTD_SB_INTRA_HO_GSM_DCS                           	0x341B                                            	
-#define FTD_SB_INTRA_HO_DCS_GSM                           	0x341C                                            	
-#define FTD_SB_FAILED_INTRA_HO_GSM_GSM                    	0x341D                                            	
-#define FTD_SB_FAILED_INTRA_HO_DCS_DCS                    	0x341E                                            	
-#define FTD_SB_FAILED_INTRA_HO_GSM_DCS                    	0x341F                                            	
-#define FTD_SB_FAILED_INTRA_HO_DCS_GSM                    	0x3420                                            	
-#define FTD_SB_INTRA_BACK_TO_PREV_GSM_GSM                 	0x3421                                            	
-#define FTD_SB_INTRA_BACK_TO_PREV_DCS_DCS                 	0x3422                                            	
-#define FTD_SB_INTRA_BACK_TO_PREV_GSM_DCS                 	0x3423                                            	
-#define FTD_SB_INTRA_BACK_TO_PREV_DCS_GSM                 	0x3424                                            	
-#define FTD_SB_T200_EXP_MS_GSM                            	0x3425                                            	
-#define FTD_SB_T200_EXP_BS_GSM                            	0x3426                                            	
-#define FTD_SB_T200_EXP_MS_DCS                            	0x3427                                            	
-#define FTD_SB_T200_EXP_BS_DCS                            	0x3428                                            	
-#define FTD_SB_MO_CALL_COUNT                              	0x3429                                            	
-#define FTD_SB_MO_CALL_OK_COUNT                           	0x342A                                            	
-#define FTD_SB_MT_CALL_COUNT                              	0x342B                                            	
-#define FTD_SB_MT_CALL_OK_COUNT                           	0x342C                                            	
-#define FTD_SB_MO_SMS_COUNT                               	0x342D                                            	
-#define FTD_SB_MO_SMS_OK_COUNT                            	0x342E                                            	
-#define FTD_SB_MT_SMS_COUNT                               	0x342F                                            	
-#define FTD_SB_MT_SMS_OK_COUNT                            	0x3430                                            	
-#define FTD_SB_CB_SCHEDULE_MSG                            	0x3431                                            	
-#define FTD_SB_TR1M_COUNT                                 	0x3432                                            	
-#define FTD_SB_TR2M_COUNT                                 	0x3433                                            	
-#define FTD_SB_TRAM_COUNT                                 	0x3434                                            	
-#define FTD_SB_TC1M_COUNT                                 	0x3435                                            	
-#define FTD_SB_TC2M_COUNT                                 	0x3436                                            	
-#define FTD_SB_CB_SCHEDULE_COUNT                          	0x3437                                            	
-#define FTD_SB_POWER_ON_TIMER                             	0x3438                                            	
-#define FTD_SB_SERV_TIMER                                 	0x3439                                            	
-#define FTD_SB_NSPS_TIMER                                 	0x343A                                            	
-#define FTD_SB_TRANSMIT_TIMER                             	0x343B                                            	
-#define FTD_SB_SMS_MO_ATT_GPRS                            	0x343C                                            	
-#define FTD_SB_SMS_MO_GPRS_OK                             	0x343D                                            	
-#define FTD_SB_SMS_MT_ATT_GPRS                            	0x343E                                            	
-#define FTD_SB_SMS_MT_GPRS_OK                             	0x343F                                            	
-#define GSS_FTD_LAST_WORD_SUB_BLOCK                       	0x3440                                            	
-#define FTD_SB_LAST_REG                                   	0x3600                                            	
-#define FTD_SB_TMSI                                       	0x3601                                            	
-#define FTD_SB_1ST_FORBIDDEN_NW                           	0x3602                                            	
-#define FTD_SB_2ND_FORBIDDEN_NW                           	0x3603                                            	
-#define FTD_SB_3RD_FORBIDDEN_NW                           	0x3604                                            	
-#define FTD_SB_4TH_FORBIDDEN_NW                           	0x3605                                            	
-#define FTD_SB_LAST_USED_BAND_SET                         	0x3606                                            	
-#define FTD_SB_SELECTED_RAT_SET                           	0x3607                                            	
-#define FTD_SB_RX_TIMESLOT_ALLOC                          	0x3608                                            	
-#define FTD_SB_TX_TIMESLOT_ALLOC                          	0x3609                                            	
-#define FTD_SB_1_EQUIV_PLMN                               	0x360A                                            	
-#define FTD_SB_2_EQUIV_PLMN                               	0x360B                                            	
-#define FTD_SB_3_EQUIV_PLMN                               	0x360C                                            	
-#define FTD_SB_4_EQUIV_PLMN                               	0x360D                                            	
-#define FTD_SB_5_EQUIV_PLMN                               	0x360E                                            	
-#define FTD_SB_6_EQUIV_PLMN                               	0x360F                                            	
-#define FTD_SB_7_EQUIV_PLMN                               	0x3610                                            	
-#define FTD_SB_8_EQUIV_PLMN                               	0x3611                                            	
-#define FTD_SB_9_EQUIV_PLMN                               	0x3612                                            	
-#define FTD_SB_10_EQUIV_PLMN                              	0x3613                                            	
-#define FTD_SB_11_EQUIV_PLMN                              	0x3614                                            	
-#define FTD_SB_12_EQUIV_PLMN                              	0x3615                                            	
-#define FTD_SB_13_EQUIV_PLMN                              	0x3616                                            	
-#define FTD_SB_14_EQUIV_PLMN                              	0x3617                                            	
-#define FTD_SB_15_EQUIV_PLMN                              	0x3618                                            	
-#define FTD_SB_16_EQUIV_PLMN                              	0x3619                                            	
-#define FTD_SB_DTM_CS_TSLOT_CONF                          	0x361A                                            	
-#define FTD_SB_DTM_PS_DL_CONF                             	0x361B                                            	
-#define FTD_SB_DTM_PS_UL_CONF                             	0x361C                                            	
-#define FTD_SB_NO_PSW_FOUND_GSM                           	0x361D                                            	
-#define FTD_SB_NO_PSW_FOUND_DCS                           	0x361E                                            	
-#define FTD_SB_SYNC_GSM                                   	0x361F                                            	
-#define FTD_SB_SYNC_DCS                                   	0x3620                                            	
-#define FTD_SB_RESEL_GSM_GSM                              	0x3621                                            	
-#define FTD_SB_RESEL_DCS_DCS                              	0x3622                                            	
-#define FTD_SB_RESEL_GSM_DCS                              	0x3623                                            	
-#define FTD_SB_RESEL_DCS_GSM                              	0x3624                                            	
-#define FTD_SB_UMA_1_AVAIL_PLMN                           	0x3625                                            	
-#define FTD_SB_UMA_2_AVAIL_PLMN                           	0x3626                                            	
-#define FTD_SB_UMA_3_AVAIL_PLMN                           	0x3627                                            	
-#define FTD_SB_UMA_4_AVAIL_PLMN                           	0x3628                                            	
-#define FTD_SB_UMA_5_AVAIL_PLMN                           	0x3629                                            	
-#define FTD_SB_UMA_6_AVAIL_PLMN                           	0x362A                                            	
-#define GSS_FTD_LAST_DWORD_SUB_BLOCK                      	0x362B                                            	
-#define FTD_SB_CARRIER                                    	0x3800                                            	
-#define FTD_SB_HOPPING                                    	0x3801                                            	
-#define FTD_SB_TX_LEVEL                                   	0x3802                                            	
-#define FTD_SB_C1                                         	0x3803                                            	
-#define FTD_SB_TYPE_OF_CURR_CH                            	0x3804                                            	
-#define FTD_SB_C2                                         	0x3805                                            	
-#define FTD_SB_PAGING_MODE                                	0x3806                                            	
-#define FTD_SB_ROAMING_IND                                	0x3807                                            	
-#define FTD_SB_C1_1_NEIGH                                 	0x3808                                            	
-#define FTD_SB_C1_2_NEIGH                                 	0x3809                                            	
-#define FTD_SB_C1_3_NEIGH                                 	0x380A                                            	
-#define FTD_SB_C1_4_NEIGH                                 	0x380B                                            	
-#define FTD_SB_C1_5_NEIGH                                 	0x380C                                            	
-#define FTD_SB_C1_6_NEIGH                                 	0x380D                                            	
-#define FTD_SB_C1_7_NEIGH                                 	0x380E                                            	
-#define FTD_SB_C1_8_NEIGH                                 	0x380F                                            	
-#define FTD_SB_C2_1_NEIGH                                 	0x3810                                            	
-#define FTD_SB_C2_2_NEIGH                                 	0x3811                                            	
-#define FTD_SB_C2_3_NEIGH                                 	0x3812                                            	
-#define FTD_SB_C2_4_NEIGH                                 	0x3813                                            	
-#define FTD_SB_C2_5_NEIGH                                 	0x3814                                            	
-#define FTD_SB_C2_6_NEIGH                                 	0x3815                                            	
-#define FTD_SB_C2_7_NEIGH                                 	0x3816                                            	
-#define FTD_SB_C2_8_NEIGH                                 	0x3817                                            	
-#define FTD_SB_CIPH                                       	0x381A                                            	
-#define FTD_SB_DTX_VALUE                                  	0x381B                                            	
-#define FTD_SB_IMSI_ATT                                   	0x381C                                            	
-#define FTD_SB_DTX_STATUS                                 	0x381D                                            	
-#define FTD_SB_DTX_DEF                                    	0x381E                                            	
-#define FTD_SB_DTX_FROM_BS                                	0x381F                                            	
-#define FTD_SB_CC_CAUSE                                   	0x3820                                            	
-#define FTD_SB_MM_CAUSE                                   	0x3821                                            	
-#define FTD_SB_RR_CAUSE                                   	0x3822                                            	
-#define FTD_SB_LOCATION_AREA_INFO_1                       	0x3823                                            	
-#define FTD_SB_LOCATION_AREA_INFO_2                       	0x3824                                            	
-#define FTD_SB_LOCATION_AREA_INFO_3                       	0x3825                                            	
-#define FTD_SB_LOCATION_AREA_INFO_4                       	0x3826                                            	
-#define FTD_SB_LOCATION_AREA_INFO_5                       	0x3827                                            	
-#define FTD_SB_LOCATION_AREA_INFO_6                       	0x3828                                            	
-#define FTD_SB_LOCATION_AREA_INFO_7                       	0x3829                                            	
-#define FTD_SB_LOCATION_AREA_INFO_8                       	0x382A                                            	
-#define FTD_SB_CELL_PRIORITY_1                            	0x382B                                            	
-#define FTD_SB_CELL_PRIORITY_2                            	0x382C                                            	
-#define FTD_SB_CELL_PRIORITY_3                            	0x382D                                            	
-#define FTD_SB_CELL_PRIORITY_4                            	0x382E                                            	
-#define FTD_SB_CELL_PRIORITY_5                            	0x382F                                            	
-#define FTD_SB_CELL_PRIORITY_6                            	0x3830                                            	
-#define FTD_SB_CELL_PRIORITY_7                            	0x3831                                            	
-#define FTD_SB_CELL_PRIORITY_8                            	0x3832                                            	
-#define FTD_SB_CELL_BARR_IND_STATUS                       	0x3833                                            	
-#define FTD_SB_C1S                                        	0x3834                                            	
-#define FTD_SB_C2S                                        	0x3835                                            	
-#define FTD_SB_HOPP_STATUS                                	0x3836                                            	
-#define FTD_SB_TEST_TIMER_STATE                           	0x3837                                            	
-#define FTD_SB_TOGGLE_TRANS_STATUS                        	0x3838                                            	
-#define FTD_SB_PH_SI13_LOCATION                           	0x3839                                            	
-#define FTD_SB_PH_USF                                     	0x383A                                            	
-#define FTD_SB_PBCCH_HOPPING                              	0x383B                                            	
-#define FTD_SB_PCCCH_HOPPING                              	0x383C                                            	
-#define FTD_SB_GPRS_HOPPING                               	0x383D                                            	
-#define FTD_SB_GPRS_TYPE_OF_CURR_CH                       	0x383E                                            	
-#define FTD_SB_GMM_STATE                                  	0x383F                                            	
-#define FTD_SB_PRIOR_CLASS_SERV                           	0x3840                                            	
-#define FTD_SB_C32_SERV                                   	0x3841                                            	
-#define FTD_SB_PRIOR_CLASS_1_NEIGH                        	0x3842                                            	
-#define FTD_SB_PRIOR_CLASS_2_NEIGH                        	0x3843                                            	
-#define FTD_SB_PRIOR_CLASS_3_NEIGH                        	0x3844                                            	
-#define FTD_SB_PRIOR_CLASS_4_NEIGH                        	0x3845                                            	
-#define FTD_SB_PRIOR_CLASS_5_NEIGH                        	0x3846                                            	
-#define FTD_SB_PRIOR_CLASS_6_NEIGH                        	0x3847                                            	
-#define FTD_SB_C32_1_NEIGH                                	0x3848                                            	
-#define FTD_SB_C32_2_NEIGH                                	0x3849                                            	
-#define FTD_SB_C32_3_NEIGH                                	0x384A                                            	
-#define FTD_SB_C32_4_NEIGH                                	0x384B                                            	
-#define FTD_SB_C32_5_NEIGH                                	0x384C                                            	
-#define FTD_SB_C32_6_NEIGH                                	0x384D                                            	
-#define FTD_SB_INT_PRO_MODE                               	0x384E                                            	
-#define FTD_SB_CARRIER_1_NEIGH                            	0x384F                                            	
-#define FTD_SB_CARRIER_2_NEIGH                            	0x3850                                            	
-#define FTD_SB_CARRIER_3_NEIGH                            	0x3851                                            	
-#define FTD_SB_CARRIER_4_NEIGH                            	0x3852                                            	
-#define FTD_SB_CARRIER_5_NEIGH                            	0x3853                                            	
-#define FTD_SB_CARRIER_6_NEIGH                            	0x3854                                            	
-#define FTD_SB_CARRIER_7_NEIGH                            	0x3855                                            	
-#define FTD_SB_CARRIER_8_NEIGH                            	0x3856                                            	
-#define FTD_SB_BCCH_CARRIER_SERV                          	0x3857                                            	
-#define FTD_SB_GPRS_CARRIER_SERV                          	0x3858                                            	
-#define FTD_SB_GPRS_CARRIER                               	0x3859                                            	
-#define FTD_SB_GPRS_CARRIER_1_NEIGH                       	0x385A                                            	
-#define FTD_SB_GPRS_CARRIER_2_NEIGH                       	0x385B                                            	
-#define FTD_SB_GPRS_CARRIER_3_NEIGH                       	0x385C                                            	
-#define FTD_SB_GPRS_CARRIER_4_NEIGH                       	0x385D                                            	
-#define FTD_SB_GPRS_CARRIER_5_NEIGH                       	0x385E                                            	
-#define FTD_SB_GPRS_CARRIER_6_NEIGH                       	0x385F                                            	
-#define FTD_SB_LAST_CALL_REL_DIRECTION                    	0x3860                                            	
-#define FTD_SB_ENAB_OR_DISAB_TEST_TIMERS                  	0x3861                                            	
-#define FTD_SB_REG_CC                                     	0x3862                                            	
-#define FTD_SB_REG_MNC                                    	0x3863                                            	
-#define FTD_SB_INT_PRO_MODE_TOGGLE                        	0x3864                                            	
-#define FTD_SB_DTM_SUPP                                   	0x3865                                            	
-#define FTD_SB_UMA_PREF_MODE_TXT_READ                     	0x3866                                            	
-#define FTD_SB_UMA_MCC                                    	0x3867                                            	
-#define FTD_SB_UMA_MNC                                    	0x3868                                            	
-#define FTD_SB_UMA_RAT_INFO                               	0x3869                                            	
-#define FTD_SB_UMA_INFO                                   	0x386A                                            	
-#define FTD_SB_UMA_DTM_SUPPORT                            	0x386B                                            	
-#define FTD_SB_UMA_GPRS_AVAIL                             	0x386C                                            	
-#define FTD_SB_UMA_NMO                                    	0x386D                                            	
-#define FTD_SB_UMA_ECMP                                   	0x386E                                            	
-#define GSS_FTD_LAST_SUB_BLOCK                            	0x386F                                            	
 
 //ConstantTable for GSS_OPERATION
 #define GSS_CS_STATUS_GET                                 	0x00                                                 	
@@ -507,11 +171,32 @@
 #define GSS_FAIL                                          	0x02                                                 	
 
 //ConstantTable for GSS_HSXPA_CAUSE
+#define GSS_HSXPA_NO_CAUSE                                	0x00                                                 	
 #define GSS_HSXPA_DISABLED_VIA_PP                         	0x01                                                 	
 
 //ConstantTable for GSS_HAC_MODE
 #define GSS_HAC_ACTIVE                                    	0x01                                                 	
 #define GSS_HAC_INACTIVE                                  	0x02                                                 	
+
+//ConstantTable for GSS_ENV_REQUEST_TYPE
+#define GSS_ENV_INFO_SET                                  	0x01                                                 	
+#define GSS_ENV_INFO_QUERY_CERTAIN                        	0x02                                                 	
+#define GSS_ENV_INFO_QUERY_ALL                            	0x03                                                 	
+
+//ConstantTable for GSS_ENV_INFO_RESP_STATUS
+#define GSS_ENV_INFO_OK                                   	0x01                                                 	
+#define GSS_ENV_INFO_FAIL                                 	0x02                                                 	
+
+//ConstantTable for GSS_USER_ACTIVITY_STATUS
+//#define GSS_ENV_INFO_STATUS_UNKNOWN                     	0x00                   	 //Already defined as 0x00
+#define GSS_ENV_USER_ACTIVE                               	0x01                                                 	
+#define GSS_ENV_USER_INACTIVE                             	0x02                                                 	
+
+//ConstantTable for GSS_BATTERY_INFO
+//#define GSS_ENV_INFO_STATUS_UNKNOWN                     	0x00                   	 //Already defined as 0x00
+#define GSS_BATTERY_IN_CHARGER                            	0x01                                                 	
+#define GSS_BATTERY_NORMAL                                	0x02                                                 	
+#define GSS_BATTERY_LOW                                   	0x03                                                 	
 
 
 //SUBBLOCKS
@@ -667,8 +352,6 @@
 #define GSS_SELECTED_GSM_BAND_INFO_OFFSET_SELECTEDGSMBANDS	2 //size 1 byte(s)
 #define GSS_SELECTED_GSM_BAND_INFO_OFFSET_FILLERBYTE1     	3 //size 1 byte(s)
 #define SIZE_GSS_SELECTED_GSM_BAND_INFO                   	4
-
-
 //Definition for GSS_REL_SIGNAL_LEVEL_INFO
 #define GSS_REL_SIGNAL_LEVEL_INFO                         	0x14                                              	
 #define GSS_REL_SIGNAL_LEVEL_INFO_OFFSET_SUBBLOCKID       	0 //size 1 byte(s)
@@ -685,6 +368,24 @@
 #define GSS_THRESHOLD_INFO_OFFSET_THRESHOLD               	2 //size 1 byte(s)
 #define GSS_THRESHOLD_INFO_OFFSET_FILLERBYTE1             	3 //size 1 byte(s)
 #define SIZE_GSS_THRESHOLD_INFO                           	4
+
+
+//Definition for GSS_ENV_USER_ACTIVITY_INFO
+#define GSS_ENV_USER_ACTIVITY_INFO                        	0x17                                              	
+#define GSS_ENV_USER_ACTIVITY_INFO_OFFSET_SUBBLOCKID      	0 //size 1 byte(s)
+#define GSS_ENV_USER_ACTIVITY_INFO_OFFSET_SUBBLOCKLENGTH  	1 //size 1 byte(s)
+#define GSS_ENV_USER_ACTIVITY_INFO_OFFSET_ACTIVITYSTATUS  	2 //size 1 byte(s)
+#define GSS_ENV_USER_ACTIVITY_INFO_OFFSET_FILLERBYTE1     	3 //size 1 byte(s)
+#define SIZE_GSS_ENV_USER_ACTIVITY_INFO                   	4
+
+
+//Definition for GSS_ENV_BATTERY_INFO
+#define GSS_ENV_BATTERY_INFO                              	0x18                                              	
+#define GSS_ENV_BATTERY_INFO_OFFSET_SUBBLOCKID            	0 //size 1 byte(s)
+#define GSS_ENV_BATTERY_INFO_OFFSET_SUBBLOCKLENGTH        	1 //size 1 byte(s)
+#define GSS_ENV_BATTERY_INFO_OFFSET_BATTERYINFORMATION    	2 //size 1 byte(s)
+#define GSS_ENV_BATTERY_INFO_OFFSET_FILLERBYTE1           	3 //size 1 byte(s)
+#define SIZE_GSS_ENV_BATTERY_INFO                         	4
 
 
 //MESSAGES
@@ -813,5 +514,32 @@
 #define GSS_HAC_MODE_WRITE_RESP_OFFSET_WRITESTATUS        	2 //size 1 byte(s)
 #define GSS_HAC_MODE_WRITE_RESP_OFFSET_FILLERBYTE1        	3 //size 1 byte(s)
 #define SIZE_GSS_HAC_MODE_WRITE_RESP                      	4
+
+
+//Definition for GSS_ENV_INFO_REQ
+#define GSS_ENV_INFO_REQ                                  	0x19                                              	
+#define GSS_ENV_INFO_REQ_OFFSET_TRANSID                   	0 //size 1 byte(s)
+#define GSS_ENV_INFO_REQ_OFFSET_MESSAGEID                 	1 //size 1 byte(s)
+#define GSS_ENV_INFO_REQ_OFFSET_ENVREQUESTTYPE            	2 //size 1 byte(s)
+#define GSS_ENV_INFO_REQ_OFFSET_NBROFSUBBLOCKS            	3 //size 1 byte(s)
+#define SIZE_GSS_ENV_INFO_REQ                             	4
+
+
+//Definition for GSS_ENV_INFO_RESP
+#define GSS_ENV_INFO_RESP                                 	0x20                                              	
+#define GSS_ENV_INFO_RESP_OFFSET_TRANSID                  	0 //size 1 byte(s)
+#define GSS_ENV_INFO_RESP_OFFSET_MESSAGEID                	1 //size 1 byte(s)
+#define GSS_ENV_INFO_RESP_OFFSET_ENVINFOSTATUS            	2 //size 1 byte(s)
+#define GSS_ENV_INFO_RESP_OFFSET_NBROFSUBBLOCKS           	3 //size 1 byte(s)
+#define SIZE_GSS_ENV_INFO_RESP                            	4
+
+
+//Definition for GSS_ENV_INFO_IND
+#define GSS_ENV_INFO_IND                                  	0x21                                              	
+#define GSS_ENV_INFO_IND_OFFSET_TRANSID                   	0 //size 1 byte(s)
+#define GSS_ENV_INFO_IND_OFFSET_MESSAGEID                 	1 //size 1 byte(s)
+#define GSS_ENV_INFO_IND_OFFSET_FILLERBYTE1               	2 //size 1 byte(s)
+#define GSS_ENV_INFO_IND_OFFSET_NBROFSUBBLOCKS            	3 //size 1 byte(s)
+#define SIZE_GSS_ENV_INFO_IND                             	4
 
 #endif

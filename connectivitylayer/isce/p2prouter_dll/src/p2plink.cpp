@@ -120,7 +120,7 @@ void DP2PLink::EnqueTrxPresenceChangedDfc(
 
     // No traces allowed due to not allowed to block.
     // Negation sets variable to be over EAmountOfTrxs if it is not present.
-    iShTrxId = ~iShTrxId;// TODO: check this atomicity and synch if needed
+    iShTrxId = ~iShTrxId;//  check this atomicity and synch if needed
     iRouter->NotifyTrxPresenceEnqueDfc( aPresent );
 
     }
@@ -157,7 +157,7 @@ void DP2PLink::Send(
     C_TRACE( ( _T( "DP2PLink::Send 0x%x 0x%x map %d <>" ), this, &aMsg, iProtocolId ) );
     ASSERT_RESET_ALWAYS( iMux, ( EP2PInitFailed2 | EDP2PLinkTraceId << KClassIdentifierShift ) );
     // Send with default prio.
-    iMux->Send( aMsg, iProtocolId ); // TODO: send priorities
+    iMux->Send( aMsg, iProtocolId ); //  send priorities
 
     }
 

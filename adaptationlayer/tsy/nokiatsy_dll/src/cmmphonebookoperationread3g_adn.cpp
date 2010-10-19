@@ -70,7 +70,7 @@ const TUint8 KMaxEmptyPatternBuf = 243;
 CMmPhoneBookOperationRead3g_adn::CMmPhoneBookOperationRead3g_adn()
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::CMmPhoneBookOperationRead3g_adn");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CMMPHONEBOOKOPERATIONREAD3G_ADN, "CMmPhoneBookOperationRead3g_adn::CMmPhoneBookOperationRead3g_adn" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_CMMPHONEBOOKOPERATIONREAD3G_ADN_TD, "CMmPhoneBookOperationRead3g_adn::CMmPhoneBookOperationRead3g_adn" );
     }
 
 // -----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ CMmPhoneBookOperationRead3g_adn::~CMmPhoneBookOperationRead3g_adn
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::~CMmPhoneBookOperationRead3g_adn");
-    OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_CMMPHONEBOOKOPERATIONREAD3G_ADN, "CMmPhoneBookOperationRead3g_adn::~CMmPhoneBookOperationRead3g_adn" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_CMMPHONEBOOKOPERATIONREAD3G_ADN_TD, "CMmPhoneBookOperationRead3g_adn::~CMmPhoneBookOperationRead3g_adn" );
     }
 
 // -----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ CMmPhoneBookOperationRead3g_adn* CMmPhoneBookOperationRead3g_adn::NewL
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::NewL");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_NEWL, "CMmPhoneBookOperationRead3g_adn::NewL" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_NEWL_TD, "CMmPhoneBookOperationRead3g_adn::NewL" );
 
 
     CMmPhoneBookOperationRead3g_adn* mmPhoneBookOperationRead3g_adn =
@@ -141,7 +141,7 @@ void CMmPhoneBookOperationRead3g_adn::ConstructL
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::ConstructL");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CONSTRUCTL, "CMmPhoneBookOperationRead3g_adn::ConstructL" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_CONSTRUCTL_TD, "CMmPhoneBookOperationRead3g_adn::ConstructL" );
     
     iLocationSearch = EFalse;
     iCurrentType1Ef = 0;
@@ -168,7 +168,7 @@ TInt CMmPhoneBookOperationRead3g_adn::UICCCreateReq
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UICCCreateReq");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCCREATEREQ, "CMmPhoneBookOperationRead3g_adn::UICCCreateReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCCREATEREQ_TD, "CMmPhoneBookOperationRead3g_adn::UICCCreateReq" );
 
     TInt ret( KErrNotSupported );
     
@@ -237,7 +237,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCCREATEREQ, "CMmPhon
             {
             // Nothing to do here
 TFLOGSTRING2("TSY: CMmPhoneBookOperationRead3g_adn::UICCCreateReq - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCCREATEREQ, "CMmPhoneBookOperationRead3g_adn::UICCCreateReq - UnKnown Ipc : %d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCCREATEREQ_TD, "CMmPhoneBookOperationRead3g_adn::UICCCreateReq - UnKnown Ipc : %d", aIpc );
             break;
             }
         } // switch-case
@@ -257,7 +257,7 @@ TInt CMmPhoneBookOperationRead3g_adn::UICCHandleData3gADNReadReq
         )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UICCHandleData3gADNReadReq");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCHANDLEDATA3GADNREADREQ, "CMmPhoneBookOperationRead3g_adn::UICCHandleData3gADNReadReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCHANDLEDATA3GADNREADREQ_TD, "CMmPhoneBookOperationRead3g_adn::UICCHandleData3gADNReadReq" );
 
     TInt ret(KErrNone);
 
@@ -317,7 +317,7 @@ TInt CMmPhoneBookOperationRead3g_adn::UiccReadEfRecordReq(
     const TUint8 aRecordNo )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UiccReadEfRecordReq");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFRECORDREQ, "CMmPhoneBookOperationRead3g_adn::UiccReadEfRecordReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFRECORDREQ_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfRecordReq" );
 
     TUiccReadLinearFixed params;
     params.messHandlerPtr =
@@ -355,7 +355,7 @@ TBool CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICCPBRESPL, "CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL" );
     
     TBool completed( EFalse );
     TInt ret( KErrNone );
@@ -363,7 +363,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICCPBRESPL, "CMm
     if ( UICC_STATUS_OK != aStatus )
         {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL-Unsuccessfully completed by UICC");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICCPBRESPL, "CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL - Unsuccessfully completed by UICC" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL - Unsuccessfully completed by UICC" );
         
         ret = CMmStaticUtility::UICCCSCauseToEpocError(aStatus );
         }
@@ -397,7 +397,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICCPBRESPL,
             {
             // Nothing to do here
 TFLOGSTRING2("TSY: CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL - Unknown IPC: %d", iSavedIPCForComplete);
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICCPBRESPL, "CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL - UnKnown Ipc : =%d", iSavedIPCForComplete );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationRead3g_adn::HandleUICCPbRespL - UnKnown Ipc : =%d", iSavedIPCForComplete );
             break;
             }
         }
@@ -418,7 +418,7 @@ TBool CMmPhoneBookOperationRead3g_adn::HandleUICC3gADNRespL
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::HandleUICC3gADNRespL");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCHANDLEDATA3GADNREADREQ, "CMmPhoneBookOperationRead3g_adn::UICCHandleData3gADNReadReq" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCHANDLEDATA3GADNREADREQ_TD, "CMmPhoneBookOperationRead3g_adn::UICCHandleData3gADNReadReq" );
 
     TBool completed ( EFalse );
     TInt ret(KErrNone);
@@ -469,7 +469,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCHANDLEDATA3GAD
         default:
             {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::HandleUICC3gADNRespL - default branch ");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICC3GADNRESPL, "CMmPhoneBookOperationRead3g_adn::HandleUICC3gADNRespL - default branch " );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_HANDLEUICC3GADNRESPL_TD, "CMmPhoneBookOperationRead3g_adn::HandleUICC3gADNRespL - default branch " );
             break;
             }
         }
@@ -560,7 +560,7 @@ TInt CMmPhoneBookOperationRead3g_adn::UiccReadEfPbrRecordResp(
     TInt aTraId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UiccReadEfPbrRecordResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFPBRRECORDRESP, "CMmPhoneBookOperationRead3g_adn::UiccReadEfPbrRecordResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFPBRRECORDRESP_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfPbrRecordResp" );
 
     TInt ret( KErrArgument );
     if( UICC_STATUS_OK == aStatus )
@@ -583,7 +583,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFPBRRECORDRESP
     else
         {
 TFLOGSTRING2("TSY: CMmPhoneBookOperationWrite3g_adn::UiccReadEfPbrRecordResp: file reading fails: 0x%x", aStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFPBRRECORDRESP, "CMmPhoneBookOperationRead3g_adn::UiccReadEfPbrRecordResp;file reading fails: =%d", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFPBRRECORDRESP_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfPbrRecordResp;file reading fails: =%d", aStatus );
         
         iNumOfEntriesToRead = 0;
         }
@@ -604,7 +604,7 @@ TInt CMmPhoneBookOperationRead3g_adn::UiccReadEfType1RespL(
         const TDesC8 &aFileData )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UiccReadEfType1RespL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE1RESPL, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType1RespL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE1RESPL_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType1RespL" );
 
      TInt ret ( KErrNone );
      
@@ -760,7 +760,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE1RESPL, "
              default:
                  {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UiccReadEfType1RespL - default branch ");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE1RESPL, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType1RespL - default branch" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE1RESPL_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType1RespL - default branch" );
 
                  break;
                  }
@@ -771,7 +771,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE1RES
          // ADN Read failed for some reason so complete the
          // operation with error value
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite3g_adn::UiccReadEfType1RespL - Type1 File Read failed ");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE1RESPL, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType1RespL - Type1 file read failed" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE1RESPL_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType1RespL - Type1 file read failed" );
 
          iCurrentReadPhase = EPB_3G_ADN_Read_Phase_complete;
          ret = KErrArgument;
@@ -802,7 +802,7 @@ TInt CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL(
         const TDesC8 &aFileData )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE2RESPL, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE2RESPL_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL" );
 
      TInt ret ( KErrNone );
      
@@ -894,7 +894,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE2RESPL, "
              default:
                  {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL - default branch");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE2RESPL, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL - default branch" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE2RESPL_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL - default branch" );
                  break;
                  }
              }
@@ -902,7 +902,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE2RES
      else
          {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL - Type2 File Read Failed");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE2RESPL, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL - Type2 file read failed" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE2RESPL_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL - Type2 file read failed" );
 
          iCurrentReadPhase = EPB_3G_ADN_Read_Phase_complete;
          ret = KErrArgument;
@@ -932,7 +932,7 @@ TInt CMmPhoneBookOperationRead3g_adn::UiccReadEfType3RespL(
         const TDesC8 &aFileData )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UiccReadEfType2RespL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE3RESPL, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType3RespL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE3RESPL_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType3RespL" );
     
      TInt ret ( KErrNone );
      
@@ -1024,7 +1024,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE3RESPL, "
          // EXT Reading fails for some reason complete the operation with
          // error value
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead3g_adn::UiccReadEfType3RespL - EXT Read fail");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE3RESPL, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType3RespL - EXT Read fail" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE3RESPL_TD, "CMmPhoneBookOperationRead3g_adn::UiccReadEfType3RespL - EXT Read fail" );
          
          iCurrentReadPhase = EPB_3G_ADN_Read_Phase_complete;
          ret = KErrArgument;
@@ -1052,7 +1052,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_UICCREADEFTYPE3RES
 TInt CMmPhoneBookOperationRead3g_adn::GetNextType1File()
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::GetNextType1File" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_GETNEXTTYPE1FILE, "CMmPhoneBookOperationRead3g_adn::GetNextType1File" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_GETNEXTTYPE1FILE_TD, "CMmPhoneBookOperationRead3g_adn::GetNextType1File" );
     
     TInt ret ( KErrNotFound );
 
@@ -1086,7 +1086,7 @@ TInt CMmPhoneBookOperationRead3g_adn::CheckForExtToContinueNextRead(
         TInt &aExtFileTagIndex )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::CheckForExtToContinueNextRead" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CHECKFOREXTTOCONTINUENEXTREAD, "CMmPhoneBookOperationRead3g_adn::CheckForExtToContinueNextRead" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_CHECKFOREXTTOCONTINUENEXTREAD_TD, "CMmPhoneBookOperationRead3g_adn::CheckForExtToContinueNextRead" );
     
     TInt ret ( KErrNone );
 
@@ -1125,7 +1125,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CHECKFOREXTTOCONTINUENE
 TInt CMmPhoneBookOperationRead3g_adn::ContinueWithNextReading( TUint8 aTraId )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::ContinueWithNextReading" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CONTINUEWITHNEXTREADING, "CMmPhoneBookOperationRead3g_adn::ContinueWithNextReading" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_CONTINUEWITHNEXTREADING_TD, "CMmPhoneBookOperationRead3g_adn::ContinueWithNextReading" );
     
     TInt ret( KErrNone );
     if( KErrNone == GetNextType1File() )
@@ -1178,7 +1178,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CONTINUEWITHNEXTREADING
 TInt CMmPhoneBookOperationRead3g_adn::StartReadingEntry( TUint8 aTransId )
     {
     TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::StartReadingEntry" );
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_STARTREADINGENTRY, "CMmPhoneBookOperationRead3g_adn::StartReadingEntry" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_STARTREADINGENTRY_TD, "CMmPhoneBookOperationRead3g_adn::StartReadingEntry" );
 
     TInt ret( KErrNone );
     
@@ -1240,7 +1240,7 @@ void CMmPhoneBookOperationRead3g_adn::CreateInternalPbEntryL(
     const TInt aLocation )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3G_adn::CreateInternalPbEntryL" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CREATEINTERNALPBENTRYL, "CMmPhoneBookOperationRead3g_adn::CreateInternalPbEntryL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_CREATEINTERNALPBENTRYL_TD, "CMmPhoneBookOperationRead3g_adn::CreateInternalPbEntryL" );
 
     // Check if this entry was already stored in internal list
     iStoreEntry = iMmPhoneBookStoreMessHandler->FindEntryFromPbList(
@@ -1270,7 +1270,7 @@ CPhoneBookStoreEntry* CMmPhoneBookOperationRead3g_adn::CreateReadPbEntryL(
     const TInt aLocation, TBool& aAllocatedNow )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::CreateReadPbEntryL" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CREATEREADPBENTRYL, "CMmPhoneBookOperationRead3g_adn::CreateReadPbEntryL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_CREATEREADPBENTRYL_TD, "CMmPhoneBookOperationRead3g_adn::CreateReadPbEntryL" );
 
     aAllocatedNow = ETrue;
     CPhoneBookStoreEntry* phoneBookStoreEntry( NULL );
@@ -1311,7 +1311,7 @@ TInt CMmPhoneBookOperationRead3g_adn::SearchForFileTagIndex(
             TUint8 aOffset )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::SearchForFileTagIndex" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_SEARCHFORFILETAGINDEX, "CMmPhoneBookOperationRead3g_adn::SearchForFileTagIndex" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_SEARCHFORFILETAGINDEX_TD, "CMmPhoneBookOperationRead3g_adn::SearchForFileTagIndex" );
     
     TInt index( KErrNotFound );
     for( TInt count(0); count<aFileList.Count(); count++ )
@@ -1336,7 +1336,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_SEARCHFORFILETAGINDEX, 
 TInt CMmPhoneBookOperationRead3g_adn::CheckForNextType2Read( TInt aTraId )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::CheckForNextType2Read" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CHECKFORNEXTTYPE2READ, "CMmPhoneBookOperationRead3g_adn::CheckForNextType2Read" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_CHECKFORNEXTTYPE2READ_TD, "CMmPhoneBookOperationRead3g_adn::CheckForNextType2Read" );
     
     TInt ret ( KErrNone );
     // Check if there is any type 2 File Data present
@@ -1375,7 +1375,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CHECKFORNEXTTYPE2READ, 
 TInt CMmPhoneBookOperationRead3g_adn::GetNextUsedType2FileRecord( TInt &aOffset )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::GetNextUsedType2FileRecord" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_GETNEXTUSEDTYPE2FILERECORD, "CMmPhoneBookOperationRead3g_adn::GetNextUsedType2FileRecord" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_GETNEXTUSEDTYPE2FILERECORD_TD, "CMmPhoneBookOperationRead3g_adn::GetNextUsedType2FileRecord" );
     
     TInt index( KErrNotFound );
     if( iStoreEntry->iapInfo.Count() == iType2FileArray.Count() )
@@ -1404,7 +1404,7 @@ TBool CMmPhoneBookOperationRead3g_adn::CheckForEmptyEntry(
     const TDesC8 &aFileData )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::CheckForEmptyEntry" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_CHECKFOREMPTYENTRY, "CMmPhoneBookOperationRead3g_adn::CheckForEmptyEntry" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_CHECKFOREMPTYENTRY_TD, "CMmPhoneBookOperationRead3g_adn::CheckForEmptyEntry" );
 
     TBool notEmpty( ETrue );
     TBuf8<KMaxEmptyPatternBuf> emptyData;
@@ -1432,7 +1432,7 @@ void CMmPhoneBookOperationRead3g_adn::GetEmptyRecordPattern(
     TDes8& aEmptyPattern )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::GetEmptyRecordPattern" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_GETEMPTYRECORDPATTERN, "CMmPhoneBookOperationRead3G_adn::GetEmptyRecordPattern" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD3G_ADN_GETEMPTYRECORDPATTERN_TD, "CMmPhoneBookOperationRead3G_adn::GetEmptyRecordPattern" );
 
     switch( aFileType )
         {
@@ -1486,7 +1486,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD3G_ADN_GETEMPTYRECORDPATTERN, 
         default:
             {
 TFLOGSTRING( "TSY: CMmPhoneBookOperationRead3g_adn::GetEmptyRecordPattern: default" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_GETEMPTYRECORDPATTERN, "CMmPhoneBookOperationRead3g_adn::GetEmptyRecordPattern : default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD3G_ADN_GETEMPTYRECORDPATTERN_TD, "CMmPhoneBookOperationRead3g_adn::GetEmptyRecordPattern : default" );
             break;
             }
         }

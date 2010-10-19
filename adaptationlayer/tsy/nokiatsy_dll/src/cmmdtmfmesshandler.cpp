@@ -82,7 +82,7 @@ CMmDtmfMessHandler::CMmDtmfMessHandler()
     //none
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::CMmDtmfMessHandler");
-OstTrace0( TRACE_NORMAL, CMMDTMFMESSHANDLER_CMMDTMFMESSHANDLER, "CMmDtmfMessHandler::CMmDtmfMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMDTMFMESSHANDLER_CMMDTMFMESSHANDLER_TD, "CMmDtmfMessHandler::CMmDtmfMessHandler" );
 
     }
 
@@ -94,7 +94,7 @@ OstTrace0( TRACE_NORMAL, CMMDTMFMESSHANDLER_CMMDTMFMESSHANDLER, "CMmDtmfMessHand
 void CMmDtmfMessHandler::ConstructL()
     {
 TFLOGSTRING("TSY: CMmDtmfMessHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMDTMFMESSHANDLER_CONSTRUCTL, "CMmDtmfMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMDTMFMESSHANDLER_CONSTRUCTL_TD, "CMmDtmfMessHandler::ConstructL" );
     iDTMFStringAfterW.Zero();
     }
 
@@ -109,7 +109,7 @@ CMmDtmfMessHandler* CMmDtmfMessHandler::NewL(
     CMmMessageRouter* aMessageRouter ) // pointer to the message router
     {
 TFLOGSTRING("TSY: CMmDtmfMessHandler::NewL");
-OstTrace0( TRACE_NORMAL, CMMDTMFMESSHANDLER_NEWL, "CMmDtmfMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMDTMFMESSHANDLER_NEWL_TD, "CMmDtmfMessHandler::NewL" );
 
     CMmDtmfMessHandler* dtmfMessHandler =
         new ( ELeave ) CMmDtmfMessHandler();
@@ -141,7 +141,7 @@ CMmDtmfMessHandler::~CMmDtmfMessHandler()
     {
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::~CMmDtmfMessHandler");
-OstTrace0( TRACE_NORMAL, DUP1_CMMDTMFMESSHANDLER_CMMDTMFMESSHANDLER, "CMmDtmfMessHandler::~CMmDtmfMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMDTMFMESSHANDLER_CMMDTMFMESSHANDLER_TD, "CMmDtmfMessHandler::~CMmDtmfMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ TInt CMmDtmfMessHandler::ExtFuncL(
     {
 
 TFLOGSTRING2("TSY: CMmDtmfMessHandler::ExtFuncL. IPC:%d", aIpc);
-OstTrace1( TRACE_NORMAL, CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMDTMFMESSHANDLER_EXTFUNCL_TD, "CMmDtmfMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     //*************************************************************//
     // NOTE:
@@ -174,7 +174,7 @@ OstTrace1( TRACE_NORMAL, CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::ExtFu
         case EMobilePhoneStartDTMFTone:
             {
 TFLOGSTRING("TSY: CMmDtmfMessHandler::ExtFuncL -- EMobilePhoneStartDTMFTone");
-OstTrace0( TRACE_NORMAL, DUP1_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneStartDTMFTone" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMDTMFMESSHANDLER_EXTFUNCL_TD, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneStartDTMFTone" );
             //unpack parameter: DTMF tone to be sent
             TChar* tone( NULL );
             aDataPackage->UnPackData ( &tone );
@@ -190,7 +190,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::
         case EMobilePhoneStopDTMFTone:
             {
 TFLOGSTRING("TSY: CMmDtmfMessHandler::ExtFuncL -- EMobilePhoneStopDTMFTone");
-OstTrace0( TRACE_NORMAL, DUP2_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneStopDTMFTone" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMDTMFMESSHANDLER_EXTFUNCL_TD, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneStopDTMFTone" );
             //no packed parameters
             //forward the request to the specific method
             CallDtmfStopReq ( transId );
@@ -200,12 +200,12 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::
         case EMobilePhoneContinueDTMFStringSending:
             {
 TFLOGSTRING("TSY: CMmDtmfMessHandler::ExtFuncL -- EMobilePhoneContinueDTMFStringSending");
-OstTrace0( TRACE_NORMAL, DUP3_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneContinueDTMFStringSending" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMDTMFMESSHANDLER_EXTFUNCL_TD, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneContinueDTMFStringSending" );
             }
         case EMobilePhoneSendDTMFTones:
             {
 TFLOGSTRING("TSY: CMmDtmfMessHandler::ExtFuncL -- EMobilePhoneSendDTMFTones");
-OstTrace0( TRACE_NORMAL, DUP4_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneSendDTMFTones" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMDTMFMESSHANDLER_EXTFUNCL_TD, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneSendDTMFTones" );
             if ( !iDtmfSendOngoing || EMobilePhoneContinueDTMFStringSending == aIpc )
                 {
                 //unpack parameter: DTMF tones to be sent
@@ -222,7 +222,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::
             else
                 {
 TFLOGSTRING("TSY: CMmDtmfMessHandler::ExtFuncL -- dtmf send already ongoing");
-OstTrace0( TRACE_NORMAL, DUP5_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::ExtFuncL, DTMF sending already ongoing" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMDTMFMESSHANDLER_EXTFUNCL_TD, "CMmDtmfMessHandler::ExtFuncL, DTMF sending already ongoing" );
                 ret = KErrServerBusy;
                 }
             break;
@@ -230,7 +230,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::
         case EMobilePhoneSendDTMFTonesCancel:
             {
 TFLOGSTRING("TSY: CMmDtmfMessHandler::ExtFuncL -- EMobilePhoneSendDTMFTonesCancel");
-OstTrace0( TRACE_NORMAL, DUP6_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneSendDTMFTonesCancel" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMDTMFMESSHANDLER_EXTFUNCL_TD, "CMmDtmfMessHandler::ExtFuncL, EMobilePhoneSendDTMFTonesCancel" );
             iDtmfSendOngoing = EFalse;
             //no packed parameters
             //forward the request to the specific method
@@ -241,7 +241,7 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::
             {
             // this method should only be called for DTMF cases
 TFLOGSTRING2("TSY: CMmDtmfMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP7_CMMDTMFMESSHANDLER_EXTFUNCL, "CMmDtmfMessHandler::ExtFuncL;Unknown IPC=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP7_CMMDTMFMESSHANDLER_EXTFUNCL_TD, "CMmDtmfMessHandler::ExtFuncL;Unknown IPC=%d", aIpc );
             ret = KErrArgument;
             break;
             }
@@ -262,7 +262,7 @@ void CMmDtmfMessHandler::ReceiveMessageL(
     TInt messageId(aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ));
 
 TFLOGSTRING3("TSY: CMmDtmfMessHandler::ReceiveMessageL. Resource:%d. MsgId:%d",resource, messageId);
-OstTraceExt2( TRACE_NORMAL, CMMDTMFMESSHANDLER_RECEIVEMESSAGEL, "CMmDtmfMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  CMMDTMFMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmDtmfMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
 
     // DTMF functionality is implemented in CALL server
     if ( PN_MODEM_CALL == resource )
@@ -293,7 +293,7 @@ OstTraceExt2( TRACE_NORMAL, CMMDTMFMESSHANDLER_RECEIVEMESSAGEL, "CMmDtmfMessHand
                 {
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::ReceiveMessageL. PN_MODEM_CALL: Switch messageID case default");
-OstTrace0( TRACE_NORMAL, DUP1_CMMDTMFMESSHANDLER_RECEIVEMESSAGEL, "CMmDtmfMessHandler::ReceiveMessageL,PN_MODEM_CALL: Switch messageID case default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMDTMFMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmDtmfMessHandler::ReceiveMessageL,PN_MODEM_CALL: Switch messageID case default" );
 
                 break;
                 }
@@ -312,7 +312,7 @@ void CMmDtmfMessHandler::SendPostAddressL(
     {
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::SendPostAddressL");
-OstTrace0( TRACE_NORMAL, CMMDTMFMESSHANDLER_SENDPOSTADDRESSL, "CMmDtmfMessHandler::SendPostAddressL" );
+OstTrace0( TRACE_NORMAL,  CMMDTMFMESSHANDLER_SENDPOSTADDRESSL_TD, "CMmDtmfMessHandler::SendPostAddressL" );
 
     if ( !iDtmfSendOngoing )
         {
@@ -334,7 +334,7 @@ TInt CMmDtmfMessHandler::CallDtmfSendReqL(
     TNOSDtmfType aDtmfType ) // Type of dtmf to send
     {
 TFLOGSTRING3("TSY: CMmDtmfMessHandler::CallDtmfSendReqL. TransId:%d, DtmfString:%S", aTransactionId, aDtmfString);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMDTMFMESSHANDLER_CALLDTMFSENDREQL, "CMmDtmfMessHandler::CallDtmfSendReqL;aTransactionId=%hhu;aDtmfString=%s", aTransactionId, ( TUint )( aDtmfString ) );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMDTMFMESSHANDLER_CALLDTMFSENDREQL_TD, "CMmDtmfMessHandler::CallDtmfSendReqL;aTransactionId=%hhu;aDtmfString=%s", aTransactionId, ( TUint )( aDtmfString ) );
 
     TInt ret( KErrNone );
 
@@ -400,7 +400,7 @@ void CMmDtmfMessHandler::CallDtmfSendResp(
     {
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::CallDtmfSendResp");
-OstTrace0( TRACE_NORMAL, DUP1_CMMDTMFMESSHANDLER_CALLDTMFSENDRESP, "CMmDtmfMessHandler::CallDtmfSendResp" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMDTMFMESSHANDLER_CALLDTMFSENDRESP_TD, "CMmDtmfMessHandler::CallDtmfSendResp" );
 
     TUint sbStartOffSet( 0 );
 
@@ -439,7 +439,7 @@ TInt CMmDtmfMessHandler::CallDtmfStopReq(
     {
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::CallDtmfStopReq");
-OstTrace0( TRACE_NORMAL, DUP1_CMMDTMFMESSHANDLER_CALLDTMFSTOPREQ, "CMmDtmfMessHandler::CallDtmfStopReq" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMDTMFMESSHANDLER_CALLDTMFSTOPREQ_TD, "CMmDtmfMessHandler::CallDtmfStopReq" );
 
     //create dtmf stop request message
     //Append data for ISI message
@@ -461,7 +461,7 @@ void CMmDtmfMessHandler::CallDtmfStopResp(
     {
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::CallDtmfStopResp");
-OstTrace0( TRACE_NORMAL, DUP1_CMMDTMFMESSHANDLER_CALLDTMFSTOPRESP, "CMmDtmfMessHandler::CallDtmfStopResp" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMDTMFMESSHANDLER_CALLDTMFSTOPRESP_TD, "CMmDtmfMessHandler::CallDtmfStopResp" );
 
     TUint8 nbrOfsubBlocks( aIsiMessage.Get8bit( ISI_HEADER_SIZE +
         CALL_MODEM_DTMF_STOP_RESP_OFFSET_SUBBLOCKS ) );
@@ -493,7 +493,7 @@ void CMmDtmfMessHandler::CallDtmfStatusInd(
     {
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::CallDtmfStatusInd");
-OstTrace0( TRACE_NORMAL, DUP2_CMMDTMFMESSHANDLER_CALLDTMFSTATUSIND, "CMmDtmfMessHandler::CallDtmfStatusInd" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMDTMFMESSHANDLER_CALLDTMFSTATUSIND_TD, "CMmDtmfMessHandler::CallDtmfStatusInd" );
 
     TUint sbStartOffSet( 0 );
 
@@ -510,7 +510,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMDTMFMESSHANDLER_CALLDTMFSTATUSIND, "CMmDtmfMess
             CALL_MODEM_SB_DTMF_STATUS_OFFSET_STATUS) );
 
 TFLOGSTRING2("TSY: CMmDtmfMessHandler::CallDtmfStatusInd. dtmfStatus:%d",dtmfStatus);
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMDTMFMESSHANDLER_CALLDTMFSTATUSIND, "CMmDtmfMessHandler::CallDtmfStatusInd;dtmfStatus=%hhu", dtmfStatus );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMDTMFMESSHANDLER_CALLDTMFSTATUSIND_TD, "CMmDtmfMessHandler::CallDtmfStatusInd;dtmfStatus=%hhu", dtmfStatus );
 
         if( CALL_MODEM_DTMF_IDLE == dtmfStatus )
             {
@@ -599,7 +599,7 @@ TBool CMmDtmfMessHandler::GetCallDtmfSendReqSubBlockL(
     TUint8 &aNumOfSbInMessage )
     {
 TFLOGSTRING2("TSY: CMmDtmfMessHandler::GetCallDtmfSendReqSubBlockL. DtmfType:%d", iDtmfType );
-OstTrace1( TRACE_NORMAL, CMMDTMFMESSHANDLER_GETCALLDTMFSENDREQSUBBLOCKL, "CMmDtmfMessHandler::GetCallDtmfSendReqSubBlockL;iDtmfType=%d", iDtmfType );
+OstTrace1( TRACE_NORMAL,  CMMDTMFMESSHANDLER_GETCALLDTMFSENDREQSUBBLOCKL_TD, "CMmDtmfMessHandler::GetCallDtmfSendReqSubBlockL;iDtmfType=%d", iDtmfType );
     // createReq flag is set to 'false' only in case the first character is 'w'
     // in DTMF string. If 'true' CALL_DTMF_SEND_REQ will be sent.
     TBool createReq( ETrue );
@@ -736,7 +736,7 @@ void CMmDtmfMessHandler::CallDtmfToneInd(
     {
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::CallDtmfToneInd");
-OstTrace0( TRACE_NORMAL, CMMDTMFMESSHANDLER_CALLDTMFTONEIND, "CMmDtmfMessHandler::CallDtmfToneInd" );
+OstTrace0( TRACE_NORMAL,  CMMDTMFMESSHANDLER_CALLDTMFTONEIND_TD, "CMmDtmfMessHandler::CallDtmfToneInd" );
 
     //create and initialize TDtmfInfo
     RMmCustomAPI::TDtmfInfo dtmfInfo;
@@ -784,7 +784,7 @@ OstTrace0( TRACE_NORMAL, CMMDTMFMESSHANDLER_CALLDTMFTONEIND, "CMmDtmfMessHandler
             dtmfInfo.iEvent = RMmCustomAPI::EDtmfStop;
             //valus of dtmfInfo.iTone has been already set as KCallDtmfNoTone;
 TFLOGSTRING("TSY: CMmDtmfMessHandler::CallDtmfToneInd-> No Tone");
-OstTrace0( TRACE_NORMAL, DUP1_CMMDTMFMESSHANDLER_CALLDTMFTONEIND, "CMmDtmfMessHandler::CallDtmfToneInd, No Tone" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMDTMFMESSHANDLER_CALLDTMFTONEIND_TD, "CMmDtmfMessHandler::CallDtmfToneInd, No Tone" );
             }
          else
             {
@@ -798,7 +798,7 @@ TFLOGSTRING2("TSY: CMmDtmfMessHandler::CallDtmfToneInd. Tone: %x", 0x0F&dtmfTone
 #ifdef OST_TRACE_COMPILER_IN_USE
 
 TUint16 tempDtmfTone( 0x0F&dtmfTone ); // Parameter just for tracing
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMDTMFMESSHANDLER_CALLDTMFTONEIND, "CMmDtmfMessHandler::CallDtmfToneInd;dtmfTone=%hx",tempDtmfTone );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMDTMFMESSHANDLER_CALLDTMFTONEIND_TD, "CMmDtmfMessHandler::CallDtmfToneInd;dtmfTone=%hx",tempDtmfTone );
 #endif // OST_TRACE_COMPILER_IN_USE
             }
         }
@@ -821,7 +821,7 @@ void CMmDtmfMessHandler::HandleError(
     {
 
 TFLOGSTRING("TSY: CMmDtmfMessHandler::HandleError");
-OstTrace0( TRACE_NORMAL, CMMDTMFMESSHANDLER_HANDLEERROR, "CMmDtmfMessHandler::HandleError" );
+OstTrace0( TRACE_NORMAL,  CMMDTMFMESSHANDLER_HANDLEERROR_TD, "CMmDtmfMessHandler::HandleError" );
 
     }
 

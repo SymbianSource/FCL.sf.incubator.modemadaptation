@@ -73,7 +73,7 @@ CMmUssdMessHandler::CMmUssdMessHandler
     )
     {
 TFLOGSTRING("TSY: CMmUssdMessHandler::CMmUssdMessHandler");
-OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_CMMUSSDMESSHANDLER, "CMmUssdMessHandler::CMmUssdMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMUSSDMESSHANDLER_CMMUSSDMESSHANDLER_TD, "CMmUssdMessHandler::CMmUssdMessHandler" );
     //None
     }
 
@@ -88,7 +88,7 @@ CMmUssdMessHandler::~CMmUssdMessHandler
     )
     {
 TFLOGSTRING("TSY: CMmUssdMessHandler::~CMmUssdMessHandler");
-OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_CMMUSSDMESSHANDLER, "CMmUssdMessHandler::~CMmUssdMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUSSDMESSHANDLER_CMMUSSDMESSHANDLER_TD, "CMmUssdMessHandler::~CMmUssdMessHandler" );
     }
 // -----------------------------------------------------------------------------
 // CMmUssdMessHandler::ConstructL
@@ -101,7 +101,7 @@ void CMmUssdMessHandler::ConstructL
     )
     {
 TFLOGSTRING("TSY: CMmUssdMessHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_CONSTRUCTL, "CMmUssdMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMUSSDMESSHANDLER_CONSTRUCTL_TD, "CMmUssdMessHandler::ConstructL" );
     // The flag indicates the correct complete method in failed case for
     // SS_SERVICE_FAILED_RESP
     iIsSendReleaseCalled = EFalse;
@@ -128,7 +128,7 @@ CMmUssdMessHandler* CMmUssdMessHandler::NewL
     )
     {
 TFLOGSTRING("TSY: CMmUssdMessHandler::NewL.\n");
-OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_NEWL, "CMmUssdMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMUSSDMESSHANDLER_NEWL_TD, "CMmUssdMessHandler::NewL" );
 
     CMmUssdMessHandler* ussdMessHandler =
         new( ELeave ) CMmUssdMessHandler();
@@ -161,7 +161,7 @@ void CMmUssdMessHandler::ReceiveMessageL
     TInt messageId (aIsiMessage.Get8bit(ISI_HEADER_OFFSET_MESSAGEID) );
 
 TFLOGSTRING3("TSY: CMmUssdMessHandler::ReceiveMessageL - resouce: %d, msgId: %d", resource, messageId);
-OstTraceExt2( TRACE_NORMAL, CMMUSSDMESSHANDLER_RECEIVEMESSAGEL, "CMmUssdMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  CMMUSSDMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmUssdMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
 
     switch( resource )
         {
@@ -189,7 +189,7 @@ OstTraceExt2( TRACE_NORMAL, CMMUSSDMESSHANDLER_RECEIVEMESSAGEL, "CMmUssdMessHand
                 default:
                     {
 TFLOGSTRING2("TSY: CMmUssdMessHandler::ReceiveMessageL - PN_SS - unknown msgId: %d", messageId);
-OstTrace1( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_RECEIVEMESSAGEL, "CMmUssdMessHandler::ReceiveMessageL;unknown messageId=%d", messageId );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMUSSDMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmUssdMessHandler::ReceiveMessageL;unknown messageId=%d", messageId );
                     // No propiert handler methods for ISI-message found
                     break;
                     }
@@ -199,7 +199,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_RECEIVEMESSAGEL, "CMmUssdMessHa
         default:
             {
 TFLOGSTRING2("TSY: CMmUssdMessHandler::ReceiveMessageL - unknown resource: %d", resource);
-OstTrace1( TRACE_NORMAL, DUP2_CMMUSSDMESSHANDLER_RECEIVEMESSAGEL, "CMmUssdMessHandler::ReceiveMessageL;resource=%d", resource );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMUSSDMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmUssdMessHandler::ReceiveMessageL;resource=%d", resource );
             break;
             }
         }
@@ -217,7 +217,7 @@ TInt CMmUssdMessHandler::SsGsmUssdSendReq
     )
     {
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsGsmUssdSendReq");
-OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessHandler::SsGsmUssdSendReq" );
+OstTrace0( TRACE_NORMAL,  CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ_TD, "CMmUssdMessHandler::SsGsmUssdSendReq" );
     TInt ret ( KErrNone );
     TBuf8<RMobileUssdMessaging::KGsmUssdDataSize> data( 0 );
     TDes8* attributes( 0 );
@@ -231,7 +231,7 @@ OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessHandle
     RMobileUssdMessaging::TMobileUssdAttributesV1 msgAttr ( ( *msgAttrPck )() );
 
 TFLOGSTRING2("TSY: CMmUssdMessHandler::SsGsmUssdSendReq. AttributeType: %d", msgAttr.iType );
-OstTrace1( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessHandler::SsGsmUssdSendReq;msgAttr.iType=%d", msgAttr.iType );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ_TD, "CMmUssdMessHandler::SsGsmUssdSendReq;msgAttr.iType=%d", msgAttr.iType );
 
     TUint8 ussdType( KFiller ); //initialize ussdtype to 0
 
@@ -248,7 +248,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessH
             case RMobileUssdMessaging::EUssdMOReply:
                 {
 TFLOGSTRING2("TSY: CMmUssdMessHandler::SsGsmUssdSendReq; iLastMtUssdIsRequest = %d", iLastMtUssdIsRequest);
-OstTrace1( TRACE_NORMAL, DUP5_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessHandler::SsGsmUssdSendReq;iLastMtUssdIsRequest=%d", iLastMtUssdIsRequest );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ_TD, "CMmUssdMessHandler::SsGsmUssdSendReq;iLastMtUssdIsRequest=%d", iLastMtUssdIsRequest );
                 if ( iLastMtUssdIsRequest )
                     {
                     ussdType = SS_GSM_USSD_MT_REPLY;
@@ -279,7 +279,7 @@ OstTrace1( TRACE_NORMAL, DUP5_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessH
     else
         {
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsGsmUssdSendReq. Type flag missing" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessHandler::SsGsmUssdSendReq, Type flag missing" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ_TD, "CMmUssdMessHandler::SsGsmUssdSendReq, Type flag missing" );
         // ussd type is unknown, report error
         ret = KErrArgument;
         }
@@ -296,7 +296,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessH
          else
             {
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsGsmUssdSendReq. DCS flag missing" );
-OstTrace0( TRACE_NORMAL, DUP3_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessHandler::SsGsmUssdSendReq, DCS flag missing" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ_TD, "CMmUssdMessHandler::SsGsmUssdSendReq, DCS flag missing" );
             // data coding scheme is unknown, report error.
             ret = KErrArgument;
             }
@@ -390,7 +390,7 @@ TInt CMmUssdMessHandler::SsGsmUssdSendReq
     )
     {
 TFLOGSTRING("LTSY: CMmUssdMessHandler::SsGsmUssdSendReq. End USSD session" );
-OstTrace0( TRACE_NORMAL, DUP4_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ, "CMmUssdMessHandler::SsGsmUssdSendReq" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMUSSDMESSHANDLER_SSGSMUSSDSENDREQ_TD, "CMmUssdMessHandler::SsGsmUssdSendReq" );
 
     // Change the flag to indicate the correct complete method for failed resp
     iIsSendReleaseCalled = ETrue;
@@ -422,7 +422,7 @@ void CMmUssdMessHandler::SsGsmUssdSendResp
     )
     {
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsGsmUssdSendResp" );
-OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSGSMUSSDSENDRESP, "CMmUssdMessHandler::SsGsmUssdSendResp" );
+OstTrace0( TRACE_NORMAL,  CMMUSSDMESSHANDLER_SSGSMUSSDSENDRESP_TD, "CMmUssdMessHandler::SsGsmUssdSendResp" );
 
     TUint8 length ( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + SS_GSM_USSD_SEND_RESP_OFFSET_LENGTHOFUSSDSTRING ) );
@@ -441,7 +441,7 @@ OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSGSMUSSDSENDRESP, "CMmUssdMessHandl
     if ( SS_GSM_USSD_END == ussdType && iIsSendReleaseCalled )
         {
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsGsmUssdSendResp. Response to SendRelease." );
-OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDSENDRESP, "CMmUssdMessHandler::SsGsmUssdSendResp, Response to SendRelease" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDSENDRESP_TD, "CMmUssdMessHandler::SsGsmUssdSendResp, Response to SendRelease" );
 
         // Reset the flag
         iIsSendReleaseCalled = EFalse;
@@ -485,7 +485,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDSENDRESP, "CMmUssdMess
         if ( iIsSendReleaseReqPending )
             {
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsGsmUssdSendResp. SendRelease pending." );
-OstTrace0( TRACE_NORMAL, DUP2_CMMUSSDMESSHANDLER_SSGSMUSSDSENDRESP, "CMmUssdMessHandler::SsGsmUssdSendResp, SendRelease pending" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMUSSDMESSHANDLER_SSGSMUSSDSENDRESP_TD, "CMmUssdMessHandler::SsGsmUssdSendResp, SendRelease pending" );
 
             TInt ret ( KErrNone );
             ret = SsGsmUssdSendReq();
@@ -520,7 +520,7 @@ void CMmUssdMessHandler::SsServiceFailedResp
     {
 
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsServiceFailedResp" );
-OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP, "CMmUssdMessHandler::SsServiceFailedResp" );
+OstTrace0( TRACE_NORMAL,  CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmUssdMessHandler::SsServiceFailedResp" );
 
     // Initialize cause type and value, if no specified.
     // subblock found, use SS_UNSPECIFIED_REASON.
@@ -631,7 +631,7 @@ OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP, "CMmUssdMessHan
             KErrCouldNotConnect,
             KErrGsmSMSNoNetworkService );
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsServiceFailedResp. Cause: SS_GSM_SS_NOT_AVAILABLE => No network coverage." );
-OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP, "CMmUssdMessHandler::SsServiceFailedResp, Cause: SS_GSM_SS_NOT_AVAILABLE => No network coverage" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmUssdMessHandler::SsServiceFailedResp, Cause: SS_GSM_SS_NOT_AVAILABLE => No network coverage" );
         }
     else
         {
@@ -648,7 +648,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP, "CMmUssdMe
     if ( iIsSendReleaseCalled )
         {
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsServiceFailedResp. SendRelease failed." );
-OstTrace0( TRACE_NORMAL, DUP2_CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP, "CMmUssdMessHandler::SsServiceFailedResp, SendRelease failed" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMUSSDMESSHANDLER_SSSERVICEFAILEDRESP_TD, "CMmUssdMessHandler::SsServiceFailedResp, SendRelease failed" );
 
         // Reset the flag
         iIsSendReleaseCalled = EFalse;
@@ -752,7 +752,7 @@ void CMmUssdMessHandler::SsGsmUssdReceiveInd
         ( RMobileUssdMessaging::EFormatPackedString );
 
 TFLOGSTRING2("TSY: CMmUssdMessHandler::SsGsmUssdReceiveInd: UssdType %d", ussdType);
-OstTraceExt1( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND, "CMmUssdMessHandler::SsGsmUssdReceiveInd;ussdType=%hhu", ussdType );
+OstTraceExt1( TRACE_NORMAL,  CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND_TD, "CMmUssdMessHandler::SsGsmUssdReceiveInd;ussdType=%hhu", ussdType );
 
     switch ( ussdType )
         {
@@ -761,7 +761,7 @@ OstTraceExt1( TRACE_NORMAL, CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND, "CMmUssdMess
             {
             iLastMtUssdIsRequest = SS_GSM_USSD_REQUEST == ussdType;
 TFLOGSTRING2("TSY: CMmUssdMessHandler::SsGsmUssdSendReq; iLastMtUssdIsRequest = %d", iLastMtUssdIsRequest);
-OstTrace1( TRACE_NORMAL, DUP3_CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND, "CMmUssdMessHandler::SsGsmUssdReceiveInd;iLastMtUssdIsRequest=%d", iLastMtUssdIsRequest );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND_TD, "CMmUssdMessHandler::SsGsmUssdReceiveInd;iLastMtUssdIsRequest=%d", iLastMtUssdIsRequest );
             receiveUssdMessageAttributes.iType =
                 RMobileUssdMessaging::EUssdMTRequest;
             break;
@@ -815,7 +815,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND, "CMmUssdMe
             KErrNone );
 
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsGsmUssdReceiveInd: Complete : EMobileUssdMessagingReceiveMessage" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND, "CMmUssdMessHandler::SsGsmUssdReceiveInd, EMobileUssdMessagingReceiveMessage" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND_TD, "CMmUssdMessHandler::SsGsmUssdReceiveInd, EMobileUssdMessagingReceiveMessage" );
         }
 
     if ( SS_GSM_USSD_END == ussdType )
@@ -828,7 +828,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND, "CMmUssdMe
             KErrNone );
 
 TFLOGSTRING("TSY: CMmUssdMessHandler::SsGsmUssdReceiveInd: Complete : EMobileUssdMessagingNotifyNetworkRelease" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND, "CMmUssdMessHandler::SsGsmUssdReceiveInd, EMobileUssdMessagingNotifyNetworkRelease" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMUSSDMESSHANDLER_SSGSMUSSDRECEIVEIND_TD, "CMmUssdMessHandler::SsGsmUssdReceiveInd, EMobileUssdMessagingNotifyNetworkRelease" );
         }
     }
 
@@ -853,7 +853,7 @@ TInt CMmUssdMessHandler::ExtFuncL
     //*************************************************************//.
 
 TFLOGSTRING("TSY: CMmUssdMessHandler::ExtFuncL");
-OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_EXTFUNCL, "CMmUssdMessHandler::ExtFuncL" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUSSDMESSHANDLER_EXTFUNCL_TD, "CMmUssdMessHandler::ExtFuncL" );
 
     TInt ret( KErrNone );
 
@@ -893,7 +893,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMUSSDMESSHANDLER_EXTFUNCL, "CMmUssdMessHandler::
         default:
             {
 TFLOGSTRING2("TSY: CMmUssdMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP2_CMMUSSDMESSHANDLER_EXTFUNCL, "CMmUssdMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMUSSDMESSHANDLER_EXTFUNCL_TD, "CMmUssdMessHandler::ExtFuncL;aIpc=%d", aIpc );
             ret = KErrNotSupported;
             break;
             }
@@ -915,7 +915,7 @@ void CMmUssdMessHandler::HandleError
     )
     {
 TFLOGSTRING("TSY: CMmUssdMessHandler::HandleError");
-OstTrace0( TRACE_NORMAL, CMMUSSDMESSHANDLER_HANDLEERROR, "CMmUssdMessHandler::HandleError" );
+OstTrace0( TRACE_NORMAL,  CMMUSSDMESSHANDLER_HANDLEERROR_TD, "CMmUssdMessHandler::HandleError" );
     }
 
 

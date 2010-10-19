@@ -18,6 +18,7 @@
 
 
 // INCLUDE FILES
+#include <e32svr.h>    // For RDebug
 #include <tisi.h>
 #include <nsisi.h>      // isi name
 #include <pipeisi.h>    // isi pipe
@@ -143,6 +144,10 @@ void CDpMif::ConstructL()
     {
     OstTrace0( TRACE_NORMAL, CDPMIF_CONSTRUCTL, "CDpMif::ConstructL" );
     LOGM(" CDpMif::ConstructL");
+
+#ifdef PIPECAMP_DATAPORT_PNS_PEP_STATUS_IND_PHONET_ADDRESS_FROM_PNS_PEP_CTRL_REQ
+    RDebug::Print( _L("PIPECAMP_DATAPORT_PNS_PEP_STATUS_IND_PHONET_ADDRESS_FROM_PNS_PEP_CTRL_REQ") );
+#endif
 
     iMsgReceiveBuffer = HBufC8::NewL( ISI_HEADER_SIZE + KDpMaxMsgReceiveSize );
     _LIT(KPanicStr, "Dataport - CDpMif::ConstructL");
@@ -486,7 +491,10 @@ void CDpMif::HandlePepCtrlReq(
     // Get sender object
     TUint8 senderObject( aIsiMessage.Get8bit(
         ISI_HEADER_OFFSET_SENDEROBJECT ) );
-
+#ifdef PIPECAMP_DATAPORT_PNS_PEP_STATUS_IND_PHONET_ADDRESS_FROM_PNS_PEP_CTRL_REQ
+    iPifDcs.SetPipeControllerDeviceIdentifier( senderDevice );
+    iPifDcs.SetPipeControllerObjectIdentifier( senderObject );
+#endif
     // E32 return value
     TInt return_E32( KErrNone );
     // PN_PIPE return value
@@ -800,7 +808,7 @@ void CDpMif::SendNameAddReqL(
     // Add Object id
     messageData.Append( obj );
     // Add Record flags
-    messageData.Append( PN_NAME_CLEARED );
+    messageData.Append( PN_NAME_UNDEF/**PN_NAME_CLEARED**/ );
     //fill
     messageData.Append( KDpPadding );
 

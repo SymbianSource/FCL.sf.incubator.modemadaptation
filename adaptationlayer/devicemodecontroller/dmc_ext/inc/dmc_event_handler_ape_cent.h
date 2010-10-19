@@ -10,8 +10,8 @@
 * Nokia Corporation - initial contribution.
 *
 * Contributors:
-* 
-* Description: 
+*
+* Description:
 *     DMC APE centric event handler class declaration.
 *
 */
@@ -33,7 +33,7 @@
 /**
 * INPUT EVENTS:
 *   This constanst defines event types / inputs to this event handler.
-*   
+*
 *
 *   Kernel events (KERNEL_*) can be one of the following:
 *      - ISI messages
@@ -49,18 +49,28 @@
 #define KERNEL_EVENT_PWR_HANDLER              0x01
 // IAD Modem connection lost
 #define KERNEL_EVENT_MODEM_CONNECTION_NOT_OK  0x02
+// Get the type of the event to be sent to kernel side client
+#define KERNEL_GET_EVENT_TYPE                 0x03
+// Used through DMC kernel IF
+#define KERNEL_IF_GET_STARTUP_MODE            0x04
+// Get hidden reset status, used through DMC kernel IF
+#define KERNEL_IF_GET_HIDDEN_RESET_STATUS     0x05
+// Generate reset requested from kernel side
+#define KERNEL_IF_GENERATE_RESET              0x06
+// Power off the device
+#define KERNEL_IF_POWER_OFF                   0x07
 // Used for detecting the event type
-#define KERNEL_LAST_KERNEL_EVENT              KERNEL_EVENT_MODEM_CONNECTION_NOT_OK
+#define KERNEL_LAST_KERNEL_EVENT              KERNEL_IF_POWER_OFF
 // Get target startup mode
-#define USER_GET_TARGET_STARTUP_MODE          0x03
-// Get target startup mode
-#define USER_GENERATE_RESET                   0x04
-// Get target startup mode
-#define USER_POWER_OFF                        0x05
-// Get target startup mode
-#define USER_GET_HIDDEN_RESET_STATUS          0x07
+#define USER_GET_TARGET_STARTUP_MODE          0x08
+// Generate reset requested from user side
+#define USER_GENERATE_RESET                   0x09
+// Power off the device
+#define USER_POWER_OFF                        0x0A
+// Get hidden reset status
+#define USER_GET_HIDDEN_RESET_STATUS          0x0B
 // Get the type of the event to be sent to user side client
-#define USER_GET_EVENT_TYPE                   0x08
+#define USER_GET_EVENT_TYPE                   0x0C
 #define LAST_EVENT                            (USER_GET_EVENT_TYPE + 1)
 #define NO_EVENTS_DEFINED                     0x00
 
@@ -74,39 +84,49 @@
 *   orginated controlled or uncontrolled power off / reset.
 */
 // Modem or PC SW orginated power off.
-#define USER_CLIENT_POWER_OFF_EVENT           0x01
+#define DMC_CLIENT_POWER_OFF_EVENT           0x01
 // Modem or PC SW orginated resest.
-#define USER_CLIENT_RESET_EVENT               0x02
+#define DMC_CLIENT_RESET_EVENT               0x02
 // No event requested
-#define USER_CLIENT_NO_EVENT                  0x00
+#define DMC_CLIENT_NO_EVENT                  0x00
 
-//  MACROS  
-//  DATA TYPES 
+
+/**
+* CLIENT TYPE:
+*    A type of the client that request services.
+*/
+#define DMC_USER_BIT                          0x01
+#define DMC_KERNEL_BIT                        0x02
+
+//  MACROS
+//  DATA TYPES
 //  EXTERNAL DATA STRUCTURES
-//  FUNCTION PROTOTYPES  
+//  FUNCTION PROTOTYPES
 //  FORWARD DECLARATIONS
 class DDmcExtension;
 class DMutex;
+class TDfc;
 
 NONSHARABLE_CLASS(DmcEvHandApeCent)
     {
     public: // Event handler new public functions
-    
+
         /**
         * Init the event handler
         *
         * @param   *aDmcExt     A pointer to the DMC kernel extension.
-        * @return  None 
+        * @return  None
         */
         static void Init(DDmcExtension* const aDmcExt);
 
         /**
         * Subscribe events.
         *
-        * @param   *aUserEventDfcPtr     A pointer to DMC logical device TDfc queue.
+        * @param   aTypeBitMask             DMC_USER_BIT or/and DMC_KERNEL_BIT
+        * @param   *aReceiveEventDfcPtr     A pointer to TDfc queue.
         * @return  None
         */
-        static void SubscribeEvents(TDfc* const aUserEventDfcPtr);
+        static void SubscribeEvents(const TUint8 aTypeBitMask, TDfc* const aReceiveEventDfcPtr);
 
         /**
         * Unsubscribe events.
@@ -124,10 +144,10 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         *                           dmc_event_handler_ape_cent.cpp-file defines allowed values.
         * @param   *aKernMsgPtr     A pointer to a incoming kernel message.
         * @param   *aUsrMsgPtr      A pointer to a incoming user message.
-        * @return  KErrNone or one of the system wide error 
+        * @return  KErrNone or one of the system wide error
         */
         static TInt HandleEvent(const TUint8  aType,
-                                const TUint8* const aKernMsgPtr,
+                                TUint8* const aKernMsgPtr,
                                 TUint* const  aUsrMsgPtr);
 
     private:  // Event handler new private functions
@@ -152,7 +172,7 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         inline static void Unlock();
 
         /**
-        * This function process an ANY-state. 
+        * This function process an ANY-state.
         * There are events, which always must be handled regardless of
         * an ongoing transaction. These type of events are handled in the state ANY.
         *
@@ -160,10 +180,10 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         *                           dmc_event_handler_ape_cent.cpp-file defines allowed values.
         * @param   *aKernMsgPtr     A pointer to a incoming kernel message.
         * @param   *aUsrMsgPtr      A pointer to a incoming user message.
-        * @return  KErrNone or one of the system wide error 
+        * @return  KErrNone or one of the system wide error
         */
         static TInt StateAny(const TUint8  aEventType,
-                             const TUint8* const aKernMsgPtr,
+                             TUint8* const aKernMsgPtr,
                              TUint* const  aUsrMsgPtr);
 
         /**
@@ -174,7 +194,7 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         *                           dmc_event_handler_ape_cent.cpp-file defines allowed values.
         * @param   *aKernMsgPtr     A pointer to a incoming kernel message.
         * @param   *aUsrMsgPtr      A pointer to a incoming user message.
-        * @return  KErrNone or one of the system wide error 
+        * @return  KErrNone or one of the system wide error
         */
         static TInt StateIdle(const TUint8  aEventType,
                               const TUint8* const aKernMsgPtr,
@@ -187,7 +207,7 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         *                           dmc_event_handler_ape_cent.cpp-file defines allowed values.
         * @param   *aKernMsgPtr     A pointer to a incoming kernel message.
         * @param   *aUsrMsgPtr      A pointer to a incoming user message.
-        * @return  KErrNone or one of the system wide error 
+        * @return  KErrNone or one of the system wide error
         */
         static TInt StateApePwrOff(const TUint8  aEventType,
                                    const TUint8* const aKernMsgPtr,
@@ -200,7 +220,7 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         *                           dmc_event_handler_ape_cent.cpp-file defines allowed values.
         * @param   *aKernMsgPtr     A pointer to a incoming kernel message.
         * @param   *aUsrMsgPtr      A pointer to a incoming user message.
-        * @return  KErrNone or one of the system wide error 
+        * @return  KErrNone or one of the system wide error
         */
         static TInt StateApeReset(const TUint8  aEventType,
                                   const TUint8* const aKernMsgPtr,
@@ -213,7 +233,7 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         *                           dmc_event_handler_ape_cent.cpp-file defines allowed values.
         * @param   *aKernMsgPtr     A pointer to a incoming kernel message.
         * @param   *aUsrMsgPtr      A pointer to a incoming user message.
-        * @return  KErrNone or one of the system wide error 
+        * @return  KErrNone or one of the system wide error
         */
         static TInt StateModemPwrOff(const TUint8  aEventType,
                                      const TUint8* const aKernMsgPtr,
@@ -226,7 +246,7 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         *                           dmc_event_handler_ape_cent.cpp-file defines allowed values.
         * @param   *aKernMsgPtr     A pointer to a incoming kernel message.
         * @param   *aUsrMsgPtr      A pointer to a incoming user message.
-        * @return  KErrNone or one of the system wide error 
+        * @return  KErrNone or one of the system wide error
         */
         static TInt StateModemControlledReset(const TUint8  aEventType,
                                               const TUint8* const aKernMsgPtr,
@@ -239,11 +259,12 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         *                           dmc_event_handler_ape_cent.cpp-file defines allowed values.
         * @param   *aKernMsgPtr     A pointer to a incoming kernel message.
         * @param   *aUsrMsgPtr      A pointer to a incoming user message.
-        * @return  KErrNone or one of the system wide error 
+        * @return  KErrNone or one of the system wide error
         */
         static TInt StateModemUncontrolledReset(const TUint8  aEventType,
                                                 const TUint8* const aKernMsgPtr,
                                                 TUint* const  aUsrMsgPtr);
+
 
         /**
         * A function to handle a MCE_MODEM_STATE_QUERY_RESP
@@ -252,6 +273,18 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         * @return  None
         */
         static void HandleMceModemStateQueryResp(const TUint8* const aMsgPtr);
+
+
+        /**
+        * This function Generates an event for user and kernel side clients.
+        * The event is generated only if events are subscribed.
+        *
+        * @param   aToWhomBitMask   Defines whom to generate an event.
+        *                           DMC_USER_BIT or/and DMC_KERNEL_BIT
+        * @return  None
+        */
+        static void GenerateEvent(const TUint8 aToWhomBitMask);
+
 
         /**
         * Handles a state transition of the DMC Event Handler.
@@ -273,7 +306,7 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         * @param   aEventType       Type of the message. A table "EVENTS" in the
         *                           dmc_event_handler_ape_cent.cpp-file.
         * @param   aKernMsgPtr      Pointer to Kernel event
-        * @return  1: Bit set to indicate that a requested event is part of the any state. 
+        * @return  1: Bit set to indicate that a requested event is part of the any state.
         *          0: Bit not set to indicate that a requested event is not part of the any state.
         */
         static TUint8 IsAnyStateEvent(const TUint8 aEventType, const TUint8* const aKernMsgPtr);
@@ -283,32 +316,52 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         /**
         * A pointer to DMC extension.
         * DMC extension owns this pointer.
-        * 
+        *
         */
         static DDmcExtension* iDmcExtPtr;
 
         /**
         * A pointer to mutex.
         * This class owns this pointer.
-        * 
+        *
         */
         static DMutex* iMutexPtr;
 
         /**
-        * A pointer to DMC user / kernel Dfc-queue.
+        * A pointer to DMC user Dfc-queue.
         * This class does not own this pointer.
-        * 
+        *
         */
         static TDfc* iUserEventDfcPtr;
 
         /**
-        * A target start-up mode. 
+        * A pointer to DMC kernel Dfc-queue.
+        * This class does not own this pointer.
+        *
+        */
+        static TDfc* iKernelEventDfcPtr;
+
+        /**
+        * Event for signaling upstairs to start power off
+        *
+        */
+        static TRawEvent iSwitchOffEvent;
+
+        /**
+        * Event for signaling upstairs to start reset
+        *
+        */
+        static TRawEvent iResetEvent;
+
+
+        /**
+        * A target start-up mode.
         * Values in the boot_reason_api.h-file.
         */
         static TBootReason::TStartupMode iTargetStartupMode;
 
         /**
-        * A  hidden reset status. 
+        * A  hidden reset status.
         * Values in the boot_reason_api.h-file.
         *
         * ETrue if the reset is hidden, otherwise EFalse.
@@ -325,13 +378,13 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         * This variable is needed to detect whether the Power Handler
         * PowerDown() has been called.
         *
-        * DMC needs this information to know if the Power Handler 
+        * DMC needs this information to know if the Power Handler
         * PowerDownDone must be called in case the modem connection
-        * is lost and there is an ongoing transaction. 
+        * is lost and there is an ongoing transaction.
         *
         * If there is no ongoing transaction, the modem connection
         * lost is handled as a "MODEM_UNCONTROLLED_RESET".
-        * 
+        *
         * Only one transaction is allowed, thus if there is already
         * ongoing transaction, the modem connection is handled as
         * below.
@@ -345,26 +398,26 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         *           PowerDown() is called and then
         *           acknowledge back immediately by
         *           calling PowerDownDone().
-        * 
+        *
         * Allowed values: TRUE / FALSE
         */
         static TUint8 iPowerDownCalled;
 
         /**
-        * Modem action bit map. 
-        * 
+        * Modem action bit map.
+        *
         * This bit map defines actions that have
         * been happend in the Modem state transition
         * and a modem connection.
-        * 
+        *
         * Action information is needed to find a correct
         * slot to acknowledge the Power Handler PowerDownDone.
         */
         static TUint8 iModemActionBitMap;
 
         /**
-        * A current modem state. 
-        * 
+        * A current modem state.
+        *
         * Values from mceisi.h-file.
         */
         static TUint8 iModemCurrentState;
@@ -376,7 +429,7 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         * user side client. The event type is used in case
         * PC SW or Modem orginated power off or reset or
         * in case of uncontrolled Modem reset..
-        * 
+        *
         * Values from OUTPUT EVENTS: defined beginning of this file.
         */
         static TUint8 iEventType;
@@ -392,6 +445,7 @@ NONSHARABLE_CLASS(DmcEvHandApeCent)
         * This table defines allowed state transitions.
         */
         static const TUint8 iStateTransitionMap[];
+
     };
 
 #endif // DMC_EVENT_HANDLER_APE_CENT_H

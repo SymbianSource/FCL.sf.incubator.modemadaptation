@@ -86,7 +86,7 @@ const TUint8 KFirstPepType   = PN_PEP_TYPE_COMM; // First PEP type
 // Second PEP
 const TUint8 KSecondPepDevice = PN_DEV_MODEM;    // Device Id of second PEP
 const TUint8 KSecondPepObject = PN_OBJ_CSD_SRV; // Object Id of second PEP
-const TUint8 KSecondPepType   = PN_PEP_TYPE_GPRS; // Second PEP type
+const TUint8 KSecondPepType   = PN_PEP_TYPE_COMMON; // Second PEP type
 
 const TUint8 KPipeTransID  = EIscNokiaDataport1;
 
@@ -131,7 +131,7 @@ CEmergencyTimer::CEmergencyTimer(
         iCallMsgHandler( aCallMsgHandler )
     {
 TFLOGSTRING("TSY: CEmergencyTimer::CEmergencyTimer");
-OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_CEMERGENCYTIMER, "CEmergencyTimer::CEmergencyTimer" );
+OstTrace0( TRACE_NORMAL,  CEMERGENCYTIMER_CEMERGENCYTIMER_TD, "CEmergencyTimer::CEmergencyTimer" );
     }
 
 // -----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_CEMERGENCYTIMER, "CEmergencyTimer::CEme
 CEmergencyTimer::~CEmergencyTimer()
     {
 TFLOGSTRING("TSY: CEmergencyTimer::~CEmergencyTimer");
-OstTrace0( TRACE_NORMAL, DUP1_CEMERGENCYTIMER_CEMERGENCYTIMER, "CEmergencyTimer::~CEmergencyTimer" );
+OstTrace0( TRACE_NORMAL,  DUP1_CEMERGENCYTIMER_CEMERGENCYTIMER_TD, "CEmergencyTimer::~CEmergencyTimer" );
     Cancel();
     }
 
@@ -154,7 +154,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CEMERGENCYTIMER_CEMERGENCYTIMER, "CEmergencyTimer:
 void CEmergencyTimer::ConstructL()
     {
 TFLOGSTRING("TSY: CEmergencyTimer::ConstructL");
-OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_CONSTRUCTL, "CEmergencyTimer::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CEMERGENCYTIMER_CONSTRUCTL_TD, "CEmergencyTimer::ConstructL" );
     CTimer::ConstructL(); // Must be called
     CActiveScheduler::Add( this );
     }
@@ -167,7 +167,7 @@ OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_CONSTRUCTL, "CEmergencyTimer::Construct
 void CEmergencyTimer::RunL()
     {
 TFLOGSTRING("TSY: CEmergencyTimer::RunL - TIMER ELAPSED");
-OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_RUNL, "CEmergencyTimer::RunL" );
+OstTrace0( TRACE_NORMAL,  CEMERGENCYTIMER_RUNL_TD, "CEmergencyTimer::RunL" );
     iCallMsgHandler.GpdsContextsClearResp();
     }
 
@@ -179,7 +179,7 @@ OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_RUNL, "CEmergencyTimer::RunL" );
 void CEmergencyTimer::StartEmergencyTimer()
     {
 TFLOGSTRING("TSY: CEmergencyTimer::StartEmergencyTimer");
-OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_STARTEMERGENCYTIMER, "CEmergencyTimer::StartEmergencyTimer" );
+OstTrace0( TRACE_NORMAL,  CEMERGENCYTIMER_STARTEMERGENCYTIMER_TD, "CEmergencyTimer::StartEmergencyTimer" );
     Cancel();
     After( KEmergencyTimerInterval ); // 5 seconds
     }
@@ -192,7 +192,7 @@ OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_STARTEMERGENCYTIMER, "CEmergencyTimer::
 void CEmergencyTimer::StopEmergencyTimer()
     {
 TFLOGSTRING("TSY: CEmergencyTimer::StopEmergencyTimer");
-OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_STOPEMERGENCYTIMER, "CEmergencyTimer::StopEmergencyTimer" );
+OstTrace0( TRACE_NORMAL,  CEMERGENCYTIMER_STOPEMERGENCYTIMER_TD, "CEmergencyTimer::StopEmergencyTimer" );
     Cancel();
     }
 
@@ -208,7 +208,7 @@ OstTrace0( TRACE_NORMAL, CEMERGENCYTIMER_STOPEMERGENCYTIMER, "CEmergencyTimer::S
 CMmCallMessHandler::CMmCallMessHandler() : iEmergencyTimer( *this )
     {
 TFLOGSTRING("TSY: CEmergencyTimer::CMmCallMessHandler");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CMMCALLMESSHANDLER, "CMmCallMessHandler::CMmCallMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CMMCALLMESSHANDLER_TD, "CMmCallMessHandler::CMmCallMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CMMCALLMESSHANDLER, "CMmCallMessHand
 void CMmCallMessHandler::ConstructL()
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CONSTRUCTL, "CMmCallMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CONSTRUCTL_TD, "CMmCallMessHandler::ConstructL" );
 
     iSubAddress.Zero();
     iBearer.Zero();
@@ -262,7 +262,7 @@ CMmCallMessHandler* CMmCallMessHandler::NewL(
     CMmMessageRouter* aMessageRouter )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::NewL");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_NEWL, "CMmCallMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_NEWL_TD, "CMmCallMessHandler::NewL" );
 
     CMmCallMessHandler* callMessHandler = new( ELeave ) CMmCallMessHandler();
 
@@ -287,6 +287,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_NEWL, "CMmCallMessHandler::NewL" );
     aPhoNetReceiver->RegisterL( callMessHandler, PN_CSD );
 
     aPhoNetReceiver->RegisterL( callMessHandler, PN_PIPE, PNS_PIPE_CREATE_RESP );
+    aPhoNetReceiver->RegisterL( callMessHandler, PN_PIPE, PNS_PIPE_ENABLE_RESP );
 
     callMessHandler->iDtmfMessHandler = aDtmfMessHandler;
     CleanupStack::Pop( callMessHandler );
@@ -302,7 +303,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_NEWL, "CMmCallMessHandler::NewL" );
 CMmCallMessHandler::~CMmCallMessHandler()
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::~CMmCallMessHandler");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CMMCALLMESSHANDLER, "CMmCallMessHandler::~CMmCallMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CMMCALLMESSHANDLER_TD, "CMmCallMessHandler::~CMmCallMessHandler" );
 
     if ( KInvalidPipeHandle != iPipeHandle )
         {
@@ -332,7 +333,7 @@ void CMmCallMessHandler::ReceiveMessageL(
     TInt messageId(aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ));
 
 TFLOGSTRING3("TSY: CMmCallMessHandler::ReceiveMessageL. Resource:%d. MsgId:%d", resource, messageId);
-OstTraceExt2( TRACE_NORMAL, CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  CMMCALLMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCallMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
 
     // Switch according to the resource
     switch ( resource )
@@ -372,7 +373,7 @@ OstTraceExt2( TRACE_NORMAL, CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHand
                         ISI_HEADER_OFFSET_TRANSID ) );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::ReceiveMessageL. CALL_MODEM_PROPERTY_SET_RESP. transactId:%d",transactId);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHandler::ReceiveMessageL. CALL_MODEM_PROPERTY_SET_RESP. transactId=%hhu", transactId );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCallMessHandler::ReceiveMessageL. CALL_MODEM_PROPERTY_SET_RESP. transactId=%hhu", transactId );
 
                     if ( KCallTransId == transactId )
                         {
@@ -420,7 +421,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMes
                     // Needed because call server messages are also handled
                     // by DTMF and conference call message handlers
 TFLOGSTRING("TSY: CMmCallMessHandler::ReceiveMessageL, switch resource - case PN_MODEM_CALL, switch messageId - default.\n" );
-OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHandler::ReceiveMessageL, switch resource - case PN_MODEM_CALL, switch messageId - default.\n" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCALLMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCallMessHandler::ReceiveMessageL, switch resource - case PN_MODEM_CALL, switch messageId - default.\n" );
                     break;
                     }
                 }
@@ -477,7 +478,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHa
                 default:
                     {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReceiveMessageL, switch resource - case PN_CSD, switch messageId - default.\n" );
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHandler::ReceiveMessageL, switch resource - case PN_CSD, switch messageId - default." );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCallMessHandler::ReceiveMessageL, switch resource - case PN_CSD, switch messageId - default." );
                     break;
                     }
                 }
@@ -493,10 +494,15 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHa
                     PnsPipeCreateResp( aIsiMessage );
                     break;
                     }
+                case PNS_PIPE_ENABLE_RESP:
+                    {
+                    PnsPipeEnableResp( aIsiMessage );
+                    break;
+                    }
                 default:
                     {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReceiveMessageL, switch resource - case PN_PIPE, switch messageId - default.\n" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHandler::ReceiveMessageL, switch resource - case PN_PIPE, switch messageId - default.\n" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCallMessHandler::ReceiveMessageL, switch resource - case PN_PIPE, switch messageId - default.\n" );
                     break;
                     }
                 }
@@ -505,7 +511,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHa
         default:
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReceiveMessageL, switch resource - default.\n" );
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_RECEIVEMESSAGEL, "CMmCallMessHandler::ReceiveMessageL, switch resource - default.\n" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmCallMessHandler::ReceiveMessageL, switch resource - default.\n" );
             break;
             }
         }
@@ -522,7 +528,7 @@ TInt CMmCallMessHandler::ExtFuncL(
     const CMmDataPackage* aDataPackage )
     {
 TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL - aIpc: %d", aIpc );
-OstTrace1( TRACE_NORMAL, CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     TInt ret( KErrNone );
     TUint8 messageId( 0 );
@@ -550,7 +556,7 @@ OstTrace1( TRACE_NORMAL, CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFu
             {
             callData->GetCallIdAndMode( callId, callMode );
 TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL. CallMode:%d", callMode );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL;callMode=%d", callMode );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL;callMode=%d", callMode );
             }
 
         if ( KSymbianCallIdNone == callId )
@@ -576,7 +582,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::
                 {
                 aDataPackage->UnPackData( iTelEmergNumber );
 TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL - emergency dial number is %S", &iTelEmergNumber);
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - emergency dial number is=%S", iTelEmergNumber );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL - emergency dial number is=%S", iTelEmergNumber );
 #ifdef NCP_COMMON_HSDPA_EMERGCALL_WORKAROUND
                 if ( iHSDPADisabledInPp )
                     {
@@ -598,7 +604,7 @@ OstTraceExt1( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandle
                     // Destroy all data connections before attempting emergency
                     // call. The call will be set up in GpdsContextsClearResp.
 TFLOGSTRING( "TSY: CMmCallMessHandler::ExtFuncL - HSDPA workaround. Emergency call delayed, data connections have to be closed first." );
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - HSDPA workaround. Emergency call delayed, data connections have to be closed first." );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL - HSDPA workaround. Emergency call delayed, data connections have to be closed first." );
                     iEmergCallDelayed = ETrue;
                     GpdsContextsClearReq();
                     }
@@ -661,7 +667,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::
                             recentCallParams.ExtensionId() )
                         {
 TFLOGSTRING("TSY: CMmCallMessHandler::ExtFuncL - Custom API call params in use ");
-OstTrace0( TRACE_NORMAL, DUP7_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - Custom API call params in use" );
+OstTrace0( TRACE_NORMAL,  DUP7_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL - Custom API call params in use" );
 
                         // Unpack custom call parameters
                         RMmCustomAPI::TCustomCallParamsPckg* customparamsPckgV1(
@@ -677,7 +683,7 @@ OstTrace0( TRACE_NORMAL, DUP7_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::
                     else if ( RMobileCall::KETelMobileCallParamsV7 == recentCallParams.ExtensionId() )
                         {
 TFLOGSTRING("TSY: CMmCallMessHandler::ExtFuncL - V7 call params in use ");
-OstTrace0( TRACE_NORMAL, DUP8_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - V7 call params in use" );
+OstTrace0( TRACE_NORMAL,  DUP8_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL - V7 call params in use" );
 
                         RMobileCall::TMobileCallParamsV7Pckg* paramsPckgV7(
                             reinterpret_cast<RMobileCall::TMobileCallParamsV7Pckg*>
@@ -694,13 +700,13 @@ OstTrace0( TRACE_NORMAL, DUP8_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::
                         if ( RMobileCall::EOriginatorSIM == recentCallParamsV7.iCallParamOrigin )
                             {
 TFLOGSTRING("TSY: CMmCallMessHandler::ExtFuncL - iNoFdnCheck = ETrue");
-OstTrace0( TRACE_NORMAL, DUP9_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - iNoFdnCheck = ETrue" );
+OstTrace0( TRACE_NORMAL,  DUP9_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL - iNoFdnCheck = ETrue" );
                             iNoFdnCheck = ETrue;
                             }
                         else
                             {
 TFLOGSTRING("TSY: CMmCallMessHandler::ExtFuncL - iNoFdnCheck = EFalse");
-OstTrace0( TRACE_NORMAL, DUP10_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - iNoFdnCheck = EFalse" );
+OstTrace0( TRACE_NORMAL,  DUP10_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL - iNoFdnCheck = EFalse" );
                             iNoFdnCheck = EFalse;
                             }
                         }
@@ -712,7 +718,7 @@ OstTrace0( TRACE_NORMAL, DUP10_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler:
                         }
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL - Cug explicit invoked: %d", recentCallParams.iCug.iExplicitInvoke );
-OstTrace1( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - Cug explicit invoked: %d", recentCallParams.iCug.iExplicitInvoke );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL - Cug explicit invoked: %d", recentCallParams.iCug.iExplicitInvoke );
                     // if CUG is explicitly invoked by
                     // the other entries in this structure will be filled in
                     // function CallPropertySetReq.
@@ -727,12 +733,9 @@ OstTrace1( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::
                         }
                     else
                         {
-    //                    RMobileCall::TMobileCallParamsV1Pckg* callParams( NULL );
-    //                    RMobileCall::TMobileCallInfoV1* callInfo( NULL );
-    //                    aDataPackage->UnPackData( &callParams, &callInfo );
                         iTelNumber = callInfo->iDialledParty.iTelNumber;
 TFLOGSTRING2("TSY: CMmCallMessHandlerExtFuncL - iTelNumber: %S", &iTelNumber);
-OstTraceExt1( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - iTelNumber=%s", iTelNumber );
+OstTraceExt1( TRACE_NORMAL,  DUP6_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL - iTelNumber=%s", iTelNumber );
                         iIdRestrict = recentCallParams.iIdRestrict;
 
                         CallCreateReq();
@@ -854,7 +857,7 @@ OstTraceExt1( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandle
             case ESatNotifySetUpCallPCmd:
                 {
 TFLOGSTRING("TSY: CMmCallMessHandler::ExtFuncL - ESatNotifySetUpCallPCmd");
-OstTrace0( TRACE_NORMAL, DUP11_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL - ESatNotifySetUpCallPCmd" );
+OstTrace0( TRACE_NORMAL,  DUP11_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL - ESatNotifySetUpCallPCmd" );
                 iResourceControlSuppress = ETrue;
                 ret = KErrNone;
                 break;
@@ -862,7 +865,7 @@ OstTrace0( TRACE_NORMAL, DUP11_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler:
             default:
                 {
 TFLOGSTRING2("TSY: CMmCallMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_EXTFUNCL, "CMmCallMessHandler::ExtFuncL; - Unknown IPC=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_EXTFUNCL_TD, "CMmCallMessHandler::ExtFuncL; - Unknown IPC=%d", aIpc );
                 ret = KErrNotSupported;
                 break;
                 }
@@ -909,7 +912,7 @@ void CMmCallMessHandler::CallPropertySetReq(
     const CCallDataPackage* aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallPropertySetReq");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLPROPERTYSETREQ, "CMmCallMessHandler::CallPropertySetReq" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLPROPERTYSETREQ_TD, "CMmCallMessHandler::CallPropertySetReq" );
 
     RMobileCall::TMobileCallParamsV1Pckg* callParams( NULL );
     RMobileCall::TMobileCallInfoV1* callInfo( NULL );
@@ -927,7 +930,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLPROPERTYSETREQ, "CMmCallMessHand
     aCallReq->Set8bit( ISI_HEADER_SIZE + CALL_MODEM_PROPERTY_SET_REQ_OFFSET_SUBBLOCKS, 2 );
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallPropertySetReq - Call Property Info sub block ");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ, "CMmCallMessHandler::CallPropertySetReq - Call Property Info sub block" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ_TD, "CMmCallMessHandler::CallPropertySetReq - Call Property Info sub block" );
 
     // Initialize message offset
     TInt currentMsgOffset(
@@ -950,7 +953,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ, "CMmCallMes
     currentMsgOffset = currentMsgOffset + SIZE_CALL_MODEM_SB_PROPERTY_INFO;
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallPropertySetReq - Call Modem Cug Info sub block ");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ, "CMmCallMessHandler::CallPropertySetReq - Call Modem Cug Info sub block" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ_TD, "CMmCallMessHandler::CallPropertySetReq - Call Modem Cug Info sub block" );
 
     // Create call GSM CUG info subblock
     TBuf8< SIZE_CALL_MODEM_SB_CUG_INFO > callGsmCugInfoBuf;
@@ -984,7 +987,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ, "CMmCallMes
         }
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallPropertySetReq - Cug Index copy 16 to 8 ");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ, "CMmCallMessHandler::CallPropertySetReq - Cug Index copy 16 to 8" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ_TD, "CMmCallMessHandler::CallPropertySetReq - Cug Index copy 16 to 8" );
 
     callGsmCugInfoBuf.Append( static_cast<TUint8>( cugIndex >> KShiftByOneByte ) );
     callGsmCugInfoBuf.Append( static_cast<TUint8>( cugIndex ) );
@@ -999,7 +1002,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ, "CMmCallMes
 
     iTelNumber = callInfo->iDialledParty.iTelNumber;
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallPropertySetReq - iTelNumber: %S", &iTelNumber);
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ, "CMmCallMessHandler::CallPropertySetReq - iTelNumber=%S", iTelNumber );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_CALLPROPERTYSETREQ_TD, "CMmCallMessHandler::CallPropertySetReq - iTelNumber=%S", iTelNumber );
     iIdRestrict = recentCallParams.iIdRestrict;
     }
 
@@ -1016,7 +1019,7 @@ void CMmCallMessHandler::CallPropertySetResp(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallPropertySetResp");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLPROPERTYSETRESP, "CMmCallMessHandler::CallPropertySetResp" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLPROPERTYSETRESP_TD, "CMmCallMessHandler::CallPropertySetResp" );
 
     // Create call property get response
     // if property set request fails, complete dial
@@ -1101,7 +1104,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLPROPERTYSETRESP, "CMmCallMessHan
 TInt CMmCallMessHandler::CallCreateReq()
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallCreateReq");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCREATEREQ, "CMmCallMessHandler::CallCreateReq" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLCREATEREQ_TD, "CMmCallMessHandler::CallCreateReq" );
 
     TIsiSend isimsg( iPhoNetSender->SendBufferDes() );
     isimsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_MODEM_CALL );
@@ -1164,7 +1167,7 @@ void CMmCallMessHandler::CallCreateResp(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallCreateResp");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCREATERESP, "CMmCallMessHandler::CallCreateResp" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLCREATERESP_TD, "CMmCallMessHandler::CallCreateResp" );
 
     TUint sbStartOffSet( 0 );
 
@@ -1312,7 +1315,7 @@ void CMmCallMessHandler::EmergencyCallCreateReq(
     TIsiSend* aCallReq )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::EmergencyCallCreateReq");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_EMERGENCYCALLCREATEREQ, "CMmCallMessHandler::EmergencyCallCreateReq" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_EMERGENCYCALLCREATEREQ_TD, "CMmCallMessHandler::EmergencyCallCreateReq" );
 
     // (TAN) Save the call mode of the latest CALL_MODEM_CREATE_REQ. This is
     // used when CALL_MODEM_CREATE_RESP is received and message handler should
@@ -1352,7 +1355,7 @@ RMobileCall::TMobileCallStatus CMmCallMessHandler::MapCallStatus(
     TUint8 aCallStatus )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::MapCallStatus");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_MAPCALLSTATUS, "CMmCallMessHandler::MapCallStatus" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_MAPCALLSTATUS_TD, "CMmCallMessHandler::MapCallStatus" );
 
     RMobileCall::TMobileCallStatus symbianStatus( RMobileCall::EStatusUnknown );
 
@@ -1442,7 +1445,7 @@ void CMmCallMessHandler::CallAnswerResp(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallAnswerResp");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLANSWERRESP, "CMmCallMessHandler::CallAnswerResp" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLANSWERRESP_TD, "CMmCallMessHandler::CallAnswerResp" );
 
     TUint sbStartOffSet( 0 );
 
@@ -1507,7 +1510,7 @@ void CMmCallMessHandler::CallReleaseReq(
     const CCallDataPackage* aDataPackage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallReleaseReq");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLRELEASEREQ, "CMmCallMessHandler::CallReleaseReq" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLRELEASEREQ_TD, "CMmCallMessHandler::CallReleaseReq" );
 
     TUint8 cause( KCallCauseNoCause );
     TInt symbianCauseValue( KErrNone );
@@ -1602,7 +1605,7 @@ void CMmCallMessHandler::CallReleaseResp(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallReleaseResp");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLRELEASERESP, "CMmCallMessHandler::CallReleaseResp" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLRELEASERESP_TD, "CMmCallMessHandler::CallReleaseResp" );
 
     TUint8 causeType( 0 );
     TUint8 causeValue( KCallCauseNoCause );
@@ -1662,7 +1665,7 @@ void CMmCallMessHandler::CallReleaseInd(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallReleaseInd");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLRELEASEIND, "CMmCallMessHandler::CallReleaseInd" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLRELEASEIND_TD, "CMmCallMessHandler::CallReleaseInd" );
 
     TUint sbStartOffSet( 0 );
 
@@ -1711,7 +1714,7 @@ void CMmCallMessHandler::CallTerminatedInd(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallTerminatedInd");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLTERMINATEDIND, "CMmCallMessHandler::CallTerminatedInd" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLTERMINATEDIND_TD, "CMmCallMessHandler::CallTerminatedInd" );
 
     TUint sbStartOffSet( 0 );
 
@@ -1745,7 +1748,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLTERMINATEDIND, "CMmCallMessHandl
         sbStartOffSet ) )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallTerminatedInd, DSAC: call was rejected because of barred CS");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLTERMINATEDIND, "CMmCallMessHandler::CallTerminatedInd, DSAC: call was rejected because of barred CS" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CALLTERMINATEDIND_TD, "CMmCallMessHandler::CallTerminatedInd, DSAC: call was rejected because of barred CS" );
         // Save error code. It is completed when CALL_STATUS_IND is received.
         iGsmMmCauseError = CMmStaticUtility::EpocErrorCode(
             KErrGeneral, KErrGsmCSConnectionBarred );
@@ -1766,7 +1769,7 @@ void CMmCallMessHandler::CallControlReq(
     {
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallControlReq. Ipc:%d",aIpc);
-OstTrace1( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCONTROLREQ, "CMmCallMessHandler::CallControlReq;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLCONTROLREQ_TD, "CMmCallMessHandler::CallControlReq;aIpc=%d", aIpc );
 
     TUint8 operation( 0 );
 
@@ -1800,7 +1803,7 @@ OstTrace1( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCONTROLREQ, "CMmCallMessHandler:
         default:
             {
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallControlReq - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLCONTROLREQ, "CMmCallMessHandler::CallControlReq - Unknown aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CALLCONTROLREQ_TD, "CMmCallMessHandler::CallControlReq - Unknown aIpc=%d", aIpc );
             break;
             }
         }
@@ -1843,7 +1846,7 @@ void CMmCallMessHandler::GetCallCreateReqSubBlock(
     TInt& aCurrentMsgOffset )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock" );
 
     iDestPostAddressIncluded = EFalse;
 
@@ -1866,7 +1869,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMe
     aNumOfSbInMsg++;
 
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_MODE CREATED");
-    OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_MODE CREATED" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_MODE CREATED" );
 
     if ( CALL_MODEM_MODE_EMERGENCY == aMode && 0 < aTelNumber.Length() )
         {
@@ -1900,11 +1903,33 @@ TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_M
         aNumOfSbInMsg++;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_DESTINATION_ADDRESS - Subblock Count:  %d", aNumOfSbInMsg );
-OstTraceExt1( TRACE_NORMAL, DUP17_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_SB_DESTINATION_ADDRESS - Subblock Count=%hhu", aNumOfSbInMsg );
+OstTraceExt1( TRACE_NORMAL,  DUP17_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_SB_DESTINATION_ADDRESS - Subblock Count=%hhu", aNumOfSbInMsg );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - emergDestAddress: %S", &aTelNumber);
-OstTraceExt1( TRACE_NORMAL, DUP18_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock;emergDestAddress=%S", aTelNumber );
+OstTraceExt1( TRACE_NORMAL,  DUP18_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock;emergDestAddress=%S", aTelNumber );
 
+        // Emergency number checking by Call Server is always disabled when
+        // call mode is set straight as emergency by the client.
+        TBuf8<SIZE_CALL_MODEM_SB_CHECK_INFO> checkInfoBuf;
+
+        TIsiSubBlock checkInfoSb(
+            checkInfoBuf,
+            CALL_MODEM_SB_CHECK_INFO,
+            EIsiSubBlockTypeId8Len8 );
+
+        checkInfoBuf.Append( CALL_MODEM_CHK_DISABLE_EMERG );
+        checkInfoBuf.Append( KCallPadding );
+
+        aCallIsiMsg.CopyData(
+            aCurrentMsgOffset, checkInfoSb.CompleteSubBlock() );
+
+        // Set new offset and increase subblock count
+        aCurrentMsgOffset =
+            aCurrentMsgOffset + checkInfoBuf.Length();
+        aNumOfSbInMsg++;
+
+TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_CHECK_INFO - Subblock Count:  %d", aNumOfSbInMsg );
+OstTraceExt1( TRACE_NORMAL,  DUP22_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock;aNumOfSbInMsg=%hhu", aNumOfSbInMsg );
         }
 
     else if ( CALL_MODEM_MODE_EMERGENCY != aMode && 0 < aTelNumber.Length() )
@@ -1914,7 +1939,7 @@ OstTraceExt1( TRACE_NORMAL, DUP18_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "
         TUint8 presentationInd( CALL_MODEM_PRESENT_DEFAULT );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - aIdRestrict: %d", aIdRestrict);
-OstTrace1( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock;aIdRestrict=%d", aIdRestrict );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock;aIdRestrict=%d", aIdRestrict );
 
         if ( KTelephonyNumberMaxLength < telNumLength )
             {
@@ -1967,13 +1992,13 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmC
                 {
                 presentationInd = CALL_MODEM_PRESENT_ALLOWED;
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by PREFIX = CALL_MODEM_PRESENT_ALLOWED");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by PREFIX = CALL_MODEM_PRESENT_ALLOWED" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by PREFIX = CALL_MODEM_PRESENT_ALLOWED" );
                 }
             else if ( '#' == ( aTelNumber )[0] )
                 {
                 presentationInd = CALL_MODEM_PRESENT_RESTRICTED;
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by PREFIX = CALL_MODEM_PRESENT_RESTRICTED");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by PREFIX = CALL_MODEM_PRESENT_RESTRICTED" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by PREFIX = CALL_MODEM_PRESENT_RESTRICTED" );
                 }
             }
         else
@@ -1985,14 +2010,14 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmC
                     {
                     presentationInd = CALL_MODEM_PRESENT_ALLOWED; //0x01
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by aIdRestrict = CALL_MODEM_PRESENT_ALLOWED");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by aIdRestrict = CALL_MODEM_PRESENT_ALLOWED" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by aIdRestrict = CALL_MODEM_PRESENT_ALLOWED" );
                     break;
                     }
                 case RMobileCall::EDontSendMyId:
                     {
                     presentationInd = CALL_MODEM_PRESENT_RESTRICTED; //0x02
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by aIdRestrict = CALL_MODEM_PRESENT_RESTRICTED");
-OstTrace0( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by aIdRestrict = CALL_MODEM_PRESENT_RESTRICTED" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by aIdRestrict = CALL_MODEM_PRESENT_RESTRICTED" );
                     break;
                     }
                 case RMobileCall::EIdRestrictDefault:
@@ -2000,7 +2025,7 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmC
                     {
                     presentationInd = CALL_MODEM_PRESENT_DEFAULT; //0x00
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by aIdRestrict = CALL_MODEM_PRESENT_DEFAULT");
-OstTrace0( TRACE_NORMAL, DUP7_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by aIdRestrict = CALL_MODEM_PRESENT_DEFAULT" );
+OstTrace0( TRACE_NORMAL,  DUP7_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock -- presentationInd by aIdRestrict = CALL_MODEM_PRESENT_DEFAULT" );
                     break;
                     }
                 }
@@ -2010,7 +2035,7 @@ OstTrace0( TRACE_NORMAL, DUP7_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmC
             {
 
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock -- Create line id sub block");
-OstTrace0( TRACE_NORMAL, DUP8_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock -- Create line id sub block" );
+OstTrace0( TRACE_NORMAL,  DUP8_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock -- Create line id sub block" );
 // Create CALL_MODEM_SB_LINE_ID subblock.
 
             TBuf8<SIZE_CALL_MODEM_SB_LINE_ID> lineIdBuf( 0 );
@@ -2031,7 +2056,7 @@ OstTrace0( TRACE_NORMAL, DUP8_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmC
             aNumOfSbInMsg++;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_LINE_ID - Subblock Count:  %d", aNumOfSbInMsg );
-OstTrace1( TRACE_NORMAL, DUP19_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_LINE_ID - Subblock Count:%d", aNumOfSbInMsg );
+OstTrace1( TRACE_NORMAL,  DUP19_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_LINE_ID - Subblock Count:%d", aNumOfSbInMsg );
 
             }
         // No else
@@ -2098,10 +2123,10 @@ OstTrace1( TRACE_NORMAL, DUP19_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMm
         aNumOfSbInMsg++;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_DESTINATION_ADDRESS - Subblock Count:  %d", aNumOfSbInMsg );
-OstTraceExt1( TRACE_NORMAL, DUP10_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_SB_DESTINATION_ADDRESS - Subblock Count=%hhu", aNumOfSbInMsg );
+OstTraceExt1( TRACE_NORMAL,  DUP10_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_SB_DESTINATION_ADDRESS - Subblock Count=%hhu", aNumOfSbInMsg );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - destAddress: %S", &destAddress);
-OstTraceExt1( TRACE_NORMAL, DUP16_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock;destAddress=%S", destAddress );
+OstTraceExt1( TRACE_NORMAL,  DUP16_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock;destAddress=%S", destAddress );
 
         if ( preAddressSupported )
             {
@@ -2136,7 +2161,7 @@ OstTraceExt1( TRACE_NORMAL, DUP16_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "
             aNumOfSbInMsg++;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_DESTINATION_PRE_ADDRESS - Subblock Count:  %d", aNumOfSbInMsg );
-OstTraceExt1( TRACE_NORMAL, DUP11_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_DESTINATION_PRE_ADDRESS - Subblock Count=%hhu", aNumOfSbInMsg );
+OstTraceExt1( TRACE_NORMAL,  DUP11_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_DESTINATION_PRE_ADDRESS - Subblock Count=%hhu", aNumOfSbInMsg );
             }
         // No else
 
@@ -2179,7 +2204,7 @@ OstTraceExt1( TRACE_NORMAL, DUP11_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "
             iDestPostAddressIncluded = ETrue;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock  - CALL_MODEM_DESTINATION_POST_ADDRESS - Subblock Count:  %d", aNumOfSbInMsg );
-OstTraceExt1( TRACE_NORMAL, DUP14_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_DESTINATION_POST_ADDRESS - Subblock Count=%hhu", aNumOfSbInMsg );
+OstTraceExt1( TRACE_NORMAL,  DUP14_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_DESTINATION_POST_ADDRESS - Subblock Count=%hhu", aNumOfSbInMsg );
             }
         // No else
 
@@ -2187,7 +2212,7 @@ OstTraceExt1( TRACE_NORMAL, DUP14_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "
         if ( 0 < iUusData.iUUI.Length() && 0 != iUusData.iServiceReq )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock. Creating sb for UUS signaling");
-OstTrace0( TRACE_NORMAL, DUP12_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock. Creating sb for UUS signaling" );
+OstTrace0( TRACE_NORMAL,  DUP12_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock. Creating sb for UUS signaling" );
 
             TBuf8<KUserToUserSbMaxLength> userToUserBuf;
             TBool validServiceType( ETrue );
@@ -2211,7 +2236,7 @@ OstTrace0( TRACE_NORMAL, DUP12_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMm
                     {
                     validServiceType = EFalse;
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock. switch UUS type case default. Illegal service req!");
-OstTrace0( TRACE_NORMAL, DUP13_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock. Switch UUS type case default. Illegal service req!" );
+OstTrace0( TRACE_NORMAL,  DUP13_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock. Switch UUS type case default. Illegal service req!" );
                     break;
                     }
                 }
@@ -2239,7 +2264,7 @@ OstTrace0( TRACE_NORMAL, DUP13_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMm
                 aNumOfSbInMsg++;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_USER_TO_USER - Subblock Count: %d", aNumOfSbInMsg );
-                OstTraceExt1( TRACE_NORMAL, DUP15_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_SB_USER_TO_USER - Subblock Count=%hhu", aNumOfSbInMsg );
+                OstTraceExt1( TRACE_NORMAL,  DUP15_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock- CALL_MODEM_SB_USER_TO_USER - Subblock Count=%hhu", aNumOfSbInMsg );
                 }
 
             // Reset data
@@ -2250,7 +2275,7 @@ TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_
         if ( iNoFdnDial || iNoFdnCheck )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock -- Create check info sub block");
-OstTrace0( TRACE_NORMAL, DUP9_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock -- Create check info sub block" );
+OstTrace0( TRACE_NORMAL,  DUP9_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock -- Create check info sub block" );
 
             // Create CALL_MODEM_SB_LINE_ID subblock.
 
@@ -2273,14 +2298,14 @@ OstTrace0( TRACE_NORMAL, DUP9_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmC
             aNumOfSbInMsg++;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_CHECK_INFO - Subblock Count:  %d", aNumOfSbInMsg );
-OstTraceExt1( TRACE_NORMAL, DUP21_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_CHECK_INFO - Subblock Count=%hhu", aNumOfSbInMsg );
+OstTraceExt1( TRACE_NORMAL,  DUP21_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock - CALL_MODEM_SB_CHECK_INFO - Subblock Count=%hhu", aNumOfSbInMsg );
 
             }
 
         if ( iResourceControlSuppress )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCallCreateReqSubBlock - suppressing resource control for this call");
-OstTrace0( TRACE_NORMAL, DUP20_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK, "CMmCallMessHandler::GetCallCreateReqSubBlock - suppressing resource control for this call" );
+OstTrace0( TRACE_NORMAL,  DUP20_CMMCALLMESSHANDLER_GETCALLCREATEREQSUBBLOCK_TD, "CMmCallMessHandler::GetCallCreateReqSubBlock - suppressing resource control for this call" );
             TBuf8<SIZE_CALL_MODEM_SB_RESOURCE_CHECK_INFO> buffer;
             TIsiSubBlock resourceCheckSb(
                 buffer,
@@ -2313,7 +2338,7 @@ void CMmCallMessHandler::CallControlResp(
     const TIsiReceiveC &aIsiMessage ) const
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallControlResp");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCONTROLRESP, "CMmCallMessHandler::CallControlResp" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLCONTROLRESP_TD, "CMmCallMessHandler::CallControlResp" );
 
     TUint sbStartOffSet( 0 );
 
@@ -2391,7 +2416,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCONTROLRESP, "CMmCallMessHandler
                 default:
                     {
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallControlResp - Not supported operation: %d", operation);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLCONTROLRESP, "CMmCallMessHandler::CallControlResp - Not supported operation=%hhu", operation );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CALLCONTROLRESP_TD, "CMmCallMessHandler::CallControlResp - Not supported operation=%hhu", operation );
                     break;
                     }
                 }
@@ -2436,7 +2461,7 @@ void CMmCallMessHandler::GetSatOriginatedSubBlocks(
     TInt& aCurrentMsgOffset ) const
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::GetSatOriginatedSubBlocks");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_GETSATORIGINATEDSUBBLOCKS, "TSY: CMmCallMessHandler::GetSatOriginatedSubBlocks" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_GETSATORIGINATEDSUBBLOCKS_TD, "TSY: CMmCallMessHandler::GetSatOriginatedSubBlocks" );
 
     //Creates sub address sub block
     if ( 0 != iSubAddress.Length() )
@@ -2500,7 +2525,7 @@ void CMmCallMessHandler::GetSatOriginatedSubBlocks(
     TInt& aCurrentMsgOffset ) const
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::GetSatOriginatedSubBlocks");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_GETSATORIGINATEDSUBBLOCKS, "CMmCallMessHandler::GetSatOriginatedSubBlocks" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_GETSATORIGINATEDSUBBLOCKS_TD, "CMmCallMessHandler::GetSatOriginatedSubBlocks" );
 
     // Creates sub address sub block
     if ( 0 != aSubAddress.Length() )
@@ -2578,7 +2603,7 @@ void CMmCallMessHandler::CallControlInd(
             & KMaskBits1to3 ) );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallControlInd, CallID: %d", callId);
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCONTROLIND, "CMmCallMessHandler::CallControlInd" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLCONTROLIND_TD, "CMmCallMessHandler::CallControlInd" );
 
     TUint8 callOperation( 0 );
     TUint sbStartOffSet( 0 );
@@ -2650,7 +2675,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCONTROLIND, "CMmCallMessHandler:
             default:
                 {
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallControlInd - Not supported operation: %d", operation);
-OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLCONTROLIND, "CMmCallMessHandler::CallControlInd - Not supported operation=%d", operation );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CALLCONTROLIND_TD, "CMmCallMessHandler::CallControlInd - Not supported operation=%d", operation );
                 break;
                 }
             }
@@ -2700,7 +2725,7 @@ void CMmCallMessHandler::CallGsmNotificationInd(
             & KMaskBits1to3 ) );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallGsmNotificationInd. CallId:%d",callId);
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCallMessHandler::CallGsmNotificationInd" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCallMessHandler::CallGsmNotificationInd" );
 
     CCallDataPackage callDataPackage;
 
@@ -2903,7 +2928,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCallMess
         sbStartOffSet ) )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallGsmNotificationInd: CALL_MODEM_SB_ORIGIN_INFO subblock");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLGSMNOTIFICATIONIND, "CMmCallMessHandler::CallGsmNotificationInd - CALL_MODEM_SB_ORIGIN_INFO subblock" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CALLGSMNOTIFICATIONIND_TD, "CMmCallMessHandler::CallGsmNotificationInd - CALL_MODEM_SB_ORIGIN_INFO subblock" );
 
         TBuf16<RMobileCall::KCallingNameSize> targetOrigName;
         CCallDataPackage callData;
@@ -2958,7 +2983,7 @@ void CMmCallMessHandler::FillModeData(
     TUint8 aIsiCallMode ) const
     {
 TFLOGSTRING2("TSY: CMmCallMessHandler::FillModeData. callmode:%d",aIsiCallMode);
-OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_FILLMODEDATA, "CMmCallMessHandler::FillModeData;aIsiCallMode=%hhu", aIsiCallMode );
+OstTraceExt1( TRACE_NORMAL,  CMMCALLMESSHANDLER_FILLMODEDATA_TD, "CMmCallMessHandler::FillModeData;aIsiCallMode=%hhu", aIsiCallMode );
 
     // Set service and alternating call mode in iMobileCallInfo
     mobileCallInfo.iAlternatingCall =
@@ -2996,7 +3021,7 @@ OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_FILLMODEDATA, "CMmCallMessHandler
         default:
             {
             TFLOGSTRING2("TSY: CMmCallMessHandler::FillModeData - Not supported ISA call mode: %d", aIsiCallMode);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_FILLMODEDATA, "CMmCallMessHandler::FillModeData - Not supported ISA call mode=%hhu", aIsiCallMode );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_FILLMODEDATA_TD, "CMmCallMessHandler::FillModeData - Not supported ISA call mode=%hhu", aIsiCallMode );
             break;
             }
         }
@@ -3019,13 +3044,13 @@ void CMmCallMessHandler::FillNumberPlanAndType(
     TUint nbrplan( aOrigAddressType & KMaskBits1to4 );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::FillNumberPlanAndType. nbrplan (mask KMaskBits1to4) : %d",nbrplan);
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_FILLNUMBERPLANANDTYPE, "CMmCallMessHandler::FillNumberPlanAndType" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_FILLNUMBERPLANANDTYPE_TD, "CMmCallMessHandler::FillNumberPlanAndType" );
 
     if ( RMobilePhone::EUnknownNumberingPlan ==
         aMobileCallInfo.iRemoteParty.iRemoteNumber.iNumberPlan )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::FillNumberPlanAndType. EUnknownNumberingPlan");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_FILLNUMBERPLANANDTYPE, "CMmCallMessHandler::FillNumberPlanAndType - EUnknownNumberingPlan" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_FILLNUMBERPLANANDTYPE_TD, "CMmCallMessHandler::FillNumberPlanAndType - EUnknownNumberingPlan" );
 
         if ( CALL_MODEM_NBR_PLAN_UNKNOWN == nbrplan )
             {
@@ -3085,13 +3110,13 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_FILLNUMBERPLANANDTYPE, "CMmCall
     TUint nbrtype( aOrigAddressType & KMaskBits5to7 );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::FillNumberPlanAndType. nbrplan (mask KMaskBits5to7) : %d",nbrtype);
-OstTrace1( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_FILLNUMBERPLANANDTYPE, "CMmCallMessHandler::FillNumberPlanAndType - nbrplan (mask KMaskBits5to7) nbrtype=%d", nbrtype );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_FILLNUMBERPLANANDTYPE_TD, "CMmCallMessHandler::FillNumberPlanAndType - nbrplan (mask KMaskBits5to7) nbrtype=%d", nbrtype );
 
     if ( RMobilePhone::EUnknownNumber ==
         aMobileCallInfo.iRemoteParty.iRemoteNumber.iTypeOfNumber )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::FillNumberPlanAndType. EUnknownNumber");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_FILLNUMBERPLANANDTYPE, "CMmCallMessHandler::FillNumberPlanAndType - EUnknownNumber" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_FILLNUMBERPLANANDTYPE_TD, "CMmCallMessHandler::FillNumberPlanAndType - EUnknownNumber" );
 
         if ( CALL_MODEM_NBR_TYPE_UNKNOWN == nbrtype )
             {
@@ -3147,7 +3172,7 @@ void CMmCallMessHandler::FillRemoteStatusAndNumber(
     RMobileCall::TMobileCallDirection aDirection ) const
     {
 TFLOGSTRING3("TSY: CMmCallMessHandler::FillRemoteStatusAndNumber. OrigAdr: %S. CallDirection:%d", &aOrigAddress, aDirection);
-OstTraceExt2( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER, "CMmCallMessHandler::FillRemoteStatusAndNumber;OrigAddr=%S;CallDirection=%d", aOrigAddress, aDirection );
+OstTraceExt2( TRACE_NORMAL,  DUP5_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER_TD, "CMmCallMessHandler::FillRemoteStatusAndNumber;OrigAddr=%S;CallDirection=%d", aOrigAddress, aDirection );
 
     // Find out if telephone number is allowed to be presented.
     if ( RMobileCall::ERemoteIdentityUnknown ==
@@ -3158,7 +3183,7 @@ OstTraceExt2( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER, "
                 || CALL_MODEM_PRESENTATION_ALLOWED == aOrigPresentInd && RMobileCall::EMobileTerminated == aDirection)
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::FillRemoteStatusAndNumber. CPN_ALLOWED");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER, "CMmCallMessHandler::FillRemoteStatusAndNumber - CPN_ALLOWED" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER_TD, "CMmCallMessHandler::FillRemoteStatusAndNumber - CPN_ALLOWED" );
 
             // Available. iRemoteIdStatus is updated using the tel number
             // presentation status. Remote name does not affect to it, Symbian's
@@ -3178,7 +3203,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER, "CMmCallM
                   aDirection == RMobileCall::EMobileTerminated )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::FillRemoteStatusAndNumber. CPN_RESTRICTED & MT call");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER, "CMmCallMessHandler::FillRemoteStatusAndNumber - CPN_RESTRICTED and MT call" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER_TD, "CMmCallMessHandler::FillRemoteStatusAndNumber - CPN_RESTRICTED and MT call" );
 
             // There are cases when remote party info should still be presented.
             // See TSW ActionDB, Notes ID: MB03081534698
@@ -3192,7 +3217,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER, "CMm
         else // CPN_NOT_AVAILABLE or CPN_RESTRICTED & MO
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::FillRemoteStatusAndNumber. CPN_NOT_AVAILABLE or CPN_RESTRICTED & MO ");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER, "CMmCallMessHandler::FillRemoteStatusAndNumber - CPN_NOT_AVAILABLE or CPN_RESTRICTED and MO" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER_TD, "CMmCallMessHandler::FillRemoteStatusAndNumber - CPN_NOT_AVAILABLE or CPN_RESTRICTED and MO" );
 
             if ( CALL_MODEM_PRESENT_RESTRICTED == aOrigPresentInd &&
                  RMobileCall::EMobileOriginated == aDirection )
@@ -3203,7 +3228,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER, "CMm
             else
                 {
 TFLOGSTRING("TSY: CMmCallMessHandler::FillRemoteStatusAndNumber. OrigPresentInd is unknown");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER, "CMmCallMessHandler::FillRemoteStatusAndNumber - OrigPresentInd is unknown" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_FILLREMOTESTATUSANDNUMBER_TD, "CMmCallMessHandler::FillRemoteStatusAndNumber - OrigPresentInd is unknown" );
                 // Unknown
                 aMobileCallInfo.iRemoteParty.iRemoteIdStatus =
                     RMobileCall::ERemoteIdentityUnknown;
@@ -3238,7 +3263,7 @@ void CMmCallMessHandler::FillCallingName(
     const TDes16& aOrigInfoName ) const
     {
 TFLOGSTRING3("TSY: CMmCallMessHandler::FillCallingName. aOrigInfoPresentInd:%d, origInfoName:%s", aOrigInfoPresentInd,&aOrigInfoName);
-OstTraceExt2( TRACE_NORMAL, CMMCALLMESSHANDLER_FILLCALLINGNAME, "CMmCallMessHandler::FillCallingName;aOrigInfoPresentInd=%hhu;aOrigInfoName=%S", aOrigInfoPresentInd, aOrigInfoName );
+OstTraceExt2( TRACE_NORMAL,  CMMCALLMESSHANDLER_FILLCALLINGNAME_TD, "CMmCallMessHandler::FillCallingName;aOrigInfoPresentInd=%hhu;aOrigInfoName=%S", aOrigInfoPresentInd, aOrigInfoName );
 
     // Find out if name is availble and can be presented.
     if ( CALL_MODEM_PRESENTATION_ALLOWED == aOrigInfoPresentInd &&
@@ -3266,7 +3291,7 @@ void CMmCallMessHandler::CallStatusIndL(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL" );
 
     TUint8 callStatusISA( 0xFF );
     TUint8 callModeISA( 0xFF );
@@ -3299,7 +3324,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler:
             sbStartOffSet + CALL_MODEM_SB_STATUS_OFFSET_STATUS );
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_STATUS subblock");
-        OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_STATUS subblock" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_STATUS subblock" );
         }
         // No else
 
@@ -3326,7 +3351,7 @@ TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_STATUS subbl
             sbStartOffSet + CALL_MODEM_SB_MODE_OFFSET_MODE );
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_MODE subblock");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_MODE subblock" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_MODE subblock" );
 
         FillModeData( mobileCallInfo, callModeISA );
         mobileCallInfo.iValid |= RMobileCall::KCallEmergency;
@@ -3340,7 +3365,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHan
         ResetIncomingCallInfo( iIncomingCallInfo );
         }
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:Normal completion of call status ind (no termination of calls which haven't been indicated to CTSY yet)");
-OstTrace0( TRACE_NORMAL, DUP20_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL:Normal completion of call status ind (no termination of calls which haven't been indicated to CTSY yet)" );
+OstTrace0( TRACE_NORMAL,  DUP20_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL:Normal completion of call status ind (no termination of calls which haven't been indicated to CTSY yet)" );
 
     // Create call package (used for all completions)
     CCallDataPackage callData;
@@ -3361,7 +3386,7 @@ OstTrace0( TRACE_NORMAL, DUP20_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHa
         {
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: Receive UUI.");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: Receive UUI" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: Receive UUI" );
 
         // Get data length
         TUint8 userToUserDataLen( aIsiMessage.Get8bit(
@@ -3406,7 +3431,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHan
             sbStartOffSet ) )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_REDIRECTING_ADDRESS subblock");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_REDIRECTING_ADDRESS subblock" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_REDIRECTING_ADDRESS subblock" );
 
             // Get address length
             TUint8 redirectingAddressLength( aIsiMessage.Get8bit(
@@ -3433,7 +3458,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHan
             sbStartOffSet ))
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_LINE_ID subblock");
-OstTrace0( TRACE_NORMAL, DUP21_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_LINE_ID subblock" );
+OstTrace0( TRACE_NORMAL,  DUP21_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_LINE_ID subblock" );
 
             origPresentInd = aIsiMessage.Get8bit(
                 sbStartOffSet + CALL_MODEM_SB_LINE_ID_OFFSET_LINEID );
@@ -3446,7 +3471,7 @@ OstTrace0( TRACE_NORMAL, DUP21_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHa
             sbStartOffSet ) )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_DESTINATION_ADDRESS subblock");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_DESTINATION_ADDRESS subblock" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_DESTINATION_ADDRESS subblock" );
             ReadAllAddressDestination(
                  mobileCallInfo,
                  targetOrig,
@@ -3461,7 +3486,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHan
             sbStartOffSet ) )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_CONNECTED_ADDRESS subblock");
-OstTrace0( TRACE_NORMAL, DUP19_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_CONNECTED_ADDRESS subblock" );
+OstTrace0( TRACE_NORMAL,  DUP19_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_CONNECTED_ADDRESS subblock" );
             ReadAllAddressConnected(
                 mobileCallInfo,
                 targetOrig,
@@ -3488,7 +3513,7 @@ OstTrace0( TRACE_NORMAL, DUP19_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHa
                 sbStartOffSet ) )
                 {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_ORIGIN_INFO subblock");
-OstTrace0( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_ORIGIN_INFO subblock" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_ORIGIN_INFO subblock" );
 
                 ReadCallInfo(
                     mobileCallInfo,
@@ -3506,7 +3531,7 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHan
                 sbStartOffSet ) )
                 {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_CAUSE subblock");
-OstTrace0( TRACE_NORMAL, DUP7_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_CAUSE subblock" );
+OstTrace0( TRACE_NORMAL,  DUP7_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_CAUSE subblock" );
 
                 // Get cause type and value
                 causeType = aIsiMessage.Get8bit(
@@ -3532,7 +3557,7 @@ OstTrace0( TRACE_NORMAL, DUP7_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHan
                     sbStartOffSet ) )
                     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:CALL_MODEM_SB_DESTINATION_POST_ADDRESS");
-OstTrace0( TRACE_NORMAL, DUP8_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_DESTINATION_POST_ADDRESS" );
+OstTrace0( TRACE_NORMAL,  DUP8_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: CALL_MODEM_SB_DESTINATION_POST_ADDRESS" );
 
                     // Get address length
                     TUint8 destinationPostAddressLength( aIsiMessage.Get8bit(
@@ -3547,7 +3572,7 @@ OstTrace0( TRACE_NORMAL, DUP8_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHan
                     if ( ( KDestPostAddressMaxLength * 2 ) >= postAddr.Length() )
                         {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:lenght less than 15 char");
-OstTrace0( TRACE_NORMAL, DUP9_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: Lenght less than 15 char" );
+OstTrace0( TRACE_NORMAL,  DUP9_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: Lenght less than 15 char" );
                         // Copy 8-bit name to the 16-bit target using correct endianess
                         TIsiUtility::CopyFromBigEndian(
                             postAddr,
@@ -3565,7 +3590,7 @@ OstTrace0( TRACE_NORMAL, DUP9_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHan
                             if ( 'w' == iDestPostAddress[ i ] )
                                 {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:w found");
-OstTrace0( TRACE_NORMAL, DUP10_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: w found" );
+OstTrace0( TRACE_NORMAL,  DUP10_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: w found" );
                                 iDestPostAddress.SetLength( 0 );
                                 iDtmfPostAddressCallId = 0;
                                 break;
@@ -3577,9 +3602,9 @@ OstTrace0( TRACE_NORMAL, DUP10_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHa
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallStatusIndL:callStatusISA: %d", callStatusISA);
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallStatusIndL:mobileCallInfo.iCallId: %d", mobileCallInfo.iCallId);
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallStatusIndL:iDtmfPostAddressCallId: %d", iDtmfPostAddressCallId);
-OstTraceExt1( TRACE_NORMAL, DUP11_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL;callStatusISA=%hhu", callStatusISA );
-OstTraceExt1( TRACE_NORMAL, DUP13_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL;mobileCallInfo.iCallId=%hhu", mobileCallInfo.iCallId );
-OstTraceExt1( TRACE_NORMAL, DUP12_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL;iDtmfPostAddressCallId=%hhu", iDtmfPostAddressCallId );
+OstTraceExt1( TRACE_NORMAL,  DUP11_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL;callStatusISA=%hhu", callStatusISA );
+OstTraceExt1( TRACE_NORMAL,  DUP13_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL;mobileCallInfo.iCallId=%hhu", mobileCallInfo.iCallId );
+OstTraceExt1( TRACE_NORMAL,  DUP12_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL;iDtmfPostAddressCallId=%hhu", iDtmfPostAddressCallId );
 
                 // When call is active, send post address
                 // DTMF sending in case this is SIMATK call
@@ -3588,7 +3613,7 @@ OstTraceExt1( TRACE_NORMAL, DUP12_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMes
                     0 < iDtmfPostAddressCallId )
                     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:Dtmf post address sending (ACTIVE)");
-OstTrace0( TRACE_NORMAL, DUP17_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL, Dtmf post address sending (ACTIVE)" );
+OstTrace0( TRACE_NORMAL,  DUP17_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL, Dtmf post address sending (ACTIVE)" );
                     iDtmfMessHandler->SendPostAddressL ( &iDestPostAddress );
 
                     // Reset iDestPostAddress and iDtmfPostAddressCallId to prevent multiple
@@ -3604,13 +3629,13 @@ OstTrace0( TRACE_NORMAL, DUP17_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHa
                     0 < iDtmfPostAddressCallId )
                     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallStatusIndL:If call fails for some reason (IDLE)");
-OstTrace0( TRACE_NORMAL, DUP14_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL: If call fails for some reason (IDLE)" );
+OstTrace0( TRACE_NORMAL,  DUP14_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL: If call fails for some reason (IDLE)" );
                     iDestPostAddress.SetLength( 0 );
                     iDtmfPostAddressCallId = 0;
                     }
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallStatusIndL:iDtmfPostAddressCallId: %d After value",iDtmfPostAddressCallId);
-OstTraceExt1( TRACE_NORMAL, DUP18_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL;iDtmfPostAddressCallId=%hhu After value", iDtmfPostAddressCallId );
+OstTraceExt1( TRACE_NORMAL,  DUP18_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL;iDtmfPostAddressCallId=%hhu After value", iDtmfPostAddressCallId );
                 }
                 // No else
 
@@ -3672,12 +3697,12 @@ OstTraceExt1( TRACE_NORMAL, DUP18_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMes
                 CALL_MODEM_STATUS_MO_RELEASE == callStatusISA )
                 {
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallStatusIndL:callStatusISA: %d", callStatusISA);
-OstTraceExt1( TRACE_NORMAL, DUP15_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL;callStatusISA=%hhu", callStatusISA );
+OstTraceExt1( TRACE_NORMAL,  DUP15_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL;callStatusISA=%hhu", callStatusISA );
 
                 TBool playRemoteAlertToneLocally( EFalse );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::CallStatusIndL:playRemoteAlert: %d", playRemoteAlertToneLocally);
-OstTraceExt1( TRACE_NORMAL, DUP16_CMMCALLMESSHANDLER_CALLSTATUSINDL, "CMmCallMessHandler::CallStatusIndL;playRemoteAlertToneLocally=%hhu", playRemoteAlertToneLocally );
+OstTraceExt1( TRACE_NORMAL,  DUP16_CMMCALLMESSHANDLER_CALLSTATUSINDL_TD, "CMmCallMessHandler::CallStatusIndL;playRemoteAlertToneLocally=%hhu", playRemoteAlertToneLocally );
 
                 CMmDataPackage dataPackage;
                 dataPackage.PackData( &playRemoteAlertToneLocally );
@@ -3741,7 +3766,7 @@ void CMmCallMessHandler::CallComingInd(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallComingInd");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHandler::CallComingInd" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLCOMINGIND_TD, "CMmCallMessHandler::CallComingInd" );
 
     // Call coming ind message
     TUint8 callMode( 0xFF );
@@ -3760,7 +3785,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHandler::
             sbStartOffSet + CALL_MODEM_SB_MODE_OFFSET_MODE );
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_MODE");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_MODE" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CALLCOMINGIND_TD, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_MODE" );
 
         FillModeData( iIncomingCallInfo, callMode );
         iIncomingCallInfo.iValid |= RMobileCall::KCallEmergency;
@@ -3784,7 +3809,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHand
             redirectingAddressLength * 2 ) );
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_REDIRECTING_ADDRESS");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_REDIRECTING_ADDRESS" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_CALLCOMINGIND_TD, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_REDIRECTING_ADDRESS" );
 
         // If there is a redirection address, the call has been forwarded
         // (but not vice versa; this information can come with another
@@ -3828,7 +3853,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHand
             callOriginAddressLength * 2 ) );
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_ORIGIN_ADDRESS");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_ORIGIN_ADDRESS" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_CALLCOMINGIND_TD, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_ORIGIN_ADDRESS" );
 
         // Check if number is international and addrDataLength is bigger
         // than zero. The length of the string does not have to be checked
@@ -3893,7 +3918,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHand
             callOriginInfoNameLength * 2 ) );
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_ORIGIN_INFO");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_ORIGIN_INFO" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_CALLCOMINGIND_TD, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_ORIGIN_INFO" );
 
         // Copy 8-bit name to the 16-bit target using correct endianess
         TIsiUtility::CopyFromBigEndian( name, targetOrigName );
@@ -3917,7 +3942,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHand
             sbStartOffSet + CALL_MODEM_SB_CAUSE_OF_NO_CLI_OFFSET_CAUSE ) );
 
 TFLOGSTRING("TSY: CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_CAUSE_OF_NO_CLI");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_CALLCOMINGIND, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_CAUSE_OF_NO_CLI" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCALLMESSHANDLER_CALLCOMINGIND_TD, "CMmCallMessHandler::CallComingInd -- CALL_MODEM_SB_CAUSE_OF_NO_CLI" );
 
         // Fill cause of no CLI
         FillCauseOfNoCli(iIncomingCallInfo, mmCauseOfNoCli);
@@ -3934,7 +3959,7 @@ void CMmCallMessHandler::ResetIncomingCallInfo(
     RMobileCall::TMobileCallInfoV1& aIncomingCallInfo ) const
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::ResetIncomingCallInfo");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_RESETINCOMINGCALLINFO, "CMmCallMessHandler::ResetIncomingCallInfo" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_RESETINCOMINGCALLINFO_TD, "CMmCallMessHandler::ResetIncomingCallInfo" );
 
     // Reset all fields that are used in aIncomingCallInfo
     aIncomingCallInfo.iValid = 0;
@@ -3965,7 +3990,7 @@ void CMmCallMessHandler::CallServiceDeniedInd(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallServiceDeniedInd");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLSERVICEDENIEDIND, "CMmCallMessHandler::CallServiceDeniedInd" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CALLSERVICEDENIEDIND_TD, "CMmCallMessHandler::CallServiceDeniedInd" );
 
     // Call service denied ind message
 
@@ -4048,7 +4073,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CALLSERVICEDENIEDIND, "CMmCallMessHa
         default:
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::CallServiceDeniedInd. Switch serviceId case default.");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CALLSERVICEDENIEDIND, "CMmCallMessHandler::CallServiceDeniedInd. Switch serviceId case default." );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CALLSERVICEDENIEDIND_TD, "CMmCallMessHandler::CallServiceDeniedInd. Switch serviceId case default." );
             break;
             }
         }
@@ -4066,7 +4091,7 @@ void CMmCallMessHandler::CheckCallIsaStatus(
     )
     {
 TFLOGSTRING2("TSY: CMmCallMessHandler::CheckCallIsaStatus. callstatusisa:%d", aCallStatusISA);
-OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_CHECKCALLISASTATUS, "CMmCallMessHandler::CheckCallIsaStatus;aCallStatusISA=%hhu", aCallStatusISA );
+OstTraceExt1( TRACE_NORMAL,  CMMCALLMESSHANDLER_CHECKCALLISASTATUS_TD, "CMmCallMessHandler::CheckCallIsaStatus;aCallStatusISA=%hhu", aCallStatusISA );
 
     // Check which status we got
     if ( CALL_MODEM_STATUS_MT_RELEASE == aCallStatusISA )
@@ -4120,7 +4145,7 @@ void CMmCallMessHandler::ReadAllAddressDestination(
     )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReadAllAddressDestination");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_READALLADDRESSDESTINATION, "CMmCallMessHandler::ReadAllAddressDestination" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_READALLADDRESSDESTINATION_TD, "CMmCallMessHandler::ReadAllAddressDestination" );
 
     TUint8 origAddressType( aIsiMessage.Get8bit(
         aSbStartOffSet + CALL_MODEM_SB_DESTINATION_ADDRESS_OFFSET_ADDRTYPE ) );
@@ -4145,7 +4170,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_READALLADDRESSDESTINATION, "CMmCallM
         aSbStartOffSet ) )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReadAllAddressDestination: CALL_MODEM_SB_DESTINATION_PRE_ADDRESS");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_READALLADDRESSDESTINATION, "CMmCallMessHandler::ReadAllAddressDestination: CALL_MODEM_SB_DESTINATION_PRE_ADDRESS" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_READALLADDRESSDESTINATION_TD, "CMmCallMessHandler::ReadAllAddressDestination: CALL_MODEM_SB_DESTINATION_PRE_ADDRESS" );
 
         // Get destination address length
         TUint8 destinationPreAddressLength( aIsiMessage.Get8bit(
@@ -4187,7 +4212,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_READALLADDRESSDESTINATION, "CMm
         aSbStartOffSet ) )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReadAllAddressDestination: CALL_MODEM_SB_DESTINATION_POST_ADDRESS");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_READALLADDRESSDESTINATION, "CMmCallMessHandler::ReadAllAddressDestination: CALL_MODEM_SB_DESTINATION_POST_ADDRESS" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_READALLADDRESSDESTINATION_TD, "CMmCallMessHandler::ReadAllAddressDestination: CALL_MODEM_SB_DESTINATION_POST_ADDRESS" );
 
         // Get destinationAddress Length
         TUint8 destinationPostAddressLength( aIsiMessage.Get8bit(
@@ -4215,7 +4240,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_READALLADDRESSDESTINATION, "CMm
     TIsiUtility::CopyFromBigEndian( address2, aTargetOrig );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::ReadAllAddressDestination: aTargetOrig = %S", &aTargetOrig);
-OstTraceExt1( TRACE_NORMAL, DUP19_CMMCALLMESSHANDLER_CallStatusIndL, "CMmCallMessHandler::ReadAllDestinationAddress;aTargetOrig=%S", aTargetOrig );
+OstTraceExt1( TRACE_NORMAL,  DUP19_CMMCALLMESSHANDLER_CallStatusIndL_TD, "CMmCallMessHandler::ReadAllDestinationAddress;aTargetOrig=%S", aTargetOrig );
     FillRemoteStatusAndNumber(
         aMobileCallInfo,
         origPresentInd,
@@ -4239,7 +4264,7 @@ void CMmCallMessHandler::ReadAllAddressConnected(
     TUint& aSbStartOffSet)
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReadAllAddressConnected");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_READALLADDRESSCONNECTED, "CMmCallMessHandler::ReadAllAddressConnected" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_READALLADDRESSCONNECTED_TD, "CMmCallMessHandler::ReadAllAddressConnected" );
 
     TUint8 origAddressType( aIsiMessage.Get8bit(
         aSbStartOffSet + CALL_MODEM_SB_CONNECTED_ADDRESS_OFFSET_ADDRTYPE ) );
@@ -4286,12 +4311,12 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_READALLADDRESSCONNECTED, "CMmCallMes
     TIsiUtility::CopyFromBigEndian( address2, aTargetOrig );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::ReadAllAddressConnected;aTargetOrig=%S", &aTargetOrig);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED, "CMmCallMessHandler::ReadAllAddressConnected;aTargetOrig=%S", aTargetOrig );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED_TD, "CMmCallMessHandler::ReadAllAddressConnected;aTargetOrig=%S", aTargetOrig );
 
     if ( CALL_MODEM_PRESENTATION_ALLOWED == origPresentInd )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReadAllAddressConnected; CPN ALLOWED");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED, "TSY: CMmCallMessHandler::ReadAllAddressConnected; CPN ALLOWED" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED_TD, "TSY: CMmCallMessHandler::ReadAllAddressConnected; CPN ALLOWED" );
         aMobileCallInfo.iRemoteParty.iRemoteIdStatus =
             RMobileCall::ERemoteIdentityAvailable;
         // Copy the actual number
@@ -4301,7 +4326,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED, "TSY: 
     else if ( CALL_MODEM_PRESENTATION_RESTRICTED == origPresentInd )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReadAllAddressConnected; CPN RESTRICTED");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED, "TSY: CMmCallMessHandler::ReadAllAddressConnected; CPN RESTRICTED" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED_TD, "TSY: CMmCallMessHandler::ReadAllAddressConnected; CPN RESTRICTED" );
         aMobileCallInfo.iRemoteParty.iRemoteIdStatus =
             RMobileCall::ERemoteIdentitySuppressed;
         aMobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber.Zero();
@@ -4309,7 +4334,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED, "TSY: 
     else
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReadAllAddressConnected; CPN UNKNOWN");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED, "TSY: CMmCallMessHandler::ReadAllAddressConnected; CPN UNKNOWN" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_READALLADDRESSCONNECTED_TD, "TSY: CMmCallMessHandler::ReadAllAddressConnected; CPN UNKNOWN" );
         aMobileCallInfo.iRemoteParty.iRemoteIdStatus =
             RMobileCall::ERemoteIdentityUnknown;
         aMobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber.Zero();
@@ -4342,7 +4367,7 @@ void CMmCallMessHandler::ReadCallInfo(
     )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::ReadCallInfo");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_READCALLINFO, "CMmCallMessHandler::ReadCallInfo" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_READCALLINFO_TD, "CMmCallMessHandler::ReadCallInfo" );
 
      // Get presentation indicator (four bits (1-4))
     TUint8 origInfoPresentInd( aIsiMessage.Get8bit(
@@ -4380,7 +4405,7 @@ void CMmCallMessHandler::CompleteIncomingCallNotif(
     )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CompleteIncomingCallNotif");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_COMPLETEINCOMINGCALLNOTIF, "CMmCallMessHandler::CompleteIncomingCallNotif" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_COMPLETEINCOMINGCALLNOTIF_TD, "CMmCallMessHandler::CompleteIncomingCallNotif" );
 
     if ( RMobileCall::EStatusRinging == aStatusETel )
         {
@@ -4399,7 +4424,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_COMPLETEINCOMINGCALLNOTIF, "CMm
 
             // Complete IncomingCall notification
 TFLOGSTRING("TSY: CMmCallMessHandler::CompleteIncomingCallNotif - iWaitingCall != aMobileCallInfo.iCallId");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_COMPLETEINCOMINGCALLNOTIF, "CMmCallMessHandler::CompleteIncomingCallNotif - iWaitingCall != aMobileCallInfo.iCallId" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_COMPLETEINCOMINGCALLNOTIF_TD, "CMmCallMessHandler::CompleteIncomingCallNotif - iWaitingCall != aMobileCallInfo.iCallId" );
 
             iMessageRouter->Complete(
                 EEtelLineNotifyIncomingCall,
@@ -4411,7 +4436,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_COMPLETEINCOMINGCALLNOTIF, "CMm
             if ( 0 < iReceivedUusData.Length() )
                 {
 TFLOGSTRING("TSY: CMmCallMessHandler::CompleteIncomingCallNotif - Completing receive uui");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_COMPLETEINCOMINGCALLNOTIF, "CMmCallMessHandler::CompleteIncomingCallNotif - Completing receive uui" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_COMPLETEINCOMINGCALLNOTIF_TD, "CMmCallMessHandler::CompleteIncomingCallNotif - Completing receive uui" );
 
                 callData.PackData( &iReceivedUusData );
                 iMessageRouter->Complete(
@@ -4440,14 +4465,14 @@ void CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange(
     TInt aResultETel )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::CompleteMobileCallInfoChange");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_COMPLETEMOBILECALLINFOANDSTATUSCHANGE, "CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_COMPLETEMOBILECALLINFOANDSTATUSCHANGE_TD, "CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange" );
 
 TFLOGSTRING3("TSY: CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange;aStatusETel=%d;aResultETel=%d", aStatusETel, aResultETel);
 TFLOGSTRING2("TSY: CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange;aMobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber=%S", &aMobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber);
 TFLOGSTRING2("TSY: CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange;aMobileCallInfo.iValid=%x", aMobileCallInfo.iValid);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_COMPLETEMOBILECALLINFOANDSTATUSCHANGE, "CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange;aStatusETel=%d;aResultETel=%d", aStatusETel, aResultETel );
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_COMPLETEMOBILECALLINFOANDSTATUSCHANGE, "CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange;aMobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber=%S", aMobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber );
-OstTrace1( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_COMPLETEMOBILECALLINFOANDSTATUSCHANGE, "CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange;aMobileCallInfo.iValid=%x", aMobileCallInfo.iValid );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_COMPLETEMOBILECALLINFOANDSTATUSCHANGE_TD, "CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange;aStatusETel=%d;aResultETel=%d", aStatusETel, aResultETel );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_COMPLETEMOBILECALLINFOANDSTATUSCHANGE_TD, "CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange;aMobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber=%S", aMobileCallInfo.iRemoteParty.iRemoteNumber.iTelNumber );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_COMPLETEMOBILECALLINFOANDSTATUSCHANGE_TD, "CMmCallMessHandler::CompleteMobileCallInfoAndStatusChange;aMobileCallInfo.iValid=%x", aMobileCallInfo.iValid );
 
     // Call data package
     CCallDataPackage callData;
@@ -4484,7 +4509,7 @@ void CMmCallMessHandler::HandleError(
     {
     // None
 TFLOGSTRING("TSY: CMmCallMessHandler::HandleError.");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_HANDLEERROR, "CMmCallMessHandler::HandleError" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_HANDLEERROR_TD, "CMmCallMessHandler::HandleError" );
     }
 
 // -----------------------------------------------------------------------------
@@ -4499,7 +4524,7 @@ void CMmCallMessHandler::FillCauseOfNoCli(
     TUint8 aCauseOfNoCli )
     {
 TFLOGSTRING2("TSY: CMmCallMessHandler::FillCauseOfNoCli. cause:%d", aCauseOfNoCli);
-OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_FILLCAUSEOFNOCLI, "CMmCallMessHandler::FillCauseOfNoCli;aCauseOfNoCli=%hhu", aCauseOfNoCli );
+OstTraceExt1( TRACE_NORMAL,  CMMCALLMESSHANDLER_FILLCAUSEOFNOCLI_TD, "CMmCallMessHandler::FillCauseOfNoCli;aCauseOfNoCli=%hhu", aCauseOfNoCli );
 
     switch( aCauseOfNoCli )
         {
@@ -4554,7 +4579,7 @@ OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_FILLCAUSEOFNOCLI, "CMmCallMessHan
         default:
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::FillCauseOfNoCli. Switch cause case default");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_FILLCAUSEOFNOCLI, "CMmCallMessHandler::FillCauseOfNoCli. Switch cause case default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_FILLCAUSEOFNOCLI_TD, "CMmCallMessHandler::FillCauseOfNoCli. Switch cause case default" );
             // Keep aMobileCallInfo.iRemoteParty.iRemoteIdStatus unchanged
             break;
             }
@@ -4569,15 +4594,18 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_FILLCAUSEOFNOCLI, "CMmCallMessH
 void CMmCallMessHandler::InitializeDataportL()
     {
 TFLOGSTRING("NTSY: CMmCallMessHandler::InitializeDataportL()");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_INITIALIZEDATAPORTL, "CMmCallMessHandler::InitializeDataportL" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_INITIALIZEDATAPORTL_TD, "CMmCallMessHandler::InitializeDataportL" );
 
     // SIM is ready, start dataport handling
     if ( !iDataPortHandler )
         {
 TFLOGSTRING("NTSY: CMmCallMessHandler::InitializeDataportL - Create pipe for videotelephony");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_INITIALIZEDATAPORTL, "CMmCallMessHandler::InitializeDataportL - Create pipe for videotelephony" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_INITIALIZEDATAPORTL_TD, "CMmCallMessHandler::InitializeDataportL - Create pipe for videotelephony" );
+        // For testtool
+#ifndef __WINSCW__
         iDataPortHandler = CMmDataPortHandler::NewL( iMessageRouter );
-        User::LeaveIfError( PnsPipeCreateReq( PN_PIPE_ENABLE ) );
+#endif /* __WINSCW__ */
+        User::LeaveIfError( PnsPipeCreateReq() );
         }
     }
 
@@ -4590,7 +4618,7 @@ TInt CMmCallMessHandler::ActivateUUS(
     const CMmDataPackage* aDataPackage )
     {
 TFLOGSTRING( "TSY: CMmCallMessHandler::ActivateUUS. Unpacking UUS data." );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_ACTIVATEUUS, "CMmCallMessHandler::ActivateUUS" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_ACTIVATEUUS_TD, "CMmCallMessHandler::ActivateUUS" );
 
     TInt ret( KErrNone );
 
@@ -4604,7 +4632,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_ACTIVATEUUS, "CMmCallMessHandler::Ac
     if ( RMobileCall::KUUS1Implicit != iUusData.iServiceReq )
         {
 TFLOGSTRING2( "TSY: CMmCallMessHandler::ActivateUUS. Service type is not supported (%d)!", iUusData.iServiceReq );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_ACTIVATEUUS, "CMmCallMessHandler::ActivateUUS;Service type is not supported (%d)", iUusData.iServiceReq );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_ACTIVATEUUS_TD, "CMmCallMessHandler::ActivateUUS;Service type is not supported (%d)", iUusData.iServiceReq );
         ret = KErrNotSupported;
         }
 
@@ -4620,10 +4648,10 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_ACTIVATEUUS, "CMmCallMessHandle
 void CMmCallMessHandler::InfoPpDataReadReq()
     {
 TFLOGSTRING( "TSY: CMmCallMessHandler::InfoPpDataReadReq" );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_INFOPPDATAREADREQ, "CMmCallMessHandler::InfoPpDataReadReq" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_INFOPPDATAREADREQ_TD, "CMmCallMessHandler::InfoPpDataReadReq" );
 
     // Create INFO_SB_PP_DATA subblock with only one PP feature (12 bytes)
-    TBuf8<12> infoSbPpBuf;
+    TBuf8<SIZE_INFO_SB_PP_DATA> infoSbPpBuf;
     TIsiSubBlock infoSbPp(
         infoSbPpBuf,
         INFO_SB_PP_DATA,
@@ -4649,7 +4677,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_INFOPPDATAREADREQ, "CMmCallMessHandl
     // Create INFO_PP_READ_REQ message:
     // batch mode (1) + number of SB (1) + INFO_SB_PP_DATA sub block with
     // only one PP feature (12)
-    TBuf8<14> infoPpReadReq;
+    TBuf8<SIZE_INFO_PP_DATA_READ_REQ + SIZE_INFO_SB_PP_DATA> infoPpReadReq;
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     infoPpReadReq.Append( INFO_PP_PROD_PROFILE_FEATURE ); // No batch reading
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
@@ -4681,7 +4709,7 @@ void CMmCallMessHandler::InfoPpDataReadResp(
     TUint8 status = aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + INFO_PP_DATA_READ_RESP_OFFSET_STATUS );
 TFLOGSTRING2( "TSY: CMmCallMessHandler::InfoPpDataReadResp, status=%d.", status );
-OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_INFOPPDATAREADRESP, "CMmCallMessHandler::InfoPpDataReadResp;status=%hhu", status );
+OstTraceExt1( TRACE_NORMAL,  CMMCALLMESSHANDLER_INFOPPDATAREADRESP_TD, "CMmCallMessHandler::InfoPpDataReadResp;status=%hhu", status );
 
     // iHSDPADisabledInPp is EFalse by default, change only if PP bit
     // is set to "HSDPA_HSUPA_DISABLED".
@@ -4702,7 +4730,7 @@ OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_INFOPPDATAREADRESP, "CMmCallMessH
                 {
                 iHSDPADisabledInPp = ETrue;
 TFLOGSTRING( "TSY: CMmCallMessHandler::InfoPpDataReadResp: HSDPA is disabled in PP." );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_INFOPPDATAREADRESP, "CMmCallMessHandler::InfoPpDataReadResp: HSDPA is disabled in PP" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_INFOPPDATAREADRESP_TD, "CMmCallMessHandler::InfoPpDataReadResp: HSDPA is disabled in PP" );
                 } // No else, ignore other values
             } // No else, ignore missing sub block
         } // No else, ignore failed reading
@@ -4716,7 +4744,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_INFOPPDATAREADRESP, "CMmCallMes
 void CMmCallMessHandler::GpdsContextsClearReq()
     {
 TFLOGSTRING( "TSY: CMmCallMessHandler::GpdsContextsClearReq" );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_GPDSCONTEXTSCLEARREQ, "CMmCallMessHandler::GpdsContextsClearReq" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_GPDSCONTEXTSCLEARREQ_TD, "CMmCallMessHandler::GpdsContextsClearReq" );
 
     // Start emergency timer
     iEmergencyTimer.StartEmergencyTimer();
@@ -4738,7 +4766,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_GPDSCONTEXTSCLEARREQ, "CMmCallMessHa
 void CMmCallMessHandler::GpdsContextsClearResp()
     {
 TFLOGSTRING( "TSY: CMmCallMessHandler::GpdsContextsClearResp" );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_GPDSCONTEXTSCLEARRESP, "CMmCallMessHandler::GpdsContextsClearResp" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_GPDSCONTEXTSCLEARRESP_TD, "CMmCallMessHandler::GpdsContextsClearResp" );
 
     // Stop emergency timer
     iEmergencyTimer.StopEmergencyTimer();
@@ -4748,7 +4776,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_GPDSCONTEXTSCLEARRESP, "CMmCallMessH
     if ( iEmergCallDelayed )
         {
 TFLOGSTRING( "TSY: CMmCallMessHandler::GpdsContextsClearResp - HSDPA workaround. Emergency call is created now." );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_GPDSCONTEXTSCLEARRESP, "CMmCallMessHandler::GpdsContextsClearResp - HSDPA workaround. Emergency call is created now" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_GPDSCONTEXTSCLEARRESP_TD, "CMmCallMessHandler::GpdsContextsClearResp - HSDPA workaround. Emergency call is created now" );
 
         TIsiSend callReq( iPhoNetSender->SendBufferDes() );
         TUint8 dosCallId( CALL_MODEM_ID_NONE );
@@ -4792,7 +4820,7 @@ void CMmCallMessHandler::GetCSDCallControlReqSubBlock(
     {
 
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock" );
 
     iDestPostAddressIncluded = EFalse;
 
@@ -4801,7 +4829,7 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCa
     TUint8 presentationInd( CSD_GSM_PRESENTATION_DEFAULT );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock - aIdRestrict: %d", aIdRestrict);
-OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock;aIdRestrict=%d", aIdRestrict );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock;aIdRestrict=%d", aIdRestrict );
 
     if ( KTelephonyNumberMaxLength < telNumLength )
         {
@@ -4854,13 +4882,13 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "
             {
             presentationInd = CSD_PRESENTATION_ALLOWED;
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by PREFIX = CSD_PRESENTATION_ALLOWED");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by PREFIX = CSD_PRESENTATION_ALLOWED" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by PREFIX = CSD_PRESENTATION_ALLOWED" );
             }
         else if ( '#' == ( aTelNumber )[0] )
             {
             presentationInd = CSD_PRESENTATION_RESTRICTED;
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by PREFIX = CSD_PRESENTATION_RESTRICTED");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by PREFIX = CSD_PRESENTATION_RESTRICTED" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by PREFIX = CSD_PRESENTATION_RESTRICTED" );
             }
         }
     else
@@ -4872,14 +4900,14 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "
                 {
                 presentationInd = CSD_PRESENTATION_ALLOWED; //0x00
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by aIdRestrict = CSD_PRESENTATION_ALLOWED");
-OstTrace0( TRACE_NORMAL, DUP4_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by aIdRestrict = CSD_PRESENTATION_ALLOWED" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by aIdRestrict = CSD_PRESENTATION_ALLOWED" );
                 break;
                 }
             case RMobileCall::EDontSendMyId:
                 {
                 presentationInd = CSD_PRESENTATION_RESTRICTED; //0x01
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by aIdRestrict = CSD_PRESENTATION_RESTRICTED");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by aIdRestrict = CSD_PRESENTATION_RESTRICTED" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by aIdRestrict = CSD_PRESENTATION_RESTRICTED" );
                 break;
                 }
             case RMobileCall::EIdRestrictDefault:
@@ -4887,7 +4915,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "
                 {
                 presentationInd = CSD_GSM_PRESENTATION_DEFAULT; //0x07
 TFLOGSTRING("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by aIdRestrict = CSD_GSM_PRESENTATION_DEFAULT");
-OstTrace0( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by aIdRestrict = CSD_GSM_PRESENTATION_DEFAULT" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock -- presentationInd by aIdRestrict = CSD_GSM_PRESENTATION_DEFAULT" );
                 break;
                 }
             }
@@ -4956,10 +4984,10 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "
     aNumOfSbInMsg++;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_DESTINATION_ADDRESS - Subblock Count:  %d", aNumOfSbInMsg );
-OstTrace1( TRACE_NORMAL, DUP10_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_DESTINATION_ADDRESS - Subblock Count: %d", aNumOfSbInMsg );
+OstTrace1( TRACE_NORMAL,  DUP10_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_DESTINATION_ADDRESS - Subblock Count: %d", aNumOfSbInMsg );
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock - destAddress: %S", &destAddress);
-OstTraceExt2( TRACE_NORMAL, DUP11_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock;destAddress=%d;iDataRateCode=%S", destAddress, iDataRateCode );
+OstTraceExt2( TRACE_NORMAL,  DUP11_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock;destAddress=%d;iDataRateCode=%S", destAddress, iDataRateCode );
 
     if ( preAddressSupported )
         {
@@ -4994,7 +5022,7 @@ OstTraceExt2( TRACE_NORMAL, DUP11_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOC
         aNumOfSbInMsg++;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_DESTINATION_PRE_ADDRESS - Subblock Count:  %d", aNumOfSbInMsg );
-OstTrace1( TRACE_NORMAL, DUP12_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_DESTINATION_PRE_ADDRESS - Subblock Count: %d", aNumOfSbInMsg );
+OstTrace1( TRACE_NORMAL,  DUP12_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_DESTINATION_PRE_ADDRESS - Subblock Count: %d", aNumOfSbInMsg );
         }
     // No else
 
@@ -5037,7 +5065,7 @@ OstTrace1( TRACE_NORMAL, DUP12_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, 
         iDestPostAddressIncluded = ETrue;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_DESTINATION_POST_ADDRESS - Subblock Count:  %d", aNumOfSbInMsg );
-OstTrace1( TRACE_NORMAL, DUP13_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_DESTINATION_POST_ADDRESS - Subblock Count: %d", aNumOfSbInMsg );
+OstTrace1( TRACE_NORMAL,  DUP13_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_DESTINATION_POST_ADDRESS - Subblock Count: %d", aNumOfSbInMsg );
     }
     // No else
 
@@ -5068,7 +5096,7 @@ OstTrace1( TRACE_NORMAL, DUP13_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, 
     aNumOfSbInMsg++;
 
 TFLOGSTRING2("TSY: CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_CBST_PARAMS - Subblock Count:  %d", aNumOfSbInMsg );
-OstTrace1( TRACE_NORMAL, DUP14_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, "CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_CBST_PARAMS - Subblock Count: %d", aNumOfSbInMsg );
+OstTrace1( TRACE_NORMAL,  DUP14_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK_TD, "CMmCallMessHandler::GetCSDCallControlReqSubBlock - CSD_CBST_PARAMS - Subblock Count: %d", aNumOfSbInMsg );
 
     }
 
@@ -5081,7 +5109,7 @@ OstTrace1( TRACE_NORMAL, DUP14_CMMCALLMESSHANDLER_GETCSDCALLCONTROLREQSUBBLOCK, 
 TInt CMmCallMessHandler::CsdCallControlReq( TUint8 aCallOperId )
     {
 TFLOGSTRING( "TSY: CMmCallMessHandler::CsdCallControlReq" );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CSDCALLCONTROLREQ, "CMmCallMessHandler::CsdCallControlReq" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CSDCALLCONTROLREQ_TD, "CMmCallMessHandler::CsdCallControlReq" );
 
     TBuf8<SIZE_CSD_CALL_CONTROL_REQ> data( 0 );
 
@@ -5135,20 +5163,20 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CSDCALLCONTROLREQ, "CMmCallMessHandl
 void CMmCallMessHandler::CsdCallControlResp( const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING( "TSY: CMmCallMessHandler::CsdCallControlResp" );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMessHandler::CsdCallControlResp" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CSDCALLCONTROLRESP_TD, "CMmCallMessHandler::CsdCallControlResp" );
 
     // Get cause
     TUint8 causeValue( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + CSD_CALL_CONTROL_RESP_OFFSET_CAUSE ) );
 
 TFLOGSTRING2( "TSY: CMmCallMessHandler::CsdCallControlResp. Cause value: %d", causeValue );
-OstTrace1( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMessHandler::CsdCallControlResp;causeValue=%d", causeValue );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP_TD, "CMmCallMessHandler::CsdCallControlResp;causeValue=%d", causeValue );
 
     TUint8 oper_Id( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + CSD_CALL_CONTROL_RESP_OFFSET_OPERID ) );
 
 TFLOGSTRING2( "TSY: CMmCallMessHandler::CsdCallControlResp. Call operation id: %d", oper_Id );
-OstTrace1( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMessHandler::CsdCallControlResp;oper_Id=%d", oper_Id );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP_TD, "CMmCallMessHandler::CsdCallControlResp;oper_Id=%d", oper_Id );
 
     TInt result( KErrNone );
 
@@ -5210,7 +5238,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMes
             default:
                 {
 TFLOGSTRING("TSY: CMmCallMessHandler::CsdCallControlResp. Switch oper_Id case default.");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMessHandler::CsdCallControlResp, Switch oper_Id case default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP_TD, "CMmCallMessHandler::CsdCallControlResp, Switch oper_Id case default" );
                 break;
                 }
             }
@@ -5225,7 +5253,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CSDCALLCONTROLRESP, "CMmCallMes
 void CMmCallMessHandler::CsdVideoCallStatusInd( const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING( "TSY: CMmCallMessHandler::CsdVideoCallStatusInd" );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessHandler::CsdVideoCallStatusInd" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND_TD, "CMmCallMessHandler::CsdVideoCallStatusInd" );
 
     iVideoCallStatus = aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + CSD_VIDEO_CALL_STATUS_IND_OFFSET_STATUS );
@@ -5241,14 +5269,14 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessH
         if ( RMobileCall::EMobileOriginated == iCallDirection )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::CsdVideoCallStatusInd: MO call connected");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessHandler::CsdVideoCallStatusInd: MO call connected" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND_TD, "CMmCallMessHandler::CsdVideoCallStatusInd: MO call connected" );
             iMessageRouter->Complete(
                 EEtelCallDial, &callData, KErrNone );
             }
         else if ( RMobileCall::EMobileTerminated == iCallDirection )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::CsdVideoCallStatusInd: MT call connected");
-OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessHandler::CsdVideoCallStatusInd: MT call connected" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND_TD, "CMmCallMessHandler::CsdVideoCallStatusInd: MT call connected" );
             iMessageRouter->Complete(
                 EEtelCallAnswer, &callData, KErrNone );
             }
@@ -5261,17 +5289,17 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCall
     if ( iIsWaitingCall )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::CsdVideoCallStatusInd. call direction reset to MT");
-OstTrace0( TRACE_NORMAL, DUP5_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessHandler::CsdVideoCallStatusInd. call direction reset to MT" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND_TD, "CMmCallMessHandler::CsdVideoCallStatusInd. call direction reset to MT" );
         iCallDirection = RMobileCall::EMobileTerminated;
         }
     else
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::CsdVideoCallStatusInd. call direction reset to unknown");
-OstTrace0( TRACE_NORMAL, DUP6_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessHandler::CsdVideoCallStatusInd. call direction reset to unknown" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND_TD, "CMmCallMessHandler::CsdVideoCallStatusInd. call direction reset to unknown" );
         iCallDirection = RMobileCall::EDirectionUnknown;
         }
 TFLOGSTRING2( "TSY: CMmCallMessHandler::CsdVideoCallStatusInd. VideoCallStatus: %d", iVideoCallStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCallMessHandler::CsdVideoCallStatusInd. VideoCallStatus: %d", iVideoCallStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND_TD, "CMmCallMessHandler::CsdVideoCallStatusInd. VideoCallStatus: %d", iVideoCallStatus );
     }
 
 // -----------------------------------------------------------------------------
@@ -5282,7 +5310,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_CSDVIDEOCALLSTATUSIND, "CMmCall
 void CMmCallMessHandler::CsdMultimediaDataRateInd( const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING( "TSY: CMmCallMessHandler::CsdMultimediaDataRateInd" );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_CSDMULTIMEDIADATARATEIND, "CMmCallMessHandler::CsdMultimediaDataRateInd" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_CSDMULTIMEDIADATARATEIND_TD, "CMmCallMessHandler::CsdMultimediaDataRateInd" );
 
     // Current maximum bearer rate for multimedia call in bits/s
     TUint dataRate( aIsiMessage.Get8bit(
@@ -5340,10 +5368,10 @@ void CMmCallMessHandler::SetMobileCallInfo(
     {
 
 TFLOGSTRING3("TSY: CMmCallMessHandler::SetMobileCallInfo. Multimedia:%d, CallWaiting:%d", aIsMultimedia, aIsWaitingCall );
-OstTraceExt2( TRACE_NORMAL, CMMCALLMESSHANDLER_SETMOBILECALLINFO, "CMmCallMessHandler::SetMobileCallInfo;aIsMultimedia=%d;aIsWaitingCall=%d", aIsMultimedia, aIsWaitingCall );
+OstTraceExt2( TRACE_NORMAL,  CMMCALLMESSHANDLER_SETMOBILECALLINFO_TD, "CMmCallMessHandler::SetMobileCallInfo;aIsMultimedia=%d;aIsWaitingCall=%d", aIsMultimedia, aIsWaitingCall );
 
 TFLOGSTRING("TSY: CMmCallMessHandler::SetMobileCallInfo. iStatus != RMobileCall::EStatusIdle");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_SETMOBILECALLINFO, "CMmCallMessHandler::SetMobileCallInfo, iStatus != RMobileCall::EStatusIdle" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_SETMOBILECALLINFO_TD, "CMmCallMessHandler::SetMobileCallInfo, iStatus != RMobileCall::EStatusIdle" );
 
     // Is call multimedia/video
     iIsMultimedia = aIsMultimedia;
@@ -5456,7 +5484,7 @@ TInt CMmCallMessHandler::DialDataCall(
     {
 
 TFLOGSTRING("TSY: CMmCallMessHandler::DialDataCall");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_DIALDATACALL, "CMmCallMessHandler::DialDataCall" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_DIALDATACALL_TD, "CMmCallMessHandler::DialDataCall" );
 
     TInt ret( KErrNone );
     RMobileCall::TMobileCallParamsV1Pckg* callParams( NULL );
@@ -5471,14 +5499,14 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_DIALDATACALL, "CMmCallMessHandler::D
     if ( callParams && callInfo )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::DialDataCall. callParams and callInfo ok." );
-OstTrace0( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_DIALDATACALL, "CMmCallMessHandler::DialDataCall;callParams and callInfo ok." );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_DIALDATACALL_TD, "CMmCallMessHandler::DialDataCall;callParams and callInfo ok." );
 
         // if CTSY does not set call id as valid we need to copy it from
         // data package
         if ( 0 == ( callInfo->iValid & RMobileCall::KCallId ) )
             {
 TFLOGSTRING("TSY: CMmCallMessHandler::DialDataCall. Copy call mode into call info");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_DIALDATACALL, "CMmCallMessHandler::DialDataCall. Copy call mode into call info" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_DIALDATACALL_TD, "CMmCallMessHandler::DialDataCall. Copy call mode into call info" );
             aDataPackage->GetCallIdAndMode(
                 callInfo->iCallId, callInfo->iService );
             // service is always valid
@@ -5514,8 +5542,7 @@ TInt CMmCallMessHandler::AnswerIncomingDataCall(
     {
 
     TFLOGSTRING("TSY: CMmCallMessHandler::AnswerIncomingDataCall");
-//OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_ANSWERINCOMINGDATACALL, "CMmCallMessHandler::AnswerIncomingDataCall" );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_ANSWERINCOMINGDATACALL, "CMmCallMessHandler::AnswerIncomingDataCall" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_ANSWERINCOMINGDATACALL_TD, "CMmCallMessHandler::AnswerIncomingDataCall" );
 
     TInt ret( KErrNone );
     TInt callId( KCallIdNone );
@@ -5524,13 +5551,13 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_ANSWERINCOMINGDATACALL, "CMmCallMess
     aCallDataPackage->GetCallIdAndMode( callId, callMode );
 
 TFLOGSTRING3("TSY: CMmCallMessHandler::AnswerIncomingDataCall. CallId:%d, CallMode:%d", callId, callMode);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_ANSWERINCOMINGDATACALL, "CMmCallMessHandler::AnswerIncomingDataCall;callId=%d;callMode=%d", callId, callMode );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_ANSWERINCOMINGDATACALL_TD, "CMmCallMessHandler::AnswerIncomingDataCall;callId=%d;callMode=%d", callId, callMode );
 
     // If we are answering an incoming call, the call status is not idle
     if ( RMobileCall::EStatusIdle < iMobileCallInfo.iStatus )
         {
 TFLOGSTRING("TSY: CMmCallMessHandler::AnswerIncomingDataCall. Send ATA");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCALLMESSHANDLER_ANSWERINCOMINGDATACALL, "CMmCallMessHandler::AnswerIncomingDataCall, Send ATA" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCALLMESSHANDLER_ANSWERINCOMINGDATACALL_TD, "CMmCallMessHandler::AnswerIncomingDataCall, Send ATA" );
 
         // Answer the call
         CsdCallControlReq( CSD_CALL_ANSWER );
@@ -5557,7 +5584,7 @@ TInt CMmCallMessHandler::HangUp(
     const TInt aCallId )
     {
 TFLOGSTRING2("TSY: CMmCallMessHandler::HangUp - Call Id: %d", aCallId);
-OstTrace1( TRACE_NORMAL, CMMCALLMESSHANDLER_HANGUP, "CMmCallMessHandler::HangUp;aCallId=%d", aCallId );
+OstTrace1( TRACE_NORMAL,  CMMCALLMESSHANDLER_HANGUP_TD, "CMmCallMessHandler::HangUp;aCallId=%d", aCallId );
 
     TInt ret( KErrNone );
 
@@ -5588,19 +5615,16 @@ OstTrace1( TRACE_NORMAL, CMMCALLMESSHANDLER_HANGUP, "CMmCallMessHandler::HangUp;
 // Construct a PNS_PIPE_CREATE_REQ ISI-message
 // ----------------------------------------------------------------------------
 //
-TInt CMmCallMessHandler::PnsPipeCreateReq( const TUint8 aPipeStateAfter ) const
+TInt CMmCallMessHandler::PnsPipeCreateReq() const
     {
     TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeCreateReq" );
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPECREATEREQ, "CMmCallMessHandler::PnsPipeCreateReq" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_PNSPIPECREATEREQ_TD, "CMmCallMessHandler::PnsPipeCreateReq" );
 
    // create buffer for isi msg data
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     TBuf8<SIZE_PNS_PIPE_CREATE_REQ> data;
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PIPE_CREATE_REQ> data;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
+
     // set message data
-    data.Append( aPipeStateAfter );
+    data.Append( PN_PIPE_DISABLE );
     data.Append( PN_MSG_PRIORITY_HIGH );
     data.Append( KFirstPepDevice );
     data.Append( EIscNokiaDataport1 );
@@ -5625,7 +5649,9 @@ void CMmCallMessHandler::PnsPipeCreateResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeCreateResp");
-OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPECREATERESP, "CMmCallMessHandler::PnsPipeCreateResp" );
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_PNSPIPECREATERESP_TD, "CMmCallMessHandler::PnsPipeCreateResp" );
+
+    TInt err( KErrGeneral );
 
     // Get transaction Id
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
@@ -5633,23 +5659,21 @@ OstTrace0( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPECREATERESP, "CMmCallMessHandl
     if ( KPipeTransID == transId )
         {
         iPipeHandle = aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
             ISI_HEADER_SIZE + PNS_PIPE_CREATE_RESP_OFFSET_PIPEHANDLE );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_CREATE_RESP_OFFSET_PIPEHANDLE );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
         TUint8 errorCode( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
             ISI_HEADER_SIZE + PNS_PIPE_CREATE_RESP_OFFSET_ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_CREATE_RESP_OFFSET_ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
 TFLOGSTRING4("TSY: CMmCallMessHandler::PnsPipeCreateResp. TransactionId: %d, PipeHandle: %d, error code: %d", transId, iPipeHandle, errorCode );
-OstTraceExt3( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPECREATERESP, "CMmCallMessHandler::PnsPipeCreateResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, iPipeHandle, errorCode );
+OstTraceExt3( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_PNSPIPECREATERESP_TD, "CMmCallMessHandler::PnsPipeCreateResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, iPipeHandle, errorCode );
 
-        if ( PN_PIPE_NO_ERROR != errorCode )
+        if ( PN_PIPE_NO_ERROR == errorCode )
+            {
+            err = PnsPipeEnableReq();
+            }
+        // no else
+
+        if ( KErrNone != err )
             {
             delete iDataPortHandler;
             iDataPortHandler = NULL;
@@ -5667,19 +5691,15 @@ OstTraceExt3( TRACE_NORMAL, DUP1_CMMCALLMESSHANDLER_PNSPIPECREATERESP, "CMmCallM
 TInt CMmCallMessHandler::PnsPipeRemoveReq()
     {
     TFLOGSTRING2("TSY: CMmCallMessHandler::PnsPipeRemoveReq. PipeHandle: %d", iPipeHandle );
-OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPEREMOVEREQ, "CMmCallMessHandler::PnsPipeRemoveReq;aPipeHandle=%hhu", iPipeHandle );
-
-    iPipeHandle = KInvalidPipeHandle;
+OstTraceExt1( TRACE_NORMAL,  CMMCALLMESSHANDLER_PNSPIPEREMOVEREQ_TD, "CMmCallMessHandler::PnsPipeRemoveReq;aPipeHandle=%hhu", iPipeHandle );
 
     // Create buffer for isi msg data
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     TBuf8<SIZE_PNS_PIPE_REMOVE_REQ> data;
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PIPE_REMOVE_REQ> data;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
     data.Append( iPipeHandle );
     data.Append( KCallPadding );
+
+    iPipeHandle = KInvalidPipeHandle;
 
     // Send Isi message via phonet
     return iPhoNetSender->Send(
@@ -5689,6 +5709,57 @@ OstTraceExt1( TRACE_NORMAL, CMMCALLMESSHANDLER_PNSPIPEREMOVEREQ, "CMmCallMessHan
         data );
     }
 
+// ----------------------------------------------------------------------------
+// CMmCallMessHandler::PnsPipeEnableReq
+// Builds PNS_PIPE_ENABLE_REQ ISI message and sends it to Phonet.
+// ----------------------------------------------------------------------------
+//
+TInt CMmCallMessHandler::PnsPipeEnableReq() const
+    {
+TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeEnableReq");
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_PNSPIPEENABLEREQ_TD, "CMmCallMessHandler::PnsPipeEnableReq" );
+    // create buffer for isi msg data
+    TBuf8<SIZE_PNS_PIPE_ENABLE_REQ> data;
+
+    // set message data
+    data.Append( iPipeHandle );
+    data.Append( KCallPadding );
+
+    // Sending message to phonet
+    return iPhoNetSender->Send(
+        PN_PIPE, KPipeTransID, PNS_PIPE_ENABLE_REQ, data );
+    }
+
+// ----------------------------------------------------------------------------
+// CMmCallMessHandler::PnsPipeEnableResp
+// Handles PNS_PIPE_ENABLE_RESP.
+// ----------------------------------------------------------------------------
+//
+void CMmCallMessHandler::PnsPipeEnableResp( const TIsiReceiveC &aIsiMessage )
+    {
+TFLOGSTRING("TSY: CMmCallMessHandler::PnsPipeEnableResp");
+OstTrace0( TRACE_NORMAL,  CMMCALLMESSHANDLER_PNSPIPEENABLERESP_TD, "CMmCallMessHandler::PnsPipeEnableResp" );
+
+    // Get transaction Id
+    TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
+
+    if ( KPipeTransID == transId )
+        {
+        TUint8 errorCode( aIsiMessage.Get8bit(
+            ISI_HEADER_SIZE + PNS_PIPE_ENABLE_RESP_OFFSET_ERRORCODE ) );
+
+TFLOGSTRING2("TSY: CMmCallMessHandler::PnsPipeEnableResp;errorCode=%d", errorCode);
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMCALLMESSHANDLER_PNSPIPEENABLERESP_TD, "CMmCallMessHandler::PnsPipeEnableResp;errorCode=%hhu", errorCode );
+
+        if ( PN_PIPE_NO_ERROR != errorCode )
+            {
+            PnsPipeRemoveReq();
+            delete iDataPortHandler;
+            iDataPortHandler = NULL;
+            }
+        // no else
+        }
+    }
 // ========================== OTHER EXPORTED FUNCTIONS =========================
 
     // None

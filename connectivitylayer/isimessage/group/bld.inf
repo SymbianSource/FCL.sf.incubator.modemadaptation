@@ -18,7 +18,6 @@
 
 #include <non_foundation_paths.hrh>
 
-#include "../ftcommonif/group/bld.inf"
 
 
 PRJ_PLATFORMS
@@ -55,8 +54,8 @@ PRJ_EXPORTS
 ../symbianisamacroif/include/wgmodem25/net_modemisi.h                                  	 NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/net_modemisi.h)
 ../symbianisamacroif/include/wgmodem25/nvdisi.h                                  	     NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/nvdisi.h)
 ../symbianisamacroif/include/wgmodem25/phonetisi.h                                       NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/phonetisi.h)
-../symbianisamacroif/include/wgmodem25/pipeisi.h                                         NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/pipeisi.h)
-../symbianisamacroif/include/wgmodem25/pipe_sharedisi.h                                  NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/pipe_sharedisi.h)
+//../symbianisamacroif/include/wgmodem25/pipeisi.h                                         NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/pipeisi.h)
+//../symbianisamacroif/include/wgmodem25/pipe_sharedisi.h                                  NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/pipe_sharedisi.h)
 ../symbianisamacroif/include/wgmodem25/pn_const.h                                        NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/pn_const.h)
 ../symbianisamacroif/include/wgmodem25/pn_eventmodem_extisi.h                            NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/pn_eventmodem_extisi.h)
 ../symbianisamacroif/include/wgmodem25/product_profile_definitions.h                     NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(wgmodem25/product_profile_definitions.h)

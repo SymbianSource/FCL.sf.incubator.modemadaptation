@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -27,8 +27,7 @@ PRJ_EXPORTS
 //NCP_COMMON_S60_VERSION_SUPPORT flag.
 #if defined(NCP_COMMON_S60_VERSION_SUPPORT) && (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
 ../nokiatsy_dll/inc/cmmmessagerouter.h      /epoc32/include/cmmmessagerouter.h
-// Temporarily removed for Bridge camp!
-//../simatktsy_dll/inc/csatmessaging.h	    /epoc32/include/satmessaging.h
+../simatktsy_dll/inc/csatmessaging.h	    /epoc32/include/satmessaging.h
 #endif // NCP_COMMON_S60_VERSION_SUPPORT
 
 ../rom/tsy.iby                  NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(tsy.iby)
@@ -39,9 +38,8 @@ PRJ_MMPFILES
 ../nokiatsy_dll/group/nokiatsy_dll.mmp
 ../nokiatsy_dll/group/nokiatsylib.mmp
 ../customapiext_dll/group/customapiext_dll.mmp
-// Temporarily removed for Bridge camp!
-// ../simatktsy_dll/group/simatktsy.mmp
-//../simatktsy_dll/group/simatktsylib.mmp
+../simatktsy_dll/group/simatktsy.mmp
+../simatktsy_dll/group/simatktsylib.mmp
 
 //NCP_COMMON_S60_VERSION_SUPPORT flag.
 #if defined(NCP_COMMON_S60_VERSION_SUPPORT ) && (NCP_COMMON_S60_VERSION_SUPPORT>S60_VERSION_32)

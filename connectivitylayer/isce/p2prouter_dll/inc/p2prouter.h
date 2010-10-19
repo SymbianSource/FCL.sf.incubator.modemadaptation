@@ -77,7 +77,7 @@ NONSHARABLE_CLASS( DP2PRouter ) : public DBase, public MP2PLinkRouterIf, public 
         /*
         * See comments from MP2PChRouterIf
         */
-        void Open( const TUint8 aProtocolId, MP2PRouterChIf* aCallback );
+        void Connect( const TUint8 aProtocolId, MP2PRouterChIf* aCallback );
 
         /*
         * See comments from MP2PChRouterIf
@@ -116,6 +116,7 @@ NONSHARABLE_CLASS( DP2PRouter ) : public DBase, public MP2PLinkRouterIf, public 
             public:
                 MP2PRouterChIf*   iChannel;
                 MP2PRouterChIf*   iWaitingChannel;
+                TBool             iTrxConnectionStatus;
             };
 
         // Guards class shared state of this class, owned

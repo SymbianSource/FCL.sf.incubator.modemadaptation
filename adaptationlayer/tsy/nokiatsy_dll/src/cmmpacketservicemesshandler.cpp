@@ -76,7 +76,7 @@ CMmPacketServiceMessHandler::CMmPacketServiceMessHandler()
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::C++ constructor");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_CMMPACKETSERVICEMESSHANDLER, "CMmPacketServiceMessHandler::CMmPacketServiceMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_CMMPACKETSERVICEMESSHANDLER_TD, "CMmPacketServiceMessHandler::CMmPacketServiceMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ CMmPacketServiceMessHandler::~CMmPacketServiceMessHandler()
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::~CMmPacketServiceMessHandler.\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_CMMPACKETSERVICEMESSHANDLER, "CMmPacketServiceMessHandler::~CMmPacketServiceMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_CMMPACKETSERVICEMESSHANDLER_TD, "CMmPacketServiceMessHandler::~CMmPacketServiceMessHandler" );
 
     // Delete iPacketMesshandlerContextList object
     if ( iPacketMesshandlerContextList )
@@ -109,7 +109,7 @@ CMmPacketServiceMessHandler* CMmPacketServiceMessHandler::NewL(
     CMmMessageRouter* aMessageRouter )
     {
 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::NewL" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_NEWL, "CMmPacketServiceMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_NEWL_TD, "CMmPacketServiceMessHandler::NewL" );
 
     CMmPacketServiceMessHandler* packetServiceMessHandler =
         new( ELeave ) CMmPacketServiceMessHandler();
@@ -158,7 +158,7 @@ void CMmPacketServiceMessHandler::ConstructL()
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_CONSTRUCTL, "CMmPacketServiceMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_CONSTRUCTL_TD, "CMmPacketServiceMessHandler::ConstructL" );
 
     iAlwaysOnMode = RMmCustomAPI::EAlwaysModeNeither;
 
@@ -176,7 +176,7 @@ TInt CMmPacketServiceMessHandler::ExtFuncL(
     {
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::ExtFuncL. IPC: %d", aIpc );
-OstTrace1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_EXTFUNCL, "CMmPacketServiceMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_EXTFUNCL_TD, "CMmPacketServiceMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     TInt ret( KErrNotSupported );
     CMmDataPackage dataPackage;
@@ -259,7 +259,7 @@ OstTrace1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_EXTFUNCL, "CMmPacketService
             {
 
             TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::ExtFuncL - Unknown IPC: %d",  aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_EXTFUNCL, "CMmPacketServiceMessHandler::ExtFuncL;Unknown aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_EXTFUNCL_TD, "CMmPacketServiceMessHandler::ExtFuncL;Unknown aIpc=%d", aIpc );
             break;
             }
         }
@@ -280,7 +280,7 @@ void CMmPacketServiceMessHandler::ReceiveMessageL(
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
 TFLOGSTRING3("TSY: CMmPacketServiceMessHandler::ReceiveMessageL. resource:%d, msgId:%d", resource, messageId);
-OstTraceExt2( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketServiceMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmPacketServiceMessHandler::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
 
     switch ( resource )
         {
@@ -308,7 +308,7 @@ OstTraceExt2( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL, "CMmPac
                 default:
                     {
 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::ReceiveMessageL. default in case PN_MODEM_NETWORK");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketServiceMessHandler::ReceiveMessageL, default in case PN_MODEM_NETWORK" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmPacketServiceMessHandler::ReceiveMessageL, default in case PN_MODEM_NETWORK" );
                     break;
                     }
                 }
@@ -386,7 +386,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL, "CMmP
                 default:
                     {
 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::SpecificPacketServiceMessageReceived: KErrNotFound");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketServiceMessHandler::ReceiveMessageL, KErrNotFound" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmPacketServiceMessHandler::ReceiveMessageL, KErrNotFound" );
                     break;
                     }
                 }
@@ -396,7 +396,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL, "CMmP
             {
             // No appropriate handler methods for ISI-message found.
 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::SpecificPacketServiceMessageReceived no handler for the message id");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketServiceMessHandler::ReceiveMessageL, SpecificPacketServiceMessageReceived no handler for the message id" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETSERVICEMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmPacketServiceMessHandler::ReceiveMessageL, SpecificPacketServiceMessageReceived no handler for the message id" );
             // server not known
             break;
             }
@@ -412,7 +412,7 @@ TInt CMmPacketServiceMessHandler::GpdsStatusReq() const
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsStatusReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSSTATUSREQ, "CMmPacketServiceMessHandler::GpdsStatusReq" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSSTATUSREQ_TD, "CMmPacketServiceMessHandler::GpdsStatusReq" );
 
     // Append data for ISI message
     TBuf8<KBuffSizeOneByte> data;
@@ -433,7 +433,7 @@ void CMmPacketServiceMessHandler::GpdsStatusResp(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsStatusResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSSTATUSRESP, "CMmPacketServiceMessHandler::GpdsStatusResp" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSSTATUSRESP_TD, "CMmPacketServiceMessHandler::GpdsStatusResp" );
 
     const TUint8 attachStatus( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + GPDS_STATUS_RESP_OFFSET_ATTACHSTATUS ) );
@@ -441,7 +441,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSSTATUSRESP, "CMmPacketS
         ISI_HEADER_SIZE + GPDS_STATUS_RESP_OFFSET_TRANSFERSTATUS ) );
 
     TFLOGSTRING3("TSY: CMmPacketServiceMessHandler::GpdsStatusResp.\n  \t Attach Status:%d\n\t Transfer Status:%d\n", attachStatus, transfStatus );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSSTATUSRESP, "CMmPacketServiceMessHandler::GpdsStatusResp;attachStatus=%hhu;transfStatus=%hhu", attachStatus, transfStatus );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSSTATUSRESP_TD, "CMmPacketServiceMessHandler::GpdsStatusResp;attachStatus=%hhu;transfStatus=%hhu", attachStatus, transfStatus );
 
     CompleteGpdsStatusRequest( attachStatus, transfStatus );
     }
@@ -455,7 +455,7 @@ TInt CMmPacketServiceMessHandler::GpdsAttachReq() const
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsAttachReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSATTACHREQ, "CMmPacketServiceMessHandler::GpdsAttachReq" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSATTACHREQ_TD, "CMmPacketServiceMessHandler::GpdsAttachReq" );
 
     // Append data for ISI message
     TBuf8<1> data;
@@ -476,7 +476,7 @@ void CMmPacketServiceMessHandler::GpdsAttachResp(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsAttachResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSATTACHRESP, "CMmPacketServiceMessHandler::GpdsAttachResp" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSATTACHRESP_TD, "CMmPacketServiceMessHandler::GpdsAttachResp" );
 
     if ( GPDS_ATTACH_REQ == aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + GPDS_ATTACH_RESP_OFFSET_UTID ) )
@@ -496,7 +496,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSATTACHRESP, "CMmPacketS
         //no else
 
         TFLOGSTRING3("TSY: CMmPacketServiceMessHandler::GpdsAttachResp.\n  \t Status:%d\n\t Cause:%d\n", status, cause );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSATTACHRESP, "CMmPacketServiceMessHandler::GpdsAttachResp;status=%hhu;cause=%hhu", status, cause );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSATTACHRESP_TD, "CMmPacketServiceMessHandler::GpdsAttachResp;status=%hhu;cause=%hhu", status, cause );
 
         //Complete Attach
         iMessageRouter->Complete(
@@ -515,7 +515,7 @@ void CMmPacketServiceMessHandler::GpdsAttachInd() const
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsAttachInd.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSATTACHIND, "CMmPacketServiceMessHandler::GpdsAttachInd" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSATTACHIND_TD, "CMmPacketServiceMessHandler::GpdsAttachInd" );
 
     RPacketService::TStatus status( RPacketService::EStatusAttached );
     TBool isResumed( EFalse );
@@ -540,7 +540,7 @@ TInt CMmPacketServiceMessHandler::GpdsDetachReq() const
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsDetachReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSDETACHREQ, "CMmPacketServiceMessHandler::GpdsDetachReq" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSDETACHREQ_TD, "CMmPacketServiceMessHandler::GpdsDetachReq" );
 
     // Create isi message
     TBuf8<SIZE_GPDS_DETACH_REQ + SIZE_GPDS_CONDITIONAL_DETACH_INFO>
@@ -579,7 +579,7 @@ void CMmPacketServiceMessHandler::GpdsDetachResp(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsDetachResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSDETACHRESP, "CMmPacketServiceMessHandler::GpdsDetachResp" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSDETACHRESP_TD, "CMmPacketServiceMessHandler::GpdsDetachResp" );
 
     if ( GPDS_DETACH_REQ == aIsiMessage.Get8bit(
         ISI_HEADER_SIZE +  GPDS_DETACH_RESP_OFFSET_UTID ) )
@@ -596,7 +596,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSDETACHRESP, "CMmPacketS
             }
 
         TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsDetachResp.\n\t Status:%d\n", status );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSDETACHRESP, "CMmPacketServiceMessHandler::GpdsDetachResp;status=%hhu", status );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSDETACHRESP_TD, "CMmPacketServiceMessHandler::GpdsDetachResp;status=%hhu", status );
 
         //Complete
         iMessageRouter->Complete(
@@ -624,7 +624,7 @@ void CMmPacketServiceMessHandler::GpdsDetachInd() const
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsDetachInd. Complete\n\t status:%d\n", status );
 
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSDETACHIND, "CMmPacketServiceMessHandler::GpdsDetachInd;status=%hhu", status );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSDETACHIND_TD, "CMmPacketServiceMessHandler::GpdsDetachInd;status=%hhu", status );
     iMessageRouter->Complete(
         EPacketNotifyStatusChange,
         &data,
@@ -639,7 +639,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSDETACHIND, "CMmPacke
 TInt CMmPacketServiceMessHandler::NetModemRegStatusGetReq() const
     {
 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::NetModemRegStatusGetReq" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETREQ, "CMmPacketServiceMessHandler::NetModemRegStatusGetReq" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETREQ_TD, "CMmPacketServiceMessHandler::NetModemRegStatusGetReq" );
 
     // Data buffer for transactionId and Message Id.
     TBuf8<2> data;
@@ -662,7 +662,7 @@ void CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd(
     const TIsiReceiveC &aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND_TD, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd" );
 
     TUint sbStartOffSet( 0 );
     TInt ret( 0 );
@@ -685,7 +685,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORI
                 NET_MODEM_REG_STATUS_GET_RESP_OFFSET_SUCCESSCODE ) );
 
 TFLOGSTRING3("TSY: CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - NetModemRegStatusGetResp, Registration Status:%d Success Code:%d", regStatus, successCode);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - NetModemRegStatusGetResp, Registration Status=%hhu Success Code=%hhu", regStatus, successCode );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND_TD, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - NetModemRegStatusGetResp, Registration Status=%hhu Success Code=%hhu", regStatus, successCode );
 
             // Map registration status mapping
             RPacketService::TRegistrationStatus regStatusClient(
@@ -702,7 +702,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGE
         else
             {
 TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - NetModemRegStatusInd, Registration Status:%d", regStatus);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - NetModemRegStatusInd, Registration Status=%hhu", regStatus );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND_TD, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - NetModemRegStatusInd, Registration Status=%hhu", regStatus );
 
             CMmDataPackage data;
 
@@ -768,9 +768,9 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGE
 TFLOGSTRING3("TSY: CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - CS Services:%d GPRS support in cell:%d", csServices, gprsSupported);
 TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - EdgeGprsSupport:%d", edgeGprsSupport);
 TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - DtmSupport:%d", dtmSupportInCell);
-OstTraceExt2( TRACE_NORMAL, DUP3_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - CS Services=%hhu GPRS support in cell=%hhu", csServices, gprsSupported );
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - EdgeGprsSupport=%hhu", edgeGprsSupport );
-OstTraceExt1( TRACE_NORMAL, DUP5_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - DtmSupport=%hhu", dtmSupportInCell );
+OstTraceExt2( TRACE_NORMAL,  DUP3_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND_TD, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - CS Services=%hhu GPRS support in cell=%hhu", csServices, gprsSupported );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND_TD, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - EdgeGprsSupport=%hhu", edgeGprsSupport );
+OstTraceExt1( TRACE_NORMAL,  DUP5_CMMPACKETSERVICEMESSHANDLER_NETMODEMREGSTATUSGETRESPORIND_TD, "CMmPacketServiceMessHandler::NetModemRegStatusGetRespOrInd - DtmSupport=%hhu", dtmSupportInCell );
 
         // Complete notification to the active extension
         CompleteGsmRegistrationInfo(
@@ -808,13 +808,13 @@ TInt CMmPacketServiceMessHandler::GpdsConfigureReq(
     {
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsConfigureReq.\n\t Attach Mode:%d\n", aAttachMode );
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGUREREQ, "CMmPacketServiceMessHandler::GpdsConfigureReq;aAttachMode=%hhu", aAttachMode );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGUREREQ_TD, "CMmPacketServiceMessHandler::GpdsConfigureReq;aAttachMode=%hhu", aAttachMode );
 
     TUint8 aAolContext = GPDS_AOL_CTX_NOT_ACTIVE;
     iAlwaysOnMode = alwaysOnMode;
 
     TFLOGSTRING3("TSY: CMmPacketServiceMessHandler::GpdsConfigureReq.\n  \t Mt Context Activation Mode:%d\n\t Class C Mode:%d\n", aMtContextActivationMode, aClassCMode );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGUREREQ, "CMmPacketServiceMessHandler::GpdsConfigureReq;aMtContextActivationMode=%hhu;aClassCMode=%hhu", aMtContextActivationMode, aClassCMode );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGUREREQ_TD, "CMmPacketServiceMessHandler::GpdsConfigureReq;aMtContextActivationMode=%hhu;aClassCMode=%hhu", aMtContextActivationMode, aClassCMode );
 
     switch ( iAlwaysOnMode )
         {
@@ -842,7 +842,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGUREREQ, "
             {
 
             TFLOGSTRING2("CMmPacketServiceMessHandler::GpdsConfigureReq.\n\t AOL Context Mode:%d\n", aAolContext);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGUREREQ, "CMmPacketServiceMessHandler::GpdsConfigureReq;aAolContext=%hhu", aAolContext );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGUREREQ_TD, "CMmPacketServiceMessHandler::GpdsConfigureReq;aAolContext=%hhu", aAolContext );
 
             break;
             }
@@ -886,7 +886,7 @@ void CMmPacketServiceMessHandler::GpdsConfigureResp(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsConfigureResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURERESP, "CMmPacketServiceMessHandler::GpdsConfigureResp" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURERESP_TD, "CMmPacketServiceMessHandler::GpdsConfigureResp" );
 
     TInt errorValue( KErrNone );
     TBool called( EFalse );
@@ -911,7 +911,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURERESP, "CMmPack
             ISI_HEADER_SIZE + GPDS_CONFIGURE_RESP_OFFSET_STATUS ) );
 
         TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsConfigureResp.\n\t Status:%d\n", status );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURERESP, "CMmPacketServiceMessHandler::GpdsConfigureResp;status=%hhu", status );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURERESP_TD, "CMmPacketServiceMessHandler::GpdsConfigureResp;status=%hhu", status );
 
         if ( GPDS_CONFIGURE_REQ == transactionId )
             {
@@ -971,7 +971,7 @@ void CMmPacketServiceMessHandler::GpdsTransferStatusInd(
         ISI_HEADER_SIZE + GPDS_TRANSFER_STATUS_IND_OFFSET_TRANSFERCAUSE) );
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsTransferStatusInd.\n  \t Transfer cause:%d\n", transferCause );
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSTRANSFERSTATUSIND, "CMmPacketServiceMessHandler::GpdsTransferStatusInd;transferCause=%hhu", transferCause );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSTRANSFERSTATUSIND_TD, "CMmPacketServiceMessHandler::GpdsTransferStatusInd;transferCause=%hhu", transferCause );
 
     CompleteTransferStatusIndication( transferCause );
     }
@@ -989,7 +989,7 @@ void CMmPacketServiceMessHandler::GpdsContextIdCreateInd(
         ISI_HEADER_SIZE + GPDS_CONTEXT_ID_CREATE_IND_OFFSET_CID ) );
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsContextIdCreateInd.\n\t Context Id:%d\n", contextId );
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTIDCREATEIND, "CMmPacketServiceMessHandler::GpdsContextIdCreateInd;contextId=%hhu", contextId );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTIDCREATEIND_TD, "CMmPacketServiceMessHandler::GpdsContextIdCreateInd;contextId=%hhu", contextId );
 
     // initial variables
     CMmDataPackage data;
@@ -1031,7 +1031,7 @@ void CMmPacketServiceMessHandler::GpdsConfigurationInfoInd(
         ISI_HEADER_SIZE + GPDS_CONFIGURATION_INFO_IND_OFFSET_CLASSCMODE) );
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsConfigurationInfoInd.\n\t Class C Mode:%d\n", classC );
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURATIONINFOIND, "CMmPacketServiceMessHandler::GpdsConfigurationInfoInd;classC=%hhu", classC );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURATIONINFOIND_TD, "CMmPacketServiceMessHandler::GpdsConfigurationInfoInd;classC=%hhu", classC );
 
     RPacketService::TPreferredBearer bearer(
         RPacketService::EBearerPacketSwitched );
@@ -1061,7 +1061,7 @@ TInt CMmPacketServiceMessHandler::GpdsContextNwiActRejectReq() const
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsContextNwiActRejectReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTNWIACTREJECTREQ, "CMmPacketServiceMessHandler::GpdsContextNwiActRejectReq" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTNWIACTREJECTREQ_TD, "CMmPacketServiceMessHandler::GpdsContextNwiActRejectReq" );
 
     // Introduce data buffer for needed GpdsContextNwiActRejectReq data
     // Needed length is 1
@@ -1086,7 +1086,7 @@ void CMmPacketServiceMessHandler::GpdsContextNwiActRejectResp(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsContextNwiActRejectResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTNWIACTREJECTRESP, "CMmPacketServiceMessHandler::GpdsContextNwiActRejectResp" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTNWIACTREJECTRESP_TD, "CMmPacketServiceMessHandler::GpdsContextNwiActRejectResp" );
 
     iMessageRouter->Complete(
         EPacketRejectActivationRequest,
@@ -1111,7 +1111,7 @@ void CMmPacketServiceMessHandler::GpdsContextNwiActRequestInd(
         ISI_HEADER_SIZE + GPDS_CONTEXT_NWI_ACT_REQUEST_IND_OFFSET_PDPTYPE ) );
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsContextNwiActRequestInd. PdpType:%d", pdpType );
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTNWIACTREQUESTIND, "CMmPacketServiceMessHandler::GpdsContextNwiActRequestInd;pdpType=%hhu", pdpType );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTNWIACTREQUESTIND_TD, "CMmPacketServiceMessHandler::GpdsContextNwiActRequestInd;pdpType=%hhu", pdpType );
 
     TPtrC8 pdpAddress;
     TPtrC8 accessPointName;
@@ -1161,7 +1161,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTNWIACTREQUEST
     //no else
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsContextNwiActRequestInd.\n  \t Pdp Type:%d\n", pdpType );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTNWIACTREQUESTIND, "CMmPacketServiceMessHandler::GpdsContextNwiActRequestInd;pdpType=%hhu", pdpType );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTNWIACTREQUESTIND_TD, "CMmPacketServiceMessHandler::GpdsContextNwiActRequestInd;pdpType=%hhu", pdpType );
 
     // Map server pdp type to client pdp type
     CMmStaticUtility::MapPdpTypeToClient(
@@ -1191,7 +1191,7 @@ TInt CMmPacketServiceMessHandler::GpdsConfigurationInfoReq(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsConfigurationInfoReq.\n\t" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURATIONINFOREQ, "CMmPacketServiceMessHandler::GpdsConfigurationInfoReq" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURATIONINFOREQ_TD, "CMmPacketServiceMessHandler::GpdsConfigurationInfoReq" );
 
     TBuf8<1> data;
     TUint8 transactionId( 0 );
@@ -1222,7 +1222,7 @@ void CMmPacketServiceMessHandler::GpdsConfigurationInfoResp(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsConfigurationInfoResp.\n\t" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURATIONINFORESP, "CMmPacketServiceMessHandler::GpdsConfigurationInfoResp" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURATIONINFORESP_TD, "CMmPacketServiceMessHandler::GpdsConfigurationInfoResp" );
 
     CMmDataPackage data;
     TBool ret( EFalse );
@@ -1242,7 +1242,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURATIONINFORESP, 
             ISI_HEADER_SIZE + GPDS_CONFIGURATION_INFO_RESP_OFFSET_ATTACHMODE ) );
 
         TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::GpdsConfigurationInfoResp.\n\t Attach mode:%d\n", attachMode );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURATIONINFORESP, "CMmPacketServiceMessHandler::GpdsConfigurationInfoResp;attachMode=%hhu", attachMode );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_GPDSCONFIGURATIONINFORESP_TD, "CMmPacketServiceMessHandler::GpdsConfigurationInfoResp;attachMode=%hhu", attachMode );
 
         RPacketService::TAttachMode attachModeForCompletion(
             RPacketService::EAttachWhenNeeded );
@@ -1298,7 +1298,7 @@ void CMmPacketServiceMessHandler::GpdsContextConfigureResp(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsContextConfigureResp.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTCONFIGURERESP, "CMmPacketServiceMessHandler::GpdsContextConfigureResp" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTCONFIGURERESP_TD, "CMmPacketServiceMessHandler::GpdsContextConfigureResp" );
 
     TBool called( EFalse );
 
@@ -1341,7 +1341,7 @@ TInt CMmPacketServiceMessHandler::GpdsContextConfigureReq(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GpdsContextConfigureReq.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTCONFIGUREREQ, "CMmPacketServiceMessHandler::GpdsContextConfigureReq" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GPDSCONTEXTCONFIGUREREQ_TD, "CMmPacketServiceMessHandler::GpdsContextConfigureReq" );
 
     // Append data for ISI message
     TBuf8<SIZE_GPDS_CONTEXT_CONFIGURE_REQ + SIZE_GPDS_COMP_INFO +
@@ -1410,7 +1410,7 @@ RPacketService::TRegistrationStatus CMmPacketServiceMessHandler::MapNtwkRegStatu
     {
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::MapNtwkRegStatus. aRegistrationStatus: %d", aRegistrationStatus);
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_MAPNTWKREGSTATUS, "CMmPacketServiceMessHandler::MapNtwkRegStatus;aRegistrationStatus=%hhu", aRegistrationStatus );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_MAPNTWKREGSTATUS_TD, "CMmPacketServiceMessHandler::MapNtwkRegStatus;aRegistrationStatus=%hhu", aRegistrationStatus );
 
     RPacketService::TRegistrationStatus registrationStatus(
         RPacketService::EUnknown );
@@ -1478,14 +1478,14 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_MAPNTWKREGSTATUS, "CMmPa
             {
 
             TFLOGSTRING("TSY: CMmPacketServiceMessHandler::MapNtwkRegStatus: Default, DO NOTHING\n" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_MAPNTWKREGSTATUS, "CMmPacketServiceMessHandler::MapNtwkRegStatus, Default, DO NOTHING" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_MAPNTWKREGSTATUS_TD, "CMmPacketServiceMessHandler::MapNtwkRegStatus, Default, DO NOTHING" );
             // Do nothing
             break;
             }
         }
 
     TFLOGSTRING3("TSY: CMmPacketServiceMessHandler::MapNtwkRegStatus.\n  \t Registration Status Server:%d\n\t Registration Status Client:%d\n", aRegistrationStatus, registrationStatus );
-OstTraceExt2( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_MAPNTWKREGSTATUS, "CMmPacketServiceMessHandler::MapNtwkRegStatus;aRegistrationStatus=%hhu;registrationStatus=%d", aRegistrationStatus, registrationStatus );
+OstTraceExt2( TRACE_NORMAL,  DUP2_CMMPACKETSERVICEMESSHANDLER_MAPNTWKREGSTATUS_TD, "CMmPacketServiceMessHandler::MapNtwkRegStatus;aRegistrationStatus=%hhu;registrationStatus=%d", aRegistrationStatus, registrationStatus );
 
     return registrationStatus;
     }
@@ -1502,7 +1502,7 @@ void CMmPacketServiceMessHandler::CompleteGsmRegistrationInfo(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::CompleteGsmRegistrationInfo.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_COMPLETEGSMREGISTRATIONINFO, "CMmPacketServiceMessHandler::CompleteGsmRegistrationInfo" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_COMPLETEGSMREGISTRATIONINFO_TD, "CMmPacketServiceMessHandler::CompleteGsmRegistrationInfo" );
 
     CMmDataPackage data;
     // save aCsServices internally
@@ -1539,7 +1539,7 @@ void CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps(
     const TBool aEdgeGprsSupport )
     {
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps.\n" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_COMPLETEPACKETNOTIFYTRANSFERCAPS, "CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_COMPLETEPACKETNOTIFYTRANSFERCAPS_TD, "CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps" );
 
     TDynamicTransferCapsFlags transferCaps ( 0 );
 
@@ -1548,7 +1548,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_COMPLETEPACKETNOTIFYTRANSFE
         transferCaps |= KCapsEGPRS;
 
         TFLOGSTRING2( "TSY: CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps, Transfer Caps = %d.", transferCaps );
-OstTrace1( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_COMPLETEPACKETNOTIFYTRANSFERCAPS, "CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps;transferCaps=%d", transferCaps );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPACKETSERVICEMESSHANDLER_COMPLETEPACKETNOTIFYTRANSFERCAPS_TD, "CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps;transferCaps=%d", transferCaps );
         }
 
     if ( iLastHsdpaAllocationStatus )
@@ -1556,7 +1556,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_COMPLETEPACKETNOTIFYTR
         transferCaps |= KCapsHSDPA;
 
         TFLOGSTRING2( "TSY: CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps, Transfer Caps = %d.", transferCaps );
-OstTrace1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_COMPLETEPACKETNOTIFYTRANSFERCAPS, "CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps;transferCaps=%d", transferCaps );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_COMPLETEPACKETNOTIFYTRANSFERCAPS_TD, "CMmPacketServiceMessHandler::CompletePacketNotifyTransferCaps;transferCaps=%d", transferCaps );
         }
 
     CMmDataPackage dataPackage;
@@ -1579,7 +1579,7 @@ void CMmPacketServiceMessHandler::CompleteDynamicCapsChange()
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::CompleteDynamicCapsChange.");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_COMPLETEDYNAMICCAPSCHANGE, "CMmPacketServiceMessHandler::CompleteDynamicCapsChange" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_COMPLETEDYNAMICCAPSCHANGE_TD, "CMmPacketServiceMessHandler::CompleteDynamicCapsChange" );
 
     CMmDataPackage data;
     data.PackData( &iLastGprsSupportInCell, &iLastCsServices );
@@ -1600,7 +1600,7 @@ TInt CMmPacketServiceMessHandler::SetAttachMode(
     {
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::SetAttachMode.\n\t Attach Mode:%d\n", *aMode );
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_SETATTACHMODE, "CMmPacketServiceMessHandler::SetAttachMode;aMode=%hhu", *aMode );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_SETATTACHMODE_TD, "CMmPacketServiceMessHandler::SetAttachMode;aMode=%hhu", *aMode );
 
     TInt ret( KErrNone );
     TUint8 attachMode( GPDS_ATTACH_MODE_DEFAULT );
@@ -1642,7 +1642,7 @@ CMmPacketContextMesshandlerList* CMmPacketServiceMessHandler::PacketContextList(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::PacketContextList.");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_PACKETCONTEXTLIST, "CMmPacketServiceMessHandler::PacketContextList" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_PACKETCONTEXTLIST_TD, "CMmPacketServiceMessHandler::PacketContextList" );
 
     return iPacketMesshandlerContextList;
     }
@@ -1656,7 +1656,7 @@ CMmMessageRouter* CMmPacketServiceMessHandler::GetMessageRouter()
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::GetMessageRouter");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_GETMESSAGEROUTER, "CMmPacketServiceMessHandler::GetMessageRouter" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_GETMESSAGEROUTER_TD, "CMmPacketServiceMessHandler::GetMessageRouter" );
 
     return iMessageRouter;
     }
@@ -1672,7 +1672,7 @@ TInt CMmPacketServiceMessHandler::SetPreferredBearer(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::SetPreferredBearer");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_SETPREFERREDBEARER, "CMmPacketServiceMessHandler::SetPreferredBearer" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_SETPREFERREDBEARER_TD, "CMmPacketServiceMessHandler::SetPreferredBearer" );
 
     RPacketService::TPreferredBearer* abearer = NULL;
     TInt ret( KErrNone );
@@ -1680,7 +1680,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_SETPREFERREDBEARER, "CMmPac
     aDataPackage.UnPackData( &abearer );
 
     TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::SetPreferredBearer.\n\t Preferred Bearer:%d\n", &abearer );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_SETPREFERREDBEARER, "CMmPacketServiceMessHandler::SetPreferredBearer;abearer=%hhu", *abearer );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_SETPREFERREDBEARER_TD, "CMmPacketServiceMessHandler::SetPreferredBearer;abearer=%hhu", *abearer );
 
     TUint8 bearer( GPDS_CLASSC_MODE_DEFAULT );
 
@@ -1722,7 +1722,7 @@ TInt CMmPacketServiceMessHandler::SetDefaultContextParams(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::SetDefaultContextParams");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_SETDEFAULTCONTEXTPARAMS, "CMmPacketServiceMessHandler::SetDefaultContextParams" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_SETDEFAULTCONTEXTPARAMS_TD, "CMmPacketServiceMessHandler::SetDefaultContextParams" );
 
     TInt ret( KErrNotSupported );
     TUint8 dataCompression( GPDS_PDP_HCOMP_DEFAULT );
@@ -1740,7 +1740,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_SETDEFAULTCONTEXTPARAMS, "C
         {
 
         TFLOGSTRING("TSY: CMmPacketServiceMessHandler::SetDefaultContextParams. ExtensionId: KConfigGPRS");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_SETDEFAULTCONTEXTPARAMS, "CMmPacketServiceMessHandler::SetDefaultContextParams, ExtensionId: KConfigGPRS" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_SETDEFAULTCONTEXTPARAMS_TD, "CMmPacketServiceMessHandler::SetDefaultContextParams, ExtensionId: KConfigGPRS" );
 
         RPacketContext::TContextConfigGPRS& configGPRS =
             *reinterpret_cast<RPacketContext::TContextConfigGPRS*>( aconfig );
@@ -1775,7 +1775,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_SETDEFAULTCONTEXTPARAM
         {
 
         TFLOGSTRING("TSY: CMmPacketServiceMessHandler::SetDefaultContextParams. ExtensionId: KConfigRel99Rel4");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_SETDEFAULTCONTEXTPARAMS, "CMmPacketServiceMessHandler::SetDefaultContextParams, ExtensionId: KConfigRel99Rel4" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETSERVICEMESSHANDLER_SETDEFAULTCONTEXTPARAMS_TD, "CMmPacketServiceMessHandler::SetDefaultContextParams, ExtensionId: KConfigRel99Rel4" );
 
         RPacketContext::TContextConfigR99_R4& configR99_R4 =
             *reinterpret_cast<RPacketContext::TContextConfigR99_R4*>(
@@ -1829,7 +1829,7 @@ void CMmPacketServiceMessHandler::CompleteTransferStatusIndication(
     const TUint8 aTransferCause )
     {
 TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::CompleteTransferStatusIndication.\n  \t Transfer Cause:%d\n", aTransferCause );
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication;aTransferCause=%hhu", aTransferCause );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION_TD, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication;aTransferCause=%hhu", aTransferCause );
 
     RPacketService::TStatus packetStatus( RPacketService::EStatusAttached );
     RMmCustomAPI::TRauEventStatus rauindication( RMmCustomAPI::ERauEventActive );
@@ -1849,7 +1849,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSIN
             data.PackData( &rauindication );
             iMessageRouter->Complete( ECustomNotifyRauEventIPC, &data, error );
 TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::CompleteTransferStatusIndicationResumed.\n  \t Rau indication:%d\n", rauindication );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication;rauindication=%hhu", rauindication );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION_TD, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication;rauindication=%hhu", rauindication );
             break;
             }
         case GPDS_TRANSFER_CAUSE_ATTACHED:
@@ -1872,7 +1872,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTA
         case GPDS_TRANSFER_CAUSE_SUSPENDED_RAU :
             {
 TFLOGSTRING2("TSY: CMmPacketServiceMessHandler::CompleteTransferStatusIndicationActivated.\n  \t Rau indication:%d\n", rauindication );
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication;rauindication=%hhu", rauindication );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION_TD, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication;rauindication=%hhu", rauindication );
             // rauindication is 'RMmCustomAPI::ERauEventActive' by default, no need to set here
             data.PackData( &rauindication );
             iMessageRouter->Complete( ECustomNotifyRauEventIPC, &data, error );
@@ -1888,7 +1888,7 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTA
         case GPDS_TRANSFER_CAUSE_DSAC_RESTRICTION:
             {
 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::CompleteTransferStatusIndication. DSAC: connection failed because of barred PS \n");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication, DSAC: connection failed because of barred PS \n" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION_TD, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication, DSAC: connection failed because of barred PS \n" );
             // Core error and extended error are completed to CTSY
             error = ( KErrGeneral & 0x0000FFFF ) |
                 ( KErrGsmPSConnectionBarred << 16 );
@@ -1899,7 +1899,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUS
             {
 
 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::CompleteTransferStatusIndication.Default case: DO NOTHING\n");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication, Default case: DO NOTHING" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETSERVICEMESSHANDLER_COMPLETETRANSFERSTATUSINDICATION_TD, "CMmPacketServiceMessHandler::CompleteTransferStatusIndication, Default case: DO NOTHING" );
             break;
             }
         }
@@ -1927,7 +1927,7 @@ void CMmPacketServiceMessHandler::CompleteNotifyMSClassChange(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::CompleteNotifyMSClassChange");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_COMPLETENOTIFYMSCLASSCHANGE, "CMmPacketServiceMessHandler::CompleteNotifyMSClassChange" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_COMPLETENOTIFYMSCLASSCHANGE_TD, "CMmPacketServiceMessHandler::CompleteNotifyMSClassChange" );
 
     CMmDataPackage data;
     RPacketService::TMSClass msClass( RPacketService::EMSClassUnknown );
@@ -1988,7 +1988,7 @@ void CMmPacketServiceMessHandler::CompleteGpdsStatusRequest(
     {
 
     TFLOGSTRING3("TSY: CMmPacketService::CompleteGpdsStatusRequest.\n\t Attach Status:%d\n\t Transfer Status:%d\n", aAttachStatus, aTransferStatus );
-OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_COMPLETEGPDSSTATUSREQUEST, "CMmPacketServiceMessHandler::CompleteGpdsStatusRequest;aAttachStatus=%hhu", aAttachStatus );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_COMPLETEGPDSSTATUSREQUEST_TD, "CMmPacketServiceMessHandler::CompleteGpdsStatusRequest;aAttachStatus=%hhu", aAttachStatus );
 
     // Initiate EStatusAttached to packet status
     RPacketService::TStatus packetStatus( RPacketService::EStatusAttached );
@@ -2024,7 +2024,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_COMPLETEGPDSSTATUSREQUES
 TInt CMmPacketServiceMessHandler::NetRatReq()
     {
 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::NetRatReq");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_NETRATREQ, "CMmPacketServiceMessHandler::NetRatReq" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_NETRATREQ_TD, "CMmPacketServiceMessHandler::NetRatReq" );
 
     // Set the message data that consists of one parameters
     TBuf8<KBuffSizeOneByte> messageData;
@@ -2049,7 +2049,7 @@ void CMmPacketServiceMessHandler::NetRatIndOrResp(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::NetRatIndOrResp");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_NETRATINDORRESP, "CMmPacketServiceMessHandler::NetRatIndOrResp" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_NETRATINDORRESP_TD, "CMmPacketServiceMessHandler::NetRatIndOrResp" );
 
     TBool readSubBlock( ETrue );
     TBool isNetRatResp( NET_RAT_RESP == aIsiMessage.
@@ -2102,14 +2102,14 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_NETRATINDORRESP, "CMmPacket
                 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::NetRatIndOrResp. RMobilePhone::ENetworkModeGsm");
 
                 ntwkMode = RMobilePhone::ENetworkModeGsm;
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_NETRATINDORRESP, "CMmPacketServiceMessHandler::NetRatIndOrResp, RMobilePhone::ENetworkModeGsm" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_NETRATINDORRESP_TD, "CMmPacketServiceMessHandler::NetRatIndOrResp, RMobilePhone::ENetworkModeGsm" );
                 }
             // Else if Wcdma Rat is supported
             else if ( NET_UMTS_RAT == ratName )
                 {
                 // WCDMA currently not supported.
                 TFLOGSTRING("TSY: CMmPacketServiceMessHandler::NetRatIndOrResp. RMobilePhone::ENetworkModeWcdma");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_NETRATINDORRESP, "CMmPacketServiceMessHandler::NetRatIndOrResp, RMobilePhone::ENetworkModeWcdma" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETSERVICEMESSHANDLER_NETRATINDORRESP_TD, "CMmPacketServiceMessHandler::NetRatIndOrResp, RMobilePhone::ENetworkModeWcdma" );
                 ntwkMode = RMobilePhone::ENetworkModeWcdma;
                 }
 
@@ -2142,7 +2142,7 @@ void CMmPacketServiceMessHandler::HandleError(
     {
 
     TFLOGSTRING("TSY: CMmPacketServiceMessHandler::HandleError DO NOTHING");
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_HANDLEERROR, "CMmPacketServiceMessHandler::HandleError DO NOTHING" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_HANDLEERROR_TD, "CMmPacketServiceMessHandler::HandleError DO NOTHING" );
     //none
     }
 
@@ -2157,7 +2157,7 @@ void CMmPacketServiceMessHandler::NetRadioInfoInd(
     {
 
     TFLOGSTRING( "TSY: CMmPacketServiceMessHandler::NetRadioInfoInd" );
-OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "CMmPacketServiceMessHandler::NetRadioInfoInd" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND_TD, "CMmPacketServiceMessHandler::NetRadioInfoInd" );
 
     TDynamicTransferCapsFlags transferCaps ( 0 );
     TBool hsdpaAllocated ( EFalse );
@@ -2178,7 +2178,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "CMmPacket
         iLastHsdpaAllocationStatus = hsdpaAllocated;
 
         TFLOGSTRING2( "TSY: CMmPacketServiceMessHandler::NetRadioInfoInd, HSDPA Allocated = %d.", hsdpaAllocated );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "CMmPacketServiceMessHandler::NetRadioInfoInd;hsdpaAllocated=%hhu", hsdpaAllocated );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND_TD, "CMmPacketServiceMessHandler::NetRadioInfoInd;hsdpaAllocated=%hhu", hsdpaAllocated );
         }
 
     // Dynamic transfer caps
@@ -2187,7 +2187,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "C
         transferCaps |= KCapsHSDPA;
 
         TFLOGSTRING2( "TSY: CMmPacketServiceMessHandler::NetRadioInfoInd, Transfer Caps = %d.", transferCaps );
-OstTrace1( TRACE_NORMAL, DUP3_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "CMmPacketServiceMessHandler::NetRadioInfoInd;transferCaps=%d", transferCaps );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND_TD, "CMmPacketServiceMessHandler::NetRadioInfoInd;transferCaps=%d", transferCaps );
         }
 
 // This is done for SUB 403-7200: NokiaTSY: HSUPA Cell Indicator for S60 (S60 3.2.2 / S_CPR8.1).
@@ -2204,7 +2204,7 @@ OstTrace1( TRACE_NORMAL, DUP3_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "CMmP
             NET_UTRAN_RADIO_INFO_OFFSET_HSUPAALLOCATED );
 
         TFLOGSTRING2( "TSY: CMmPacketServiceMessHandler::NetRadioInfoInd, HSUPA Allocated = %d.", hsupaAllocated );
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "CMmPacketServiceMessHandler::NetRadioInfoInd;hsupaAllocated=%hhu", hsupaAllocated );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND_TD, "CMmPacketServiceMessHandler::NetRadioInfoInd;hsupaAllocated=%hhu", hsupaAllocated );
         }
 
     if ( hsdpaAllocated || hsupaAllocated )
@@ -2215,7 +2215,7 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "C
         iLastHsdpaAllocationStatus = ETrue;
 
         TFLOGSTRING2( "TSY: CMmPacketServiceMessHandler::NetRadioInfoInd, Transfer Caps (HSDPA or HSUPA) = %d.", transferCaps );
-OstTrace1( TRACE_NORMAL, DUP4_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "CMmPacketServiceMessHandler::NetRadioInfoInd;transferCaps=%d", transferCaps );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND_TD, "CMmPacketServiceMessHandler::NetRadioInfoInd;transferCaps=%d", transferCaps );
 
         }
 #endif // defined ( CASW_HSXPA_INDICATOR_SUPPORTED ) || defined ( INTERNAL_TESTING_CASW_HSXPA_INDICATOR_SUPPORT )
@@ -2225,7 +2225,7 @@ OstTrace1( TRACE_NORMAL, DUP4_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "CMmP
         transferCaps |= KCapsEGPRS;
 
         TFLOGSTRING2( "TSY: CMmPacketServiceMessHandler::NetRadioInfoInd, Transfer Caps = %d.", transferCaps );
-OstTrace1( TRACE_NORMAL, DUP5_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND, "CMmPacketServiceMessHandler::NetRadioInfoInd;transferCaps=%d", transferCaps );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMPACKETSERVICEMESSHANDLER_NETRADIOINFOIND_TD, "CMmPacketServiceMessHandler::NetRadioInfoInd;transferCaps=%d", transferCaps );
         }
 
     // Pack the data

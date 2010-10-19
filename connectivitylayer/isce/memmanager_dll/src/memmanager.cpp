@@ -124,7 +124,7 @@ void DMemManager::PoolAllocateDfc(
     C_TRACE( ( _T( "DMemManager::PoolAllocateDfc aPtr 0x%x>" ), aPtr ) );
             
     DMemManager& tmp = *reinterpret_cast<DMemManager*>( aPtr );
-    TRACE_ASSERT_ALWAYS;// See below TODO comment, needs a fix
+    TRACE_ASSERT_ALWAYS;
     
     NKern::FMWait( tmp.iFastMutex );
     
@@ -149,7 +149,7 @@ void DMemManager::PoolDeleteDfc(
     C_TRACE( ( _T( "DMemManager::PoolDeleteDfc aPtr 0x%x>" ), aPtr ) );
             
     DMemManager& tmp = *reinterpret_cast<DMemManager*>( aPtr );
-    TRACE_ASSERT_ALWAYS; // See below TODO comment, needs a fix
+    TRACE_ASSERT_ALWAYS; 
     NKern::FMWait( tmp.iFastMutex );
     
     ASSERT_RESET_ALWAYS( ( tmp.iPoolDeleteQueue.Count() > 0 ), ( EInvalidQueueCount | EDMemmanagerTraceId << KClassIdentifierShift ) );
@@ -258,7 +258,7 @@ DMemManager::DMemPool::~DMemPool()
 */
 TPtr8* DMemManager::DMemPool::Alloc( const TUint16 aSize )
     {
-// TODO : not when FM	  C_TRACE( ( _T( "DMemManager::DMemPool::Alloc>" ) ) );
+//  not when FM	  C_TRACE( ( _T( "DMemManager::DMemPool::Alloc>" ) ) );
 	  
 	  ASSERT_RESET_ALWAYS( (iMemoryArea || iFreeMemBlock), ( EMemBlockAllocationFailed | EDMemmanagerTraceId << KClassIdentifierShift ) );
     
@@ -282,7 +282,7 @@ TPtr8* DMemManager::DMemPool::Alloc( const TUint16 aSize )
     
     iBlockUsage++;
    
-// TODO : not when FM	  C_TRACE( ( _T( "DMemManager::DMemPool::Alloc<" ) ) );
+//  not when FM	  C_TRACE( ( _T( "DMemManager::DMemPool::Alloc<" ) ) );
     return iAllocatedMemBlock->iMemPtr;
     }
 
@@ -292,7 +292,7 @@ TPtr8* DMemManager::DMemPool::Alloc( const TUint16 aSize )
 */
 TBool DMemManager::DMemPool::Free( const TUint8* aBlockAddress )
     {
-// TODO : not when FM    C_TRACE( ( _T( "DMemManager::DMemPool::Free>" ) ) );
+//  not when FM    C_TRACE( ( _T( "DMemManager::DMemPool::Free>" ) ) );
 	    
     struct sUnit *pCurUnit = (struct sUnit *)(aBlockAddress - sizeof(struct sUnit) );
 
@@ -314,7 +314,7 @@ TBool DMemManager::DMemPool::Free( const TUint8* aBlockAddress )
     iFreeMemBlock->iMemPtr->Zero();
     iBlockUsage--;
     
-// TODO : not when FM    C_TRACE( ( _T( "DMemManager::DMemPool::Free<" ) ) );
+//  not when FM    C_TRACE( ( _T( "DMemManager::DMemPool::Free<" ) ) );
 
     //If empty & ready to be deleted
     return ( iCopyPoolInUse && iBlockUsage == 0 ) ? ETrue : EFalse; 
@@ -366,7 +366,8 @@ EXPORT_C void MemApi::DeallocBlock( TDes8& aBlock )
     __ASSERT_NO_FAST_MUTEX;
     
     ASSERT_THREAD_CONTEXT_ALWAYS( ( EDeallocNotThreadContext | EDMemmanagerTraceId << KClassIdentifierShift ) );
-    
+    aBlock.FillZ( aBlock.MaxLength() );
+    aBlock.SetLength(0);
     TBool removePool = EFalse;
     NKern::FMWait( DMemManager::iThisptr->iFastMutex );
     

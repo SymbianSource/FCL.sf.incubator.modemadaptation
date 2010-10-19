@@ -80,7 +80,13 @@ NONSHARABLE_CLASS( DISILink ) : public DBase, public MMuxLinkIf, public MISIRout
         */
         TBool Send( TDes8& aMsg );
         // From MISIRouterLinkIf end
+        /*
+        * See comments from MISIRouterLinkIf.
+        */
+        TBool StateConnected(){ return iTrxPresent;};
         
+        TUint8 GetTrxId();
+
     private:
 
         // Not owned, can be called from 1...N thread, router responsible of it's own states guarding.

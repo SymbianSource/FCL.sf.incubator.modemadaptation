@@ -24,6 +24,7 @@ BASEDEFAULT
 #include "../usbphonetlink/group/bld.inf"
 #include "../isce/group/bld.inf"
 #include "../isimessage/group/bld.inf"
+#include "../ist/group/bld.inf"
 
 PRJ_EXPORTS
 ../rom/connectivitylayer.iby					NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(connectivitylayer.iby)

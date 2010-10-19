@@ -70,7 +70,7 @@ CMmConferenceCallMessHandler::CMmConferenceCallMessHandler()
     {
     // None
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::CMmConferenceCallMessHandler");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_CMMCONFERENCECALLMESSHANDLER, "CMmConferenceCallMessHandler::CMmConferenceCallMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_CMMCONFERENCECALLMESSHANDLER_TD, "CMmConferenceCallMessHandler::CMmConferenceCallMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ CMmConferenceCallMessHandler* CMmConferenceCallMessHandler::NewL(
     )
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::NewL");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_NEWL, "CMmConferenceCallMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_NEWL_TD, "CMmConferenceCallMessHandler::NewL" );
 
     CMmConferenceCallMessHandler* conferenceCallMessHandler =
         new ( ELeave ) CMmConferenceCallMessHandler();
@@ -121,7 +121,7 @@ OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_NEWL, "CMmConferenceCallMe
 void CMmConferenceCallMessHandler::ConstructL()
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_CONSTRUCTL, "CMmConferenceCallMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_CONSTRUCTL_TD, "CMmConferenceCallMessHandler::ConstructL" );
 
     iIsCreateConference = EFalse;
     iLastOperation = 0;
@@ -135,7 +135,7 @@ OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_CONSTRUCTL, "CMmConference
 CMmConferenceCallMessHandler::~CMmConferenceCallMessHandler()
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::~CMmConferenceCallMessHandler");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCONFERENCECALLMESSHANDLER_CMMCONFERENCECALLMESSHANDLER, "CMmConferenceCallMessHandler::~CMmConferenceCallMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCONFERENCECALLMESSHANDLER_CMMCONFERENCECALLMESSHANDLER_TD, "CMmConferenceCallMessHandler::~CMmConferenceCallMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ TInt CMmConferenceCallMessHandler::ExtFuncL(
     const CMmDataPackage* aDataPackage )
     {
 TFLOGSTRING2("TSY: CMmConferenceCallMessHandler::ExtFuncL. Ipc:%d", aIpc);
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_EXTFUNCL, "CMmConferenceCallMessHandler::ExtFuncL" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_EXTFUNCL_TD, "CMmConferenceCallMessHandler::ExtFuncL" );
 
     TInt ret( KErrNone );
     TUint8 transId( KConferenceCallTransId );
@@ -234,7 +234,7 @@ OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_EXTFUNCL, "CMmConferenceCa
         default:
             {
 TFLOGSTRING2("TSY: CMmConferenceCallMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMCONFERENCECALLMESSHANDLER_EXTFUNCL, "CMmConferenceCallMessHandler::ExtFuncL - Unknown IPC=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMCONFERENCECALLMESSHANDLER_EXTFUNCL_TD, "CMmConferenceCallMessHandler::ExtFuncL - Unknown IPC=%d", aIpc );
             ret = KErrNotSupported;
             break;
             }
@@ -252,7 +252,7 @@ TUint8 CMmConferenceCallMessHandler::MapETelCallIdToISACallId(
     const TInt aETelCallId )
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::MapETelCallIdToISACallId");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_MAPETELCALLIDTOISACALLID, "CMmConferenceCallMessHandler::MapETelCallIdToISACallId" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_MAPETELCALLIDTOISACALLID_TD, "CMmConferenceCallMessHandler::MapETelCallIdToISACallId" );
 
     TUint8 callId( CALL_MODEM_ID_NONE );
 
@@ -277,7 +277,7 @@ void CMmConferenceCallMessHandler::ReceiveMessageL(
     const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::ReceiveMessageL.");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_RECEIVEMESSAGEL, "CMmConferenceCallMessHandler::ReceiveMessageL" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmConferenceCallMessHandler::ReceiveMessageL" );
 
     TInt resource( aIsiMsg.Get8bit( ISI_HEADER_OFFSET_RESOURCEID ) );
     TInt messageId( aIsiMsg.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
@@ -306,7 +306,7 @@ OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_RECEIVEMESSAGEL, "CMmConfe
                 default:
                     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::ReceiveMessageL. PN_CALL Switch messageID case default.");
-OstTrace0( TRACE_NORMAL, DUP1_CMMCONFERENCECALLMESSHANDLER_RECEIVEMESSAGEL, "CMmConferenceCallMessHandler::ReceiveMessageL. PN_CALL Switch messageID case default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMCONFERENCECALLMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmConferenceCallMessHandler::ReceiveMessageL. PN_CALL Switch messageID case default" );
                     break;
                     }
                 }
@@ -315,7 +315,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMCONFERENCECALLMESSHANDLER_RECEIVEMESSAGEL, "CMm
         default:
             {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::ReceiveMessageL. Switch resource case default.");
-OstTrace0( TRACE_NORMAL, DUP2_CMMCONFERENCECALLMESSHANDLER_RECEIVEMESSAGEL, "CMmConferenceCallMessHandler::ReceiveMessageL. Switch resource case default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMCONFERENCECALLMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmConferenceCallMessHandler::ReceiveMessageL. Switch resource case default" );
             break;
             }
         }
@@ -333,7 +333,7 @@ TInt CMmConferenceCallMessHandler::CallControlReq(
     TBool aIsCreateConference )
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::CallControlReq");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_CALLCONTROLREQ, "CMmConferenceCallMessHandler::CallControlReq" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_CALLCONTROLREQ_TD, "CMmConferenceCallMessHandler::CallControlReq" );
 
     // Data for ISI message
     TBuf8<2 + SIZE_CALL_MODEM_SB_OPERATION> messageBuf;
@@ -375,7 +375,7 @@ void CMmConferenceCallMessHandler::CallControlResp(
     const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::CallControlResp");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_CALLCONTROLRESP, "CMmConferenceCallMessHandler::CallControlResp" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_CALLCONTROLRESP_TD, "CMmConferenceCallMessHandler::CallControlResp" );
 
     TUint sbStartOffSet( 0 );
 
@@ -448,7 +448,7 @@ void CMmConferenceCallMessHandler::CallControlInd(
     const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::CallControlInd");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_CALLCONTROLIND, "CMmConferenceCallMessHandler::CallControlInd" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_CALLCONTROLIND_TD, "CMmConferenceCallMessHandler::CallControlInd" );
 
     TUint sbStartOffSet( 0 );
 
@@ -529,7 +529,7 @@ OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_CALLCONTROLIND, "CMmConfer
                 sbStartOffSet + CALL_MODEM_SB_OPERATION_OFFSET_OPERATION );
 
 TFLOGSTRING2("TSY: CMmConferenceCallMessHandler::CallControlInd - Call operation: %d", callOperation);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMCONFERENCECALLMESSHANDLER_CALLCONTROLIND, "CMmConferenceCallMessHandler::CallControlInd;callOperation=%hhu", callOperation );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMCONFERENCECALLMESSHANDLER_CALLCONTROLIND_TD, "CMmConferenceCallMessHandler::CallControlInd;callOperation=%hhu", callOperation );
             // Purpose of this case is to prepare handling of externally
             // controlled conference call
             switch ( callOperation )
@@ -600,7 +600,7 @@ TInt CMmConferenceCallMessHandler::CallReleaseReq(
     TUint8 aCause )
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::CallReleaseReq");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_CALLRELEASEREQ, "CMmConferenceCallMessHandler::CallReleaseReq" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_CALLRELEASEREQ_TD, "CMmConferenceCallMessHandler::CallReleaseReq" );
 
     // Create isi message
     TIsiSend callreleaseReq( iPhoNetSender->SendBufferDes() );
@@ -682,7 +682,7 @@ void CMmConferenceCallMessHandler::CallReleaseResp(
     const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::CallReleaseResp");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_CALLRELEASERESP, "CMmConferenceCallMessHandler::CallReleaseResp" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_CALLRELEASERESP_TD, "CMmConferenceCallMessHandler::CallReleaseResp" );
 
     TUint sbStartOffSet( 0 );
 
@@ -732,7 +732,7 @@ void CMmConferenceCallMessHandler::HandleError(
     TInt /*aError*/ )
     {
 TFLOGSTRING("TSY: CMmConferenceCallMessHandler::HandleError");
-OstTrace0( TRACE_NORMAL, CMMCONFERENCECALLMESSHANDLER_HANDLEERROR, "CMmConferenceCallMessHandler::HandleError" );
+OstTrace0( TRACE_NORMAL,  CMMCONFERENCECALLMESSHANDLER_HANDLEERROR_TD, "CMmConferenceCallMessHandler::HandleError" );
 
     // None
     }

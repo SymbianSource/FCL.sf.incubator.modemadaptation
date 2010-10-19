@@ -20,10 +20,14 @@
 #define ADAPTATIONLAYER_IBY
 
 #include <bcaiscadapter.iby>
+#include <dataport.iby>
 #include <modematadaptation.iby>
 #include <devicemodecontroller.iby>
-#include <sspluginsadaptation.iby>
+#include <filesystemaccess.iby>
+#include <mobileterminalcontroller.iby>
+#include <systemstatemanageradaptation.iby>
 #include <tsy.iby>
+#include <phoneinfo.iby>
 
 #endif // ADAPTATIONLAYER_IBY
 

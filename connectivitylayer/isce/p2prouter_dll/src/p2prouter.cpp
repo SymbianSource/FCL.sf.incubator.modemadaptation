@@ -91,21 +91,36 @@ DP2PRouter::~DP2PRouter(
     for( TInt i( 0 ); i < EP2PAmountOfProtocols; i++ )
         {
         MP2PRouterLinkIf* temp = iLinksArray[ i ];
-        temp->Release();
-        temp = NULL;
+        if ( temp )
+            {
+            temp->Release();
+            temp = NULL;
+            }
         iLinksArray[ i ] = NULL;
         }
     delete []iLinksArray;
     delete []iP2PDfcQueList;
-    iInitDfc->Cancel();
-    delete iInitDfc;
-    iInitDfc = NULL;
-    iTrxPrecentDfc->Cancel();
-    delete iTrxPrecentDfc;
-    iTrxPrecentDfc = NULL;
-    iTrxNotPrecentDfc->Cancel();
-    delete iTrxNotPrecentDfc;
-    iTrxNotPrecentDfc = NULL;
+    
+    if ( iInitDfc )
+        {
+        iInitDfc->Cancel();//what about this
+        delete iInitDfc;
+        iInitDfc = NULL;
+        }
+        
+    if ( iTrxPrecentDfc )
+        {
+        iTrxPrecentDfc->Cancel();//what about this
+        delete iTrxPrecentDfc;
+        iTrxPrecentDfc = NULL;
+        }
+        
+    if ( iTrxNotPrecentDfc )
+        {
+        iTrxNotPrecentDfc->Cancel();//what about this
+        delete iTrxNotPrecentDfc;
+        iTrxNotPrecentDfc = NULL;
+        }
     C_TRACE( ( _T( "DP2PRouter::~DP2PRouter<" ) ) );
 
     }
@@ -161,20 +176,20 @@ void DP2PRouter::Receive(
 // From MP2PLinkRouterIf end
 
 // From MP2PChRouterIf start
-void DP2PRouter::Open(
+void DP2PRouter::Connect(
         const TUint8 aProtocolId,
         MP2PRouterChIf* aCallback
         )
     {
 
-    C_TRACE( ( _T( "DP2PRouter::Open %d>" ), aProtocolId ) );
-    // TODO :  assert to check always called in p2p extension thread context
+    C_TRACE( ( _T( "DP2PRouter::Connect %d>" ), aProtocolId ) );
+    //  assert to check always called in p2p extension thread context
     ASSERT_RESET_ALWAYS( aCallback, EP2PRouterNullParam );
     ASSERT_RESET_ALWAYS( aProtocolId < EP2PAmountOfProtocols, ( EP2PRouterWrongParam2 | EDP2PRouterTraceId << KClassIdentifierShift ) );
     ASSERT_RESET_ALWAYS( iLinksArray[ aProtocolId ], ( EP2PRouterWrongParam3 | EDP2PRouterTraceId << KClassIdentifierShift ) );
     if( iLinksArray[ aProtocolId ]->TrxPresent() )
         {
-        C_TRACE( ( _T( "DP2PRouter::Open ok %d" ), aProtocolId ) );
+        C_TRACE( ( _T( "DP2PRouter::Connect ok %d" ), aProtocolId ) );
         NKern::FMWait( iShChannelTableFastMutex );
         // Channel with the same protocol id is already opened or waiting to complete the opening.
         if( iShChannelTable[ aProtocolId ].iChannel || iShChannelTable[ aProtocolId ].iWaitingChannel )
@@ -182,7 +197,7 @@ void DP2PRouter::Open(
             NKern::FMSignal( iShChannelTableFastMutex );
             // If another channel tries to open already open channel.
             TRACE_WARNING( iShChannelTable[ aProtocolId ].iChannel == aCallback, (TUint8)aProtocolId );
-            aCallback->EnqueChannelRequestCompleteDfc( EP2PAsyncOpen, KErrInUse );//TODO: synch user and kernel APIs return values
+            aCallback->EnqueChannelRequestCompleteDfc( EP2PAsyncOpen, KErrInUse );// synch user and kernel APIs return values
             }
         else
             {
@@ -193,13 +208,13 @@ void DP2PRouter::Open(
         }
     else
         {
-        C_TRACE( ( _T( "DP2PRouter::Open pending %d" ), aProtocolId ) );
+        C_TRACE( ( _T( "DP2PRouter::Connect pending %d" ), aProtocolId ) );
         ASSERT_RESET_ALWAYS( !iShChannelTable[ aProtocolId ].iWaitingChannel, EP2PRouterWrongRequest );
         NKern::FMWait( iShChannelTableFastMutex );
         iShChannelTable[ aProtocolId ].iWaitingChannel = aCallback;
         NKern::FMSignal( iShChannelTableFastMutex );
         }
-    C_TRACE( ( _T( "DP2PRouter::Open %d<" ), aProtocolId ) );
+    C_TRACE( ( _T( "DP2PRouter::Connect %d<" ), aProtocolId ) );
 
     }
 
@@ -209,7 +224,7 @@ void DP2PRouter::Close(
     {
 
     C_TRACE( ( _T( "DP2PRouter::Close %d>" ), aProtocolId ) );
-    // TODO :  assert to check always called in p2p extension thread context
+    //  assert to check always called in p2p extension thread context
     ASSERT_RESET_ALWAYS( aProtocolId < EP2PAmountOfProtocols, ( EP2PRouterWrongParam4 | EDP2PRouterTraceId << KClassIdentifierShift ) );
     NKern::FMWait( iShChannelTableFastMutex );
     if( iShChannelTable[ aProtocolId ].iChannel || iShChannelTable[ aProtocolId ].iWaitingChannel )
@@ -263,7 +278,7 @@ TInt DP2PRouter::Send(
     {
 
     C_TRACE( ( _T( "DP2PRouter::Send 0x%x>" ), &aMessage ) );
-    // TODO :  assert to check always called in p2p extension thread context
+    //   assert to check always called in p2p extension thread context
     // Inside link array limits, if not programmer error.
     ASSERT_RESET_ALWAYS( aProtocolId < EP2PAmountOfProtocols, ( EP2PRouterWrongParam7 | EDP2PRouterTraceId << KClassIdentifierShift ) );
     MP2PRouterLinkIf* link = iLinksArray[ aProtocolId ];
@@ -306,8 +321,9 @@ void DP2PRouter::Init(
         {
         iShChannelTable[ i ].iChannel = NULL;
         iShChannelTable[ i ].iWaitingChannel = NULL;
+        iShChannelTable[ i ].iTrxConnectionStatus = EFalse;
         }
-    // TODO:do more clever way to create links.
+    // do more clever way to create links.
     // Configuration of links.
     iLinksArray[ EP2PRpc ] = MP2PRouterLinkIf::CreateLinkF( this, EP2PRpc, ETrxSharedMemory );
     iLinksArray[ EP2PTest ] = MP2PRouterLinkIf::CreateLinkF( this, EP2PTest, ETrxTest );
@@ -345,21 +361,29 @@ void DP2PRouter::TrxPrecentDfc(
         {
         TUint8 protocolId( i );
         C_TRACE( ( _T( "DP2PRouter::TrxPrecentDfc Trx present id=0x%x" ), protocolId ) );
-        NKern::FMWait( self.iShChannelTableFastMutex );
-        MP2PRouterChIf* waitingChannel = self.iShChannelTable[ protocolId ].iWaitingChannel;
-        if( waitingChannel )
+        if ( !self.iShChannelTable[ protocolId ].iTrxConnectionStatus &&
+              self.ConnectionExist( protocolId ) )
             {
-            self.iShChannelTable[ protocolId ].iChannel = waitingChannel;
-            NKern::FMSignal( self.iShChannelTableFastMutex );
-            C_TRACE( ( _T( "DP2PRouter::TrxPrecentDfc channel open waiting %d>" ), protocolId ) );
-            waitingChannel->EnqueChannelRequestCompleteDfc( EP2PAsyncOpen, KErrNone );
+            // Trx status changed
+            C_TRACE( ( _T( "DP2PRouter::TrxPrecentDfc Trx 0x%x present" ), protocolId ) );
+            self.iShChannelTable[ protocolId ].iTrxConnectionStatus = ETrue;
+            NKern::FMWait( self.iShChannelTableFastMutex );
+            MP2PRouterChIf* waitingChannel = self.iShChannelTable[ protocolId ].iWaitingChannel;
+            if( waitingChannel )
+                {
+                self.iShChannelTable[ protocolId ].iChannel = waitingChannel;
+                NKern::FMSignal( self.iShChannelTableFastMutex );
+                C_TRACE( ( _T( "DP2PRouter::TrxPrecentDfc channel open waiting %d>" ), protocolId ) );
+                waitingChannel->EnqueChannelRequestCompleteDfc( EP2PAsyncOpen, KErrNone );
+                }
+            else
+                {
+                // No need to inform presence, when connection is lost it is closed too and must be opened again.
+                NKern::FMSignal( self.iShChannelTableFastMutex );
+                C_TRACE( ( _T( "DP2PRouter::TrxPrecentDfc nothing waiting %d>" ), protocolId ) );
+                }
             }
-        else
-            {
-            // No need to inform presence, when connection is lost it is closed too and must be opened again.
-            NKern::FMSignal( self.iShChannelTableFastMutex );
-            C_TRACE( ( _T( "DP2PRouter::TrxPrecentDfc nothing waiting %d>" ), protocolId ) );
-            }
+        // No else: If trx status not changed no need to react
         }
     C_TRACE( ( _T( "DP2PRouter::TrxPrecentDfc<" )) );
 
@@ -376,21 +400,27 @@ void DP2PRouter::TrxNotPrecentDfc(
     for( TUint8 i( 0 ); i < EP2PAmountOfProtocols; i++ )
         {
         TUint8 protocolId( i );
-        C_TRACE( ( _T( "DP2PRouter::TrxNotPrecentDfc Trx lost id=0x%x" ), protocolId ) );
-        // Notifying channel that connection is lost and discard any received messages.
-        NKern::FMWait( self.iShChannelTableFastMutex );
-        MP2PRouterChIf* channel = self.iShChannelTable[ protocolId ].iChannel;
-        if( channel )
-            {
-            NKern::FMSignal( self.iShChannelTableFastMutex );
-            C_TRACE( ( _T( "DP2PRouter::TrxNotPrecentDfc Trx lost channel found for id=0x%x" ), protocolId ) );
-            channel->ConnectionLost();
+        if ( self.iShChannelTable[ protocolId ].iTrxConnectionStatus &&
+             !self.ConnectionExist( protocolId ) )
+            {                
+            C_TRACE( ( _T( "DP2PRouter::TrxNotPrecentDfc Trx lost id=0x%x" ), protocolId ) );
+            self.iShChannelTable[ protocolId ].iTrxConnectionStatus = EFalse;
+            // Notifying channel that connection is lost and discard any received messages.
+            NKern::FMWait( self.iShChannelTableFastMutex );
+            MP2PRouterChIf* channel = self.iShChannelTable[ protocolId ].iChannel;
+            if( channel )
+                {
+                NKern::FMSignal( self.iShChannelTableFastMutex );
+                C_TRACE( ( _T( "DP2PRouter::TrxNotPrecentDfc Trx lost channel found for id=0x%x" ), protocolId ) );
+                channel->ConnectionLost();
+                }
+            else
+                {
+                NKern::FMSignal( self.iShChannelTableFastMutex );
+                C_TRACE( ( _T( "DP2PRouter::TrxNotPrecentDfc Trx lost no channel found for id=0x%x" ), protocolId ) );
+                }         
             }
-        else
-            {
-            NKern::FMSignal( self.iShChannelTableFastMutex );
-            C_TRACE( ( _T( "DP2PRouter::TrxNotPrecentDfc Trx lost no channel found for id=0x%x" ), protocolId ) );
-            }
+            // No else: If trx status not changed no need to react
         }
     C_TRACE( ( _T( "DP2PRouter::TrxNotPrecentDfc<" )) );
 

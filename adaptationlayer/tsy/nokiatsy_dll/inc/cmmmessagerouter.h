@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -66,8 +66,7 @@ class CMmUssdMessHandler;
 class CMmSmsMessHandler;
 class CMmSecurityMessHandler;
 class CMmPhoneMessHandler;
-// Temporarily removed for bridge camp!
-//class CTsySatMessagingBase;
+class CTsySatMessagingBase;
 class CMmUiccMessHandler;
 
 #if (NCP_COMMON_S60_VERSION_SUPPORT==S60_VERSION_32)
@@ -210,8 +209,7 @@ class CMmMessageRouter :
     public:
         
 		// pointer to SAT Messaging
-        // Temporarily removed for bridge camp!
-		//CTsySatMessagingBase* iSatMessaging;
+		CTsySatMessagingBase* iSatMessaging;
 
     // protected attributes
     protected:

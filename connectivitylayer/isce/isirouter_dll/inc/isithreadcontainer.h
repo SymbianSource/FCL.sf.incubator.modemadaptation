@@ -18,10 +18,10 @@
 #ifndef __ISITHREADCONTAINER_H__
 #define __ISITHREADCONTAINER_H__
 
-#include "misichannelrouterif.h"  // For MISIChannelRouterIf
+#include "misiobjectrouterif.h"  // For MISIObjectRouterIf
 
-const TUint8 KAmountOfKernelThreads( 5 );
-const TUint8 KAmountOfUserThreads( 5 );
+const TUint8 KAmountOfKernelThreads( 1 );
+const TUint8 KAmountOfUserThreads( 1 );
 
 NONSHARABLE_CLASS( DISIThreadContainer ) : public DBase
     {
@@ -31,14 +31,14 @@ NONSHARABLE_CLASS( DISIThreadContainer ) : public DBase
         DISIThreadContainer();
         ~DISIThreadContainer();
             
-        TDfcQue* AllocateThread( const MISIChannelRouterIf::TISIDfcQThreadType aType );
+        TDfcQue* AllocateThread( const MISIObjectRouterIf::TISIDfcQThreadType aType );
         void DeallocateThread( TDfcQue* );
         
         TDfcQue* ReserveKernelThread();
         TDfcQue* ReserveUserThread();
         
     private:
-        
+        //  synch
         // Owned
         TDfcQue* iKClientDfcQueList[ KAmountOfKernelThreads ];
         TDfcQue* iUClientDfcQueList[ KAmountOfUserThreads ];

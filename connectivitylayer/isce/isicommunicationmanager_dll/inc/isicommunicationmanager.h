@@ -49,26 +49,39 @@ NONSHARABLE_CLASS( DISICommunicationManager ) : public DBase, public MISIRouterO
 
     private:
 
+        void HandleBootMessage( const TDesC8& aMessageDuringBoot );
+
+        void HandleCommunicationManagerCommonMessage( const TDesC8& aMessageToCommunicationManager );
+
+        void HandleApeCommunicationManagerMessage( const TDesC8& aMessageToCommunicationManager );
+
+        void HandlePnCommgrMessage( const TDesC8& aMessageToCommunicationManager );
+
+        void HandleMessageMulticast( const TDesC8& aMessageToMulticast );
+
         void SendNameAddReqs();
-        
-        void SendPnsSubscribeResp( const TDesC8& aMessage );
-        
+
+        void SendApeCommgrSubscribeResp( const TDesC8& aMessage );
+
         void SendCommServiceNotIdentifiedResp( const TDesC8& aMessage );
-        
+
         void SendCommIsiVersionGetResp( const TDesC8& aMessage );
-        
-    private:
+
+        void SetIsiHeaderForCommonMessage( TDes8& aCommonResponse,
+                                           const TDesC8& aCommonRequest );
 
         static void InitDfc( TAny* aPtr );
+
+    private:
         
         // Owned
         static DMutex*         iCommunicationManagerMutex;
         TDfc*                  iInitDfc;
         DISIIndicationHandler* iISIIndicationHandler;
-        TUint8                 iObjId;
+        TUint8                 iObjectIdentifier;
+        TUint8                 iBootMsgCount;
         // Not owned
         MISIObjectRouterIf*    iRouter;
-        TUint8                 iBootMsgCount;
         
     };
 

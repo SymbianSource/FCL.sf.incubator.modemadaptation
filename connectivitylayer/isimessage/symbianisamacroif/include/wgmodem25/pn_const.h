@@ -32,6 +32,7 @@
 /* === Objects === */
 #define PN_OBJ_ROUTING_REQ              0x00  /* Resource-based routing              */
 #define PN_OBJ_EVENT_MULTICAST          0x20  /* Indications are sent to this object */
+#define PN_OBJ_PEP_GPDS                 0x30  /* Pipe-End-Point, General Packet Data Service    */
 
 /* === Resources/Servers === */
 #define PN_SMS                          0x02  /* Short Message Services              */
@@ -57,7 +58,6 @@
 #define PN_COMMON_RF_TEST               0xEC  /* Common RF test server               */
 #define PN_WCDMA_RF_TEST                0xEE  /* WCDMA RF test server                */
 #define PN_GSM_RF_TEST                  0xF1  /* GSM test server                     */
-
 
 /* === NOTE! Next definitions are temporary System resources from non MeXe pn_const === */
 

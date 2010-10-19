@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -22,7 +22,7 @@
 #define NOKIATSY_RELEASE_H
 
 // UPDATE THIS STRING FOR EVERY RELEASE!!!
-#define NOKIATSY_RELEASE_STR "TSY: RELEASE --> modemadaptation-MCL_201015"
+#define NOKIATSY_RELEASE_STR "TSY: RELEASE --> modemadaptation-MCL_201039"
 #endif // NOKIATSY_RELEASE_H
            
 // End of File

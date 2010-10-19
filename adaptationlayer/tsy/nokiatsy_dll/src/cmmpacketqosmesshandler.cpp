@@ -75,7 +75,7 @@ CMmPacketQoSMessHandler::CMmPacketQoSMessHandler()
     {
     
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::C++ constructor");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_CMMPACKETQOSMESSHANDLER, "CMmPacketQoSMessHandler::CMmPacketQoSMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_CMMPACKETQOSMESSHANDLER_TD, "CMmPacketQoSMessHandler::CMmPacketQoSMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ CMmPacketQoSMessHandler::~CMmPacketQoSMessHandler()
     {
 
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::~CMmPacketQoSMessHandler." );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_CMMPACKETQOSMESSHANDLER, "CMmPacketQoSMessHandler::~CMmPacketQoSMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_CMMPACKETQOSMESSHANDLER_TD, "CMmPacketQoSMessHandler::~CMmPacketQoSMessHandler" );
 
     // if for some reasons, pointers haven't been deleted in SetProfileParamtersL
     // do it here
@@ -129,7 +129,7 @@ CMmPacketQoSMessHandler* CMmPacketQoSMessHandler::NewL(
     {
 
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::NewL.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_NEWL, "CMmPacketQoSMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_NEWL_TD, "CMmPacketQoSMessHandler::NewL" );
 
     CMmPacketQoSMessHandler* packetQoSMessHandler =
         new ( ELeave ) CMmPacketQoSMessHandler();
@@ -164,7 +164,7 @@ void CMmPacketQoSMessHandler::ConstructL()
     {
 
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::ConstructL.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_CONSTRUCTL, "CMmPacketQoSMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_CONSTRUCTL_TD, "CMmPacketQoSMessHandler::ConstructL" );
 
     // Initialise to NULL
     iQos.iQoSMinInfo = NULL;
@@ -184,7 +184,7 @@ void CMmPacketQoSMessHandler::ReceiveMessageL(
     {
 
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::ReceiveMessageL." );
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketQoSMessHandler::ReceiveMessageL" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmPacketQoSMessHandler::ReceiveMessageL" );
 
     TInt resource( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_RESOURCEID ) );
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
@@ -197,7 +197,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketQoSM
                 {
                 
                 TFLOGSTRING("TSY: CMmPacketQoSMessHandler::GpdsContextConfigureResp." );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketQoSMessHandler::ReceiveMessageL, GpdsContextConfigureResp" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmPacketQoSMessHandler::ReceiveMessageL, GpdsContextConfigureResp" );
                 GpdsContextConfigureResp( aIsiMessage );
                 break;
                 }
@@ -205,7 +205,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL, "CMmPacke
                 {
                 
                 TFLOGSTRING("TSY: CMmPacketQoSMessHandler::GpdsContextActivateInd." );
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketQoSMessHandler::ReceiveMessageL, GpdsContextActivateInd" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmPacketQoSMessHandler::ReceiveMessageL, GpdsContextActivateInd" );
                 GpdsContextActivateOrModifyInd( aIsiMessage );
                 break;
                 }
@@ -213,7 +213,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL, "CMmPacke
                 {
                 
                 TFLOGSTRING("TSY: CMmPacketQoSMessHandler::GpdsContextModifyInd." );
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketQoSMessHandler::ReceiveMessageL, GpdsContextModifyInd" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmPacketQoSMessHandler::ReceiveMessageL, GpdsContextModifyInd" );
                 GpdsContextActivateOrModifyInd( aIsiMessage );
                 break;
                 }
@@ -221,7 +221,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL, "CMmPacke
                 {
                 
                 TFLOGSTRING("TSY: CMmPacketQoSMessHandler::ReceiveMessageL. Default case: Do nothing");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL, "CMmPacketQoSMessHandler::ReceiveMessageL, Default case: Do nothing" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPACKETQOSMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmPacketQoSMessHandler::ReceiveMessageL, Default case: Do nothing" );
                 break;
                 }
             }
@@ -245,7 +245,7 @@ TInt CMmPacketQoSMessHandler::GpdsContextConfigureReq(
     {
    
     TFLOGSTRING2("TSY: CMmPacketQoSMessHandler::GpdsContextConfigureReq.  \t contextId:%d", aContextId );
-OstTraceExt1( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ, "CMmPacketQoSMessHandler::GpdsContextConfigureReq;aContextId=%hhu", aContextId );
+OstTraceExt1( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ_TD, "CMmPacketQoSMessHandler::GpdsContextConfigureReq;aContextId=%hhu", aContextId );
 
     TInt ret( KErrArgument );
 
@@ -308,7 +308,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ, "CM
         {
         
         TFLOGSTRING("TSY: CMmPacketQoSMessHandler::GpdsContextConfigureReq.  KConfigGPRS" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ, "CMmPacketQoSMessHandler::GpdsContextConfigureReq, KConfigGPRS" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ_TD, "CMmPacketQoSMessHandler::GpdsContextConfigureReq, KConfigGPRS" );
         // Add GPDS_DNS_ADDRESS_REQ_INFO sub block
         if( iMmPacketContextMesshandlerList->
             GetDNSAddressInfoToContextInfo(aContextId) )
@@ -404,14 +404,14 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ, "
         {
         
         TFLOGSTRING("TSY: CMmPacketQoSMessHandler::GpdsContextConfigureReq.  KConfigRel99Rel4" );
-OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ, "CMmPacketQoSMessHandler::GpdsContextConfigureReq, KConfigRel99Rel4" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ_TD, "CMmPacketQoSMessHandler::GpdsContextConfigureReq, KConfigRel99Rel4" );
 
         // Add GPDS_DNS_ADDRESS_REQ_INFO sub block
         if( iMmPacketContextMesshandlerList->GetDNSAddressInfoToContextInfo(aContextId) )
             {
             
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::GpdsContextConfigureReq.  DNS Addresses REQUESTED" );
-OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ, "CMmPacketQoSMessHandler::GpdsContextConfigureReq, DNS Addresses REQUESTED" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ_TD, "CMmPacketQoSMessHandler::GpdsContextConfigureReq, DNS Addresses REQUESTED" );
             TBuf8<SIZE_GPDS_DNS_ADDRESS_REQ_INFO> dnsAddrInfoBuf;
             TIsiSubBlock dnsAddrInfoSubBlock( 
                 dnsAddrInfoBuf,
@@ -436,7 +436,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ, "
 			{
 			
             TFLOGSTRING("TSY: CMmPacketContextMessHandler::GpdsContextConfigureReq. PCSCF Addresses Requested");
-OstTrace0( TRACE_NORMAL, DUP6_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ, "CMmPacketQoSMessHandler::GpdsContextConfigureReq, PCSCF Addresses Requested" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGUREREQ_TD, "CMmPacketQoSMessHandler::GpdsContextConfigureReq, PCSCF Addresses Requested" );
 
 			TBuf8<SIZE_GPDS_SHARED_PCSCF_ADDRESS_REQ_INFO> tempPscfAddrInfo;
 	        TIsiSubBlock reqInfoSubBlock( 
@@ -604,7 +604,7 @@ void CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd(
     {
     
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd." );
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND_TD, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd" );
 
     TUint8 messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
@@ -629,7 +629,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND,
         }
 
     TFLOGSTRING2("TSY: CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd.  \t ContextId:%d", contextId );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd;contextId=%hhu", contextId );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND_TD, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd;contextId=%hhu", contextId );
 
     TUint sbStartOffSet( 0 );
 
@@ -735,7 +735,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMO
 				// Set pointer subblock to GPDS_SHARED_INITIAL_DL_DCH_RATE (0xFC) subblock
 
                 TFLOGSTRING("TSY: CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd. Flag CASW_INITIAL_DCH_RATE is defined" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd, Flag CASW_INITIAL_DCH_RATE is defined" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND_TD, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd, Flag CASW_INITIAL_DCH_RATE is defined" );
 
                 ret = aIsiMessage.FindSubBlockOffsetById(
 	               subBlockDataOffset,
@@ -750,9 +750,9 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIF
                         sbStartOffSet + GPDS_SHARED_INITIAL_DL_DCH_RATE_OFFSET_MAXBITRATEDOWNLINK );
                         
                     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd. Sub block GPDS_SHARED_INITIAL_DL_DCH_RATE exists." );
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd, Sub block GPDS_SHARED_INITIAL_DL_DCH_RATE exists" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND_TD, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd, Sub block GPDS_SHARED_INITIAL_DL_DCH_RATE exists" );
                     TFLOGSTRING2("TSY: CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd. qoS99Negotiated.iGuaranteedDownlinkRate = %d", qoS99Negotiated.iGuaranteedDownlinkRate );
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd;qoS99Negotiated.iGuaranteedDownlinkRate=%hhu", qoS99Negotiated.iGuaranteedDownlinkRate );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTACTIVATEORMODIFYIND_TD, "CMmPacketQoSMessHandler::GpdsContextActivateOrModifyInd;qoS99Negotiated.iGuaranteedDownlinkRate=%hhu", qoS99Negotiated.iGuaranteedDownlinkRate );
 		            }
 
 #endif // defined ( CASW_INITIAL_DCH_RATE ) || defined ( INTERNAL_CASW_INITIAL_DCH_RATE )
@@ -813,7 +813,7 @@ void CMmPacketQoSMessHandler::GpdsContextConfigureResp(
         ISI_HEADER_OFFSET_TRANSID ));
 
     TFLOGSTRING3("TSY: CMmPacketQoSMessHandler::GpdsContextConfigureResp.\t contextId: %d, transId: %d", contextId, transId );
-OstTraceExt2( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGURERESP, "CMmPacketQoSMessHandler::GpdsContextConfigureResp;contextId=%hhu;transId=%hhu", contextId, transId );
+OstTraceExt2( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGURERESP_TD, "CMmPacketQoSMessHandler::GpdsContextConfigureResp;contextId=%hhu;transId=%hhu", contextId, transId );
 
     if ( GPDS_CONTEXT_CONFIGURE_REQ == transId )
         {
@@ -849,7 +849,7 @@ OstTraceExt2( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGURERESP, "C
             }
 
         TFLOGSTRING2("TSY: CMmPacketQoSMessHandler::GpdsContextConfigureResp.\t Status:%d",status);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGURERESP, "CMmPacketQoSMessHandler::GpdsContextConfigureResp;status=%hhu", status );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_GPDSCONTEXTCONFIGURERESP_TD, "CMmPacketQoSMessHandler::GpdsContextConfigureResp;status=%hhu", status );
         }
     }
 
@@ -864,7 +864,7 @@ TInt CMmPacketQoSMessHandler::ExtFuncL(
     {
 
     TFLOGSTRING2("TSY: CMmPacketQoSMessHandler::ExtFuncL. IPC:%d", aIpc);
-OstTrace1( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_EXTFUNCL, "CMmPacketQoSMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_EXTFUNCL_TD, "CMmPacketQoSMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     TInt ret( KErrNotSupported );
 
@@ -879,7 +879,7 @@ OstTrace1( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_EXTFUNCL, "CMmPacketQoSMessHand
             {
             
             TFLOGSTRING2("TSY: CMmPacketQoSMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_EXTFUNCL, "CMmPacketQoSMessHandler::ExtFuncL;Unknown aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_EXTFUNCL_TD, "CMmPacketQoSMessHandler::ExtFuncL;Unknown aIpc=%d", aIpc );
             break;
             }
         }
@@ -896,7 +896,7 @@ TInt CMmPacketQoSMessHandler::SetProfileParametersL(
     {
     
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::SetProfileParametersL.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CMmPacketQoSMessHandler::SetProfileParametersL" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL_TD, "CMmPacketQoSMessHandler::SetProfileParametersL" );
 
     // error value
     TInt ret( KErrNone );
@@ -934,7 +934,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CMmPack
         {
         
         TFLOGSTRING("TSY: CMmPacketQoSMessHandler::SetProfileParametersL. => Rel97");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CMmPacketQoSMessHandler::SetProfileParametersL => Rel97" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL_TD, "CMmPacketQoSMessHandler::SetProfileParametersL => Rel97" );
         supported = ETrue;
         TPckg<RPacketQoS::TQoSGPRSRequested >* gprsProfilePckg =
             reinterpret_cast<TPckg<RPacketQoS::TQoSGPRSRequested>*>(
@@ -1011,7 +1011,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CM
         {
         
         TFLOGSTRING("TSY: CMmPacketQoSMessHandler::SetProfileParametersL. => Rel99");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CMmPacketQoSMessHandler::SetProfileParametersL => Rel99" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL_TD, "CMmPacketQoSMessHandler::SetProfileParametersL => Rel99" );
         supported = ETrue;
 
         TPckg<RPacketQoS::TQoSR99_R4Requested >* gprsProfilePckg =
@@ -1118,7 +1118,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CM
         {
         
         TFLOGSTRING("TSY: CMmPacketQoSMessHandler::SetProfileParametersL.=>R5");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CMmPacketQoSMessHandler::SetProfileParametersL => R5" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL_TD, "CMmPacketQoSMessHandler::SetProfileParametersL => R5" );
         supported = ETrue;
         
         TPckg<RPacketQoS::TQoSR5Requested >* gprsProfilePckg =
@@ -1209,9 +1209,9 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CM
 
         TFLOGSTRING2("TSY: CMmPacketQoSMessHandler::SetProfileParametersL. signallingIndication:%d", signallingIndication );
 
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CMmPacketQoSMessHandler::SetProfileParametersL;signallingIndication=%hhu", signallingIndication );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL_TD, "CMmPacketQoSMessHandler::SetProfileParametersL;signallingIndication=%hhu", signallingIndication );
         TFLOGSTRING2("TSY: CMmPacketQoSMessHandler::SetProfileParametersL. sourceStatisticsDescriptor:%d", sourceStatisticsDescriptor );
-OstTraceExt1( TRACE_NORMAL, DUP5_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL, "CMmPacketQoSMessHandler::SetProfileParametersL;sourceStatisticsDescriptor=%hhu", sourceStatisticsDescriptor );
+OstTraceExt1( TRACE_NORMAL,  DUP5_CMMPACKETQOSMESSHANDLER_SETPROFILEPARAMETERSL_TD, "CMmPacketQoSMessHandler::SetProfileParametersL;sourceStatisticsDescriptor=%hhu", sourceStatisticsDescriptor );
 
         // Delete QoS R97/98 info structs
         if ( NULL != iQos.iQoSMinInfo )
@@ -1358,7 +1358,7 @@ TInt CMmPacketQoSMessHandler::MapQoSInfoToServer(
     {
     
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToServer.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPacketQoSMessHandler::MapQoSInfoToServer" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoSInfoToServer" );
 
     TInt ret( KErrNone );
 
@@ -1388,7 +1388,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPacketQ
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToServer. aPrecedence -> default");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPacketQoSMessHandler::MapQoSInfoToServer,aPrecedence -> default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoSInfoToServer,aPrecedence -> default" );
 
             ret = KErrArgument;
             break;
@@ -1426,7 +1426,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPa
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToServer. aDelay -> default");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPacketQoSMessHandler::MapQoSInfoToServer, aDelay -> default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoSInfoToServer, aDelay -> default" );
 
             ret = KErrArgument;
             break;
@@ -1469,7 +1469,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPa
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToServer. aReliability -> default");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPacketQoSMessHandler::MapQoSInfoToServer, aReliability -> default" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoSInfoToServer, aReliability -> default" );
 
             ret = KErrArgument;
             break;
@@ -1532,7 +1532,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPa
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToServer. aPeakThroughput -> default");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPacketQoSMessHandler::MapQoSInfoToServer, aPeakThroughput -> default" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoSInfoToServer, aPeakThroughput -> default" );
 
             ret = KErrArgument;
             break;
@@ -1645,7 +1645,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPa
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToServer. aMeanThroughput -> default");
-OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER, "CMmPacketQoSMessHandler::MapQoSInfoToServer, aMeanThroughput -> default" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoSInfoToServer, aMeanThroughput -> default" );
 
             ret = KErrArgument;
             break;
@@ -1671,7 +1671,7 @@ TInt CMmPacketQoSMessHandler::MapQoS99InfoToServer(
     {
     
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToServer.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMmPacketQoSMessHandler::MapQoS99InfoToServer" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToServer" );
     TInt ret( KErrNone );
 
     switch ( aTrafficClass )
@@ -1705,7 +1705,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMmPacke
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToServer. aTrafficClass -> default");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aTrafficClass -> default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aTrafficClass -> default" );
 
             ret = KErrArgument;
             break;
@@ -1733,7 +1733,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToServer. aDeliveryOrderReqd -> default");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aDeliveryOrderReqd -> default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aDeliveryOrderReqd -> default" );
 
             ret = KErrArgument;
             break;
@@ -1766,7 +1766,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToServer. aDeliverErroneousSDU -> default");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aDeliverErroneousSDU -> default" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aDeliverErroneousSDU -> default" );
 
             ret = KErrArgument;
             break;
@@ -1829,7 +1829,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToServer. aBER -> default");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aBER -> default" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aBER -> default" );
 
             ret = KErrArgument;
             break;
@@ -1882,7 +1882,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToServer. aSDUErrorRatio -> default");
-OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aSDUErrorRatio -> default" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aSDUErrorRatio -> default" );
 
             ret = KErrArgument;
             break;
@@ -1915,7 +1915,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToServer. aTrafficHandlingPriority -> default");
-OstTrace0( TRACE_NORMAL, DUP6_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aTrafficHandlingPriority -> default" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOSERVER_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToServer, aTrafficHandlingPriority -> default" );
 
             ret = KErrArgument;
             break;
@@ -1939,7 +1939,7 @@ TInt CMmPacketQoSMessHandler::CopyQoS99ValuesToServer(
     {
     
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::CopyQoS99ValuesToServer.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_COPYQOS99VALUESTOSERVER, "CMmPacketQoSMessHandler::CopyQoS99ValuesToServer" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_COPYQOS99VALUESTOSERVER_TD, "CMmPacketQoSMessHandler::CopyQoS99ValuesToServer" );
 
     aQoS99Info.iTransferDelay = static_cast<TUint16>( aMaxTransferDelay );
     aQoS99Info.iMaxSDUSize = static_cast<TUint16>( aMaxSDUSize );
@@ -1967,7 +1967,7 @@ void CMmPacketQoSMessHandler::ResetRequestedQoS(
     {
     
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::ResetRequestedQoS.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_RESETREQUESTEDQOS, "CMmPacketQoSMessHandler::ResetRequestedQoS" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_RESETREQUESTEDQOS_TD, "CMmPacketQoSMessHandler::ResetRequestedQoS" );
 
     if ( NULL != aQoS.iQoSMinInfo )
         {
@@ -2008,7 +2008,7 @@ void CMmPacketQoSMessHandler::CompleteNotifyProfileChanged(
     {
     
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::CompleteNotifyProfileChanged.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED_TD, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged" );
 
     TInt ret( KErrGeneral );
     TInfoName mmPacketContextName;
@@ -2025,7 +2025,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED, "
             iQoSGPRSNegotiated.iMeanThroughput );
 
         TFLOGSTRING("TSY: CMmPacketQoSMessHandler::CompleteNotifyProfileChanged.  R97/98 QoS Parameters set in TSY");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged, R97/98 QoS Parameters set in TSY" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED_TD, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged, R97/98 QoS Parameters set in TSY" );
         }
     //no else
 
@@ -2036,7 +2036,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANG
             iQoSR5_Negotiated );
 
         TFLOGSTRING("TSY: CMmPacketQoSMessHandler::CompleteNotifyProfileChanged.  R99/R4 QoS Parameters set in TSY");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged, R99/R4 QoS Parameters set in TSY" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED_TD, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged, R99/R4 QoS Parameters set in TSY" );
         }
     //no else
 
@@ -2048,7 +2048,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANG
             GetContextNameByContextId( aContextId, mmPacketContextName );
 
         TFLOGSTRING("TSY: CMmPacketQoSMessHandler::CompleteNotifyProfileChanged.  R97/98 QoS Parameters in use");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged, R97/98 QoS Parameters in use" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED_TD, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged, R97/98 QoS Parameters in use" );
         }
      //no else
 
@@ -2062,7 +2062,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANG
             GetContextNameByContextId( aContextId, mmPacketContextName );
 
         TFLOGSTRING("TSY: CMmPacketQoSMessHandler::CompleteNotifyProfileChanged.  R99/R4 QoS Parameters in use");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged, R99/R4 QoS Parameters in use" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPACKETQOSMESSHANDLER_COMPLETENOTIFYPROFILECHANGED_TD, "CMmPacketQoSMessHandler::CompleteNotifyProfileChanged, R99/R4 QoS Parameters in use" );
         }
      //no else
 
@@ -2100,7 +2100,7 @@ void CMmPacketQoSMessHandler::MapQoSInfoToClient(
     {
 
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToClient.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoSInfoToClient" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoSInfoToClient" );
 
     switch ( aQoSInfo.iPrecedence )
         {
@@ -2125,7 +2125,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPacketQ
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToClient. Switch Precedence case default");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch Precedence case default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch Precedence case default" );
 
             aPrecedence = RPacketQoS::EUnspecifiedPrecedence;
             break;
@@ -2160,7 +2160,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPa
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToClient. Switch Delay case default");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch Delay case default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch Delay case default" );
 
             aDelay = RPacketQoS::EUnspecifiedDelayClass;
             break;
@@ -2200,7 +2200,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPa
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToClient. Switch Reliability case default");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch Reliability case default" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch Reliability case default" );
 
             aReliability = RPacketQoS::EUnspecifiedReliabilityClass;
             break;
@@ -2260,7 +2260,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPa
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToClient. Switch PeakThroughput case default");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch PeakThroughput case default" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch PeakThroughput case default" );
 
             aPeakThroughput = RPacketQoS::EUnspecifiedPeakThroughput;
             break;
@@ -2370,7 +2370,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPa
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoSInfoToClient. Switch MeanThroughput case default");
-OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch MeanThroughput case default" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMPACKETQOSMESSHANDLER_MAPQOSINFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoSInfoToClient, Switch MeanThroughput case default" );
 
             aMeanThroughput = RPacketQoS::EUnspecifiedMeanThroughput;
             break;
@@ -2390,7 +2390,7 @@ void CMmPacketQoSMessHandler::MapQoS99InfoToClient(
     {
     
     TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToClient.");
-OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoS99InfoToClient" );
+OstTrace0( TRACE_NORMAL,  CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToClient" );
 
     switch ( aQoS99Info.iTrafficClass )
         {
@@ -2424,7 +2424,7 @@ OstTrace0( TRACE_NORMAL, CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMmPacke
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToClient. Switch TrafficClass case default");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch TrafficClass case default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch TrafficClass case default" );
 
             aQoSR5Negotiated.iTrafficClass
                 = RPacketQoS::ETrafficClassUnspecified;
@@ -2452,7 +2452,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToClient. Switch DeliveryOrderReqd case default");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch DeliveryOrderReqd case default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch DeliveryOrderReqd case default" );
 
             aQoSR5Negotiated.iDeliveryOrderReqd
                 = RPacketQoS::EDeliveryOrderUnspecified;
@@ -2486,7 +2486,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToClient. Switch DeliverErroneousSDU case default");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch DeliverErroneousSDU case default" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch DeliverErroneousSDU case default" );
 
             aQoSR5Negotiated.iDeliverErroneousSDU
                 = RPacketQoS::EErroneousSDUDeliveryUnspecified;
@@ -2556,7 +2556,7 @@ OstTrace0( TRACE_NORMAL, DUP3_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToClient. Switch BER case default");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch BER case default" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch BER case default" );
 
             aQoSR5Negotiated.iBER
                 = RPacketQoS::EBERUnspecified;
@@ -2614,7 +2614,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToClient. Switch SDUErrorRatio case default");
-OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch SDUErrorRatio case default" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch SDUErrorRatio case default" );
 
             aQoSR5Negotiated.iSDUErrorRatio
                 = RPacketQoS::ESDUErrorRatioUnspecified;
@@ -2648,7 +2648,7 @@ OstTrace0( TRACE_NORMAL, DUP5_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToClient. Switch TrafficHandlingPriority case default");
-OstTrace0( TRACE_NORMAL, DUP6_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch TrafficHandlingPriority case default" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch TrafficHandlingPriority case default" );
 
             aQoSR5Negotiated.iTrafficHandlingPriority
                 = RPacketQoS::ETrafficPriorityUnspecified;
@@ -2688,7 +2688,7 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMm
             {
 
             TFLOGSTRING("TSY: CMmPacketQoSMessHandler::MapQoS99InfoToClient. Switch SourceStatisticsDescriptor case default");
-OstTrace0( TRACE_NORMAL, DUP7_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch SourceStatisticsDescriptor case default" );
+OstTrace0( TRACE_NORMAL,  DUP7_CMMPACKETQOSMESSHANDLER_MAPQOS99INFOTOCLIENT_TD, "CMmPacketQoSMessHandler::MapQoS99InfoToClient, Switch SourceStatisticsDescriptor case default" );
 
             aQoSR5Negotiated.iSourceStatisticsDescriptor
                 = RPacketQoS::ESourceStatisticsDescriptorUnknown;

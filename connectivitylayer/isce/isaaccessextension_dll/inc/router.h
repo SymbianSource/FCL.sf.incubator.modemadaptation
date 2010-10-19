@@ -23,24 +23,21 @@
 #include <e32def.h>                 // For TUint16
 #include <e32cmn.h>                 // For TDesC8
 #include "internalapi.h"            // For MIAD2ChannelApi
-//ISCE #include "mist2iadapi.h"             // For TIADConnectionStatus, MIST2IADApi
+#include "mist2iadapi.h"             // For TIADConnectionStatus, MIST2IADApi
 #include "iadinternaldefinitions.h" // For TIADConnectionStatus
-#include "iadnokiadefinitions.h"    // For EIADSizeOfChannels
-//ISCE
-#include "isirouterlinkifs.h"       // For MLinkRouterIf
-//ISCE
-#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT 
+#include "iadnokiadefinitions.h"    // For EIADSizeOfChannels, includes iscnokiadefinitions.h.
+
 class DPipeHandler;
-#endif
-//ISCE class MIAD2ISTApi;
+class MIAD2ISTApi;
 class DRouter;
+class DIndicationHandler;
 class MIAD2ChannelApi;
 class DQueue;
 
 static DObject* iThreadPtr = NULL;
 const TUint8 KIADEventSubscriptionObjId( 0xfc );
 
-// TODO: own API for indicationhandler (and pipehandler allocate, deallocate, sendmessage ?)
+//  own API for indicationhandler (and pipehandler allocate, deallocate, sendmessage ?)
 
 // - stores UL (APE destinated) message to receive queue
 // 
@@ -52,11 +49,7 @@ const TUint8 KIADEventSubscriptionObjId( 0xfc );
 // receive DL message from LDD
 // 
 // route DL message to appropriate handler
-NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
-                            // ISCE
-                            public MISILinkRouterIf
-                            // ISCE
-
+NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi, public MIST2IADApi
     {
 
     public:
@@ -93,14 +86,22 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
 
         // From MChannel2IADApi end
 
+        // From MIST2IADApi start  const, check others too
+        IMPORT_C void NotifyConnectionStatus( MIST2IADApi::TISTConnectionStatus aStatus );
+
+        IMPORT_C void ReceiveMessage( TDes8& aMsg );
+
+        IMPORT_C const RArray<TUint>& GetBlockConfig();
+
+        IMPORT_C void Register( MIAD2ISTApi* aISTApi );
+
         // For Router and it's handler DPipeHandler and DIndicationHandler
         TInt SendMsg( TDes8& aMsg );
 
         // For PipeHandler
         MIAD2ChannelApi* GetChannel( const TUint16 aChannel );
         // For PipeHandler
-// ISCE
-// TODO: DEF files!!!
+
         // From MISILinkRouterIf start
         /*
         * See comments from MISILinkRouterIf.
@@ -112,21 +113,14 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
         */
         void Receive( TDes8& aMsg );
         // From MISILinkRouterIf end
-        IMPORT_C void DummyDoNothing();
-
-        IMPORT_C void DummyDoNothing2();
-
-// ISCE
-
         // For internal receiving.
         void DRouter::MessageReceived( TDes8& aMsg );
 
-#if (NCP_COMMON_SOS_VERSION_SUPPORT >= SOS_VERSION_95)
+
         EXPORT_C TInt Loan( const TUint16 aChannel, const TUint16 aRequest,
                             MIAD2ChannelApi* aCallback );
         EXPORT_C TInt ReturnLoan( const TUint16 aChannel, const TUint16 aRequest,
                             MIAD2ChannelApi* aCallback );
-#endif
 
     private:
 
@@ -136,16 +130,15 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
             EPipeMsg,
             EMediaMsg,
             EIndicationMsg,
+            EControlMsg,
+            EPnNameAddRespMsg,
             ENotKnownMsg,
-            EUsbPhonetMsg
             };
 
         enum TWaitingType
             {
             ENormalOpen = 1,
-#if (NCP_COMMON_SOS_VERSION_SUPPORT >= SOS_VERSION_95)
             ELoan
-#endif
             };
 
         void HandleIsiMessage( TDes8& aMsg );
@@ -154,6 +147,9 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
 
         void HandleMediaMessage( TDes8& aMsg );
 
+        void HandleControlMessage( TDes8& aMsg );
+
+        void HandlePnsNameAddResp( TDes8& aMsg );
 
         void SendCommIsaEntityNotReachableResp( const TDesC8& aMsg );
 
@@ -164,23 +160,16 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
     public:
         static void CheckRouting( DRouter& aTmp, TDes8& aMsg );
 
-        static DRouter* iThisPtr;
-        MISIRouterObjectIf* iNameService;
-        MISIRouterObjectIf* iCommunicationManager;
-        /*
-        * See comments from MISIChannelRouterIf
-        */
-        TDfcQue* GetDfcThread( const TISIDfcQThreadType aType );
-
-        void FreeDfcThread( TDfcQue* aThread );
-
-   
     private:
         static void CommonRxDfc( TAny* aPtr );
 
         static void InitCmtDfc( TAny* aPtr );
 
-        void InitConnectionOk();
+        void InitCmtConnection();
+
+        void SendDrmReq( const TUint16 aChannelId );
+
+        void SendPnsNameAddReq( const TUint16 aChannel, const TDesC8& aOpenInfo );
 
         static void NotifyObjLayerConnStatDfc( TAny* aPtr );
 
@@ -188,15 +177,12 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
 
         void SetSenderInfo( TDes8& aMessage, const TUint16 aCh );
 
-        //From objectapi
-        TInt Send( TDes8& aMessage, const TUint8 aObjId );
-
       // Member data
     private:
         
         void CheckSameThreadContext();
         
-        // TODO
+        // 
         // Needed due to opening that are waiting a response from cmt side.
         // Use iWaitingChannel to store a channel pointer then and when resp
         // received from cmt set iChannel = iWaitingChannel and complete request
@@ -210,22 +196,11 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
                 TWaitingType       iType;
             };
 
-// ISCE
-        TUint8 MapMediaToLinkId( const TUint8 aMedia );
-
-        enum TISIMedias
-            {
-            EISIMediaHostSSI        = 0x00,
-            EISIAmountOfMedias
-            };
-// ISCE
-
         // owned
         // APE <-> CMT connection status ok/nok.
         TIADConnectionStatus                            iConnectionStatus;
-#ifdef NCP_COMMON_BRIDGE_FAMILY_PIPE_SUPPORT
         DPipeHandler*                                   iPipeHandler;
-#endif
+        DIndicationHandler*                             iIndicationHandler;
         DQueue*                                         iCommonRxQueue;
         TIADChannel                                     iChannelTable[ EIADSizeOfChannels ];
         //static TDfc*                                    iConnStatusBcDfc;
@@ -236,12 +211,13 @@ NONSHARABLE_CLASS( DRouter ) : public MChannel2IADApi,
         TUint16                                         iMaxFrameSize;
         // not owned, just using     
         // When registered !NULL when unregistered NULL. API towards IST.
-        // ISCE        RArray<TUint>                                   iArray;
-        TBool                                           iBootDone;
+        MIAD2ISTApi*                                    iIST;
 
-        // ISCE
-        MISIRouterLinkIf**                              iLinksArray;
-        // ISCE
+        RArray<TUint>                                   iArray;
+
+        
+        TBool                                           iBootDone;
+        
 
 
     };

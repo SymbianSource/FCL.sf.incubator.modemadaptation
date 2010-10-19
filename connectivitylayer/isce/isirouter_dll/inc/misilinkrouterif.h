@@ -31,12 +31,27 @@ class MISILinkRouterIf
     public:
 
         /*
+        * Route ISI messages
+        * @param aMsg, message to be routed
+        * TODO:
+		* @return Error value
+        */
+        virtual TInt RouteISIMessage( TDes8& aMsg,  TBool aDynamicSenderCheckNeeded ) = 0;
+        
+        /*
         * Receive message from link.
         * Called without FM held.
         * @param aMsg, message to be received
 		* @return Error value
         */
-        virtual TInt RouteISIMessage( TDes8& aMsg ) = 0;
+        virtual void ReceiveISIMessage( const TDesC8& aMessage, const TUint8 aTrxId ) = 0;
+        
+        /*
+        * Called with FM held.
+        * NOTE! restrictions when used with FM held.
+        */
+        virtual void StateChanged() = 0;
+
     };
 
 

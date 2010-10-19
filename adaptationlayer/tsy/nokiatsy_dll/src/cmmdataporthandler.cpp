@@ -69,7 +69,7 @@ CMmDataPortHandler::CMmDataPortHandler()
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::CMmDataPortHandler");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_CMMDATAPORTHANDLER, "CMmDataPortHandler::CMmDataPortHandler" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_CMMDATAPORTHANDLER_TD, "CMmDataPortHandler::CMmDataPortHandler" );
 
     }
 
@@ -82,7 +82,7 @@ void CMmDataPortHandler::ConstructL()
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_CONSTRUCTL, "CMmDataPortHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_CONSTRUCTL_TD, "CMmDataPortHandler::ConstructL" );
 
     iDP0LoanedToClient = EFalse;
     iDP1LoanedToClient = EFalse;
@@ -105,7 +105,7 @@ CMmDataPortHandler* CMmDataPortHandler::NewL(
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::NewL");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_NEWL, "CMmDataPortHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_NEWL_TD, "CMmDataPortHandler::NewL" );
 
     CMmDataPortHandler* dataHandler = new ( ELeave ) CMmDataPortHandler();
 
@@ -127,7 +127,7 @@ CMmDataPortHandler::~CMmDataPortHandler()
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::~CMmDataPortHandler");
-OstTrace0( TRACE_NORMAL, DUP1_CMMDATAPORTHANDLER_CMMDATAPORTHANDLER, "CMmDataPortHandler::~CMmDataPortHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMDATAPORTHANDLER_CMMDATAPORTHANDLER_TD, "CMmDataPortHandler::~CMmDataPortHandler" );
 
     // Close Comms server connections
     if ( ECommsDataportOpened <= iCommsStatus )
@@ -158,7 +158,7 @@ void CMmDataPortHandler::ResetInternalAttributes()
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::ResetInternalAttributes");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_RESETINTERNALATTRIBUTES, "CMmDataPortHandler::ResetInternalAttributes" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_RESETINTERNALATTRIBUTES_TD, "CMmDataPortHandler::ResetInternalAttributes" );
 
     iBearerService.iBearerCaps = ( RCall::KBearerCapsCompressionNone |
         RCall::KBearerCapsProtocolUnknown );
@@ -218,7 +218,7 @@ void CMmDataPortHandler::InitDataParamsL()
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::InitDataParamsL");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_INITDATAPARAMSL, "CMmDataPortHandler::InitDataParamsL" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_INITDATAPARAMSL_TD, "CMmDataPortHandler::InitDataParamsL" );
 
     // Open dataport for AT commands.
     if ( ECommsNotConnected == iCommsStatus )
@@ -232,7 +232,7 @@ OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_INITDATAPARAMSL, "CMmDataPortHandler
             {
 
             TFLOGSTRING2("TSY: CMmDataPortHandler::OpenDataPortL - Left with error: %d", trapError);
-OstTrace1( TRACE_NORMAL, DUP1_CMMDATAPORTHANDLER_INITDATAPARAMSL, "CMmDataPortHandler::InitDataParamsL;Left with error=%d", trapError );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMDATAPORTHANDLER_INITDATAPARAMSL_TD, "CMmDataPortHandler::InitDataParamsL;Left with error=%d", trapError );
             }
         //no else
 
@@ -252,7 +252,7 @@ void CMmDataPortHandler::OpenDataPortL()
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::OpenDataPortL");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_OPENDATAPORTL, "CMmDataPortHandler::OpenDataPortL" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_OPENDATAPORTL_TD, "CMmDataPortHandler::OpenDataPortL" );
 
     TInt ret( KErrNone );
 
@@ -284,14 +284,14 @@ OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_OPENDATAPORTL, "CMmDataPortHandler::
     iCommsStatus = ECommsServerConnected;
 
     TFLOGSTRING2("TSY: CMmDataPortHandler::OpenDataPortL - iCommPort.iCsy: %S", &iCommPort.iCsy );
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMDATAPORTHANDLER_OPENDATAPORTL, "CMmDataPortHandler::OpenDataPortL;iCommPort.iCsy=%S", iCommPort.iCsy );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMDATAPORTHANDLER_OPENDATAPORTL_TD, "CMmDataPortHandler::OpenDataPortL;iCommPort.iCsy=%S", iCommPort.iCsy );
 
     // Load dataport module
     User::LeaveIfError( iCommServer.LoadCommModule( iCommPort.iCsy ) );
     iCommsStatus = ECommsModuleLoaded;
 
     TFLOGSTRING2("TSY: CMmDataPortHandler::OpenDataPortL - iCommPort.iPort: %S", &iCommPort.iPort);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMDATAPORTHANDLER_OPENDATAPORTL, "CMmDataPortHandler::OpenDataPortL;iCommPort.iPort=%S", iCommPort.iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMDATAPORTHANDLER_OPENDATAPORTL_TD, "CMmDataPortHandler::OpenDataPortL;iCommPort.iPort=%S", iCommPort.iPort );
 
     // Open dataport
     User::LeaveIfError( iDataPort.Open( iCommServer, iCommPort.iPort,
@@ -337,7 +337,7 @@ TInt CMmDataPortHandler::LoanDataPort(
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::LoanDataPort");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_LOANDATAPORT, "CMmDataPortHandler::LoanDataPort" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_LOANDATAPORT_TD, "CMmDataPortHandler::LoanDataPort" );
 
     TInt ret( KErrNone );
     TInt callId( KCallIdNone );
@@ -351,7 +351,7 @@ OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_LOANDATAPORT, "CMmDataPortHandler::L
         {
 
         TFLOGSTRING2("TSY: CMmDataPortHandler::LoanDataPort - Client taking control: %S", &commPort->iPort);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMDATAPORTHANDLER_LOANDATAPORT, "CMmDataPortHandler::LoanDataPort;commPort->iPort=%S", commPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMDATAPORTHANDLER_LOANDATAPORT_TD, "CMmDataPortHandler::LoanDataPort;commPort->iPort=%S", commPort->iPort );
         // Check port and mode
         if ( ( commPort->iPort == KDataPortPort1 ||
             commPort->iPort == KDataPortPort4 ||
@@ -384,7 +384,7 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMDATAPORTHANDLER_LOANDATAPORT, "CMmDataPortHa
                 commPort->iCsy.Copy( KDataPortName );
                 iDP0LoanedToClient = ETrue;
                 TFLOGSTRING2("TSY: CMmDataPortHandler::LoanDataPort - %S Loaned", &commPort->iPort );
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMDATAPORTHANDLER_LOANDATAPORT, "CMmDataPortHandler::LoanDataPort;commPort->iPort=%S", commPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMDATAPORTHANDLER_LOANDATAPORT_TD, "CMmDataPortHandler::LoanDataPort;commPort->iPort=%S", commPort->iPort );
 
                 }
             else
@@ -399,7 +399,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMDATAPORTHANDLER_LOANDATAPORT, "CMmDataPortHa
         }
 
     TFLOGSTRING2("TSY: CMmDataPortHandler::LoanDataPort - Result: %d", ret );
-OstTrace1( TRACE_NORMAL, DUP1_CMMDATAPORTHANDLER_LOANDATAPORT, "CMmDataPortHandler::LoanDataPort;ret=%d", ret );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMDATAPORTHANDLER_LOANDATAPORT_TD, "CMmDataPortHandler::LoanDataPort;ret=%d", ret );
 
     return ret;
     }
@@ -415,7 +415,7 @@ TInt CMmDataPortHandler::GetNextFreeDialUpPort(
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::GetNextFreeDialUpPort");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT, "CMmDataPortHandler::GetNextFreeDialUpPort" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT_TD, "CMmDataPortHandler::GetNextFreeDialUpPort" );
 
     TInt result( KErrNone );
 
@@ -425,7 +425,7 @@ OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT, "CMmDataPortH
 
         TFLOGSTRING2("TSY: CMmDataPortHandler::GetNextFreeDialUpPort - %S Free", &aCommPort->iPort );
 
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT, "CMmDataPortHandler::GetNextFreeDialUpPort;aCommPort->iPort=%S Free", aCommPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT_TD, "CMmDataPortHandler::GetNextFreeDialUpPort;aCommPort->iPort=%S Free", aCommPort->iPort );
         }
     else if ( !iDP4LoanedToClient )
         {
@@ -433,7 +433,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT, "CMmD
 
         TFLOGSTRING2("TSY: CMmDataPortHandler::GetNextFreeDialUpPort - %S Free", &aCommPort->iPort );
 
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT, "CMmDataPortHandler::GetNextFreeDialUpPort;aCommPort->iPort=%S Free", aCommPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT_TD, "CMmDataPortHandler::GetNextFreeDialUpPort;aCommPort->iPort=%S Free", aCommPort->iPort );
         }
     else if ( !iDP5LoanedToClient )
         {
@@ -441,7 +441,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT, "CMmD
 
         TFLOGSTRING2("TSY: CMmDataPortHandler::GetNextFreeDialUpPort - %S Free", &aCommPort->iPort );
 
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT, "CMmDataPortHandler::GetNextFreeDialUpPort;aCommPort->iPort=%S - Free", aCommPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMDATAPORTHANDLER_GETNEXTFREEDIALUPPORT_TD, "CMmDataPortHandler::GetNextFreeDialUpPort;aCommPort->iPort=%S - Free", aCommPort->iPort );
         }
     else
         {
@@ -462,7 +462,7 @@ TInt CMmDataPortHandler::LoanDialUpPort(
     {
 
     TFLOGSTRING("TSY: CMmDataPortHandler::LoanDialUpPort");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_LOANDIALUPPORT, "CMmDataPortHandler::LoanDialUpPort" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_LOANDIALUPPORT_TD, "CMmDataPortHandler::LoanDialUpPort" );
 
     TInt result( KErrNone );
 
@@ -475,7 +475,7 @@ OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_LOANDIALUPPORT, "CMmDataPortHandler:
 
             TFLOGSTRING2("TSY: CMmDataPortHandler::LoanDialUpPort - %S Loaned", &aCommPort->iPort );
 
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMDATAPORTHANDLER_LOANDIALUPPORT, "CMmDataPortHandler::LoanDialUpPort;aCommPort->iPort=%S Loaned", aCommPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMDATAPORTHANDLER_LOANDIALUPPORT_TD, "CMmDataPortHandler::LoanDialUpPort;aCommPort->iPort=%S Loaned", aCommPort->iPort );
             }
          else
             {
@@ -491,7 +491,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMDATAPORTHANDLER_LOANDIALUPPORT, "CMmDataPort
 
             TFLOGSTRING2("TSY: CMmDataPortHandler::LoanDialUpPort - %S Loaned", &aCommPort->iPort );
 
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMDATAPORTHANDLER_LOANDIALUPPORT, "CMmDataPortHandler::LoanDialUpPort;aCommPort->iPort=%S Loaned", aCommPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMDATAPORTHANDLER_LOANDIALUPPORT_TD, "CMmDataPortHandler::LoanDialUpPort;aCommPort->iPort=%S Loaned", aCommPort->iPort );
             }
          else
             {
@@ -507,7 +507,7 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMDATAPORTHANDLER_LOANDIALUPPORT, "CMmDataPort
 
             TFLOGSTRING2("TSY: CMmDataPortHandler::LoanDialUpPort - %S Loaned", &aCommPort->iPort );
 
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMDATAPORTHANDLER_LOANDIALUPPORT, "CMmDataPortHandler::LoanDialUpPort;aCommPort->iPort=%S Loaned", aCommPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMDATAPORTHANDLER_LOANDIALUPPORT_TD, "CMmDataPortHandler::LoanDialUpPort;aCommPort->iPort=%S Loaned", aCommPort->iPort );
             }
          else
             {
@@ -533,7 +533,7 @@ TInt CMmDataPortHandler::RecoverDataPort(
     const CCallDataPackage* aCallDataPackage )
     {
 TFLOGSTRING("TSY: CMmDataPortHandler::RecoverDataPort");
-OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort" );
+OstTrace0( TRACE_NORMAL,  CMMDATAPORTHANDLER_RECOVERDATAPORT_TD, "CMmDataPortHandler::RecoverDataPort" );
 
     TInt ret( KErrNone );
     RCall::TCommPort* commPort = NULL;
@@ -544,7 +544,7 @@ OstTrace0( TRACE_NORMAL, CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler
         {
 
 TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - Client returning control: %S", &commPort->iPort );
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;Client returning control=%S", commPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMDATAPORTHANDLER_RECOVERDATAPORT_TD, "CMmDataPortHandler::RecoverDataPort;Client returning control=%S", commPort->iPort );
         // Check if port 0 has been loaned
         if ( iDP0LoanedToClient && commPort->iPort == KDataPortPort0 )
             {
@@ -552,25 +552,25 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPor
             // noone needs remaining data in buffers
             ret = iDataPort.ResetBuffers();
 TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMDATAPORTHANDLER_RECOVERDATAPORT_TD, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
             }
         else if ( iDP1LoanedToClient && commPort->iPort == KDataPortPort1 )
             {
             iDP1LoanedToClient = EFalse;
 TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMDATAPORTHANDLER_RECOVERDATAPORT_TD, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
             }
         else if ( iDP4LoanedToClient && commPort->iPort == KDataPortPort4 )
             {
             iDP4LoanedToClient = EFalse;
 TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
-OstTraceExt1( TRACE_NORMAL, DUP5_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP5_CMMDATAPORTHANDLER_RECOVERDATAPORT_TD, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
             }
         else if ( iDP5LoanedToClient && commPort->iPort == KDataPortPort5 )
             {
             iDP5LoanedToClient = EFalse;
 TFLOGSTRING2("TSY: CMmDataPortHandler::RecoverDataPort - %S Recovered", &commPort->iPort );
-OstTraceExt1( TRACE_NORMAL, DUP6_CMMDATAPORTHANDLER_RECOVERDATAPORT, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
+OstTraceExt1( TRACE_NORMAL,  DUP6_CMMDATAPORTHANDLER_RECOVERDATAPORT_TD, "CMmDataPortHandler::RecoverDataPort;commPort->iPort=%S Recovered", commPort->iPort );
             }
         else
             {

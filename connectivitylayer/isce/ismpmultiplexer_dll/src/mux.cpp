@@ -207,12 +207,12 @@ void DMux::Receive(
     {
 
     C_TRACE( ( _T( "DMux::Receive this 0x%x id %d msg 0x%x aMuxId 0x%x>" ), this, iShTrxId, &aMsg, aMuxPacket ) );
-    const TUint8 protocolId = static_cast<TUint8>( aMuxPacket >> 24 );    // TODO macro
-    Kern::Printf( "protocolId=0x%x", protocolId );// TODO TBR (ToBeRemoved)
+    const TUint8 protocolId = static_cast<TUint8>( aMuxPacket >> 24 );    
+    C_TRACE( ( _T( "DMux::Receive this 0x%x id %d msg 0x%x aMuxId 0x%x protocolId 0x%x" ), this, iShTrxId, &aMsg, aMuxPacket, protocolId ) );
     __ASSERT_NO_FAST_MUTEX;
     MUX_ASSERT_FAULT_MACRO( ( protocolId < EMuxAmountOfProtocols ), MTrxMuxIf::EInvalidMuxingHeader );
     MUX_ASSERT_FAULT_MACRO( ( ISTAPI_ASSERT_KERNEL_THREAD_CONTEXT_ALWAYS ), MTrxMuxIf::ENotKernelThreadContext );
-    // TODO ( aMsg.Length() != protocollenght) 
+    //  ( aMsg.Length() != protocollenght) 
     NKern::FMWait( iFastMutex );
     MMuxLinkIf* link = iShLinks[ protocolId ];
     NKern::FMSignal( iFastMutex );
@@ -253,8 +253,8 @@ void DMux::Send(
     {
 
     C_TRACE( ( _T( "DMux::Send this 0x%x id %d msg 0x%x aLinkId 0x%x priority %d <>" ), this, iShTrxId, &aMsg, aLinkId, aPriority ) );
-    TUint32 muxId = static_cast<TUint32>( aMsg.Length() | aLinkId << 24 );    // TODO macro 
-    Kern::Printf( "muxId=0x%x", muxId );//TODO TBR
+    TUint32 muxId = static_cast<TUint32>( aMsg.Length() | aLinkId << 24 );     
+    C_TRACE( ( _T( "DMux::Send this 0x%x id %d msg 0x%x aLinkId 0x%x priority %d muxId 0x%x<>" ), this, iShTrxId, &aMsg, aLinkId, aPriority, muxId ) );
     ASSERT_RESET_ALWAYS( ( iShTrx ), ( EMuxNullPtr2 | EDMuxTraceId << KClassIdentifierShift ) );
     iShTrx->Transmit( aMsg, (MMuxTrxIf::TDataTransmitPriority) aPriority, muxId );
 
@@ -271,7 +271,7 @@ void DMux::NotifyTrxStatusChangeToAllLinks(
        )
     {
 
-    // TODO: Change status so that it can not be happen send from up and status change from down simultaneously
+    //  Change status so that it can not be happen send from up and status change from down simultaneously
     for( TInt i( 0 ); i < EMuxAmountOfProtocols; i++ )
         {
         MMuxLinkIf* link = iShLinks[ i ];

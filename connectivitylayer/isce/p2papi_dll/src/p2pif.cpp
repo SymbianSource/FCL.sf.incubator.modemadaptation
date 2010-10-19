@@ -107,9 +107,13 @@ EXPORT_C void RP2PIf::Open(
     ASSERT_PANIC_ALWAYS( ( KErrNone == loadStatus || KErrAlreadyExists == loadStatus), EP2PApiDriverLoadFailed );
     TInt error( KErrInUse );
     C_TRACE( ( _T( "RP2PIf::Open ldd" ) ) );
-    TBuf8<KInfoLength> info;
+    HBufC8* buffer = NULL;
+    TRAPD( err, buffer = HBufC8::NewL( KInfoLength ) );        
+    ASSERT_PANIC_ALWAYS( err == KErrNone, KErrNoMemory );
+        
+    TPtr8 info = buffer->Des();
     info.Append( aP2PProtocolId );
-    // TODO: check wrong usage of driver load differently than from here
+    //  check wrong usage of driver load differently than from here
     // KErrPermissionDenied( no capabilities) ,  KErrNotSupported (Wrong protocol id), KErrGeneral (DThread::Open), 
     // KErrAlreadyExists same object had opened the interface with some other protocolid
     error = DoCreate( KP2PDriverName, 
@@ -118,6 +122,7 @@ EXPORT_C void RP2PIf::Open(
                       NULL, 
                       &info, 
                       aType );
+    delete buffer;
     if( KErrNone != error )
         {
         C_TRACE( ( _T( "RP2PIf::Open 0x%x failed 0x%x error %d" ), this, aP2PProtocolId, error ) );

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -128,23 +128,23 @@ static void TFLOG_PRINT_ISIMESSAGE( const TDesC8& aBuf )
                ( ( i + 1 ) == length ) ) // All bytes collected and traced
               {
               firstTime = EFalse;
-OstTraceExt1( TRACE_NORMAL, DUP2__TFLOG_PRINT_ISIMESSAGE, "Phonet Receiver: [ %s]", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP2__TFLOG_PRINT_ISIMESSAGE_TD, "Phonet Receiver: [ %s]", trace_msg );
                 trace_msg.SetLength( 0 );
               }
             else if ( firstTime ) // 1st line of the trace
               {
               firstTime = EFalse;
-OstTraceExt1( TRACE_NORMAL, DUP3__TFLOG_PRINT_ISIMESSAGE, "Phonet Receiver: [ %s", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP3__TFLOG_PRINT_ISIMESSAGE_TD, "Phonet Receiver: [ %s", trace_msg );
                 trace_msg.SetLength( 0 );
               }
             else if ( ( i + 1 ) == length ) // The last line
               {
-OstTraceExt1( TRACE_NORMAL, DUP4_TFLOG_PRINT_ISIMESSAGE, "Phonet Receiver:   %s]", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP4_TFLOG_PRINT_ISIMESSAGE_TD, "Phonet Receiver:   %s]", trace_msg );
                 trace_msg.SetLength( 0 );
               }
             else // just print bytes
               {
-OstTraceExt1( TRACE_NORMAL, DUP5_TFLOG_PRINT_ISIMESSAGE, "Phonet Receiver:   %s", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP5_TFLOG_PRINT_ISIMESSAGE_TD, "Phonet Receiver:   %s", trace_msg );
                 trace_msg.SetLength( 0 );
               }
             counter = 0;
@@ -178,7 +178,7 @@ CMmPhoNetReceiver::CMmPhoNetReceiver()
         iSatMessageBuffer( NULL )
     {
     TFLOGSTRING("TSY: CMmPhoNetReceiver::CMmPhoNetReceiver");
-OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_CMMPHONETRECEIVER, "CMmPhoNetReceiver::CMmPhoNetReceiver" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETRECEIVER_CMMPHONETRECEIVER_TD, "CMmPhoNetReceiver::CMmPhoNetReceiver" );
     //None
     }
 
@@ -190,7 +190,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_CMMPHONETRECEIVER, "CMmPhoNetReceiver
 CMmPhoNetReceiver::~CMmPhoNetReceiver()
     {
     TFLOGSTRING("TSY: CMmPhoNetReceiver::~CMmPhoNetReceiver");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_CMMPHONETRECEIVER, "CMmPhoNetReceiver::~CMmPhoNetReceiver" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONETRECEIVER_CMMPHONETRECEIVER_TD, "CMmPhoNetReceiver::~CMmPhoNetReceiver" );
     // Shutdown the active scheduler correctly.
     Cancel();
     Deque();
@@ -216,7 +216,7 @@ CMmPhoNetReceiver* CMmPhoNetReceiver::NewL
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetReceiver::NewL");
-OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_NEWL, "CMmPhoNetReceiver::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETRECEIVER_NEWL_TD, "CMmPhoNetReceiver::NewL" );
 
     CMmPhoNetReceiver* phoNetReceiver = NULL;
 
@@ -247,17 +247,17 @@ void CMmPhoNetReceiver::ConstructL()
     {
     // Allocate memory for incoming message.
     TFLOGSTRING("TSY: CMmPhoNetReceiver::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_CONSTRUCTL, "CMmPhoNetReceiver::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETRECEIVER_CONSTRUCTL_TD, "CMmPhoNetReceiver::ConstructL" );
 
     iMessageBuffer = HBufC8::NewL( KDefaultReceiveBufferSize );
     iMessageBufferPtr.Set( iMessageBuffer->Des() );
 
     TFLOGSTRING2("TSY: iMessageBuffer len=%d", iMessageBuffer->Length());
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_CONSTRUCTL, "CMmPhoNetReceiver::ConstructL;iMessageBuffer->Length=%d", iMessageBuffer->Length() );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONETRECEIVER_CONSTRUCTL_TD, "CMmPhoNetReceiver::ConstructL;iMessageBuffer->Length=%d", iMessageBuffer->Length() );
     TFLOGSTRING3("TSY: iMessageBufferPtr len=%d maxlen=%d",
         iMessageBufferPtr.Length(),
         iMessageBufferPtr.MaxLength());
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONETRECEIVER_CONSTRUCTL, "CMmPhoNetReceiver::ConstructL;iMessageBufferPtr.MaxLength=%d", iMessageBufferPtr.MaxLength() );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPHONETRECEIVER_CONSTRUCTL_TD, "CMmPhoNetReceiver::ConstructL;iMessageBufferPtr.MaxLength=%d", iMessageBufferPtr.MaxLength() );
     }
 
 // -----------------------------------------------------------------------------
@@ -268,7 +268,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMPHONETRECEIVER_CONSTRUCTL, "CMmPhoNetReceiver::
 void CMmPhoNetReceiver::DoCancel()
     {
     TFLOGSTRING("TSY: CMmPhoNetReceiver::DoCancel");
-OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_DOCANCEL, "CMmPhoNetReceiver::DoCancel" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETRECEIVER_DOCANCEL_TD, "CMmPhoNetReceiver::DoCancel" );
     // Cancel message receiving from Phonet
     iPhoNet->ReceiveCancel();
     }
@@ -286,7 +286,7 @@ TInt CMmPhoNetReceiver::RunError
         )
     {
     TFLOGSTRING2("TSY: CMmPhoNetReceiver::RunError - Error code: %d", aError);
-OstTrace1( TRACE_NORMAL, CMMPHONETRECEIVER_RUNERROR, "CMmPhoNetReceiver::RunError;aError=%d", aError );
+OstTrace1( TRACE_NORMAL,  CMMPHONETRECEIVER_RUNERROR_TD, "CMmPhoNetReceiver::RunError;aError=%d", aError );
     if ( iMessageReceiver )
         {
         iMessageReceiver->HandleError( TIsiReceiveC( iMessageBufferPtr ),
@@ -298,7 +298,7 @@ OstTrace1( TRACE_NORMAL, CMMPHONETRECEIVER_RUNERROR, "CMmPhoNetReceiver::RunErro
         {
         TFLOGSTRING("TSY: CMmPhoNetReceiver::RunError\
             -- receive buffer resize failed!");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_RUNERROR, "CMmPhoNetReceiver::RunError, receive buffer resize failed!" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONETRECEIVER_RUNERROR_TD, "CMmPhoNetReceiver::RunError, receive buffer resize failed!" );
         }
 
     // Restart message receiving
@@ -318,7 +318,7 @@ void CMmPhoNetReceiver::RunL()
         -- iMessageBufferPtr len=%d maxlen=%d",
         iMessageBufferPtr.Length(),
         iMessageBufferPtr.MaxLength());
-OstTraceExt2( TRACE_NORMAL, CMMPHONETRECEIVER_RUNL, "CMmPhoNetReceiver::RunL;iMessageBufferPtr.Length=%d;iMessageBufferPtr.MaxLength=%d", iMessageBufferPtr.Length(), iMessageBufferPtr.MaxLength() );
+OstTraceExt2( TRACE_NORMAL,  CMMPHONETRECEIVER_RUNL_TD, "CMmPhoNetReceiver::RunL;iMessageBufferPtr.Length=%d;iMessageBufferPtr.MaxLength=%d", iMessageBufferPtr.Length(), iMessageBufferPtr.MaxLength() );
 
     if ( KErrNone != iStatus.Int() && KErrOverflow != iStatus.Int() )
         {
@@ -329,7 +329,7 @@ OstTraceExt2( TRACE_NORMAL, CMMPHONETRECEIVER_RUNL, "CMmPhoNetReceiver::RunL;iMe
             TFLOGSTRING2("TSY: CMmPhoNetReceiver::RunL\
                 -- Large message received, resizing buffer to %d",
                 iNeededBufferLength);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_RUNL, "CMmPhoNetReceiver::RunL;iNeededBufferLength=%hu", iNeededBufferLength );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPHONETRECEIVER_RUNL_TD, "CMmPhoNetReceiver::RunL;iNeededBufferLength=%hu", iNeededBufferLength );
             // Request message again
             ReceiveL( iNeededBufferLength );
             }
@@ -338,7 +338,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_RUNL, "CMmPhoNetReceiver::Run
             // For all other error cases, just start waiting for next message
             TFLOGSTRING2("CMmPhoNetReceiver::Receive - iStatus = %d",
                 iStatus.Int());
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONETRECEIVER_RUNL, "CMmPhoNetReceiver::RunL;iStatus.Int=%d", iStatus.Int() );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPHONETRECEIVER_RUNL_TD, "CMmPhoNetReceiver::RunL;iStatus.Int=%d", iStatus.Int() );
             ReceiveL();
             }
         }
@@ -373,7 +373,7 @@ void CMmPhoNetReceiver::RegisterL
         (TInt)aReceiver,
         aResource,
         aMessageId);
-OstTraceExt3( TRACE_NORMAL, CMMPHONETRECEIVER_REGISTERL, "CMmPhoNetReceiver::RegisterL;aReceiver=%x;aResource=%x;aMessageId=%d", (TInt)aReceiver, aResource, aMessageId );
+OstTraceExt3( TRACE_NORMAL,  CMMPHONETRECEIVER_REGISTERL_TD, "CMmPhoNetReceiver::RegisterL;aReceiver=%x;aResource=%x;aMessageId=%d", (TInt)aReceiver, aResource, aMessageId );
 
     TInt resourceIndex = -1;
 
@@ -396,7 +396,7 @@ OstTraceExt3( TRACE_NORMAL, CMMPHONETRECEIVER_REGISTERL, "CMmPhoNetReceiver::Reg
                 // a message twice..
                 TFLOGSTRING("TSY: CMmPhoNetReceiver::RegisterL\
                     -- Already registered");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_REGISTERL, "CMmPhoNetReceiver::RegisterL, ASSERT Already registered" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONETRECEIVER_REGISTERL_TD, "CMmPhoNetReceiver::RegisterL, ASSERT Already registered" );
                 TF_ASSERT_NOT_REACHED();
                 return;
                 }
@@ -451,7 +451,7 @@ void CMmPhoNetReceiver::DispatchL
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetReceiver::DispatchL");
-OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_DISPATCHL, "CMmPhoNetReceiver::DispatchL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETRECEIVER_DISPATCHL_TD, "CMmPhoNetReceiver::DispatchL" );
 
     // Get resource and message id
     TInt resource( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_RESOURCEID ) );
@@ -460,7 +460,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_DISPATCHL, "CMmPhoNetReceiver::Dispat
     TFLOGSTRING3("TSY: CMmPhoNetReceiver::DispatchL - resource: 0x%x, id: 0x%x",
         resource,
         messageId);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_DISPATCHL, "CMmPhoNetReceiver::DispatchL;resource=%d;messageId=%x", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPHONETRECEIVER_DISPATCHL_TD, "CMmPhoNetReceiver::DispatchL;resource=%d;messageId=%x", resource, messageId );
 
     // Get lowest request index using binary search
     TInt highIndex = iMsgReceivers.Count();
@@ -520,7 +520,7 @@ void CMmPhoNetReceiver::ReceiveL
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetReceiver::Receive");
-OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_RECEIVEL, "CMmPhoNetReceiver::ReceiveL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETRECEIVER_RECEIVEL_TD, "CMmPhoNetReceiver::ReceiveL" );
 
     // Resize receive buffer size if necessary
     if ( NULL == iMessageBuffer ||
@@ -528,7 +528,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_RECEIVEL, "CMmPhoNetReceiver::Receive
         {
         TFLOGSTRING2("TSY: CMmPhoNetReceiver::Receive - resizing buffer to %d",
             aBufferLength);
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_RECEIVEL, "CMmPhoNetReceiver::ReceiveL;aBufferLength=%d", aBufferLength );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONETRECEIVER_RECEIVEL_TD, "CMmPhoNetReceiver::ReceiveL;aBufferLength=%d", aBufferLength );
 
         // Delete old buffer
         delete iMessageBuffer;
@@ -538,7 +538,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_RECEIVEL, "CMmPhoNetReceiver::Re
         iMessageBuffer = HBufC8::NewL( aBufferLength );
         iMessageBufferPtr.Set( iMessageBuffer->Des() );
         TFLOGSTRING2("TSY: iMessageBuffer len=%d", iMessageBuffer->Length());
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONETRECEIVER_RECEIVEL, "CMmPhoNetReceiver::ReceiveL;iMessageBuffer->Length=%d", iMessageBuffer->Length() );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPHONETRECEIVER_RECEIVEL_TD, "CMmPhoNetReceiver::ReceiveL;iMessageBuffer->Length=%d", iMessageBuffer->Length() );
         }
 
     // Do asyncronous reqest for message from Phonet
@@ -561,9 +561,21 @@ TInt CMmPhoNetReceiver::SetSatMessHandler
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetReceiver::SetSatMessHandler");
-OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_SETSATMESSHANDLER, "CMmPhoNetReceiver::SetSatMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETRECEIVER_SETSATMESSHANDLER_TD, "CMmPhoNetReceiver::SetSatMessHandler" );
     iSatMessHandler = aSatMessHandler;
     return KErrNone;
+    }
+
+// -----------------------------------------------------------------------------
+// CMmPhoNetReceiver::SatMessHandler
+// Get SAT messagehandler pointer
+// -----------------------------------------------------------------------------
+//
+MMmMessageReceiver* CMmPhoNetReceiver::SatMessHandler()
+    {
+    TFLOGSTRING("TSY: CMmPhoNetReceiver::SatMessHandler");
+    OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_SATMESSHANDLER_TD, "CMmPhoNetReceiver::SatMessHandler" );
+    return iSatMessHandler;
     }
 
 // -----------------------------------------------------------------------------
@@ -577,7 +589,7 @@ TInt CMmPhoNetReceiver::SatReady
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetReceiver::SatReady");
-OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_SATREADY, "CMmPhoNetReceiver::SatReady" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETRECEIVER_SATREADY_TD, "CMmPhoNetReceiver::SatReady" );
     TInt ret( KErrNotFound );
 
     // If there is cached SAT message that
@@ -593,12 +605,12 @@ OstTrace0( TRACE_NORMAL, CMMPHONETRECEIVER_SATREADY, "CMmPhoNetReceiver::SatRead
             -- aTypeOfCommandRequested: 0x%x, typeOfCommand: 0x%x",
             aTypeOfCommandRequested,
             typeOfCommand);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPHONETRECEIVER_SATREADY, "CMmPhoNetReceiver::SatReady;aTypeOfCommandRequested=%hhx;typeOfCommand=%hhx", aTypeOfCommandRequested, typeOfCommand );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPHONETRECEIVER_SATREADY_TD, "CMmPhoNetReceiver::SatReady;aTypeOfCommandRequested=%hhx;typeOfCommand=%hhx", aTypeOfCommandRequested, typeOfCommand );
 
         if ( typeOfCommand == aTypeOfCommandRequested )
             {
             TFLOGSTRING("TSY: CMmPhoNetReceiver::SatReady -- sending msg to sat");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONETRECEIVER_SATREADY, "CMmPhoNetReceiver::SatReady, sending msg to sat" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONETRECEIVER_SATREADY_TD, "CMmPhoNetReceiver::SatReady, sending msg to sat" );
             // Call receivemessage and catch possible leave.
             TRAP_IGNORE( iSatMessHandler->ReceiveMessageL(
                 TIsiReceiveC( message ) ) );
@@ -607,7 +619,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONETRECEIVER_SATREADY, "CMmPhoNetReceiver::Sa
             iSatMessageBuffer = NULL;
             TFLOGSTRING("TSY: CMmPhoNetReceiver::SatReady\
                 -- iSatMessageBuffer deleted");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPHONETRECEIVER_SATREADY, "CMmPhoNetReceiver::SatReady, iSatMessageBuffer deleted" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPHONETRECEIVER_SATREADY_TD, "CMmPhoNetReceiver::SatReady, iSatMessageBuffer deleted" );
             ret = KErrNone;
             }
         }

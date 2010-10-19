@@ -65,7 +65,7 @@ const TUint8 KPbrTlvLengthWithoutSfi( 4 );
 CMmPhoneBookStoreOperationBase::CMmPhoneBookStoreOperationBase()
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::CMmPhoneBookStoreOperationBase");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOPERATIONBASE, "CMmPhoneBookStoreOperationBase::CMmPhoneBookStoreOperationBase" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOPERATIONBASE_TD, "CMmPhoneBookStoreOperationBase::CMmPhoneBookStoreOperationBase" );
 
     iRet = KErrNone;
     iWriteLocation = 0;
@@ -82,7 +82,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOPERATI
 CMmPhoneBookStoreOperationBase::~CMmPhoneBookStoreOperationBase()
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::~CMmPhoneBookStoreOperationBase");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOPERATIONBASE, "CMmPhoneBookStoreOperationBase::~CMmPhoneBookStoreOperationBase" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOPERATIONBASE_TD, "CMmPhoneBookStoreOperationBase::~CMmPhoneBookStoreOperationBase" );
     }
 
 // ---------------------------------------------------------------------------
@@ -93,7 +93,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CMMPHONEBOOKSTOREOP
 void CMmPhoneBookStoreOperationBase::CancelReq( TName& /*aPhoneBook*/ )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::CancelReq - does nothing");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CANCELREQ, "CMmPhoneBookStoreOperationBase::CancelReq - does nothing" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CANCELREQ_TD, "CMmPhoneBookStoreOperationBase::CancelReq - does nothing" );
     }
 
 // ---------------------------------------------------------------------------
@@ -104,7 +104,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CANCELREQ, "CMmPhon
 TInt CMmPhoneBookStoreOperationBase::CompleteReq( TInt /*aErrorCode*/ )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::CompleteReq - not supported");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_COMPLETEREQ, "CMmPhoneBookStoreOperationBase::CompleteReq - not supported" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_COMPLETEREQ_TD, "CMmPhoneBookStoreOperationBase::CompleteReq - not supported" );
     return KErrNotSupported;
     }
 
@@ -117,7 +117,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_COMPLETEREQ, "CMmPh
 const TName& CMmPhoneBookStoreOperationBase::GetPhoneBookName()const
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::GetPhoneBookName - PhoenbookName");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_GETPHONEBOOKNAME, "CMmPhoneBookStoreOperationBase::GetPhoneBookName - PhoneBookName" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONBASE_GETPHONEBOOKNAME_TD, "CMmPhoneBookStoreOperationBase::GetPhoneBookName - PhoneBookName" );
 
     return iPhoneBookTypeName;
     }
@@ -132,7 +132,7 @@ TUint16 CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType(
     const TUint8 aPbMask )
     {
 TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType SourcePBType: 0x%x", aPbMask);
-OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBOOKTYPE, "CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType;aPbMask=%hhx", aPbMask );
+OstTraceExt1( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBOOKTYPE_TD, "CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType;aPbMask=%hhx", aPbMask );
 
     TUint16 phoneBookType( KMaskUnspecifiedType );
 
@@ -170,13 +170,13 @@ OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBOOK
             }
         default:
             {
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBOOKTYPE, "CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType;ASSERT phoneBookType (%d) != KMaskUnspecifiedType", phoneBookType );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBOOKTYPE_TD, "CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType;ASSERT phoneBookType (%d) != KMaskUnspecifiedType", phoneBookType );
             TF_ASSERT( phoneBookType != KMaskUnspecifiedType );
             break;
             }
         }
 TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType phoneBookType: 0x%x" ,phoneBookType );
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBOOKTYPE, "CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType;phoneBookType=%x", phoneBookType );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOSIMPHONEBOOKTYPE_TD, "CMmPhoneBookStoreOperationBase::ConvertToSimPhoneBookType;phoneBookType=%x", phoneBookType );
 
     return phoneBookType;
     }
@@ -221,7 +221,7 @@ TUint8 CMmPhoneBookStoreOperationBase::ConvertToPBtype(
     const TName& aPBType )
     {
     TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBtype");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBTYPE, "CMmPhoneBookStoreOperationBase::ConvertToPBtype" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBTYPE_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBtype" );
 
     TUint8 pbMask( 0 );
 
@@ -255,7 +255,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBTYPE, "CMmPho
         }
 
 TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBtype : phonebooktype: %d", pbMask);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBTYPE, "CMmPhoneBookStoreOperationBase::ConvertToPBtype;pbMask=%hhx", pbMask );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBTYPE_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBtype;pbMask=%hhx", pbMask );
 
     return pbMask;
     }
@@ -270,7 +270,7 @@ TUint16 CMmPhoneBookStoreOperationBase::ConvertToPBfileId(
     const TName& aPBType, TUint16 &aFileIdExt, TUint8 aCardType )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBfileId");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID, "CMmPhoneBookStoreOperationBase::ConvertToPBfileId" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBfileId" );
 
     TUint16 fileId( 0 );
 
@@ -322,7 +322,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID, "CMmP
         fileId = UICC_ILLEGAL_FILE_ID;
         }
 TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBfileId phonebookfileid: %d", fileId);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID, "CMmPhoneBookStoreOperationBase::ConvertToPBfileId;fileId=%hu", fileId );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBFILEID_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBfileId;fileId=%hu", fileId );
 
 
     return fileId;
@@ -339,7 +339,7 @@ TUint8 CMmPhoneBookStoreOperationBase::ConvertToConfArrayIndex(
     const TUint16 aFileId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToConfArrayIndex");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOCONFARRAYINDEX, "CMmPhoneBookStoreOperationBase::ConvertToConfArrayIndex" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOCONFARRAYINDEX_TD, "CMmPhoneBookStoreOperationBase::ConvertToConfArrayIndex" );
     TUint8 index( 0 );
     switch(aFileId)
         {
@@ -375,7 +375,7 @@ void CMmPhoneBookStoreOperationBase::ConvertToPBname(
     TName& aName )
     {
 TFLOGSTRING2("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname : source: %d" ,aTrans );
-OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname;source=%hhu", aTrans );
+OstTraceExt1( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBname;source=%hhu", aTrans );
 
     // get number of phonebook type from transaction Id
     TUint8 numOfPbType( aTrans & KMaskPhonebookType );
@@ -383,43 +383,43 @@ OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMm
     if ( KMaskAdnType == numOfPbType )
         {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - ADN");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - ADN" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBname - ADN" );
         aName = KETelIccAdnPhoneBook;
         }
     else if ( KMaskFdnType == numOfPbType )
         {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - FDN");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - FDN" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBname - FDN" );
         aName = KETelIccFdnPhoneBook;
         }
     else if ( KMaskSdnType == numOfPbType )
         {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - SDN");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - SDN" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBname - SDN" );
         aName = KETelIccSdnPhoneBook;
         }
     else if ( KMaskBdnType == numOfPbType )
         {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - BDN");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - BDN" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBname - BDN" );
         aName = KETelIccBdnPhoneBook;
         }
     else if ( KMaskVoiceMailBox == numOfPbType )
         {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - VMBX");
-OstTrace0( TRACE_NORMAL, DUP5_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - VMBX" );
+OstTrace0( TRACE_NORMAL,  DUP5_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBname - VMBX" );
         aName = KETelIccVoiceMailBox;
         }
     else if ( KMaskMbdnType == numOfPbType )
         {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - MBDN");
-OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - MBDN" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBname - MBDN" );
         aName = KETelIccMbdnPhoneBook;
         }
     else
         {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToPBname - unknown -> Error situation!" );
-OstTrace0( TRACE_NORMAL, DUP7_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "CMmPhoneBookStoreOperationBase::ConvertToPBname - unknown -> Error situation!" );
+OstTrace0( TRACE_NORMAL,  DUP7_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME_TD, "CMmPhoneBookStoreOperationBase::ConvertToPBname - unknown -> Error situation!" );
         //Nothing can do.
         }
     }
@@ -433,7 +433,7 @@ OstTrace0( TRACE_NORMAL, DUP7_CMMPHONEBOOKSTOREOPERATIONBASE_CONVERTTOPBNAME, "C
 TInt CMmPhoneBookStoreOperationBase::EmptyEntryCheck( const TDesC8 &aFileData)
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::EmptyEntryCheck");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_EMPTYENTRYCHECK, "CMmPhoneBookStoreOperationBase::EmptyEntryCheck" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_EMPTYENTRYCHECK_TD, "CMmPhoneBookStoreOperationBase::EmptyEntryCheck" );
 
 
     TInt ret( KErrNone);
@@ -457,7 +457,7 @@ TInt CMmPhoneBookStoreOperationBase::FetchFileListFromPBR(
     RArray <TPrimitiveTag>& aFileList )
     {
 TFLOGSTRING( "TSY: CMmPhoneBookStoreOperationBase::FetchFileListFromPBR" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_FETCHFILELISTFROMPBR, "CMmPhoneBookStoreOperationBase::FetchFileListFromPBR" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONBASE_FETCHFILELISTFROMPBR_TD, "CMmPhoneBookStoreOperationBase::FetchFileListFromPBR" );
 
     TInt ret( KErrNone );
     TPrimitiveTag primTag;

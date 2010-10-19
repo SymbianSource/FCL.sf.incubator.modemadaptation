@@ -171,7 +171,7 @@ class CSatCC : public CBase
         * @param aCcstruct structure containing data to be sent
         * @return phonet sender status
         */
-        TInt SendUSSDEnvelope( const TCallControl& aCcstruct );
+        TInt SendUSSDEnvelopeL( const TCallControl& aCcstruct );
 
         /**
         * send (to sim) call control envelope for Call operation
@@ -200,7 +200,7 @@ class CSatCC : public CBase
         * @param aIsiMessage Received UICC_CAT_RESP
         * @return void
         */
-        void UiccCatRespEnvelopeReceived( const TIsiReceiveC& aIsiMessage );
+        void UiccCatRespEnvelopeReceivedL( const TIsiReceiveC& aIsiMessage );
 
         /*
         * This methods returns ETrue when a Ussd string contains
@@ -225,7 +225,7 @@ class CSatCC : public CBase
         * @param aIsiMessage CALL_MODEM_RESOURCE_IND
         * @return none
         */
-        void CallModemResourceInd( const TIsiReceiveC& aIsiMessage );
+        void CallModemResourceIndL( const TIsiReceiveC& aIsiMessage );
 
         /**
         * Creates resource control response for modem Call server
@@ -234,7 +234,7 @@ class CSatCC : public CBase
         * @param aAtkData possible additional response data provided by (U)SIM
         * @return none
         */
-        void SendCallModemResourceReq(
+        void SendCallModemResourceReqL(
             const TCallControl& aTcc,
             const TUint8 aResult,
             TPtrC8 aAtkData );
@@ -244,7 +244,7 @@ class CSatCC : public CBase
         * @param aIsiMessage SS_RESOURCE_CONTROL_IND
         * @return none
         */
-        void SsResourceControlInd( const TIsiReceiveC& aIsiMessage );
+        void SsResourceControlIndL( const TIsiReceiveC& aIsiMessage );
 
         /**
         * Creates resource control response for modem SS server
@@ -255,7 +255,7 @@ class CSatCC : public CBase
         * @param aAtkData possible additional response data provided by (U)SIM
         * @return none
         */
-        void SendSsResourceControlReq(
+        void SendSsResourceControlReqL(
             const TCallControl& aTcc,
             const TUint8 aSw1,
             const TUint8 aSw2,

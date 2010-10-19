@@ -127,7 +127,7 @@ DDmcLogicalDevice::DDmcLogicalDevice()
                            KErrNoMemory);
 
     // Assign the TDfc-queue to the event handler used for event sending.
-    DmcEvHandApeCent::SubscribeEvents(iUserEventDfcPtr);
+    DmcEvHandApeCent::SubscribeEvents(DMC_USER_BIT, iUserEventDfcPtr);
 
 
     OstTrace1(TRACE_FLOW, DDMC_LOGICAL_DEVICE_3,
@@ -578,13 +578,13 @@ void DDmcLogicalDevice::ReceiveEventsDfc(TAny* aPtr)
 
     switch (event)
         {
-        case USER_CLIENT_POWER_OFF_EVENT:
+        case DMC_CLIENT_POWER_OFF_EVENT:
             {
             eventType = RDmc::EPowerOffEvent;
             }
             break;
 
-        case USER_CLIENT_RESET_EVENT:
+        case DMC_CLIENT_RESET_EVENT:
             {
             eventType = RDmc::EResetEvent;
             }

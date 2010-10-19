@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -37,17 +37,17 @@
 
 // CONSTANTS
 const TUint8 KFirstPepType = PN_PEP_TYPE_COMMON; // First PEP type
-const TUint8 KSecondPepType = PN_PEP_TYPE_GPRS; // Second PEP type
-const TUint8 KSecondPepDevice = 0x00; // Device Id of second PEP 
-const TUint8 KSecondPepObject = 0x33; // Object Id of second PEP
+const TUint8 KSecondPepType = PN_PEP_TYPE_COMMON; // Second PEP type
+const TUint8 KFirstPepDevice = PN_DEV_OWN;      // Device Id of first PEP
+const TUint8 KSecondPepDevice = PN_DEV_MODEM;    // Device Id of second PEP
+const TUint8 KSecondPepObject = PN_OBJ_PEP_GPDS; // Object Id of second PEP
+
 const TUint8 KUnknownTransID  = 0x00;
 
 const TUint8 KInvalidPipeHandle = 0xFF;
 
 // Maximum number of simultaneous PipeHandle supported by this phone.
 const TInt KMmMaxNumberOfPipeHandles  = KMmMaxNumberOfContexts;
- 
-const TUint8 KFirstPepDevice = PN_DEV_HOST; // Device Id of first PEP
 
 #ifdef DUMMY_NIF_PEP_FOR_PACKET_DATA_TESTING_DOS
 
@@ -106,11 +106,11 @@ class CMmPacketContextMesshandlerList;
 // CMmPipeControl is used to create and send GSM-specific pipe control
 // ISI messages to PhoNet via PhoNetSender. It also receives
 // GSM-specific pipe control ISI messages from Phonet via PhoNetReceiver.
-class CMmPipeControl : public CBase, 
+class CMmPipeControl : public CBase,
     public MMmMessageReceiver
     {
     public: // Constructors and destructor.
-        
+
         /**
         * NewL method is used to create a new instance of class.
         * @param CMmPhoNetSender*: pointer to phonet sender
@@ -131,7 +131,7 @@ class CMmPipeControl : public CBase,
         ~CMmPipeControl();
 
     public: // New classes
-    
+
         // TPipeOperationInfo
         class TPipeOperationInfo
             {
@@ -141,12 +141,12 @@ class CMmPipeControl : public CBase,
             };
 
     public: // Functions from base classes
-        
+
         /**
         * Isimsg received by PhonetReceiver.
         * @param TIsiReceiveC, reference to the received message.
         */
-		void ReceiveMessageL( const TIsiReceiveC& aIsiMessage );
+        void ReceiveMessageL( const TIsiReceiveC& aIsiMessage );
 
     public: // New functions
 
@@ -155,7 +155,7 @@ class CMmPipeControl : public CBase,
         * @param aTransId: transaction Id
         * @param aPipeState: pipe state
         * @param aFirstPepObject: First PEP object Id
-		* @return error value: Symbian error code
+        * @return error value: Symbian error code
         */
         TInt PnsPipeCreateReq(
             const TUint8 aTransId,
@@ -164,17 +164,20 @@ class CMmPipeControl : public CBase,
 
         /**
         * Creates PnsPipeEnableReq ISI message and sends it to Phonet.
-        * @param aPackage: data package
-		* @return error value: Symbian error code
+        * @param aPipeHandle: pipe to be enabled
+        * @param aTransId: transaction Id
+        * @return error value: Symbian error code
         */
-        TInt PnsPipeEnableReq( const CMmDataPackage& aPackage ) const;
+        TInt PnsPipeEnableReq(
+            TUint8 aPipeHandle,
+            TUint8 aTransId ) const;
 
         /**
         * Creates PnsPipeResetReq ISI message and sends it to Phonet.
         * @param aTransId: transaction Id
         * @param aPipeHandle: pipe handle
         * @param aStateAfterReset: pipe state after reset
-		* @return error value: Symbian error code
+        * @return error value: Symbian error code
         */
         TInt PnsPipeResetReq(
             const TUint8 aTransId,
@@ -185,15 +188,52 @@ class CMmPipeControl : public CBase,
         * Creates PnsPipeRemoveReq ISI message and sends it to Phonet.
         * @param aTransId: transaction Id
         * @param aPipeHandle: pipe handle
-		* @return error value: Symbian error code
+        * @return error value: Symbian error code
         */
         TInt PnsPipeRemoveReq(
             const TUint8 aTransId,
             const TUint8 aPipeHandle );
- 
+
+        /**
+        * Creates PnsPipeRedirectReq ISI message and sends it to Phonet.
+        * @param aTransId: transaction Id
+        * @param aPipeHandle: pipe handle
+        * @param aOldPepDevId: Device ID to remove from
+        * @param aOldPepObjId: Object ID to remove from
+        * @param aReplacementPepDevId: Device ID to redirect to
+        * @param aReplacementPepObjId: Object ID to redirect to
+        * @return error value: Symbian error code
+        */
+        TInt PnsPipeRedirectReq(
+            TUint8 aTransId,
+            TUint8 aPipeHandle,
+            TUint8 aOldPepDevId,
+            TUint8 aOldPepObjId,
+            TUint8 aReplacementPepDevId,
+            TUint8 aReplacementPepObjId);
+
+        /**
+        * Creates PnsPepCtrlReq ISI message and sends it to Phonet.
+        * @param aDevId: device Id
+        * @param aObjId: object Id
+        * @param aTransId: transaction Id
+        * @param aPipeHandle: pipe handle
+        * @param aControlId: control id
+        * @param aStatus: status code
+        * @return error value: Symbian error code
+        */
+        TInt PnsPepCtrlReq(
+            TUint8 aDevId,
+            TUint8 aObjId,
+            TUint8 aTransId,
+            TUint8 aPipeHandle,
+            TUint8 aControlId,
+            TUint8 aStatus,
+            TUint8 aChannelId );
+
      public: // Functions from base classes
         // None
-        
+
     protected: // New functions
         // None
 
@@ -212,16 +252,8 @@ class CMmPipeControl : public CBase,
         */
         void ConstructL();
 
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
         /**
-        * Creates PnsNameQueryReq ISI message and sends it to Phonet.
-		* @return error value: Symbian error code
-        */
-        TInt PnsNameQueryReq() const;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-        /**
-        * PnsPipeCreate response. 
+        * PnsPipeCreate response.
         * @param aIsiMessage, reference to the received message.
         */
         void PnsPipeCreateResp( const TIsiReceiveC &aIsiMessage );
@@ -233,54 +265,59 @@ class CMmPipeControl : public CBase,
         void PnsPipeEnableResp( const TIsiReceiveC& aIsiMessage );
 
         /**
-        * PnsPipeReset response. 
+        * PnsPipeReset response.
         * @param aIsiMessage, reference to the received message.
         */
         void PnsPipeResetResp( const TIsiReceiveC& aIsiMessage );
 
         /**
-        * PnsPipeRemove response. 
+        * PnsPipeRemove response.
         * @param aIsiMessage, reference to the received message.
         */
         void PnsPipeRemoveResp( const TIsiReceiveC& aIsiMessage );
 
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-       /**
-        * PnsNameQuery response.  
+        /**
+        * PnsPipeRedirect response.
         * @param aIsiMessage, reference to the received message.
         */
-        void PnsNameQueryResp( const TIsiReceiveC& aIsiMessage );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
+        void PnsPipeRedirectResp( const TIsiReceiveC& aIsiMessage );
 
         /**
-        * Initialize lists.           
+        * PnsPepCtrl response.
+        * @param aIsiMessage, reference to the received message.
+        */
+        void PnsPepCtrlResp( const TIsiReceiveC& aIsiMessage );
+
+
+        /**
+        * Initialize lists.
         */
         void InitLists();
 
         /**
-        * Set Pipe Handle.   
+        * Set Pipe Handle.
         * @param aPipeHandle: pipe handle
         */
         void SetPipeHandle( const TUint8 aPipeHandle );
 
         /**
-        * Set Transaction Id. 
+        * Set Transaction Id.
         * @param aPipeHandle: pipe handle
         * @param aTransId: transaction Id
         */
         void SetTransactionId(
-            const TUint8 aPipeHandle, 
+            const TUint8 aPipeHandle,
             const TUint8 aTransId );
 
         /**
-        * Return Transaction Id.  
+        * Return Transaction Id.
         * @param aPipeHandle: pipe handle
-		* @return TUint8, Transaction Id 
+        * @return TUint8, Transaction Id
         */
         TUint8 TransactionId( const TUint8 aPipeHandle ) const;
 
         /**
-        * Reset Pipe Handle.   
+        * Reset Pipe Handle.
         * @param aPipeHandle: pipe handle
         */
         void ResetPipeHandle( const TUint8 aPipeHandle );
@@ -291,7 +328,7 @@ class CMmPipeControl : public CBase,
         */
         TBool IsOperationCalled( const TUint8 aPipeHandle ) const;
 
-#ifdef DUMMY_NIF_PEP_FOR_PACKET_DATA_TESTING_DOS 
+#ifdef DUMMY_NIF_PEP_FOR_PACKET_DATA_TESTING_DOS
         /**
         * PnsPepConnect request.
         * @param aIsiMessage, reference to the received message.
@@ -305,19 +342,19 @@ class CMmPipeControl : public CBase,
         void PnsPepDisconnectReq( const TIsiReceiveC& aIsiMessage );
 
         /**
-        * PnsPepReset request. 
+        * PnsPepReset request.
         * @param aIsiMessage, reference to the received message.
         */
         void PnsPepResetReq( const TIsiReceiveC& aIsiMessage );
 
         /**
-        * PnsPepEnable request. 
+        * PnsPepEnable request.
         * @param aIsiMessage, reference to the received message.
         */
         void PnsPepEnableReq( const TIsiReceiveC& aIsiMessage );
 
         /**
-        * PnsPepConnect response. 
+        * PnsPepConnect response.
         * @param aTransId: transaction Id
         * @param aPipeHandle: pipe handle
         */
@@ -326,7 +363,7 @@ class CMmPipeControl : public CBase,
             const TUint8 aPipeHandle );
 
         /**
-        * PnsPepDisconnect response. 
+        * PnsPepDisconnect response.
         * @param aTransId: transaction Id
         * @param aPipeHandle: pipe handle
         */
@@ -344,7 +381,7 @@ class CMmPipeControl : public CBase,
             const TUint8 aPipeHandle );
 
         /**
-        * PnsPepEnable response. 
+        * PnsPepEnable response.
         * @param aTransId: transaction Id
         * @param aPipeHandle: pipe handle
         */
@@ -363,13 +400,13 @@ class CMmPipeControl : public CBase,
 
         // A pointer to the context messhandler.
         CMmPacketContextMessHandler* iContextMessHandler;
-        
+
         // Pointer to contextlist
         CMmPacketContextMesshandlerList* iContextList;
 
         // A pointer to the PhonetSender.
         CMmPhoNetSender* iPhoNetSender;
-        
+
         // Pipe Operation Array contains TPipeOperation elements.
         TPipeOperationInfo iPipeOperationArray[KMmMaxNumberOfPipeHandles];
 
@@ -391,5 +428,5 @@ class CMmPipeControl : public CBase,
     };
 
 #endif // CMMPIPECONTROL_H  
-            
+
 // End of File

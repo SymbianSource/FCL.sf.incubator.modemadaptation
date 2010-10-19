@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -67,6 +67,7 @@ const TInt KMaximumCcBufferSize =
 const TUint8 KMSBMask = 0x80;
 const TUint8 KSw1Sw2Unknown = 0;
 const TUint8 KValidTonNpi   = 0x3F;
+const TUint8 KSw1Sw2Length  = 2;
 
 
 // ==================== MEMBER FUNCTIONS ====================================
@@ -88,7 +89,7 @@ CSatCC::CSatCC
         iTonNpiPresent( EFalse ),
         iEnvelopeResponseData( NULL )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_CSATCC, "CSatCC::CSatCC" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_CSATCC_TD, "CSatCC::CSatCC" );
     }
 
 // -----------------------------------------------------------------------------
@@ -98,7 +99,7 @@ CSatCC::CSatCC
 //
 void CSatCC::ConstructL()
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_CONSTRUCTL, "CSatCC::ConstructL" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_CONSTRUCTL_TD, "CSatCC::ConstructL" );
     TFLOGSTRING("TSY: CSatCC::ConstructL");
 
     // Create array for CC request information storing
@@ -118,7 +119,7 @@ CSatCC* CSatCC::NewL
         CTsySatMessaging*   aSatMessaging    //Pointer to satmessaging class
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_NEWL, "CSatCC::NewL" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_NEWL_TD, "CSatCC::NewL" );
     TFLOGSTRING("TSY: CSatCC::NewL");
 
     CSatCC* self = new( ELeave ) CSatCC( aSatMessHandler, aSatMessaging );
@@ -138,7 +139,7 @@ CSatCC* CSatCC::NewL
 //
 CSatCC::~CSatCC()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATCC_CSATCC, "CSatCC::~CSatCC" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATCC_CSATCC_TD, "CSatCC::~CSatCC" );
     TFLOGSTRING("TSY: CSatCC::~CSatCC");
 
     if( iCallControlArray )
@@ -165,7 +166,7 @@ TInt CSatCC::GetArrayIndexById
         const TInt &aTid
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_GETARRAYINDEXBYID, "CSatCC::GetArrayIndexById" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_GETARRAYINDEXBYID_TD, "CSatCC::GetArrayIndexById" );
     TFLOGSTRING("TSY: CSatCC::GetArrayIndexById");
 
     TInt ret ( KErrNotFound );
@@ -184,7 +185,7 @@ TInt CSatCC::GetArrayIndexById
         if ( KErrNotFound == ret)
             {
             TFLOGSTRING3("TSY: CSatCC::GetArrayIndexById, Error:ID 0x%x not found. Array size: %d", aTid, arraySize );
-            OstTraceExt2( TRACE_NORMAL, DUP1_CSATCC_GETARRAYINDEXBYID, "CSatCC::GetArrayIndexById, Error: ID 0x%x not found. Array size: %d", aTid, arraySize );
+            OstTraceExt2( TRACE_NORMAL,  DUP1_CSATCC_GETARRAYINDEXBYID_TD, "CSatCC::GetArrayIndexById, Error: ID 0x%x not found. Array size: %d", aTid, arraySize );
             }
         }
     else
@@ -205,7 +206,7 @@ void CSatCC::AddLocationInformationToTlv
         TTlv& aTlv //Tlv to be sent
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_ADDLOCATIONINFORMATIONTOTLV, "CSatCC::AddLocationInformationToTlv" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_ADDLOCATIONINFORMATIONTOTLV_TD, "CSatCC::AddLocationInformationToTlv" );
     TFLOGSTRING("TSY: CSatCC::AddLocationInformationToTlv");
 
     const CSatMessHandler::TLocationInfo& locInfo
@@ -231,7 +232,7 @@ TInt CSatCC::SendSSEnvelope
         const TCallControl& aCcstruct //Structure containing call event info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_SENDSSENVELOPE, "CSatCC::SendSSEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_SENDSSENVELOPE_TD, "CSatCC::SendSSEnvelope" );
     TFLOGSTRING("TSY: CSatCC::SendSSEnvelope");
 
     // create envelope
@@ -358,16 +359,17 @@ TInt CSatCC::SendSSEnvelope
 
 
 // -----------------------------------------------------------------------------
-// CSatCC::SendUSSDEnvelope
+// CSatCC::SendUSSDEnvelopeL
 // Sends call control USSD envelope
 // -----------------------------------------------------------------------------
 //
-TInt CSatCC::SendUSSDEnvelope
+TInt CSatCC::SendUSSDEnvelopeL
         (
         const TCallControl& aCcstruct //Structure containing call event info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_SENDUSSDENVELOPE, "CSatCC::SendUSSDEnvelope" );
+    TFLOGSTRING( "TSY: CSatCC::SendUSSDEnvelopeL" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_SENDUSSDENVELOPEL_TD, "CSatCC::SendUSSDEnvelopeL" );
 
     TInt ret( KErrNone );
     // create envelope
@@ -419,11 +421,11 @@ TInt CSatCC::SendUSSDEnvelope
             // impossible. Remove the created CcStruct from the CC array and
             // send CC event response.
             TPtrC8 atkData;
-            SendSsResourceControlReq( 
-                aCcstruct, 
-                KSw1Sw2Unknown, 
-                KSw1Sw2Unknown, 
-                KError, 
+            SendSsResourceControlReqL(
+                aCcstruct,
+                KSw1Sw2Unknown,
+                KSw1Sw2Unknown,
+                KError,
                 atkData );
 
             TInt index( GetArrayIndexById( aCcstruct.iTransId ) );
@@ -449,7 +451,7 @@ TInt CSatCC::SendCallEnvelope
         const TCallControl& aCallControl //Structure containing call event info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_SENDCALLENVELOPE, "CSatCC::SendCallEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_SENDCALLENVELOPE_TD, "CSatCC::SendCallEnvelope" );
 
     // create envelope
     TTlv envelope;
@@ -517,7 +519,7 @@ TInt CSatCC::SendPdpContextActivationEnvelope
         const TDesC8& aPdpContextActivationParams
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_SENDPDPCONTEXTACTIVATIONENVELOPE, "CSatCC::SendPdpContextActivationEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_SENDPDPCONTEXTACTIVATIONENVELOPE_TD, "CSatCC::SendPdpContextActivationEnvelope" );
     TFLOGSTRING( "TSY: CSatCC::SendPdpContextActivationEnvelope" );
     // Create envelope
     TTlv envelope;
@@ -537,14 +539,14 @@ TInt CSatCC::SendPdpContextActivationEnvelope
     }
 
 // -----------------------------------------------------------------------------
-// CSatCC::UiccCatRespEnvelopeReceived
+// CSatCC::UiccCatRespEnvelopeReceivedL
 // Handler function of incoming call control related data notification messages
 // -----------------------------------------------------------------------------
 //
-void CSatCC::UiccCatRespEnvelopeReceived( const TIsiReceiveC& aIsiMessage )
+void CSatCC::UiccCatRespEnvelopeReceivedL( const TIsiReceiveC& aIsiMessage )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_UICCCATRESPENVELOPERECEIVED, "CSatCC::UiccCatRespEnvelopeReceived" );
-    TFLOGSTRING( "TSY:CSatCC::UiccCatRespEnvelopeReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_UICCCATRESPENVELOPERECEIVEDL_TD, "CSatCC::UiccCatRespEnvelopeReceivedL" );
+    TFLOGSTRING( "TSY:CSatCC::UiccCatRespEnvelopeReceivedL" );
 
     TUint8 status( aIsiMessage.Get8bit(
         ISI_HEADER_SIZE + UICC_CAT_RESP_OFFSET_STATUS ) );
@@ -585,20 +587,20 @@ void CSatCC::UiccCatRespEnvelopeReceived( const TIsiReceiveC& aIsiMessage )
                     {
                     case PN_MODEM_CALL:
                         {
-                        SendCallModemResourceReq(
+                        SendCallModemResourceReqL(
                             ( *iCallControlArray )[ccIndex],
                             result,
-                            apduData );
+                            apduData.Mid( 0, apduData.Length() - KSw1Sw2Length ) );
                         break;
                         }
                     case PN_SS:
                         {
-                        SendSsResourceControlReq(
+                        SendSsResourceControlReqL(
                             ( *iCallControlArray )[ccIndex],
                             sw1,
                             sw2,
                             result,
-                            apduData );
+                            apduData.Mid( 0, apduData.Length() - KSw1Sw2Length ) );
                         break;
                         }
                     case PN_GPDS:
@@ -606,7 +608,7 @@ void CSatCC::UiccCatRespEnvelopeReceived( const TIsiReceiveC& aIsiMessage )
                         SendGpdsResourceControlReq(
                             ( *iCallControlArray )[ccIndex],
                             result,
-                            apduData );
+                            apduData.Mid( 0, apduData.Length() - KSw1Sw2Length ) );
                         break;
                         }
                     default:
@@ -620,8 +622,8 @@ void CSatCC::UiccCatRespEnvelopeReceived( const TIsiReceiveC& aIsiMessage )
             }
         else // Subblock is mandatory
             {
-            TFLOGSTRING("TSY: CSatMessHandler::UiccCatRespEnvelopeReceived - Mandatory subblock UICC_SB_APDU not found");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATCC_UICCCATRESPENVELOPERECEIVED, "CSatCC::UiccCatRespEnvelopeReceived - Mandatory subblock UICC_SB_APDU not found" );
+            TFLOGSTRING("TSY: CSatMessHandler::UiccCatRespEnvelopeReceivedL - Mandatory subblock UICC_SB_APDU not found");
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATCC_UICCCATRESPENVELOPERECEIVEDL_TD, "CSatCC::UiccCatRespEnvelopeReceivedL - Mandatory subblock UICC_SB_APDU not found" );
             }
         } // End of if ( UICC_STATUS_OK  == status )
     }
@@ -636,7 +638,7 @@ void CSatCC::UiccCatRespEnvelopeReceived( const TIsiReceiveC& aIsiMessage )
 //
 void CSatCC::ClearArraysForRefresh()
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_CLEARARRAYSFORREFRESH, "CSatCC::ClearArraysForRefresh" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_CLEARARRAYSFORREFRESH_TD, "CSatCC::ClearArraysForRefresh" );
     TFLOGSTRING("TSY: CSatCC::ClearArraysForRefresh");
 
     iCallControlArray->Reset();
@@ -652,7 +654,7 @@ void CSatCC::SetStatusOfUssdSupport
         TBool aStatus
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_SETSTATUSOFUSSDSUPPORT, "CSatCC::SetStatusOfUssdSupport" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_SETSTATUSOFUSSDSUPPORT_TD, "CSatCC::SetStatusOfUssdSupport" );
     TFLOGSTRING("TSY: CSatCC::SetStatusOfUssdSupport");
     iUssdTlvSupported = aStatus;
     }
@@ -670,7 +672,7 @@ TBool CSatCC::IsOnlyDigitsInUssd
         TPtrC8 aUSSDString
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_ISONLYDIGITSINUSSD, "CSatCC::IsOnlyDigitsInUssd" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_ISONLYDIGITSINUSSD_TD, "CSatCC::IsOnlyDigitsInUssd" );
     TFLOGSTRING("TSY: CSatCC::IsOnlyDigitsInUssd");
 
     // Unpack it
@@ -706,7 +708,7 @@ void CSatCC::MessageReceivedL
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_MESSAGERECEIVEDL, "CSatCC::MessageReceivedL" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_MESSAGERECEIVEDL_TD, "CSatCC::MessageReceivedL" );
     TFLOGSTRING("TSY: CSatCC::MessageReceivedL");
 
     TUint8 resource( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_RESOURCEID ) );
@@ -719,13 +721,13 @@ void CSatCC::MessageReceivedL
             {
             case CALL_MODEM_RESOURCE_IND:
                 {
-                CallModemResourceInd( aIsiMessage );
+                CallModemResourceIndL( aIsiMessage );
                 break;
                 }
             case CALL_MODEM_RESOURCE_CONF_IND:
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_IND");
-    OstTrace0( TRACE_NORMAL, DUP1_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_IND" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATCC_MESSAGERECEIVED_TD, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_IND" );
 
                 if ( CALL_MODEM_RES_CONF_STARTUP ==
                     aIsiMessage.Get8bit( ISI_HEADER_SIZE +
@@ -753,14 +755,14 @@ void CSatCC::MessageReceivedL
             case CALL_MODEM_RESOURCE_CONF_RESP:
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP");
-    OstTrace0( TRACE_NORMAL, DUP2_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP" );
+    OstTrace0( TRACE_NORMAL,  DUP2_CSATCC_MESSAGERECEIVED_TD, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP" );
 
                 if ( CALL_MODEM_RES_CONF_SET ==
                     aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                         CALL_MODEM_RESOURCE_CONF_RESP_OFFSET_CONFOPERATION ) )
                     {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP Resource configured");
-    OstTrace0( TRACE_NORMAL, DUP3_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP Resource configured" );
+    OstTrace0( TRACE_NORMAL,  DUP3_CSATCC_MESSAGERECEIVED_TD, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_CONF_RESP Resource configured" );
 
                     }
                 break;
@@ -768,7 +770,7 @@ void CSatCC::MessageReceivedL
             case CALL_MODEM_RESOURCE_RESP:
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_RESP Resource control sequence done");
-    OstTrace0( TRACE_NORMAL, DUP4_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_RESP Resource control sequence done" );
+    OstTrace0( TRACE_NORMAL,  DUP4_CSATCC_MESSAGERECEIVED_TD, "TSY: CSatCC::MessageReceived, CALL_MODEM_RESOURCE_RESP Resource control sequence done" );
 
                 break;
                 }
@@ -786,13 +788,13 @@ void CSatCC::MessageReceivedL
             {
             case SS_RESOURCE_CONTROL_IND:
                 {
-                SsResourceControlInd( aIsiMessage );
+                SsResourceControlIndL( aIsiMessage );
                 break;
                 }
             case SS_RESOURCE_CONF_IND:
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_IND");
-    OstTrace0( TRACE_NORMAL, DUP5_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_IND" );
+    OstTrace0( TRACE_NORMAL,  DUP5_CSATCC_MESSAGERECEIVED_TD, "TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_IND" );
 
                 if ( SS_RESOURCE_CONF_READY  ==
                     aIsiMessage.Get8bit( ISI_HEADER_SIZE +
@@ -813,7 +815,7 @@ void CSatCC::MessageReceivedL
                             SS_RESOURCE_CONF_RESP_OFFSET_CONFOPERATION  ) )
                     {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_RESP Resource configured");
-    OstTrace0( TRACE_NORMAL, DUP6_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_RESP Resource configured" );
+    OstTrace0( TRACE_NORMAL,  DUP6_CSATCC_MESSAGERECEIVED_TD, "TSY: CSatCC::MessageReceived, SS_RESOURCE_CONF_RESP Resource configured" );
 
                     }
                 break;
@@ -859,14 +861,14 @@ void CSatCC::MessageReceivedL
             case GPDS_RESOURCE_CONTROL_RESP:
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONTROL_RESP Resource control sequence done");
-    OstTrace0( TRACE_NORMAL, DUP7_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONTROL_RESP Resource control sequence done" );
+    OstTrace0( TRACE_NORMAL,  DUP7_CSATCC_MESSAGERECEIVED_TD, "TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONTROL_RESP Resource control sequence done" );
 
                 break;
                 }
             case GPDS_RESOURCE_CONF_IND:
                 {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONF_IND");
-    OstTrace0( TRACE_NORMAL, DUP8_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONF_IND" );
+    OstTrace0( TRACE_NORMAL,  DUP8_CSATCC_MESSAGERECEIVED_TD, "TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONF_IND" );
 
                 if ( iCallControlOnGPRSEnabled )
                     {
@@ -881,7 +883,7 @@ void CSatCC::MessageReceivedL
                             GPDS_RESOURCE_CONF_RESP_OFFSET_CONFOPERATION  ) )
                     {
     TFLOGSTRING("TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONF_RESP Resource configured");
-    OstTrace0( TRACE_NORMAL, DUP9_CSATCC_MESSAGERECEIVED, "TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONF_RESP Resource configured" );
+    OstTrace0( TRACE_NORMAL,  DUP9_CSATCC_MESSAGERECEIVED_TD, "TSY: CSatCC::MessageReceived, GPDS_RESOURCE_CONF_RESP Resource configured" );
 
                     }
                 break;
@@ -930,52 +932,82 @@ void CSatCC::MessageReceivedL
                         // Check call control status
                         if ( KUiccTrIdServiceTableByte4 == trId )
                             {
-                            TUint8 usedBitMaskCallControl( KCallControlBitMaskUsim );
-                            if ( UICC_CARD_TYPE_ICC == cardType )
-                                {
-                                usedBitMaskCallControl = KCallControlBitMaskSim;
-                                }
+                            TInt ret( KErrNone );
                             // Bit 6 is the status bit of call control
-                            if ( fileData[0] & usedBitMaskCallControl )
+                            if ( fileData[0] & KCallControlBitMaskUsim )
                                 {
                                 // Call control enabled in (U)SIM
                                 iCallControlEnabled = ETrue;
-                                iSatMessHandler->CallModemResourceConfReq(
+                                ret = iSatMessHandler->CallModemResourceConfReq(
                                     CALL_MODEM_RES_ID_MO_INIT |
                                     CALL_MODEM_RES_ID_MT_INIT,
                                     CALL_MODEM_RES_ID_MASK_MO_INIT |
                                     CALL_MODEM_RES_ID_MASK_MT_INIT );
-                                iSatMessHandler->SsResourceConfReq();
+                                User::LeaveIfError( ret );
+                                ret = iSatMessHandler->SsResourceConfReq();
+                                User::LeaveIfError( ret );
                                 }
                              else
                                 {
                                 // Call control disabled in (U)SIM
                                 iCallControlEnabled = EFalse;
-                                iSatMessHandler->CallModemResourceConfReq(
+                                ret = iSatMessHandler->CallModemResourceConfReq(
                                     CALL_MODEM_RES_ID_MT_INIT,
                                     CALL_MODEM_RES_ID_MASK_MT_INIT );
+                                User::LeaveIfError( ret );
                                 }
                             }
-                        // Check call control GPRS status
+                        // Check call control GPRS status (UICC) or
+                        // Call control status (ICC)
                         else if ( KUiccTrIdServiceTableByte7 == trId )
                             {
-                            if ( fileData[0] & KCallControlBitMaskUsim )
+                            TInt ret( KErrNone );
+                            if ( UICC_CARD_TYPE_UICC == cardType )
                                 {
-                                // Call control on GPRS enabled in USIM
-                                iCallControlOnGPRSEnabled = ETrue;
-                                iSatMessHandler->GpdsResourceConfReq();
+                                if ( fileData[0] & KCallControlBitMaskUsim )
+                                    {
+                                    // Call control on GPRS enabled in USIM
+                                    iCallControlOnGPRSEnabled = ETrue;
+                                    ret = iSatMessHandler->GpdsResourceConfReq();
+                                    User::LeaveIfError( ret );
+                                    }
+                                else
+                                    {
+                                    // Call control on GPRS disabled in USIM
+                                    iCallControlOnGPRSEnabled = EFalse;
+                                    }
                                 }
-                            else
+                            else if ( UICC_CARD_TYPE_ICC == cardType )
                                 {
-                                // Call control on GPRS disabled in USIM
-                                iCallControlOnGPRSEnabled = EFalse;
+                                if ( KCallControlBitMaskSim == ( fileData[0] & KCallControlBitMaskSim ) )
+                                    {
+                                    // Call control enabled in (U)SIM
+                                    iCallControlEnabled = ETrue;
+                                    ret = iSatMessHandler->CallModemResourceConfReq(
+                                        CALL_MODEM_RES_ID_MO_INIT |
+                                        CALL_MODEM_RES_ID_MT_INIT,
+                                        CALL_MODEM_RES_ID_MASK_MO_INIT |
+                                        CALL_MODEM_RES_ID_MASK_MT_INIT );
+                                    User::LeaveIfError( ret );
+                                    ret = iSatMessHandler->SsResourceConfReq();
+                                    User::LeaveIfError( ret );
+                                    }
+                                else
+                                    {
+                                    // Call control disabled in (U)SIM
+                                    iCallControlEnabled = EFalse;
+                                    ret = iSatMessHandler->CallModemResourceConfReq(
+                                        CALL_MODEM_RES_ID_MT_INIT,
+                                        CALL_MODEM_RES_ID_MASK_MT_INIT );
+                                    User::LeaveIfError( ret );
+                                    }
                                 }
                             }
                         }
                     else // Subblock is mandatory
                         {
                         TFLOGSTRING("TSY: CSatCC::MessageReceivedL - Mandatory subblock UICC_SB_FILE_DATA not found");
-                        OstTrace0( TRACE_NORMAL, DUP1_CSATCC_MESSAGERECEIVEDL, "CSatCC::MessageReceivedL - - Mandatory subblock UICC_SB_FILE_DATA not found" );
+                        OstTrace0( TRACE_NORMAL,  DUP1_CSATCC_MESSAGERECEIVEDL_TD, "CSatCC::MessageReceivedL - - Mandatory subblock UICC_SB_FILE_DATA not found" );
                         }
                     } // End of if ( UICC_STATUS_OK == status
                 break;
@@ -988,7 +1020,7 @@ void CSatCC::MessageReceivedL
                         ISI_HEADER_SIZE + UICC_CAT_RESP_OFFSET_SERVICETYPE ) );
                 if ( UICC_CAT_ENVELOPE == serviceType )
                     {
-                    UiccCatRespEnvelopeReceived( aIsiMessage );
+                    UiccCatRespEnvelopeReceivedL( aIsiMessage );
                     }
                 break;
                 }
@@ -1012,7 +1044,7 @@ void CSatCC::SetTonNpi
         const TUint8 aTonNpi
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATCC_SETTONNPI, "CSatCC::SetTonNpi" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_SETTONNPI_TD, "CSatCC::SetTonNpi" );
     TFLOGSTRING("TSY: CSatCC::SetTonNpi");
 
     iTonNpiForSS = aTonNpi;
@@ -1020,14 +1052,14 @@ void CSatCC::SetTonNpi
     }
 
 // -----------------------------------------------------------------------------
-// CSatCC::CallModemResourceInd
+// CSatCC::CallModemResourceIndL
 // Handles resource control request from modem Call server
 // -----------------------------------------------------------------------------
 //
-void CSatCC::CallModemResourceInd( const TIsiReceiveC& aIsiMessage )
+void CSatCC::CallModemResourceIndL( const TIsiReceiveC& aIsiMessage )
     {
-    TFLOGSTRING("TSY: CSatCC::CallModemResourceInd");
-    OstTrace0( TRACE_NORMAL, CSATCC_CALLMODEMRESOURCEIND, "CSatCC::CallModemResourceInd" );
+    TFLOGSTRING("TSY: CSatCC::CallModemResourceIndL");
+    OstTrace0( TRACE_NORMAL,  CSATCC_CALLMODEMRESOURCEINDL_TD, "CSatCC::CallModemResourceIndL" );
 
     TUint sbStartOffset( 0 );
     // Check if resource control is requested for MO call.
@@ -1121,7 +1153,7 @@ void CSatCC::CallModemResourceInd( const TIsiReceiveC& aIsiMessage )
             {
             // Do not make SIM call control, allow emergency calls always
             TPtrC8 atkData;
-            SendCallModemResourceReq(
+            SendCallModemResourceReqL(
                 callcontrol,
                 KAllowed,
                 atkData );
@@ -1137,17 +1169,17 @@ void CSatCC::CallModemResourceInd( const TIsiReceiveC& aIsiMessage )
     }
 
 // -----------------------------------------------------------------------------
-// CSatCC::SendCallModemResourceReq
+// CSatCC::SendCallModemResourceReqL
 // Creates resource control response for modem Call server
 // -----------------------------------------------------------------------------
 //
-void CSatCC::SendCallModemResourceReq(
+void CSatCC::SendCallModemResourceReqL(
     const TCallControl& aTcc,
     const TUint8 aResult,
     TPtrC8 aApduData )
     {
-    TFLOGSTRING("TSY: CSatCC::SendCallModemResourceReq");
-    OstTrace0( TRACE_NORMAL, CSATCC_SENDCALLMODEMRESOURCEREQ, "CSatCC::SendCallModemResourceReq" );
+    TFLOGSTRING("TSY: CSatCC::SendCallModemResourceReqL");
+    OstTrace0( TRACE_NORMAL,  CSATCC_SENDCALLMODEMRESOURCEREQL_TD, "CSatCC::SendCallModemResourceReqL" );
 
     TBuf8<KMaximumCcBufferSize> isiMessage;
     TInt ret( KErrNotFound );
@@ -1311,8 +1343,8 @@ void CSatCC::SendCallModemResourceReq(
             else
                 {
                 // use default TON/NPI in reserved cases
-                isiMessage.Append( 
-                    CALL_MODEM_NBR_TYPE_UNKNOWN | 
+                isiMessage.Append(
+                    CALL_MODEM_NBR_TYPE_UNKNOWN |
                     CALL_MODEM_NBR_PLAN_ISDN_TELEPHONY );
                 }
 
@@ -1324,10 +1356,10 @@ void CSatCC::SendCallModemResourceReq(
             TSatUtility::BCDToAscii( addressTlv.GetValue().Mid( 1 ),
                 asciiAddress );
 
-            // let's check is new number "112". This because of if number 
-            // is "112" emergency call is needed to establish. otherwise 
-            // normal call needs to be established, even new number is found 
-            // from EFecc. So if number is not "112" we need to add subblock 
+            // let's check is new number "112". This because of if number
+            // is "112" emergency call is needed to establish. otherwise
+            // normal call needs to be established, even new number is found
+            // from EFecc. So if number is not "112" we need to add subblock
             // CALL_MODEM_CHECK_INFO with CALL_MODEM_CHK_DISABLE_EMERG
             _LIT8(KEccNbr, "112");
             if( 0 != asciiAddress.Compare( KEccNbr ) )
@@ -1419,7 +1451,7 @@ void CSatCC::SendCallModemResourceReq(
     CMmDataPackage dataPackage;
     TUint8 callId( aTcc.iCallId );
     dataPackage.PackData( &callId, &ccresult );
-    iSatMessaging->GetMessageRouter()->ExtFuncL( 
+    iSatMessaging->GetMessageRouter()->ExtFuncL(
         ESatNotifyCallControlRequest, &dataPackage );
     // send request
     iSatMessHandler->CallModemResourceReq( aTcc.iTransId, isiMessage );
@@ -1435,14 +1467,14 @@ void CSatCC::SendCallModemResourceReq(
    }
 
 // -----------------------------------------------------------------------------
-// CSatCC::SsResourceControlInd
+// CSatCC::SsResourceControlIndL
 // Handles resource control request from modem SS server
 // -----------------------------------------------------------------------------
 //
-void CSatCC::SsResourceControlInd( const TIsiReceiveC& aIsiMessage )
+void CSatCC::SsResourceControlIndL( const TIsiReceiveC& aIsiMessage )
     {
-    TFLOGSTRING("TSY: CSatCC::SsResourceControlInd");
-    OstTrace0( TRACE_NORMAL, CSATCC_SSRESOURCECONTROLIND, "CSatCC::SsResourceControlInd" );
+    TFLOGSTRING("TSY: CSatCC::SsResourceControlIndL");
+    OstTrace0( TRACE_NORMAL,  CSATCC_SSRESOURCECONTROLINDL_TD, "CSatCC::SsResourceControlIndL" );
 
     TCallControl callcontrol;
     TInt stringLength;
@@ -1506,24 +1538,24 @@ void CSatCC::SsResourceControlInd( const TIsiReceiveC& aIsiMessage )
         }
     else
         {
-        SendUSSDEnvelope( callcontrol );
+        SendUSSDEnvelopeL( callcontrol );
         }
     }
 
 // -----------------------------------------------------------------------------
-// CSatCC::SendSsResourceControlReq
+// CSatCC::SendSsResourceControlReqL
 // Creates resource control response for modem SS server
 // -----------------------------------------------------------------------------
 //
-void CSatCC::SendSsResourceControlReq(
+void CSatCC::SendSsResourceControlReqL(
         const TCallControl& aTcc,
         const TUint8 aSw1,
         const TUint8 aSw2,
         const TUint8 aResult,
         TPtrC8 aApduData )
     {
-    TFLOGSTRING("TSY: CSatCC::SendSsResourceControlReq");
-    OstTrace0( TRACE_NORMAL, CSATCC_SENDSSRESOURCECONTROLREQ, "CSatCC::SendSsResourceControlReq" );
+    TFLOGSTRING("TSY: CSatCC::SendSsResourceControlReqL");
+    OstTrace0( TRACE_NORMAL,  CSATCC_SENDSSRESOURCECONTROLREQL_TD, "CSatCC::SendSsResourceControlReqL" );
 
     TBuf8<KMaximumCcBufferSize> isiMessage;
     CBerTlv response;
@@ -1633,10 +1665,20 @@ void CSatCC::SendSsResourceControlReq(
                 else if ( KErrNone == response.TlvByTagValue( &ssServerString,
                     KTlvUssdStringTag ) )
                     {
-                    // USSD string has been modified to new USSD string
-                    isiMessage.Append( SS_RESOURCE_ALLOWED );
-                    isiMessage.Append( KPadding );
-                    internalCcResult = KModified;
+                    // Check if modified USSD string has valid DCS
+                    if ( ESmsUnknownOrReservedDcs
+                        != TSatUtility::DecodeCbsDcs( ssServerString.GetValue()[0] ) )
+                        {
+                        // USSD string has been modified to new USSD string
+                        isiMessage.Append( SS_RESOURCE_ALLOWED );
+                        internalCcResult = KModified;
+                        }
+                    else
+                        {
+                        // Not valid DCS, do not send USSD to network
+                        isiMessage.Append( SS_RESOURCE_DENIED );
+                        internalCcResult = KRejected;
+                        }
                     }
                 }
             break;
@@ -1721,7 +1763,7 @@ void CSatCC::SendSsResourceControlReq(
             }
         }
 
-    // SS_SB_RESOURCE_CONTROL_INFO [O] with sw1, sw2 and result 
+    // SS_SB_RESOURCE_CONTROL_INFO [O] with sw1, sw2 and result
     TIsiSubBlock resourceCtrlInfo(
         isiMessage,
         SS_SB_RESOURCE_CONTROL_INFO,
@@ -1765,7 +1807,7 @@ void CSatCC::SendSsResourceControlReq(
 void CSatCC::GpdsResourceControlInd( const TIsiReceiveC& aIsiMessage )
     {
     TFLOGSTRING("TSY: CSatCC::GpdsResourceControlInd");
-    OstTrace0( TRACE_NORMAL, CSATCC_GPDSRESOURCECONTROLIND, "CSatCC::GpdsResourceControlInd" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_GPDSRESOURCECONTROLIND_TD, "CSatCC::GpdsResourceControlInd" );
 
     TCallControl callcontrol;
     TInt paramsLength;
@@ -1815,7 +1857,7 @@ void CSatCC::SendGpdsResourceControlReq(
         TPtrC8 aAtkData )
     {
     TFLOGSTRING("TSY: CSatCC::SendGpdsResourceControlReq");
-    OstTrace0( TRACE_NORMAL, CSATCC_SENDGPDSRESOURCECONTROLREQ, "CSatCC::SendGpdsResourceControlReq" );
+    OstTrace0( TRACE_NORMAL,  CSATCC_SENDGPDSRESOURCECONTROLREQ_TD, "CSatCC::SendGpdsResourceControlReq" );
 
     TBuf8<KMaximumCcBufferSize> isiMessage;
     CBerTlv response;

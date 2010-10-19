@@ -119,7 +119,7 @@ CUsbPnIsaSender::~CUsbPnIsaSender()
 // -----------------------------------------------------------------------------
 void CUsbPnIsaSender::DeletePackets( )
     {
-    OstTrace0( TRACE_API, CUSBPNISASENDER_DELETEPACKETS_ENTRY, "CUsbPnIsaSender::DeletePackets" );
+    OstTrace0( TRACE_BORDER, CUSBPNISASENDER_DELETEPACKETS_ENTRY, "CUsbPnIsaSender::DeletePackets" );
     A_TRACE( ( _T( "CUsbPnIsaSender::DeletePackets()" ) ) );
     CUsbPnPacket* packet = NULL;
     while(iPacketCount > 0)
@@ -129,7 +129,7 @@ void CUsbPnIsaSender::DeletePackets( )
         delete iPacket;
         iPacket = packet;
         }
-    OstTrace0( TRACE_API, CUSBPNISASENDER_DELETEPACKETS_EXIT, "CUsbPnIsaSender::DeletePackets - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNISASENDER_DELETEPACKETS_EXIT, "CUsbPnIsaSender::DeletePackets - return void" );
     A_TRACE( ( _T( "CUsbPnIsaSender::DeletePackets() - return void" ) ) );
     }
 
@@ -176,7 +176,7 @@ void CUsbPnIsaSender::DoCancel( )
 //
 void CUsbPnIsaSender::RunL( )
     {
-    OstTrace1( TRACE_API, CUSBPNISASENDER_RUNL_ENTRY, "CUsbPnIsaSender::RunL;iStatus=%d", iStatus.Int() );
+    OstTrace1( TRACE_BORDER, CUSBPNISASENDER_RUNL_ENTRY, "CUsbPnIsaSender::RunL;iStatus=%d", iStatus.Int() );
     A_TRACE( ( _T( "CUsbPnIsaSender::RunL() iStatus:%d" ), iStatus.Int() ) );
 
     User::LeaveIfError( iStatus.Int() );
@@ -186,18 +186,18 @@ void CUsbPnIsaSender::RunL( )
     iBufferListener.Receive( ETrue );
 
     iCurrentPacket = &iCurrentPacket->NextPacket();
-    OstTraceExt2( TRACE_DETAILED, CUSBPNISASENDER_RUNL, "CUsbPnIsaSender::RunL;tail:%d,head:%d", iCurrentPacket->PacketNumber(), iPacket->PacketNumber() );
+    OstTraceExt2( TRACE_INTERNALS, CUSBPNISASENDER_RUNL, "CUsbPnIsaSender::RunL;tail:%d,head:%d", iCurrentPacket->PacketNumber(), iPacket->PacketNumber() );
     E_TRACE( ( _T( "CUsbPnIsaSender::RunL() - tail:%d,head:%d " ), iCurrentPacket->PacketNumber(), iPacket->PacketNumber()));
 
     if(iCurrentPacket != iPacket)
         {
         // Continue write
-        OstTrace0( TRACE_DETAILED, CUSBPNISASENDER_RUNL_DUP1, "CUsbPnIsaSender::RunL - Write next in queue." );
+        OstTrace0( TRACE_INTERNALS, CUSBPNISASENDER_RUNL_DUP1, "CUsbPnIsaSender::RunL - Write next in queue." );
         E_TRACE( ( _T( "CUsbPnIsaSender::RunL() - Write next in queue." )));
         TryToSendPacket( iCurrentPacket->NextPacket() );
         }
 
-    OstTrace0( TRACE_API, CUSBPNISASENDER_RUNL_EXIT, "CUsbPnIsaSender::RunL - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNISASENDER_RUNL_EXIT, "CUsbPnIsaSender::RunL - return void" );
     A_TRACE( ( _T( "CUsbPnIsaSender::RunL() - return void" ) ) );
     }
 
@@ -207,7 +207,7 @@ void CUsbPnIsaSender::RunL( )
 //
 TInt CUsbPnIsaSender::RunError( TInt aError )
     {
-    OstTrace1( TRACE_API, CUSBPNISASENDER_RUNERROR_ENTRY, "CUsbPnIsaSender::RunError;aError=%d", aError );
+    OstTrace1( TRACE_BORDER, CUSBPNISASENDER_RUNERROR_ENTRY, "CUsbPnIsaSender::RunError;aError=%d", aError );
     A_TRACE( ( _T( "CUsbPnIsaSender::RunError( aError:%d )" ), aError ) );
 
     switch( aError )
@@ -261,14 +261,14 @@ CUsbPnPacket& CUsbPnIsaSender::GetNextPacketL()
 void CUsbPnIsaSender::AddPacketToSendingQueue( CUsbPnPacket& aPacket )
     {
     ASSERT( &aPacket );
-    OstTrace1( TRACE_API, CUSBPNISASENDER_ADDPACKETTOSENDINGQUEUE_ENTRY, "CUsbPnIsaSender::AddPacketToSendingQueue;aPacket=%x", ( TUint )&( aPacket ) );
+    OstTrace1( TRACE_BORDER, CUSBPNISASENDER_ADDPACKETTOSENDINGQUEUE_ENTRY, "CUsbPnIsaSender::AddPacketToSendingQueue;aPacket=%x", ( TUint )&( aPacket ) );
     A_TRACE( ( _T( "CUsbPnIsaSender::AddPacketToSendingQueue( aPacket:0x%x)" ), &aPacket ) );
 
     CUsbPnPacket& packet( iPacket->NextPacket() );
     if( &packet == &aPacket )
         {
         iPacket = &packet;
-        OstTrace1( TRACE_DETAILED, CUSBPNISASENDER_ADDPACKETTOSENDINGQUEUE, "CUsbPnIsaSender::AddPacketToSendingQueue;packet number:%d", iPacket->PacketNumber() );
+        OstTrace1( TRACE_INTERNALS, CUSBPNISASENDER_ADDPACKETTOSENDINGQUEUE, "CUsbPnIsaSender::AddPacketToSendingQueue;packet number:%d", iPacket->PacketNumber() );
         E_TRACE( ( _T( "CUsbPnIsaSender::AddPacketToSendingQueue() - packet number:%d" ), iPacket->PacketNumber() ) );
 
         TryToSendPacket( *iPacket );
@@ -279,7 +279,7 @@ void CUsbPnIsaSender::AddPacketToSendingQueue( CUsbPnPacket& aPacket )
         User::Panic(_L("USBPNSERVER"), KErrTotalLossOfPrecision);
         }
 
-    OstTrace0( TRACE_API, CUSBPNISASENDER_ADDPACKETTOSENDINGQUEUE_EXIT, "CUsbPnIsaSender::AddPacketToSendingQueue - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNISASENDER_ADDPACKETTOSENDINGQUEUE_EXIT, "CUsbPnIsaSender::AddPacketToSendingQueue - return void" );
     A_TRACE( ( _T( "CUsbPnIsaSender::AddPacketToSendingQueue() - return void" ) ) );
     }
 
@@ -291,7 +291,7 @@ void CUsbPnIsaSender::AddPacketToSendingQueue( CUsbPnPacket& aPacket )
 void CUsbPnIsaSender::TryToSendPacket( CUsbPnPacket& aPacket )
     {
     ASSERT( &aPacket );
-    OstTrace1( TRACE_API, CUSBPNISASENDER_TRYTOSENDPACKET_ENTRY, "CUsbPnIsaSender::TryToSendPacket;aPacket=%x", ( TUint )&( aPacket ) );
+    OstTrace1( TRACE_BORDER, CUSBPNISASENDER_TRYTOSENDPACKET_ENTRY, "CUsbPnIsaSender::TryToSendPacket;aPacket=%x", ( TUint )&( aPacket ) );
     A_TRACE( ( _T( "CUsbPnIsaSender::TryToSendPacket( aPacket:0x%x )" ), &aPacket ) );
 
     if(!IsActive())
@@ -299,7 +299,7 @@ void CUsbPnIsaSender::TryToSendPacket( CUsbPnPacket& aPacket )
         if( &aPacket == ( &iCurrentPacket->NextPacket() )
             || &aPacket == iCurrentPacket )
             {
-            OstTrace0( TRACE_DETAILED, CUSBPNISASENDER_TRYTOSENDPACKET, "CUsbPnIsaSender::TryToSendPacket - Send to ISA" );
+            OstTrace0( TRACE_INTERNALS, CUSBPNISASENDER_TRYTOSENDPACKET, "CUsbPnIsaSender::TryToSendPacket - Send to ISA" );
             E_TRACE( ( _T( "CUsbPnIsaSender::TryToSendPacket() - Send to ISA")));
 
             
@@ -309,7 +309,7 @@ void CUsbPnIsaSender::TryToSendPacket( CUsbPnPacket& aPacket )
             TInt length( data.Length() );
             for( TInt i = 0; i < length; i++ )
                 {
-                OstTraceExt2( TRACE_DETAILED, CUSBPNISASENDER_TRYTOSENDPACKET_DUP1, "CUsbPnIsaSender::Send([%d] = %x )", i, data[i] );
+                OstTraceExt2( TRACE_INTERNALS, CUSBPNISASENDER_TRYTOSENDPACKET_DUP1, "CUsbPnIsaSender::Send([%d] = %x )", i, data[i] );
                 E_TRACE( ( _T( "CUsbPnIsaSender::Send([%d] = %x )" ), i, data[i] ) );
                 i++;
                 }
@@ -326,11 +326,11 @@ void CUsbPnIsaSender::TryToSendPacket( CUsbPnPacket& aPacket )
         }
     else
         {
-        OstTrace0( TRACE_DETAILED, CUSBPNISASENDER_TRYTOSENDPACKET_DUP2, "CUsbPnIsaSender::TryToSendPacket - Already sending" );
+        OstTrace0( TRACE_INTERNALS, CUSBPNISASENDER_TRYTOSENDPACKET_DUP2, "CUsbPnIsaSender::TryToSendPacket - Already sending" );
         E_TRACE( ( _T( "CUsbPnIsaSender::TryToSendPacket() - Already sending")));
         }
 
-    OstTrace0( TRACE_API, CUSBPNISASENDER_TRYTOSENDPACKET_EXIT, "CUsbPnIsaSender::TryToSendPacket - return void" );
+    OstTrace0( TRACE_BORDER, CUSBPNISASENDER_TRYTOSENDPACKET_EXIT, "CUsbPnIsaSender::TryToSendPacket - return void" );
     A_TRACE( ( _T( "CUsbPnIsaSender::TryToSendPacket() - return void" ) ) );
     }
 

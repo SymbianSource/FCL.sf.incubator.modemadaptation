@@ -27,9 +27,11 @@
 
 enum TP2PUserChannelFaults
     {
-    EP2PUserChannelMemAllocFail = 0x00,
+    EP2PUserChannelMemAllocFail = 0x01,
     EP2PUserChannelMemAllocFail1,
     EP2PUserChannelMemAllocFail2,
+    EP2PUserChannelMemAllocFail3,
+    EP2PUserChannelMemAllocFail4,
     EP2PUserChannelWrongRequest,
     EP2PUserChannelWrongRequest1,
     EP2PUserChannelWrongRequest2,
@@ -69,6 +71,7 @@ enum TP2PUserChannelFaults
     EP2PUserChannelReqQueueOutOfSync7,
     EP2PUserChannelReqQueueOverTheLimits,
     EP2PUserChannelReqQueueOverTheLimits2,
+    EP2PUserChannelReqQueueOverTheLimits3,
     EP2PUserChannelReqQueueWrongRequest,
     EP2PUserChannelReqQueueWrongRequest2,
     EP2PUserChannelReqQueueMemoryAllocFailure,
@@ -188,9 +191,17 @@ TInt DP2PUserChannel::DoCreate(
     if( !Kern::CurrentThreadHasCapability( ECapabilityCommDD, __PLATSEC_DIAGNOSTIC_STRING( "Check by: P2PRouter" ) ) ) return KErrPermissionDenied;  
     TRACE_ASSERT_INFO( anInfo, EP2PUserChannelProtocolIdNotSpecified );
     // Check for channel number inside anInfo.
-    TRACE_ASSERT_INFO( anInfo->Length() > 0, ( EP2PUserChannelOverTheArrayLimits | EDP2PUserChannelTraceId << KClassIdentifierShift ) );
-    if( !anInfo || anInfo->Length() == 0 ) return KErrNotSupported;
-    TUint8 protocolId = static_cast<TUint8>( ( *anInfo )[ 0 ] );
+    TUint8* buffer = reinterpret_cast<TUint8*>( Kern::Alloc( 1 ) );
+    
+    
+    TPtr8* bufferPtr = new TPtr8( buffer, 1 );    
+    ASSERT_RESET_ALWAYS( bufferPtr && buffer, EP2PUserChannelMemAllocFail3 | EDP2PUserChannelTraceId << KClassIdentifierShift );
+    
+    ASSERT_RESET_ALWAYS( KErrNone == Kern::ThreadDesRead( iThread, anInfo, *bufferPtr, 0, KChunkShiftBy0 ), EP2PUserChannelMemAllocFail4 | EDP2PUserChannelTraceId << KClassIdentifierShift );
+    ASSERT_RESET_ALWAYS( bufferPtr->Length() > 0 , EP2PUserChannelReqQueueOverTheLimits3 | EDP2PUserChannelTraceId << KClassIdentifierShift);
+    
+    TUint8 protocolId = static_cast<TUint8>( ( *bufferPtr )[ 0 ] );
+
     TRACE_ASSERT_INFO( ( protocolId < EP2PAmountOfProtocols ), ( EP2PUserChannelWrongParam | EDP2PUserChannelTraceId << KClassIdentifierShift ) );
     if( protocolId >= EP2PAmountOfProtocols ) return KErrNotSupported;
     TInt err( Kern::MutexWait( *iShP2PProtocolIdMutex ) );
@@ -447,7 +458,7 @@ void DP2PUserChannel::CompleteChReqDfc(
     C_TRACE( ( _T( "DP2PUserChannel::CompleteChReqDfc>" ) ) );
     // Make sure that user side is accessed only by ldd DFCThread.
     ASSERT_THREAD_CONTEXT_ALWAYS( ( EP2PIUserChannelfNotThreadContext2 | EDP2PUserChannelTraceId << KClassIdentifierShift ) );
-    //TODO    ASSERT_DFCTHREAD_INLDD();
+    //    ASSERT_DFCTHREAD_INLDD();
     DP2PUserChannel* chPtr = reinterpret_cast<DP2PUserChannel*>( aPtr );
     C_TRACE( ( _T( "DP2PUserChannel::CompleteChReqDfc 0x%x 0x%x" ), chPtr, chPtr->iShP2PProtocolId ) );
     TP2PReq requ = chPtr->iP2PReqQueue->Get();
@@ -478,7 +489,7 @@ void DP2PUserChannel::EmptyRxQueueDfc(
         )
     {
 
-// TODO    ASSERT_DFCTHREAD_INLDD();
+//     ASSERT_DFCTHREAD_INLDD();
     DP2PUserChannel& chTmp = *reinterpret_cast<DP2PUserChannel*>( aPtr );
     C_TRACE( ( _T( "DP2PUserChannel::EmptyRxQueueDfc 0x%x 0x%x>" ), &chTmp, chTmp.iShP2PProtocolId ) );
     if( ( chTmp.iP2PReqQueue->GetReq( EP2PAsyncReceive ) ) && ( chTmp.iRx->Count() > 0 ) )
@@ -554,7 +565,7 @@ void DP2PUserChannel::HandleAsyncRequest(
                 {
                 C_TRACE( ( _T( "DP2PUserChannel::HandleAsyncRequest 0x%x 0x%x EP2PAsyncOpen" ), this, iShP2PProtocolId ) );
                 // Set open to pending to router, router completes it when the interconnection to other point is ready.
-                iRouterIf->Open( ~iShP2PProtocolId, this );
+                iRouterIf->Connect( ~iShP2PProtocolId, this );
                 break;
                 }
             case EP2PAsyncReceive:

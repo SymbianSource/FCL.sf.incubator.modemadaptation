@@ -127,17 +127,17 @@ const TUint16 KIADChDataRxLowWaterMark( KMaxNumberOfDataMsgAfterDelay / 2 );
 
 //////////////////////////////// DO NOT EDIT BEFORE THIS ////////////////////////////////
 
-const TInt KIADMaxIsiMsgSize( 2048 ); // TODO: to be changed for MINI_OS could it be static?
+const TInt KIADMaxIsiMsgSize( 2048 ); //  to be changed for MINI_OS could it be static?
 
 // QUEUE CONFIGURATIONS
-// TODO: configure properly
+//  configure properly
 const TInt KIADExtensionRxQueueSize( 200);//50 );
 const TInt KIADLddFlowCtrlRxQueuSize( 5 );
 const TInt KIADLddRxQueuSize( 50 );
 const TInt KIADLddDataRxQueuSize( KIADChDataRxQueueSize );
 const TInt KIADKernelRxQueuSize( 50 );
 const TInt KIADKernelDataRxQueuSize( 100 );
-// Re-used due to buffer configurations TODO: how to ensure enough blocks without cbfc and knowing how big is the IST send que?
+// Re-used due to buffer configurations  how to ensure enough blocks without cbfc and knowing how big is the IST send que?
 const TInt KTotalDataSpace( KIADLddDataRxQueuSize + 50 );
 
 // DFC Thread names.
@@ -186,10 +186,8 @@ enum TIADRequest
     EIADDeAllocateDataBlock,
     EIADDeAllocateBlockInternal,
     EIADDeAllocateDataBlockInternal,
-#if (NCP_COMMON_SOS_VERSION_SUPPORT >= SOS_VERSION_95)
     EIADLoan,
-    EIADReturnLoan,
-#endif
+    EIADReturnLoan
     };
 
 // FUNCTION PROTOTYPES

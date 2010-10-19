@@ -201,7 +201,7 @@ void CUsbPnPacket::ReleaseL()
     TPtr8 ptr(iBuffer->Des());
     if(ptr.Length() > KPnPacketSize )
         {
-        OstTrace0( TRACE_DETAILED, CUSBPNPACKET_RELEASEL, "CUsbPnPacket::ReleaseL - Returning to normal size" );
+        OstTrace0( TRACE_INTERNALS, CUSBPNPACKET_RELEASEL, "CUsbPnPacket::ReleaseL - Returning to normal size" );
         E_TRACE((_T("CUsbPnPacket::ReleaseL() - Returning to normal size")));
         delete iBuffer;
         iBuffer = NULL;

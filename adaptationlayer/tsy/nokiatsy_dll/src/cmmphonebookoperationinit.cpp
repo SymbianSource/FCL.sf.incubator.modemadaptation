@@ -66,7 +66,7 @@ CMmPhoneBookOperationInit::CMmPhoneBookOperationInit
     )
     {
     TFLOGSTRING("TSY: CmmPhonebookOperatorInit::CmmPhonebookOperatorInit");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_CMMPHONEBOOKOPERATIONINIT, "CMmPhoneBookOperationInit::CMmPhoneBookOperationInit" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT_CMMPHONEBOOKOPERATIONINIT_TD, "CMmPhoneBookOperationInit::CMmPhoneBookOperationInit" );
 
     iTypeOfReading = EBasicEfRead;
     }
@@ -82,7 +82,7 @@ CMmPhoneBookOperationInit::~CMmPhoneBookOperationInit
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::~CMmPhoneBookOperationInit");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_CMMPHONEBOOKOPERATIONINIT, "CMmPhoneBookOperationInit::~CMmPhoneBookOperationInit" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT_CMMPHONEBOOKOPERATIONINIT_TD, "CMmPhoneBookOperationInit::~CMmPhoneBookOperationInit" );
     delete iPBStoreInfoData;
     }
 
@@ -100,7 +100,7 @@ CMmPhoneBookOperationInit* CMmPhoneBookOperationInit::NewL
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::NewL");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_NEWL, "CMmPhoneBookOperationInit::NewL" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT_NEWL_TD, "CMmPhoneBookOperationInit::NewL" );
 
     TName phonebookTypeName;
 
@@ -149,7 +149,7 @@ void CMmPhoneBookOperationInit::ConstructL
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_CONSTRUCTL, "CMmPhoneBookOperationInit::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT_CONSTRUCTL_TD, "CMmPhoneBookOperationInit::ConstructL" );
 
     iPBStoreInfoData = new( ELeave ) CStorageInfoData();
 
@@ -178,7 +178,7 @@ TInt CMmPhoneBookOperationInit::UICCCreateReq
     )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCCreateReq");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_UICCCREATEREQ, "CMmPhoneBookOperationInit::UICCCreateReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT_UICCCREATEREQ_TD, "CMmPhoneBookOperationInit::UICCCreateReq" );
     TInt ret( KErrNotSupported );
 
     switch( aIpc )
@@ -219,7 +219,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_UICCCREATEREQ, "CMmPhoneBookO
             // Nothing to do here
             TFLOGSTRING2("TSY: CMmPhoneBookOperationInit::UICCCreateReq - \
             Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_UICCCREATEREQ, "CMmPhoneBookOperationInit::UICCCreateReq;Unknowns aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT_UICCCREATEREQ_TD, "CMmPhoneBookOperationInit::UICCCreateReq;Unknowns aIpc=%d", aIpc );
             break;
             }
         } // switch-case ends
@@ -235,7 +235,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_UICCCREATEREQ, "CMmPhone
 TInt CMmPhoneBookOperationInit::UICCInitializeReq( TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq");
-OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq" );
+OstTrace0( TRACE_FATAL,  CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq" );
 
         TInt ret( KErrNone );
         TInt appFileID ( APPL_FILE_ID );   // Application File id for DFphonebook
@@ -243,26 +243,21 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
 
         cmdParams.messHandlerPtr = static_cast<MUiccOperationBase*>(iMmPhoneBookStoreMessHandler);
         cmdParams.trId = static_cast<TUiccTrId>( aTransId );
-
         cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
         cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
-        cmdParams.filePath.Append(appFileID>>8);
-        cmdParams.filePath.Append(appFileID);
-        if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
-            {
-            cmdParams.filePath.Append(static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-            cmdParams.filePath.Append(static_cast<TUint8>( DF_PHONEBOOK ));
-            }
+
 
         switch( iIniPhase )
             {
             case EPBInitPhaseADN:
                 {
+                cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID >> 8 ) );
+                cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID ) );
                 // Create Data for ADN EF read
                 if( EBasicEfRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - ADN Init for Fileinfo OR FileData");
-                    OstTrace0( TRACE_FATAL, DUP1_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - ADN Init for Fileinfo OR FileData" );
+                    OstTrace0( TRACE_FATAL,  DUP1_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - ADN Init for Fileinfo OR FileData" );
                     // Send Request to read File Info or data from EFadn (depends upon iServiceType)
                     cmdParams.fileId = PB_ADN_FID;
                     cmdParams.serviceType = iServiceType;
@@ -271,7 +266,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 else if( EExtensionRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - ADN Phonebook Init Extension request");
-                    OstTrace0( TRACE_FATAL, DUP2_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - ADN Phonebook Init Extension request" );
+                    OstTrace0( TRACE_FATAL,  DUP2_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - ADN Phonebook Init Extension request" );
 
                     // Initialization for EXT1
                     cmdParams.fileId = PB_EXT1_FID;
@@ -282,11 +277,13 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 }
             case EPBInitPhaseFDN:
                 {
+                cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID >> 8 ) );
+                cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID ) );
                 // Create Data for FDN EF read
                 if( EBasicEfRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - FDN Init FileInfo OR FileData request");
-                    OstTrace0( TRACE_FATAL, DUP3_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq -  FDN Init FileInfo OR FileData request" );
+                    OstTrace0( TRACE_FATAL,  DUP3_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq -  FDN Init FileInfo OR FileData request" );
 
                     cmdParams.fileId = PB_FDN_FID;
                     cmdParams.serviceType = iServiceType;
@@ -295,7 +292,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 else if( EExtensionRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - FDN Init Extension request");
-                    OstTrace0( TRACE_FATAL, DUP4_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - FDN Init Extension request" );
+                    OstTrace0( TRACE_FATAL,  DUP4_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - FDN Init Extension request" );
 
                     // Initialization for EXT2
                     cmdParams.fileId = PB_EXT2_FID;
@@ -306,10 +303,12 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 }
             case EPBInitPhaseSDN:
                 {
+                cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID >> 8 ) );
+                cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID ) );
                 if( EBasicEfRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init FileInfo OR FileData request");
-                    OstTrace0( TRACE_FATAL, DUP5_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init FileInfo OR FileData request" );
+                    OstTrace0( TRACE_FATAL,  DUP5_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init FileInfo OR FileData request" );
 
                     cmdParams.fileId = PB_SDN_FID;
                     cmdParams.serviceType = iServiceType;
@@ -318,7 +317,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 else if(  EExtensionRead == iTypeOfReading )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init Extension request");
-                    OstTrace0( TRACE_FATAL, DUP6_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init Extension request" );
+                    OstTrace0( TRACE_FATAL,  DUP6_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - SDN Init Extension request" );
 
                     // Initialization for EXT3
                     cmdParams.fileId = PB_EXT3_FID;
@@ -329,11 +328,12 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBo
                 }
             case EPBInitPhaseMBDN:
                 {
+                cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
                 // Start with MBI reading
                 if( EBasicEfRead == iTypeOfReading )
                     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init FileInfo OR FileData request");
-OstTrace0( TRACE_FATAL, DUP7_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init FileInfo OR FileData request" );
+OstTrace0( TRACE_FATAL,  DUP7_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init FileInfo OR FileData request" );
 
                     cmdParams.fileId = PB_MBDN_FID;
                     cmdParams.serviceType = iServiceType;
@@ -342,7 +342,7 @@ OstTrace0( TRACE_FATAL, DUP7_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPh
                 else if( EExtensionRead == iTypeOfReading )
                     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init Extension request");
-OstTrace0( TRACE_FATAL, DUP8_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init Extension request" );
+OstTrace0( TRACE_FATAL,  DUP8_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init Extension request" );
 
                     cmdParams.fileId = PB_EXT6_FID;
                     cmdParams.serviceType = iServiceType;
@@ -351,7 +351,7 @@ OstTrace0( TRACE_FATAL, DUP8_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPh
                 else if( EMailboxIdRead == iTypeOfReading )
                     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init MBI request");
-OstTrace0( TRACE_FATAL, DUP14_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init MBI request" );
+OstTrace0( TRACE_FATAL,  DUP14_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - MBDN Init MBI request" );
 
                     cmdParams.fileId = PB_MBI_FID;
                     cmdParams.serviceType = iServiceType;
@@ -364,8 +364,10 @@ OstTrace0( TRACE_FATAL, DUP14_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmP
                 if( EBasicEfRead == iTypeOfReading )
                     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init FileInfo OR FileData request");
-OstTrace0( TRACE_FATAL, DUP9_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init FileInfo OR FileData request" );
+OstTrace0( TRACE_FATAL,  DUP9_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init FileInfo OR FileData request" );
 
+                    cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID >> 8 ) );
+                    cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID ) );
                     cmdParams.fileId = PB_MSISDN_FID;
                     cmdParams.serviceType = iServiceType;
                     cmdParams.record = 0;
@@ -373,8 +375,9 @@ OstTrace0( TRACE_FATAL, DUP9_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPh
                 else if( EExtensionRead == iTypeOfReading )
                     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - MSISDN Init Extension request");
-OstTrace0( TRACE_NORMAL, DUP10_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq" );
+OstTrace0( TRACE_NORMAL,  DUP10_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq" );
 
+                        cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
                     if ( UICC_CARD_TYPE_ICC == 
                     	       iMmUiccMessHandler->GetCardType() )
                         {
@@ -382,7 +385,7 @@ OstTrace0( TRACE_NORMAL, DUP10_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMm
                         }
                     else if ( UICC_CARD_TYPE_UICC == 
                     	            iMmUiccMessHandler->GetCardType() )
-                    	  {                    
+                        {
                         cmdParams.fileId = PB_EXT5_FID;
                         }
                     cmdParams.serviceType = iServiceType;
@@ -392,10 +395,13 @@ OstTrace0( TRACE_NORMAL, DUP10_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMm
                 }
             case EPBInitPhaseVMBX:
                 {
+                cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID >> 8 ) );
+                cmdParams.filePath.Append(static_cast<TUint8>( APPL_FILE_ID ) );
+
                 if( EBasicEfRead == iTypeOfReading )
                     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init FileInfo OR FileData request");
-OstTrace0( TRACE_FATAL, DUP11_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init FileInfo OR FileData request" );
+OstTrace0( TRACE_FATAL,  DUP11_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init FileInfo OR FileData request" );
 
                     cmdParams.fileId = PB_VMBX_FID;
                     cmdParams.serviceType = iServiceType;
@@ -404,7 +410,7 @@ OstTrace0( TRACE_FATAL, DUP11_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmP
                 else if( EExtensionRead == iTypeOfReading )
                     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init Extension request");
-OstTrace0( TRACE_NORMAL, DUP13_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init Extension request" );
+OstTrace0( TRACE_NORMAL,  DUP13_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - VMBX Init Extension request" );
 
                     cmdParams.fileId = PB_EXT1_FID;
                     cmdParams.serviceType = iServiceType;
@@ -415,7 +421,7 @@ OstTrace0( TRACE_NORMAL, DUP13_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMm
             default:
                 {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::UICCInitializeReq - PhoneBook not supported ");
-OstTrace0( TRACE_NORMAL, DUP12_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ, "CMmPhoneBookOperationInit::UICCInitializeReq - PhoneBook not supported" );
+OstTrace0( TRACE_NORMAL,  DUP12_CMMPHONEBOOKOPERATIONINIT_UICCINITIALIZEREQ_TD, "CMmPhoneBookOperationInit::UICCInitializeReq - PhoneBook not supported" );
                 break;
                 }
             }
@@ -458,7 +464,7 @@ TBool CMmPhoneBookOperationInit::HandleUICCPbRespL
     if ( iInternalInit )
         {
 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleUICCPbRespL. Internal Init->Break");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEUICCPBRESPL, "CMmPhoneBookOperationInit::HandleUICCPbRespL, Internal Init->Break" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationInit::HandleUICCPbRespL, Internal Init->Break" );
 
         iIniPhase = EPBIniPhase_Unknown;
 
@@ -504,7 +510,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEUICCPBRESPL, "CMmP
 TInt CMmPhoneBookOperationInit::HandlePBRespL(const TDesC8& aFileData, TInt aStatus, TUint8 aTransId )
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandlePBRespL");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_HANDLEPBRESPL, "CMmPhoneBookOperationInit::HandlePBRespL" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT_HANDLEPBRESPL_TD, "CMmPhoneBookOperationInit::HandlePBRespL" );
 
     TInt ret(KErrNone);
 
@@ -519,7 +525,7 @@ TInt CMmPhoneBookOperationInit::HandlePBRespL(const TDesC8& aFileData, TInt aSta
         }
     else
         {
-        ret = HandleMBIFileResp( aFileData, aStatus );
+        HandleMBIFileResp( aFileData, aStatus );
         }
 
     if(KErrNone == ret)
@@ -540,7 +546,7 @@ TInt CMmPhoneBookOperationInit::HandlePBRespL(const TDesC8& aFileData, TInt aSta
 TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aStatus)
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP_TD, "CMmPhoneBookOperationInit::HandleFileResp" );
 
 
     TInt ret(KErrNone);
@@ -576,7 +582,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                     if(UICC_APPL_FILE_INFO == iServiceType)
                         {
                         TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for ADN Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for ADN Phonebook" );
+                        OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP_TD, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for ADN Phonebook" );
                         // Check for ADN phone book is incalidated by Fdn phonebook or not
                         TInt status(0);
                         TFci fci( aFileData );
@@ -646,7 +652,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                     if(UICC_APPL_FILE_INFO == iServiceType)
                         {
                         TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for FDN Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for FDN Phonebook" );
+                        OstTrace0( TRACE_NORMAL,  DUP3_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP_TD, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for FDN Phonebook" );
 
                         iPBStoreInfoData->iFDNNumOfEntries = numOfEntries;
                         iPBStoreInfoData->iFDNNumberLengthMax = numLength;
@@ -722,7 +728,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                     if(UICC_APPL_FILE_INFO == iServiceType)
                         {
                         TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for SDN Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP5_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for SDN Phonebook" );
+                        OstTrace0( TRACE_NORMAL,  DUP5_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP_TD, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for SDN Phonebook" );
 
                         iPBStoreInfoData->iSDNNumOfEntries = numOfEntries;
                         iPBStoreInfoData->iSDNNumberLengthMax = numLength;
@@ -792,7 +798,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                     if(UICC_APPL_FILE_INFO == iServiceType)
                         {
                         TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for MBDN Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP7_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for MBDN Phonebook" );
+                        OstTrace0( TRACE_NORMAL,  DUP7_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP_TD, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for MBDN Phonebook" );
 
                         iPBStoreInfoData->iMBDNNumOfEntries = numOfEntries;
                         iPBStoreInfoData->iMBDNNumberLengthMax = numLength;
@@ -815,7 +821,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                 if( UICC_STATUS_OK == aStatus )
                     {
                     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for MSISDN Phonebook");
-                    OstTrace0( TRACE_NORMAL, DUP9_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for MSISDN Phonebook" );
+                    OstTrace0( TRACE_NORMAL,  DUP9_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP_TD, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for MSISDN Phonebook" );
 
                     if(UICC_APPL_FILE_INFO == iServiceType)
                         {
@@ -887,7 +893,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
                     if(UICC_APPL_FILE_INFO == iServiceType)
                         {
                         TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for VMBX Phonebook");
-                        OstTrace0( TRACE_NORMAL, DUP13_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for VMBX Phonebook" );
+                        OstTrace0( TRACE_NORMAL,  DUP13_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP_TD, "CMmPhoneBookOperationInit::HandleFileResp - Handle File Info for VMBX Phonebook" );
 
                         // update Data in CommonTSY buffer
                         iPBStoreInfoData->iVMBXNumOfEntries = numOfEntries;
@@ -928,7 +934,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
             default:
                 {
                 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleFileResp - PhoneBook not supported");
-                OstTrace0( TRACE_NORMAL, DUP12_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP, "CMmPhoneBookOperationInit::HandleFileResp - PhoneBook not supported" );
+                OstTrace0( TRACE_NORMAL,  DUP12_CMMPHONEBOOKOPERATIONINIT_HANDLEFILERESP_TD, "CMmPhoneBookOperationInit::HandleFileResp - PhoneBook not supported" );
                 }
                 break;
             }
@@ -954,7 +960,7 @@ TInt CMmPhoneBookOperationInit::HandleFileResp(const TDesC8 &aFileData, TInt aSt
 TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TInt aStatus)
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleEXTFileResp");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP_TD, "CMmPhoneBookOperationInit::HandleEXTFileResp" );
 
 
     TInt ret(KErrNone);
@@ -980,7 +986,7 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
             case EPBInitPhaseADN:
                 {
                 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleEXTFileResp - For ADN Phone book");
-                OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - For ADN Phone book" );
+                OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP_TD, "CMmPhoneBookOperationInit::HandleEXTFileResp - For ADN Phone book" );
 
                 iPBStoreInfoData->iADNNumberLengthMax = numLength;
                 
@@ -1002,7 +1008,7 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
             case EPBInitPhaseFDN:
                 {
                 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleEXTFileResp - For FDN PhoneBook");
-                OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp  -For FDN PhoneBoo" );
+                OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP_TD, "CMmPhoneBookOperationInit::HandleEXTFileResp  -For FDN PhoneBoo" );
 
                 iPBStoreInfoData->iFDNNumberLengthMax = numLength;
 
@@ -1029,7 +1035,7 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
             case EPBInitPhaseSDN:
                 {
                 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleEXTFileResp - For SDN PhoneBook");
-                OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - For SDN PhoneBook" );
+                OstTrace0( TRACE_NORMAL,  DUP3_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP_TD, "CMmPhoneBookOperationInit::HandleEXTFileResp - For SDN PhoneBook" );
 
                 iPBStoreInfoData->iSDNNumberLengthMax = numLength;
 
@@ -1057,7 +1063,7 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
             case EPBInitPhaseMBDN:
                 {
                 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleEXTFileResp - for MBDN PhoneBook");
-                OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - for MBDN PhoneBook" );
+                OstTrace0( TRACE_NORMAL,  DUP4_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP_TD, "CMmPhoneBookOperationInit::HandleEXTFileResp - for MBDN PhoneBook" );
 
                 iPBStoreInfoData->iMBDNNumberLengthMax = numLength;
 
@@ -1085,7 +1091,7 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
             case EPBInitPhaseMSISDN:
                 {
                 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleEXTFileResp - for MSISDN Phonebook");
-                OstTrace0( TRACE_NORMAL, DUP5_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - for MSISDN Phonebook" );
+                OstTrace0( TRACE_NORMAL,  DUP5_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP_TD, "CMmPhoneBookOperationInit::HandleEXTFileResp - for MSISDN Phonebook" );
 
                 iPBStoreInfoData->iMSISDNNumberLengthMax = numLength;
                 
@@ -1113,7 +1119,7 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
             case EPBInitPhaseVMBX:
                 {
                 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleEXTFileResp  - For VMBX PhoneBook");
-                OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - For VMBX PhoneBook" );
+                OstTrace0( TRACE_NORMAL,  DUP6_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP_TD, "CMmPhoneBookOperationInit::HandleEXTFileResp - For VMBX PhoneBook" );
 
                 iPBStoreInfoData->iVMBXNumberLengthMax = numLength;
                 
@@ -1134,7 +1140,7 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
             default:
                 {
                 TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleEXTFileResp  - PhoneBook not supported");
-                OstTrace0( TRACE_NORMAL, DUP7_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP, "CMmPhoneBookOperationInit::HandleEXTFileResp - PhoneBook not supported" );
+                OstTrace0( TRACE_NORMAL,  DUP7_CMMPHONEBOOKOPERATIONINIT_HANDLEEXTFILERESP_TD, "CMmPhoneBookOperationInit::HandleEXTFileResp - PhoneBook not supported" );
                 }
                 break;
             }
@@ -1156,13 +1162,12 @@ TInt CMmPhoneBookOperationInit::HandleEXTFileResp( const TDesC8 &aFileData , TIn
 // by index
 // -----------------------------------------------------------------------------
 //
-TInt CMmPhoneBookOperationInit::HandleMBIFileResp( const TDesC8 &aFileData , TInt aStatus )
+void CMmPhoneBookOperationInit::HandleMBIFileResp( const TDesC8 &aFileData , TInt aStatus )
     {
     
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::HandleMBIFileResp");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_HANDLEMBIFILERESP, "CMmPhoneBookOperationInit::HandleMBIFileResp" );
-    
-    TInt ret(KErrNone);
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT_HANDLEMBIFILERESP_TD, "CMmPhoneBookOperationInit::HandleMBIFileResp" );
+
     if(UICC_STATUS_OK == aStatus)
         {
         // get the no of records
@@ -1170,7 +1175,12 @@ TInt CMmPhoneBookOperationInit::HandleMBIFileResp( const TDesC8 &aFileData , TIn
         iMbiRecLen = fci.GetRecordLength();
         iTypeOfReading = EBasicEfRead;
         }
-    return ret ;
+    else
+        {
+        iServiceType = UICC_APPL_FILE_INFO;
+        GetNextPhoneBookInitPhase(iIniPhase);
+        }
+
     }
 
 // -----------------------------------------------------------------------------
@@ -1183,7 +1193,7 @@ TInt CMmPhoneBookOperationInit::HandleMBIFileResp( const TDesC8 &aFileData , TIn
 TUint8 CMmPhoneBookOperationInit::GetNextAvailablePbIcc(TUint8 aPBook)
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::GetNextAvailablePbIcc");
-    OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONINIT_GETNEXTAVAILABLEPBICC, "CMmPhoneBookOperationInit::GetNextAvailablePbIcc" );
+    OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONINIT_GETNEXTAVAILABLEPBICC_TD, "CMmPhoneBookOperationInit::GetNextAvailablePbIcc" );
 
     switch(aPBook)
         {
@@ -1294,7 +1304,7 @@ TUint8 CMmPhoneBookOperationInit::GetNextAvailablePbIcc(TUint8 aPBook)
         default:
             {
             TFLOGSTRING("TSY: CMmPhoneBookOperationInit::GetNextAvailablePbIcc - Not Supported");
-            OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_GETNEXTAVAILABLEPBICC, "CMmPhoneBookOperationInit::GetNextAvailablePbIcc - Not Supported" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT_GETNEXTAVAILABLEPBICC_TD, "CMmPhoneBookOperationInit::GetNextAvailablePbIcc - Not Supported" );
             }
             break;
         }
@@ -1319,7 +1329,7 @@ TUint8 CMmPhoneBookOperationInit::GetNextAvailablePbIcc(TUint8 aPBook)
 TUint8 CMmPhoneBookOperationInit::GetNextAvailablePbUicc(TUint8 aPBook)
     {
     TFLOGSTRING("TSY: CMmPhoneBookOperationInit::GetNextAvailablePbUicc");
-    OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONINIT_GETNEXTAVAILABLEPBUICC, "CMmPhoneBookOperationInit::GetNextAvailablePbUicc" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONINIT_GETNEXTAVAILABLEPBUICC_TD, "CMmPhoneBookOperationInit::GetNextAvailablePbUicc" );
 
     switch(aPBook)
         {

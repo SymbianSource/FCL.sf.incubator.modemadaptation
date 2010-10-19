@@ -91,7 +91,7 @@ static const TUint16 KUnicode[128] =
 //
 TTransIdMessage::TTransIdMessage() : iTransNum(KTransactionIdMinNumber)
     {
-    OstTrace0( TRACE_NORMAL, TTRANSIDMESSAGE_TTRANSIDMESSAGE, "TTransIdMessage::TTransIdMessage" );
+    OstTrace0( TRACE_NORMAL,  TTRANSIDMESSAGE_TTRANSIDMESSAGE_TD, "TTransIdMessage::TTransIdMessage" );
     }
 
 // -----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ TTransIdMessage::TTransIdMessage() : iTransNum(KTransactionIdMinNumber)
 //
 TUint8 TTransIdMessage::GetTransactionId()
     {
-    OstTrace0( TRACE_NORMAL, TTRANSIDMESSAGE_GETTRANSACTIONID, "TTransIdMessage::GetTransactionId" );
+    OstTrace0( TRACE_NORMAL,  TTRANSIDMESSAGE_GETTRANSACTIONID_TD, "TTransIdMessage::GetTransactionId" );
     TFLOGSTRING("TSY: TTransIdMessage::GetTransactionId");
     // 0xff and 0x00 are
     // not valid transaction id's and will not be generated. This is done
@@ -127,7 +127,7 @@ void TSatUtility::GetTonAndNpi
         RSat::TNumberingPlan* aNpi      // Number plan identification
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_GETTONANDNPI, "TSatUtility::GetTonAndNpi: RSat" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_GETTONANDNPI_TD, "TSatUtility::GetTonAndNpi: RSat" );
     TFLOGSTRING("TSY: TSatUtility::GetTonAndNpi: RSat");
 
     TInt ton( ( aTonAndNpi >> 4 ) & KTONMask );
@@ -210,7 +210,7 @@ void TSatUtility::GetTonAndNpi
         RMobilePhone::TMobileNPI& aNpi
         )
     {
-    OstTrace0( TRACE_NORMAL, DUP1_TSATUTILITY_GETTONANDNPI, "TSatUtility::GetTonAndNpi: Etel MM" );
+    OstTrace0( TRACE_NORMAL,  DUP1_TSATUTILITY_GETTONANDNPI_TD, "TSatUtility::GetTonAndNpi: Etel MM" );
     TFLOGSTRING("TSY: TSatUtility::GetTonAndNpi: Etel MM");
 
     TInt ton( ( aTonAndNpi >> 4 ) & KTONMask );
@@ -288,7 +288,7 @@ void TSatUtility::Packed7to8Unpacked
         TDes8& aOutput    //8-bit unpacked string
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_PACKED7TO8UNPACKED, "TSatUtility::Packed7to8Unpacked" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_PACKED7TO8UNPACKED_TD, "TSatUtility::Packed7to8Unpacked" );
     TFLOGSTRING("TSY: TSatUtility::Packed7to8Unpacked");
 
     // The string is in packed GSM default alphabet format.
@@ -343,7 +343,7 @@ void TSatUtility::UCSToPacket7
         TDes8& aOutput   //7-bit packed format output string
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_UCSTOPACKET7, "TSatUtility::UCSToPacket7" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_UCSTOPACKET7_TD, "TSatUtility::UCSToPacket7" );
     TFLOGSTRING("TSY: TSatUtility::UCSToPacket7");
 
     TBuf8<255> string;
@@ -405,7 +405,7 @@ void TSatUtility::BCDToAscii
         TDes8& aOutput   //Ascii format output string
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_BCDTOASCII, "TSatUtility::BCDToAscii" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_BCDTOASCII_TD, "TSatUtility::BCDToAscii" );
     TFLOGSTRING("TSY: TSatUtility::BCDToAscii");
 
     // Convert Abbreviated dialling numbers format back to ASCII format.
@@ -431,9 +431,9 @@ void TSatUtility::BCDToAscii
 
     if ( aOutput.Length() == outputMaxLength )
         {
-        OstTrace0( TRACE_NORMAL, DUP1_TSATUTILITY_BCDTOASCII, "TSatUtility::BCDToAscii, probably dropped characters" );
-        OstTraceExt2( TRACE_NORMAL, DUP2_TSATUTILITY_BCDTOASCII, "Input buffer length: %d, possible characters: %d", len, len * 2 );
-        OstTraceExt2( TRACE_NORMAL, DUP3_TSATUTILITY_BCDTOASCII, "Converted characters: %d, dropped: %d", aOutput.Length(), ( len * 2 ) - aOutput.Length() );
+        OstTrace0( TRACE_NORMAL,  DUP1_TSATUTILITY_BCDTOASCII_TD, "TSatUtility::BCDToAscii, probably dropped characters" );
+        OstTraceExt2( TRACE_NORMAL,  DUP2_TSATUTILITY_BCDTOASCII_TD, "Input buffer length: %d, possible characters: %d", len, len * 2 );
+        OstTraceExt2( TRACE_NORMAL,  DUP3_TSATUTILITY_BCDTOASCII_TD, "Converted characters: %d, dropped: %d", aOutput.Length(), ( len * 2 ) - aOutput.Length() );
 
         TFLOGSTRING("TSY: TSatUtility::BCDToAscii, \
             probably dropped characters");
@@ -457,7 +457,7 @@ void TSatUtility::RemoveExpansionDigit
         )
 
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_REMOVEEXPANSIONDIGIT, "TSatUtility::RemoveExpansionDigit" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_REMOVEEXPANSIONDIGIT_TD, "TSatUtility::RemoveExpansionDigit" );
     TFLOGSTRING("TSY: TSatUtility::RemoveExpansionDigit");
 
     TInt pos( 0 );
@@ -482,7 +482,7 @@ void TSatUtility::AsciiToBCD
         TDes8& aOutput         //binary code decimal output string
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_ASCIITOBCD, "TSatUtility::AsciiToBCD" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_ASCIITOBCD_TD, "TSatUtility::AsciiToBCD" );
     TFLOGSTRING("TSY: TSatUtility::AsciiToBCD");
 
     TInt i;
@@ -513,7 +513,7 @@ void TSatUtility::AsciiToBCD
             case '.': bcd = 0xe; break; // RFU
             default:  bcd = 0xf;        // should never be part of number
                TFLOGSTRING3("TSY: TSatUtility::AsciiToBCD -- dropped character %d at i=%d", TInt(aString[i]), i );
-               OstTraceExt2( TRACE_NORMAL, DUP1_TSATUTILITY_ASCIITOBCD, "TSatUtility::AsciiToBCD -- dropped character %d at i=%d", TInt(aString[i]), i );
+               OstTraceExt2( TRACE_NORMAL,  DUP1_TSATUTILITY_ASCIITOBCD_TD, "TSatUtility::AsciiToBCD -- dropped character %d at i=%d", TInt(aString[i]), i );
 
                break;
             }
@@ -556,7 +556,7 @@ void TSatUtility::SetAlphaId
         TDes& aAlphaId   //alpha id
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_SETALPHAID, "TSatUtility::SetAlphaId" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_SETALPHAID_TD, "TSatUtility::SetAlphaId" );
     TFLOGSTRING("TSY: TSatUtility::SetAlphaId");
 
     if( aRawData.Length())
@@ -578,7 +578,7 @@ void TSatUtility::SetAlphaId
     else
         {
         TFLOGSTRING("TSY: TSatUtility::SetAlphaId, RawData NULL");
-        OstTrace0( TRACE_NORMAL, DUP1_TSATUTILITY_SETALPHAID, "TSatUtility::SetAlphaId, RawData NULL" );
+        OstTrace0( TRACE_NORMAL,  DUP1_TSATUTILITY_SETALPHAID_TD, "TSatUtility::SetAlphaId, RawData NULL" );
 
         }
     }
@@ -594,7 +594,7 @@ TUint8 TSatUtility::ConvertToSemiOctet
         TInt aTime  //time
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_CONVERTTOSEMIOCTET, "TSatUtility::ConvertToSemiOctet" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_CONVERTTOSEMIOCTET_TD, "TSatUtility::ConvertToSemiOctet" );
     TFLOGSTRING("TSY: TSatUtility::ConvertToSemiOctet");
 
     // Converting given time to meet the TP-Service-Centre-Time-Stamp format in
@@ -618,7 +618,7 @@ void TSatUtility::ConvertSms7ToUnicode16
         TDesC8& aInput   //input
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_CONVERTSMS7TOUNICODE16, "TSatUtility::ConvertSms7ToUnicode16" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_CONVERTSMS7TOUNICODE16_TD, "TSatUtility::ConvertSms7ToUnicode16" );
     TFLOGSTRING( "TSY: TSatUtility::ConvertSms7ToUnicode16" );
 
     TInt i( 0 );
@@ -710,7 +710,7 @@ void TSatUtility::ConvertSms7ToUnicode16
                         {
                         TFLOGSTRING("TSY: TSatUtility::ConvertSms7ToUnicode16, \
                             Character not valid.");
-                        OstTrace0( TRACE_NORMAL, DUP1_TSATUTILITY_CONVERTSMS7TOUNICODE16, "TSatUtility::ConvertSms7ToUnicode16, Character not valid." );
+                        OstTrace0( TRACE_NORMAL,  DUP1_TSATUTILITY_CONVERTSMS7TOUNICODE16_TD, "TSatUtility::ConvertSms7ToUnicode16, Character not valid." );
 
                         }
                     break;
@@ -729,7 +729,7 @@ void TSatUtility::ConvertSms7ToUnicode16
             {
             TFLOGSTRING("TSY: TSatUtility::ConvertSms7ToUnicode16, \
                 Character not valid.");
-            OstTrace0( TRACE_NORMAL, DUP2_TSATUTILITY_CONVERTSMS7TOUNICODE16, "TSatUtility::ConvertSms7ToUnicode16, Character not valid." );
+            OstTrace0( TRACE_NORMAL,  DUP2_TSATUTILITY_CONVERTSMS7TOUNICODE16_TD, "TSatUtility::ConvertSms7ToUnicode16, Character not valid." );
 
             }
         }
@@ -746,7 +746,7 @@ void TSatUtility::ConvertUnicode16ToSms7
         TDesC16& aInput     // unicode 16
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_CONVERTUNICODE16TOSMS7, "TSatUtility::ConvertUnicode16ToSms7" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_CONVERTUNICODE16TOSMS7_TD, "TSatUtility::ConvertUnicode16ToSms7" );
     TFLOGSTRING("TSY: TSatUtility::ConvertUnicode16ToSms7");
 
     // A hash table would be useful here instead of switch/case
@@ -1036,7 +1036,7 @@ void TSatUtility::FillDurationStructure
         RSat::TDuration& aTDuration   // duration structure
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_FILLDURATIONSTRUCTURE, "TSatUtility::FillDurationStructure" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_FILLDURATIONSTRUCTURE_TD, "TSatUtility::FillDurationStructure" );
     TFLOGSTRING("TSY: TSatUtility::FillDurationStructure");
 
     CTlv duration;
@@ -1094,7 +1094,7 @@ void TSatUtility::FillIconStructure
         TInt aItemNmb            //item number
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_FILLICONSTRUCTURE, "TSatUtility::FillIconStructure" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_FILLICONSTRUCTURE_TD, "TSatUtility::FillIconStructure" );
     TFLOGSTRING("TSY: TSatUtility::FillIconStructure");
 
     CTlv iconId;
@@ -1129,7 +1129,7 @@ TInt8 TSatUtility::Sw1Sw2Check
         TUint8 aSw2   //status word 2
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_SW1SW2CHECK, "TSatUtility::Sw1Sw2Check" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_SW1SW2CHECK_TD, "TSatUtility::Sw1Sw2Check" );
     TFLOGSTRING("TSY: TSatUtility::Sw1Sw2Check");
 
     //These are the ok responses ( for envelope )
@@ -1230,7 +1230,7 @@ void TSatUtility::SetText
         TDes& aText        // unicode output text string
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_SETTEXT, "TSatUtility::SetText" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_SETTEXT_TD, "TSatUtility::SetText" );
     TFLOGSTRING("TSY: TSatUtility::SetText");
 
     if ( aTextString.GetLength() )
@@ -1284,7 +1284,7 @@ void TSatUtility::SetText
     else
         {
         TFLOGSTRING("TSY: TSatUtility::SetText, text string length not valid");
-        OstTrace0( TRACE_NORMAL, DUP1_TSATUTILITY_SETTEXT, "TSatUtility::SetText, text string length not valid" );
+        OstTrace0( TRACE_NORMAL,  DUP1_TSATUTILITY_SETTEXT_TD, "TSatUtility::SetText, text string length not valid" );
 
         }
     }
@@ -1300,7 +1300,7 @@ void TSatUtility::ConvertAlphaFieldsToUnicode
         TDes& aText
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_CONVERTALPHAFIELDSTOUNICODE, "TSatUtility::ConvertAlphaFieldsToUnicode" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_CONVERTALPHAFIELDSTOUNICODE_TD, "TSatUtility::ConvertAlphaFieldsToUnicode" );
     TFLOGSTRING("TSY: TSatUtility::ConvertAlphaFieldsToUnicode");
 
     // ArabicCoding, GreekCoding and TurkishCoding have different coding
@@ -1380,7 +1380,7 @@ void TSatUtility::ConvertAlphaFieldsToUnicode
         else
             {
             TFLOGSTRING("TSY: TSatUtility::ConvertAlphaFieldsToUnicode, Source length NULL ");
-            OstTrace0( TRACE_NORMAL, DUP1_TSATUTILITY_CONVERTALPHAFIELDSTOUNICODE, "TSatUtility::ConvertAlphaFieldsToUnicode, Source length NULL" );
+            OstTrace0( TRACE_NORMAL,  DUP1_TSATUTILITY_CONVERTALPHAFIELDSTOUNICODE_TD, "TSatUtility::ConvertAlphaFieldsToUnicode, Source length NULL" );
 
             }
 
@@ -1395,7 +1395,7 @@ void TSatUtility::ConvertAlphaFieldsToUnicode
          if( maxCharAmount < length )
              {
              TFLOGSTRING3("TSY: TSatUtility::ConvertAlphaFieldsToUnicode, incorrect char amount: max char amount: %d actual len: %d ", maxCharAmount, length);
-             OstTraceExt2( TRACE_NORMAL, DUP3_TSATUTILITY_CONVERTALPHAFIELDSTOUNICODE, "TSatUtility::ConvertAlphaFieldsToUnicode, incorrect char amount: max char amount: %d actual len: %d", maxCharAmount, length );
+             OstTraceExt2( TRACE_NORMAL,  DUP3_TSATUTILITY_CONVERTALPHAFIELDSTOUNICODE_TD, "TSatUtility::ConvertAlphaFieldsToUnicode, incorrect char amount: max char amount: %d actual len: %d", maxCharAmount, length );
              length = maxCharAmount;
              }
 
@@ -1432,7 +1432,7 @@ void TSatUtility::ConvertAlphaFieldsToUnicode
     else
         {
         TFLOGSTRING("TSY: TSatUtility::ConvertAlphaFieldsToUnicode, No expanding needed ");
-        OstTrace0( TRACE_NORMAL, DUP2_TSATUTILITY_CONVERTALPHAFIELDSTOUNICODE, "TSatUtility::ConvertAlphaFieldsToUnicode, No expanding needed" );
+        OstTrace0( TRACE_NORMAL,  DUP2_TSATUTILITY_CONVERTALPHAFIELDSTOUNICODE_TD, "TSatUtility::ConvertAlphaFieldsToUnicode, No expanding needed" );
 
         }
     }
@@ -1449,7 +1449,7 @@ TSmsDcs TSatUtility::DecodeCbsDcs
         const TUint8 aDcs
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_DECODECBSDCS, "TSatUtility::DecodeCbsDcs" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_DECODECBSDCS_TD, "TSatUtility::DecodeCbsDcs" );
     TFLOGSTRING("TSY: TSatUtility::DecodeCbsDcs");
 
     // Coding group: 4 left most significant bits
@@ -1549,7 +1549,7 @@ void TSatUtility::GetWord
         TInt aIndex         //Index
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_GETWORD, "TSatUtility::GetWord" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_GETWORD_TD, "TSatUtility::GetWord" );
     if ( aIndex + 1 < aSource.Length() )
         {
         aTarget = TUint16( aSource[aIndex] << 8 );
@@ -1568,7 +1568,7 @@ void TSatUtility::AppendWord
         TDes8& aTarget  //Target
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_APPENDWORD, "TSatUtility::AppendWord" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_APPENDWORD_TD, "TSatUtility::AppendWord" );
     if ( aTarget.MaxLength() >= aTarget.Length() + 2 )
         {
         aTarget.Append( TUint8( aWord >> 8 ) );
@@ -1588,7 +1588,7 @@ void TSatUtility::SetUserLoginAndUserPassword
         RSat::TTextString& aUserPassword
         )
     {
-    OstTrace0( TRACE_NORMAL, TSATUTILITY_SETUSERLOGINANDUSERPASSWORD, "TSatUtility::SetUserLoginAndUserPassword" );
+    OstTrace0( TRACE_NORMAL,  TSATUTILITY_SETUSERLOGINANDUSERPASSWORD_TD, "TSatUtility::SetUserLoginAndUserPassword" );
     TFLOGSTRING("TSY: TSatUtility::SetUserLoginAndUserPassword");
 
     // Text string - User Login ( Optional )
@@ -1599,7 +1599,7 @@ void TSatUtility::SetUserLoginAndUserPassword
     if ( KErrNone == returnValue )
         {
         TFLOGSTRING("TSY: TSatUtility::SetUserLoginAndUserPassword - User Login");
-        OstTrace0( TRACE_NORMAL, DUP1_TSATUTILITY_SETUSERLOGINANDUSERPASSWORD, "TSatUtility::SetUserLoginAndUserPassword - User Login" );
+        OstTrace0( TRACE_NORMAL,  DUP1_TSATUTILITY_SETUSERLOGINANDUSERPASSWORD_TD, "TSatUtility::SetUserLoginAndUserPassword - User Login" );
 
         // Convert and set text
         TSatUtility::SetText( textStringUL, aUserLogin );
@@ -1613,7 +1613,7 @@ void TSatUtility::SetUserLoginAndUserPassword
     if ( KErrNone == returnValue )
         {
         TFLOGSTRING("TSY: TSatUtility::SetUserLoginAndUserPassword - User Password");
-        OstTrace0( TRACE_NORMAL, DUP2_TSATUTILITY_SETUSERLOGINANDUSERPASSWORD, "TSatUtility::SetUserLoginAndUserPassword - User Password" );
+        OstTrace0( TRACE_NORMAL,  DUP2_TSATUTILITY_SETUSERLOGINANDUSERPASSWORD_TD, "TSatUtility::SetUserLoginAndUserPassword - User Password" );
 
         // Convert and set text
         TSatUtility::SetText( textStringUP, aUserPassword );

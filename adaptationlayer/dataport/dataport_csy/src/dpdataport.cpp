@@ -1967,19 +1967,19 @@ void CDpDataPort::WriteStateLog()
 
     #ifdef USE_FILE_DEBUG
 
-    OstTrace0( TRACE_DETAILED, DUP1_CDPDATAPORT_WRITESTATELOG, "CDpDataPort:: --- DATA LOG: ----------------------------------------------" );
-    OstTraceExt2( TRACE_DETAILED, DUP2_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugDteWrites=    %d iDebugBytesFromDte=    %d", iDebugDteWrites, iDebugBytesFromDte );
-    OstTraceExt2( TRACE_DETAILED, DUP3_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugDteReads=     %d iDebugBytesToDte=      %d", iDebugDteReads, iDebugBytesToDte );
-    OstTraceExt2( TRACE_DETAILED, DUP4_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugPnWrites=     %d iDebugBytesToPn=       %d", iDebugPnWrites, iDebugBytesToPn );
-    OstTraceExt2( TRACE_DETAILED, DUP5_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugPnReads=      %d iDebugBytesFromPn=     %d", iDebugPnReads, iDebugBytesFromPn );
-    OstTrace0( TRACE_DETAILED, DUP6_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|" );
-    OstTraceExt2( TRACE_DETAILED, DUP7_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|rxlen= %d txlen= %d", rxlen, txlen );
-    OstTrace0( TRACE_DETAILED, DUP8_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|" );
-    OstTraceExt2( TRACE_DETAILED, DUP9_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iRx->iHead=     %d iRx->iTail=  %d", iRx->iHead, iRx->iTail );
-    OstTraceExt2( TRACE_DETAILED, DUP10_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iRx->iTailWrp=  %d iRx->iEnd=   %d", iRx->iTailWhenWrappedAround, iRx->iEnd );
-    OstTraceExt2( TRACE_DETAILED, DUP11_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iTx->iHead=     %d iTx->iTail=  %d", iTx->iHead, iTx->iTail );
-    OstTraceExt2( TRACE_DETAILED, DUP12_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iTx->iTailWrp=  %d iTx->iEnd=   %d", iTx->iTailWhenWrappedAround, iTx->iEnd );
-    OstTrace0( TRACE_DETAILED, DUP13_CDPDATAPORT_WRITESTATELOG, "CDpDataPort:: ------------------------------------------------------------" );
+    OstTrace0( TRACE_INTERNALS, DUP1_CDPDATAPORT_WRITESTATELOG, "CDpDataPort:: --- DATA LOG: ----------------------------------------------" );
+    OstTraceExt2( TRACE_INTERNALS, DUP2_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugDteWrites=    %d iDebugBytesFromDte=    %d", iDebugDteWrites, iDebugBytesFromDte );
+    OstTraceExt2( TRACE_INTERNALS, DUP3_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugDteReads=     %d iDebugBytesToDte=      %d", iDebugDteReads, iDebugBytesToDte );
+    OstTraceExt2( TRACE_INTERNALS, DUP4_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugPnWrites=     %d iDebugBytesToPn=       %d", iDebugPnWrites, iDebugBytesToPn );
+    OstTraceExt2( TRACE_INTERNALS, DUP5_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugPnReads=      %d iDebugBytesFromPn=     %d", iDebugPnReads, iDebugBytesFromPn );
+    OstTrace0( TRACE_INTERNALS, DUP6_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|" );
+    OstTraceExt2( TRACE_INTERNALS, DUP7_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|rxlen= %d txlen= %d", rxlen, txlen );
+    OstTrace0( TRACE_INTERNALS, DUP8_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|" );
+    OstTraceExt2( TRACE_INTERNALS, DUP9_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iRx->iHead=     %d iRx->iTail=  %d", iRx->iHead, iRx->iTail );
+    OstTraceExt2( TRACE_INTERNALS, DUP10_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iRx->iTailWrp=  %d iRx->iEnd=   %d", iRx->iTailWhenWrappedAround, iRx->iEnd );
+    OstTraceExt2( TRACE_INTERNALS, DUP11_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iTx->iHead=     %d iTx->iTail=  %d", iTx->iHead, iTx->iTail );
+    OstTraceExt2( TRACE_INTERNALS, DUP12_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iTx->iTailWrp=  %d iTx->iEnd=   %d", iTx->iTailWhenWrappedAround, iTx->iEnd );
+    OstTrace0( TRACE_INTERNALS, DUP13_CDPDATAPORT_WRITESTATELOG, "CDpDataPort:: ------------------------------------------------------------" );
 
     BDEBUG("\n  DATA LOG:------------------------------------------------");
     BFDEBUG2("|iDebugDteWrites=    %d\tiDebugBytesFromDte=    %d",
@@ -2008,20 +2008,20 @@ void CDpDataPort::WriteStateLog()
 
     #if ( defined USE_SERIAL_DEBUG || defined USE_TRUST_DEBUG )
 
-    OstTrace0( TRACE_DETAILED, DUP14_CDPDATAPORT_WRITESTATELOG, "CDpDataPort:: --- DATA LOG: ----------------------------------------------" );
-    OstTrace1( TRACE_DETAILED, DUP15_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugDteWrites=    %d", iDebugDteWrites );
-    OstTrace1( TRACE_DETAILED, DUP16_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugBytesFromDte= %d", iDebugBytesFromDte );
-    OstTrace1( TRACE_DETAILED, DUP17_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugDteReads=     %d", iDebugDteReads );
-    OstTrace1( TRACE_DETAILED, DUP18_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugBytesToDte=   %d", iDebugBytesToDte );
-    OstTrace1( TRACE_DETAILED, DUP19_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugPnWrites=     %d", iDebugPnWrites );
-    OstTrace1( TRACE_DETAILED, DUP20_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugBytesToPn=    %d", iDebugBytesToPn );
-    OstTrace1( TRACE_DETAILED, DUP21_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugPnReads=      %d", iDebugPnReads );
-    OstTrace1( TRACE_DETAILED, DUP22_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugBytesFromPn=  %d", iDebugBytesFromPn );
-    OstTrace0( TRACE_DETAILED, DUP23_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|" );
-    OstTrace1( TRACE_DETAILED, DUP24_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|rxlen= %d", rxlen );
-    OstTrace1( TRACE_DETAILED, DUP25_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|txlen= %d", txlen );
-    OstTrace0( TRACE_DETAILED, DUP26_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|" );
-    OstTrace0( TRACE_DETAILED, DUP27_CDPDATAPORT_WRITESTATELOG, "CDpDataPort:: ------------------------------------------------------------" );
+    OstTrace0( TRACE_INTERNALS, DUP14_CDPDATAPORT_WRITESTATELOG, "CDpDataPort:: --- DATA LOG: ----------------------------------------------" );
+    OstTrace1( TRACE_INTERNALS, DUP15_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugDteWrites=    %d", iDebugDteWrites );
+    OstTrace1( TRACE_INTERNALS, DUP16_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugBytesFromDte= %d", iDebugBytesFromDte );
+    OstTrace1( TRACE_INTERNALS, DUP17_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugDteReads=     %d", iDebugDteReads );
+    OstTrace1( TRACE_INTERNALS, DUP18_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugBytesToDte=   %d", iDebugBytesToDte );
+    OstTrace1( TRACE_INTERNALS, DUP19_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugPnWrites=     %d", iDebugPnWrites );
+    OstTrace1( TRACE_INTERNALS, DUP20_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugBytesToPn=    %d", iDebugBytesToPn );
+    OstTrace1( TRACE_INTERNALS, DUP21_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugPnReads=      %d", iDebugPnReads );
+    OstTrace1( TRACE_INTERNALS, DUP22_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|iDebugBytesFromPn=  %d", iDebugBytesFromPn );
+    OstTrace0( TRACE_INTERNALS, DUP23_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|" );
+    OstTrace1( TRACE_INTERNALS, DUP24_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|rxlen= %d", rxlen );
+    OstTrace1( TRACE_INTERNALS, DUP25_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|txlen= %d", txlen );
+    OstTrace0( TRACE_INTERNALS, DUP26_CDPDATAPORT_WRITESTATELOG, "CDpDataPort::|" );
+    OstTrace0( TRACE_INTERNALS, DUP27_CDPDATAPORT_WRITESTATELOG, "CDpDataPort:: ------------------------------------------------------------" );
 
     RDEBUG("\n  DATA LOG:------------------------------------------------");
     FRDEBUG("|iDebugDteWrites=    %d", iDebugDteWrites );

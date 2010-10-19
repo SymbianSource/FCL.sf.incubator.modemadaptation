@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -135,10 +135,16 @@ class CMmPhoNetReceiver : public CActive
         */
         virtual TInt SetSatMessHandler( MMmMessageReceiver* aSatMessHandler );
 
-		/**
+        /**
+        * Gets SAT MessageHandler.
+        * @return MMmMessageReceiver*: pointer to SAT message handler
+        */
+        virtual MMmMessageReceiver* SatMessHandler();
+
+        /**
         * Sat ready indication
-		* @param TUint8: Message to be retrieved.
-		* @return TInt: success/failure if msg was found
+        * @param TUint8: Message to be retrieved.
+        * @return TInt: success/failure if msg was found
         */
         virtual TInt SatReady( TUint8 aMsg );
 

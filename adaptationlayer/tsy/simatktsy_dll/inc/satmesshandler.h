@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -40,17 +40,17 @@ const TInt KAtkPdpCcRespMaxSize( 690 );
 // Bitmask for status bit of call control in USIM
 const TUint8 KCallControlBitMaskUsim( 0x20 );
 // Bitmask for status bit of call control in SIM
-const TUint8 KCallControlBitMaskSim( 0x08 );
+const TUint8 KCallControlBitMaskSim( 0xC0 );
 // Bitmask for status bit of SMS PP DD in USIM
 const TUint8 KSmsPpDdBitMaskUsim( 0x08 );
 // Bitmask for status bit of SMS PP DD in SIM
-const TUint8 KSmsPpDdBitMaskSim( 0x02 );
+const TUint8 KSmsPpDdBitMaskSim( 0x0C );
 // Bitmask for status bit of MO SMS control in USIM
 const TUint8 KMoSmsControlBitMaskUsim( 0x40 );
 // Bitmask for status bit of MO SMS control in SIM
-const TUint8 KMoSmsControlBitMaskSim( 0x10 );
+const TUint8 KMoSmsControlBitMaskSim( 0x03 );
 // Bitmask for status bit of USSD CC  in SIM
-const TUint8 KMoUssdCallControlBitMaskSim( 0x01 );
+const TUint8 KMoUssdCallControlBitMaskSim( 0x03 );
 // Unique transaction IDs for UICC messages
 const TUint8 KUiccTrIdCommon( 0xFA );
 const TUint8 KUiccTrIdReadSatIcon( 0xFB );
@@ -58,9 +58,9 @@ const TUint8 KUiccTrIdReadIconClut( 0xF8 );
 const TUint8 KUiccTrIdReadIconInstancePhase1( 0xF7 );
 const TUint8 KUiccTrIdReadIconInstancePhase2( 0xF6 );
 const TUint8 KUiccTrIdServiceTableByte4( 0xFC );
-const TUint8 KUiccTrIdServiceTableByte5( 0xF9 );
+const TUint8 KUiccTrIdServiceTableByte10( 0xF9 );
 const TUint8 KUiccTrIdServiceTableByte7( 0xFD );
-const TUint8 KUiccTrIdServiceTableByte6( 0xFF );
+const TUint8 KUiccTrIdServiceTableByte11( 0xFF );
 
 // PollInterval, PollingOff
 const TUint8 KDefaultPollInterval( 0x00 );
@@ -550,7 +550,7 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         * @param TIsiReceiveC& aIsiMessage response to envelope
         * @return none
         */
-        void InfoSerialNumberReadResp( const TIsiReceiveC& aIsiMessage );
+        //void InfoSerialNumberReadResp( const TIsiReceiveC& aIsiMessage );
 
         /**
         * Send NET_NEIGHBOUR_CELLS_REQ message to Phonet.
@@ -634,7 +634,7 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         * @param aStatus SIM server status
         * @return none
         */
-        void RefreshResult( TUint8 aStatus );
+        void RefreshResultL( TUint8 aStatus );
 
         /**
         * Method to check SIM server response to a set polling request
@@ -688,7 +688,7 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         * @param aTarget: requested data
         * return value TInt : success/failure value
         */
-        TInt InfoSerialNumberReadReq( TUint8 aTransId, TUint8 aTarget );
+        //TInt InfoSerialNumberReadReq( TUint8 aTransId, TUint8 aTarget );
 
         /**
         * Creates NET_CELL_INFO_GET_REQ ISI message and sends it to Phonet
@@ -815,7 +815,7 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         * @param aIsiMessage received indication
         * @return none
         */
-        void InfoPpReadResp( const TIsiReceiveC& aIsiMessage );
+        void InfoPpReadRespL( const TIsiReceiveC& aIsiMessage );
 
         /**
         * Validates lengths of simple tlv objects inside BER TLV
@@ -1085,14 +1085,14 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         * @param aIsiMsg proactive command
         * @return none
         */
-        void PhoneInfoMessageReceived( const TIsiReceiveC& aIsiMessage );
+        //void PhoneInfoMessageReceivedL( const TIsiReceiveC& aIsiMessage );
 
         /**
         * Handles the UICC server related messages
         * @param aIsiMessage received ISI message
         * @return Information about handling of response
         */
-        TBool UiccServerMessageReceived( const TIsiReceiveC& aIsiMessage );
+        TBool UiccServerMessageReceivedL( const TIsiReceiveC& aIsiMessage );
 
         /**
         * Handles the Sms server related messages
@@ -1129,19 +1129,6 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
             const TIsiReceiveC& aIsiMessage );
 
         /**
-        * Sends a PN_ATK message with the data given as parameter
-        * @since NCP 5.1
-        * @param aReceiverObject: Receiver object ID
-        * @param aTransactionId: Message Transaction ID
-        * @param aMessageId: Message identifier
-        * @param aData: Message data to be sent
-        * @return Error/Success value from sending the message
-        */
-        TInt CSatMessHandler::SendPnAtkMessage( const TUint8 aReceiverObject,
-            const TUint8 aTransactionId, const TInt aMessageId,
-            const TDesC8& aData );
-
-        /**
         * Breaks UICC_APPL_CMD_RESP ISI message
         * @param aReceiverObject: Receiver object ID
         * @return None
@@ -1153,7 +1140,7 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
         * @param aIsiMessage Received ISI message
         * @return None
         */
-        void UiccCatInd( const TIsiReceiveC& aIsiMessage );
+        void UiccCatIndL( const TIsiReceiveC& aIsiMessage );
 
     private: // Data
 
@@ -1171,6 +1158,9 @@ class CSatMessHandler : public CBase, public MMmMessageReceiver
 
         // Save the SimReadField transaction id used by DataDownload.
         TInt                iDataDownloadSimReadFieldTraId;
+
+        // Save the SMS_CB_ROUTING_REQ transaction id used by DataDownload.
+        TInt                iCbRoutingReqTraId;
 
         // Variable for storing card id
         TUint8              iCardId;

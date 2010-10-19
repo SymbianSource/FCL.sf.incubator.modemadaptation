@@ -13,7 +13,7 @@
 * 
 * Description:
 * Name      : PN_NVD [ 0x43 ] Resource Non-Volatile Data Server
-* Version   : 000.001
+* Version   : 000.002
 *
 * Documentation: www.wirelessmodemapi.com
 *
@@ -24,7 +24,7 @@
 #define _SYMBIAN_ISI_NVDISI_H_
 
 #define NON_VOLATILE_DATA_SERVER_ISI_VERSION_Z	 0
-#define NON_VOLATILE_DATA_SERVER_ISI_VERSION_Y	 1
+#define NON_VOLATILE_DATA_SERVER_ISI_VERSION_Y	 2
 
 
 //TABLES

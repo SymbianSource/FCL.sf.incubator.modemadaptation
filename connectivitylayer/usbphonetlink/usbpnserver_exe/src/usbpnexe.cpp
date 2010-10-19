@@ -64,7 +64,7 @@ GLDEF_C TInt E32Main()
         TRACE_ASSERT_ALWAYS;
         }
 
-    OstTrace0( TRACE_API, _E32MAIN_ENTRY, "USBPhonetLink - UsbPnExe::E32Main" );
+    OstTrace0( TRACE_BORDER, _E32MAIN_ENTRY, "USBPhonetLink - UsbPnExe::E32Main" );
     A_TRACE( _L( "USBPhonetLink - UsbPnExe::E32Main()" ) );
     BUILD_TRACE( &KTraceName );
 
@@ -75,7 +75,7 @@ GLDEF_C TInt E32Main()
         TRACE_ASSERT_ALWAYS;
         }
 
-    OstTrace1( TRACE_API, _E32MAIN_EXIT, "USBPhonetLink - UsbPnExe::E32Main - return %d", err );
+    OstTrace1( TRACE_BORDER, _E32MAIN_EXIT, "USBPhonetLink - UsbPnExe::E32Main - return %d", err );
     A_TRACE( ( _T( "USBPhonetLink - UsbPnExe::E32Main() return %d" ), err ) );
     return err;
     }

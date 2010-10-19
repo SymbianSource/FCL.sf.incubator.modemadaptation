@@ -71,7 +71,7 @@ CMmPhoneBookOperationCache::CMmPhoneBookOperationCache
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CMmPhoneBookOperationCache");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_CMMPHONEBOOKOPERATIONCACHE, "CMmPhoneBookOperationCache::CMmPhoneBookOperationCache" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONCACHE_CMMPHONEBOOKOPERATIONCACHE_TD, "CMmPhoneBookOperationCache::CMmPhoneBookOperationCache" );
     }
 
 // -----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ CMmPhoneBookOperationCache::~CMmPhoneBookOperationCache
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::~CMmPhoneBookOperationCache");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONCACHE_CMMPHONEBOOKOPERATIONCACHE, "CMmPhoneBookOperationCache::~CMmPhoneBookOperationCache" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONCACHE_CMMPHONEBOOKOPERATIONCACHE_TD, "CMmPhoneBookOperationCache::~CMmPhoneBookOperationCache" );
     }
 
 // -----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ CMmPhoneBookOperationCache* CMmPhoneBookOperationCache::NewL
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::NewL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_NEWL, "CMmPhoneBookOperationCache::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONCACHE_NEWL_TD, "CMmPhoneBookOperationCache::NewL" );
 
     TName phonebookTypeName ;
 
@@ -138,7 +138,7 @@ TInt CMmPhoneBookOperationCache::UICCCreateReq
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CreateReq");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_CREATEREQ, "CMmPhoneBookOperationCache::CreateReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONCACHE_CREATEREQ_TD, "CMmPhoneBookOperationCache::CreateReq" );
 
     TInt ret( KErrNotSupported );
 
@@ -150,12 +150,14 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_CREATEREQ, "CMmPhoneBookOper
         {
         case EMmTsyPhoneBookStoreGetInfoIPC:
             {
+TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CreateReq EMmTsyPhoneBookStoreGetInfoIPC");
             iNumOfUsedSDNEntries = 0;
             iNumOfUsedVMBXEntries = 0;
             break;
             }
         case EMmTsyONStoreGetInfoIPC:
             {
+TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CreateReq EMmTsyONStoreGetInfoIPC");
             iFileId = PB_MSISDN_FID;
             iExtFileId = PB_EXT1_FID;
             iArrayIndex = EPhonebookTypeMSISDN;
@@ -171,6 +173,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_CREATEREQ, "CMmPhoneBookOper
             }
         case EMmTsyPhoneBookStoreCacheIPC:
             {
+TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CreateReq EMmTsyPhoneBookStoreCacheIPC");
             // Convert Phone Book name to file id
             iExtFileId = UICC_ILLEGAL_FILE_ID;
             iFileId = ConvertToPBfileId( iPhoneBookTypeName, 
@@ -181,19 +184,25 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_CREATEREQ, "CMmPhoneBookOper
             const CPhoneBookDataPackage* phoneBookData(
                 static_cast<const CPhoneBookDataPackage*>( aDataPackage ) );
 
-            CArrayPtrSeg<CPhoneBookStoreEntry>* prtToCacheArray;
-            phoneBookData->UnPackData( prtToCacheArray );
+            CArrayPtrSeg<CPhoneBookStoreEntry>* ptrToCacheArray;
+TFLOGSTRING2("TSY: CMmPhoneBookOperationCache::CreateReq ptrToCacheArray %X", ptrToCacheArray);
+TFLOGSTRING2("TSY: CMmPhoneBookOperationCache::CreateReq aDataPackage %X", aDataPackage);
+TFLOGSTRING2("TSY: CMmPhoneBookOperationCache::CreateReq aDataPackage %X", this);
+            phoneBookData->UnPackData( &ptrToCacheArray );
 
-            if ( prtToCacheArray )
+TFLOGSTRING2("TSY: CMmPhoneBookOperationCache::CreateReq ptrToCacheArray %X", ptrToCacheArray);
+            if ( ptrToCacheArray )
                 {
-                iPhoneBookStoreCacheArray = prtToCacheArray;
+                iPhoneBookStoreCacheArray = ptrToCacheArray;
                 ret = KErrNone;
                 iIndexToRead = 1 ; // Strat from 1st Record to read
                 // Start Reading records from 1st record
+TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CreateReq USimPbReqRead called");
                 ret = USimPbReqRead( iIndexToRead, aTransId );
                 }
             else
                 {
+TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CreateReq KErrArgument");
                 ret = KErrArgument;
                 }
 
@@ -203,7 +212,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_CREATEREQ, "CMmPhoneBookOper
             {
             // Nothing to do here
 TFLOGSTRING2("TSY: CMmPhoneBookOperationCache::CreateReq - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONCACHE_UICCCREATEREQ, "CMmPhoneBookOperationCache::UICCCreateReq;Unknown aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONCACHE_UICCCREATEREQ_TD, "CMmPhoneBookOperationCache::UICCCreateReq;Unknown aIpc=%d", aIpc );
             break;
             }
         }//switch-case
@@ -234,7 +243,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL,"CMmPhoneB
     if ( ( UICC_STATUS_OK != aStatus ) && ( !iExtensionToRead) )
         {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::HandleSimPbResp:Unsuccessfully completed by UICC");
-OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationCache::HandleUICCPbRespL - Unsuceesfully completed by UICC" );
+OstTrace0( TRACE_NORMAL,  DUP4_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationCache::HandleUICCPbRespL - Unsuceesfully completed by UICC" );
 
         ret = CMmStaticUtility::UICCCSCauseToEpocError( aStatus );
         }
@@ -307,7 +316,7 @@ OstTrace0( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMm
                                 CleanupStack::Pop( phoneBookStoreMsg );
                                 iNumOfEntriesFilled++;
 TFLOGSTRING2("TSY: CMmPhoneBookOperationCache::HandleUICCPbRespL - Append entries into array %d",iNumOfEntriesFilled);
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationCache::HandleUICCPbRespL; - Append entries into array iNumOfEntriesFilled=%hhu", iNumOfEntriesFilled );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationCache::HandleUICCPbRespL; - Append entries into array iNumOfEntriesFilled=%hhu", iNumOfEntriesFilled );
 
                                 } // End of if Ext Data is not Present
                             else
@@ -402,7 +411,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "
                                 CleanupStack::Pop( phoneBookStoreMsg );
                                 iNumOfEntriesFilled++;
 TFLOGSTRING2("TSY: CMmPhoneBookOperationCache::HandleUSimPbRespL - Append entries into array %d",iNumOfEntriesFilled);
-OstTraceExt1( TRACE_NORMAL, DUP5_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationCache::HandleUICCPbRespL; - Append entries into array iNumOfEntriesFilled=%hhu", iNumOfEntriesFilled );
+OstTraceExt1( TRACE_NORMAL,  DUP5_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationCache::HandleUICCPbRespL; - Append entries into array iNumOfEntriesFilled=%hhu", iNumOfEntriesFilled );
                                 } // end for checking Data type in EXT
                             } // end for Entry store
                         }
@@ -417,7 +426,7 @@ OstTraceExt1( TRACE_NORMAL, DUP5_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "
             default:
                 {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::HandleUICCPbRespL. PhoneBook operation not supported ");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationCache::HandleUICCPbRespL. PhoneBook Operation not supported" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationCache::HandleUICCPbRespL. PhoneBook Operation not supported" );
                 break;
                 }
             } // End of switch case
@@ -459,7 +468,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMm
     else if ( EMmTsyONStoreGetInfoIPC == iSavedIPC )
         {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::HandleUICCPbRespL: Handle EMmTsyONStoreGetInfoIPC");
-OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationCache::HandleUICCPbRespL: Handle EMmTsyONStoreGetInfoIPC" );
+OstTrace0( TRACE_NORMAL,  DUP6_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationCache::HandleUICCPbRespL: Handle EMmTsyONStoreGetInfoIPC" );
         complete = HandleUiccReadApplFileInfoResp( aTransId,
                                                    aStatus,
                                                    aFileData );
@@ -468,7 +477,7 @@ OstTrace0( TRACE_NORMAL, DUP6_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMm
         { // Operation has been canceled
         complete = ETrue;
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::HandleUICCPbRespL; operation was canceled");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationCache::HandleUICCPbRespL; operation was canceled" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationCache::HandleUICCPbRespL; operation was canceled" );
         }
     return complete;
 
@@ -487,7 +496,7 @@ TInt CMmPhoneBookOperationCache::USimPbReqRead
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::USimPbReqRead");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBookOperationCache::USimPbReqRead" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD_TD, "CMmPhoneBookOperationCache::USimPbReqRead" );
 
 
     TInt ret( KErrNone );
@@ -497,16 +506,10 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBook
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*>
                                ( iMmPhoneBookStoreMessHandler );
 
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
-    cmdParams.filePath.Append( appFileID>>8);
-    cmdParams.filePath.Append( appFileID);
-
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType())
-        {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
-        }
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
+    cmdParams.filePath.Append( APPL_FILE_ID >> 8 );
+    cmdParams.filePath.Append( APPL_FILE_ID );
 
     switch( iFileId )
         {
@@ -580,7 +583,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBook
         default:
             {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::USimPbReqRead - PhoneBook Not supported");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBookOperationCache::USimPbReqRead - PhoneBook not supported" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD_TD, "CMmPhoneBookOperationCache::USimPbReqRead - PhoneBook not supported" );
                 break;
             }
         }
@@ -591,7 +594,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhon
         ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->
         CreateUiccApplCmdReq( cmdParams );
 TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhoneBookOperationCache::USimPbReqRead;returns ret=%d", ret );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD_TD, "CMmPhoneBookOperationCache::USimPbReqRead;returns ret=%d", ret );
         }
     return ret;
     }
@@ -606,7 +609,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONCACHE_USIMPBREQREAD, "CMmPhon
 void CMmPhoneBookOperationCache::CancelReq( TName& aPhoneBook )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CancelReq");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_CANCELREQ, "CMmPhoneBookOperationCache::CancelReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONCACHE_CANCELREQ_TD, "CMmPhoneBookOperationCache::CancelReq" );
     if( iPhoneBookTypeName == aPhoneBook )
         {
         iPhoneBookStoreCacheArray = NULL;
@@ -625,7 +628,7 @@ TInt CMmPhoneBookOperationCache::UiccReadApplFileInfo(
     const TUint8 aTrId )
     {
 TFLOGSTRING3("TSY: CMmPhoneBookOperationCache::UiccReadApplFileInfo, aTraId: %d, aRecordId: %d", aTrId, aRecordId );
-OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_UICCREADAPPLFILEINFO, "CMmPhoneBookOperationCache::UiccReadApplFileInfo;aFileId=%d;aRecordId=%d", aFileId, aRecordId );
+OstTraceExt2( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONCACHE_UICCREADAPPLFILEINFO_TD, "CMmPhoneBookOperationCache::UiccReadApplFileInfo;aFileId=%d;aRecordId=%d", aFileId, aRecordId );
 
     TInt ret( KErrNone );
 
@@ -661,7 +664,7 @@ OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_UICCREADAPPLFILEINFO, "CM
     else
         {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::UiccReadApplFileInfo MSISDN is not activated on SIM" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONCACHE_UICCREADAPPLFILEINFO, "CMmPhoneBookOperationCache::UiccReadApplFileInfo MSISDN is not activated on SIM" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONCACHE_UICCREADAPPLFILEINFO_TD, "CMmPhoneBookOperationCache::UiccReadApplFileInfo MSISDN is not activated on SIM" );
         }
     return ret;
     }
@@ -677,7 +680,7 @@ TBool CMmPhoneBookOperationCache::HandleUiccReadApplFileInfoResp(
       const TDesC8 &aFileData )
     {
 TFLOGSTRING2("TSY: CMmPhoneBookOperationCache::HandleUiccReadApplFileInfoResp, aStatus: %d", aStatus );
-OstTrace1( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCREADAPPLFILEINFORESP, "CMmPhoneBookOperationCache::HandleUiccReadApplFileInfoResp;aStatus=%d", aStatus );
+OstTrace1( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCREADAPPLFILEINFORESP_TD, "CMmPhoneBookOperationCache::HandleUiccReadApplFileInfoResp;aStatus=%d", aStatus );
 
     TInt ret( KErrNone );
     TBool completed( EFalse );
@@ -832,7 +835,7 @@ OstTrace1( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCREADAPPLFILEINFORE
             default:
                 {
 TFLOGSTRING2("TSY: CMmPhoneBookOperationCache::HandleUiccReadApplFileInfoResp - Unknown iTypeOfReading: %d", iTypeOfReading);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCREADAPPLFILEINFORESP, "CMmPhoneBookOperationCache::HandleUiccReadApplFileInfoResp;Unknown iTypeOfReading=%hhu", iTypeOfReading );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONCACHE_HANDLEUICCREADAPPLFILEINFORESP_TD, "CMmPhoneBookOperationCache::HandleUiccReadApplFileInfoResp;Unknown iTypeOfReading=%hhu", iTypeOfReading );
                 completed = ETrue;
                 break;
                 }
@@ -852,7 +855,7 @@ TInt CMmPhoneBookOperationCache::CheckMSISDNSupport
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CheckMSISDNSupport" );
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_CHECKMSISDNSUPPORT, "CMmPhoneBookOperationCache::CheckMSISDNSupport" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONCACHE_CHECKMSISDNSUPPORT_TD, "CMmPhoneBookOperationCache::CheckMSISDNSupport" );
 
     TInt ret( KErrNotSupported );
 
@@ -878,7 +881,7 @@ void CMmPhoneBookOperationCache::CompleteThisIPC
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationCache::CompleteThisIPC" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONCACHE_CHECKMSISDNSUPPORT, "CMmPhoneBookOperationCache::CheckMSISDNSupport" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONCACHE_CHECKMSISDNSUPPORT_TD, "CMmPhoneBookOperationCache::CheckMSISDNSupport" );
 
     iMmPhoneBookStoreMessHandler->MessageRouter()->Complete(
         aIPCToBeCompleted,
@@ -897,23 +900,17 @@ TInt CMmPhoneBookOperationCache::UiccReadApplFileData(
     const TUint8 aTrId )
     {
 TFLOGSTRING3("TSY: CMmPhoneBookOperationCache::UiccReadApplFileData, aTraId: %d, aRecordId: %d", aTrId, aRecordId );
-OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONCACHE_UICCREADAPPLFILEDATA, "CMmPhoneBookOperationCache::UiccReadApplFileData;aTrId=%d;aRecordId=%d", aTrId, aRecordId );
+OstTraceExt2( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONCACHE_UICCREADAPPLFILEDATA_TD, "CMmPhoneBookOperationCache::UiccReadApplFileData;aTrId=%d;aRecordId=%d", aTrId, aRecordId );
 
     TInt ret( KErrNone );
 
     TUiccReadLinearFixed cmdParams;
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*>
                                ( iMmPhoneBookStoreMessHandler );
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
     cmdParams.filePath.Append( APPL_FILE_ID>>8);
     cmdParams.filePath.Append( APPL_FILE_ID);
-
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
-        {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
-        }
 
     cmdParams.trId = static_cast<TUiccTrId>( aTrId );
     cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;

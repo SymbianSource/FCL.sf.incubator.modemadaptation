@@ -69,7 +69,7 @@ const TUint8 KMaxMobileTelNumberSize = 100;
 CMmPhoneBookOperationWrite::CMmPhoneBookOperationWrite()
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::CMmPhoneBookOperationWrite");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_CMMPHONEBOOKOPERATIONWRITE, "CMmPhoneBookOperationWrite::CMmPhoneBookOperationWrite" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_CMMPHONEBOOKOPERATIONWRITE_TD, "CMmPhoneBookOperationWrite::CMmPhoneBookOperationWrite" );
     iPhoneBookEntry = NULL;
     }
 
@@ -81,7 +81,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_CMMPHONEBOOKOPERATIONWRITE, 
 CMmPhoneBookOperationWrite::~CMmPhoneBookOperationWrite()
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::~CMmPhoneBookOperationWrite");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_CMMPHONEBOOKOPERATIONWRITE, "CMmPhoneBookOperationWrite::~CMmPhoneBookOperationWrite" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_CMMPHONEBOOKOPERATIONWRITE_TD, "CMmPhoneBookOperationWrite::~CMmPhoneBookOperationWrite" );
     }
 
 // ---------------------------------------------------------------------------
@@ -97,7 +97,7 @@ CMmPhoneBookOperationWrite* CMmPhoneBookOperationWrite::NewL(
     TInt aIpc ) // Data
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::NewL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_NEWL, "CMmPhoneBookOperationWrite::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_NEWL_TD, "CMmPhoneBookOperationWrite::NewL" );
 
     TName phonebookTypeName;
 
@@ -133,7 +133,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_NEWL, "CMmPhoneBookOperation
 void CMmPhoneBookOperationWrite::ConstructL()
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_CONSTRUCTL, "CMmPhoneBookOperationWrite::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_CONSTRUCTL_TD, "CMmPhoneBookOperationWrite::ConstructL" );
     }
 
 
@@ -150,7 +150,7 @@ TInt CMmPhoneBookOperationWrite::UICCCreateReq
         )
     {
 TFLOGSTRING2("TSY: CMmPhoneBookOperationWrite::UICCCreateReq Ipc: %d", aIpc);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCCREATEREQ, "CMmPhoneBookOperationWrite::UICCCreateReq;aIpc=%hd", aIpc );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCCREATEREQ_TD, "CMmPhoneBookOperationWrite::UICCCreateReq;aIpc=%hd", aIpc );
     
     TInt ret (KErrNotSupported);
     iSavedIpc = aIpc;
@@ -257,7 +257,7 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCCREATEREQ, "CMmP
             default:
                 {
 TFLOGSTRING2("TSY: CMmPhoneBookOperationWrite::UICCCreateReq Unknown Ipc: %d", aIpc);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONWRITE_UICCCREATEREQ, "CMmPhoneBookOperationWrite::UICCCreateReq;Unknown aIpc =%hd", aIpc );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONWRITE_UICCCREATEREQ_TD, "CMmPhoneBookOperationWrite::UICCCreateReq;Unknown aIpc =%hd", aIpc );
                  
                 break;
                 }
@@ -277,7 +277,7 @@ TInt CMmPhoneBookOperationWrite::UiccPbReqWriteL(
         CPhoneBookStoreEntry& aDataToWrite )
     {
 TFLOGSTRING3("TSY: CMmPhoneBookOperationWrite::SimPbReqWriteL, aTransId:%d,index:%d", aTransId,  aIndex);
-OstTraceExt2( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEL, "CMmPhoneBookOperationWrite::UiccPbReqWriteL;aTransId=%hhu;aIndex=%hd", aTransId, aIndex );
+OstTraceExt2( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEL_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteL;aTransId=%hhu;aIndex=%hd", aTransId, aIndex );
     
     TInt ret( KErrNone );
     
@@ -372,24 +372,25 @@ TInt CMmPhoneBookOperationWrite::UiccPBReqWriteEntry(
              CPhoneBookStoreEntry& aDataToWrite )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPBReqWriteEntry");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEENTRY, "CMmPhoneBookOperationWrite::UiccPBReqWriteEntry" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEENTRY_TD, "CMmPhoneBookOperationWrite::UiccPBReqWriteEntry" );
 
     TInt ret( KErrNone );
     
     TUiccWriteLinearFixed cmdParams;
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*> 
                                ( iMmPhoneBookStoreMessHandler );
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
-    cmdParams.filePath.Append( APPL_FILE_ID>>8);
-    cmdParams.filePath.Append( APPL_FILE_ID);
-    
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
+    if( PB_MBDN_FID == iFileId )
         {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
+        cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
         }
-    
+    else
+        {
+        cmdParams.filePath.Append( APPL_FILE_ID >> 8 );
+        cmdParams.filePath.Append( APPL_FILE_ID );
+        }
+
     cmdParams.serviceType = UICC_APPL_UPDATE_LINEAR_FIXED;
     cmdParams.fileId = iFileId;
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
@@ -472,7 +473,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEENTRY, "CMmPho
         ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->
             CreateUiccApplCmdReq( cmdParams );
 TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEENTRY, "CMmPhoneBookOperationWrite::UiccPBReqWriteEntry;ret=%hd", ret );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEENTRY_TD, "CMmPhoneBookOperationWrite::UiccPBReqWriteEntry;ret=%hd", ret );
         
         }
 
@@ -492,24 +493,26 @@ TInt CMmPhoneBookOperationWrite::UiccPbReqWriteExt(
         CPhoneBookStoreEntry& aDataToWrite )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPbReqWriteExt");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBWRITEEXT, "CMmPhoneBookOperationWrite::UiccPbReqWriteExt" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_UICCPBWRITEEXT_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteExt" );
     
     TInt ret( KErrNone );
     
     TUiccWriteLinearFixed cmdParams;
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*> 
                                 ( iMmPhoneBookStoreMessHandler );
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
-    cmdParams.filePath.Append( APPL_FILE_ID>>8);
-    cmdParams.filePath.Append( APPL_FILE_ID);
-    
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
+    if( ( PB_EXT5_FID == iExtFileId ) ||
+        ( PB_EXT6_FID  == iExtFileId) )
         {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
+        cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
         }
-    
+    else
+        {
+        cmdParams.filePath.Append( APPL_FILE_ID >> 8 );
+        cmdParams.filePath.Append( APPL_FILE_ID );
+        }
+
     cmdParams.fileId = iExtFileId;
     cmdParams.serviceType = UICC_APPL_UPDATE_LINEAR_FIXED;
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
@@ -583,7 +586,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBWRITEEXT, "CMmPhoneBoo
         ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->
             CreateUiccApplCmdReq( cmdParams );
 TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
-OstTraceExt1( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXT, "CMmPhoneBookOperationWrite::UiccPbReqWriteExt;ret=%hd", ret );
+OstTraceExt1( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXT_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteExt;ret=%hd", ret );
         }
     
     return ret;
@@ -603,25 +606,27 @@ TInt CMmPhoneBookOperationWrite::UiccPbReqWriteReadExt(
              TUint8 aTransId)
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPbReqWriteEXTDelete");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREADEXT, "CMmPhoneBookOperationWrite::UiccPbReqWriteReadExt" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREADEXT_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteReadExt" );
     
     TInt ret ( KErrNone );
     
     TUiccReadLinearFixed cmdParams;
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*> 
                                ( iMmPhoneBookStoreMessHandler );
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
-    cmdParams.filePath.Append( APPL_FILE_ID>>8);
-    cmdParams.filePath.Append( APPL_FILE_ID);
-    
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
+    if( ( PB_EXT5_FID == iExtFileId ) ||
+        ( PB_EXT6_FID  == iExtFileId) )
         {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
+        cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
         }
-    
-    // Append transaction id 
+    else
+        {
+        cmdParams.filePath.Append( APPL_FILE_ID >> 8 );
+        cmdParams.filePath.Append( APPL_FILE_ID );
+        }
+
+    // Append transaction id
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
     
     // Append File id
@@ -648,7 +653,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREADEXT, "CMmP
         ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->
             CreateUiccApplCmdReq( cmdParams );
 TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREADEXT, "CMmPhoneBookOperationWrite::UiccPbReqWriteReadExt;ret=%hd", ret );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREADEXT_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteReadExt;ret=%hd", ret );
         }
 
     return ret;
@@ -665,24 +670,25 @@ TInt CMmPhoneBookOperationWrite::UiccPbReqWriteRead(
                      TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPbReqWriteRead");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREAD, "CMmPhoneBookOperationWrite::UiccPbReqWriteRead" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREAD_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteRead" );
     
     TInt ret ( KErrNone );
     
     TUiccReadLinearFixed cmdParams;
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*> 
                                ( iMmPhoneBookStoreMessHandler );
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
-    cmdParams.filePath.Append( APPL_FILE_ID>>8);
-    cmdParams.filePath.Append( APPL_FILE_ID);
-    
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
+    if( PB_MBDN_FID == iExtFileId )
         {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
+        cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
         }
-    
+    else
+        {
+        cmdParams.filePath.Append( APPL_FILE_ID >> 8 );
+        cmdParams.filePath.Append( APPL_FILE_ID );
+        }
+
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
     cmdParams.fileId = iFileId;
     cmdParams.serviceType =  UICC_APPL_READ_LINEAR_FIXED ;
@@ -701,7 +707,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREAD, "CMmPhon
         ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->
             CreateUiccApplCmdReq( cmdParams );
 TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREAD, "CMmPhoneBookOperationWrite::UiccPbReqWriteRead;ret=%hd", ret );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEREAD_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteRead;ret=%hd", ret );
         }
 
     return ret;
@@ -717,7 +723,7 @@ TInt CMmPhoneBookOperationWrite::UiccPbReqWriteExtDelete(
                   TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPbReqWriteEXTDelete");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXTDELETE, "CMmPhoneBookOperationWrite::UiccPbReqWriteEXTDelete" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXTDELETE_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteEXTDelete" );
     
     TInt ret ( KErrNone );
     TBuf8<13>deleteEntryData;
@@ -725,17 +731,19 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXTDELETE, "CM
     TUiccWriteLinearFixed cmdParams;
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*> 
                                ( iMmPhoneBookStoreMessHandler );
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
-    cmdParams.filePath.Append( APPL_FILE_ID>>8);
-    cmdParams.filePath.Append( APPL_FILE_ID);
-    
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
+    if( ( PB_EXT5_FID == iExtFileId ) ||
+        ( PB_EXT6_FID  == iExtFileId) )
         {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
+        cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
         }
-    
+    else
+        {
+        cmdParams.filePath.Append( APPL_FILE_ID >> 8 );
+        cmdParams.filePath.Append( APPL_FILE_ID );
+        }
+
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
     cmdParams.fileId = iExtFileId;
     cmdParams.serviceType =  UICC_APPL_UPDATE_LINEAR_FIXED ;
@@ -765,7 +773,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXTDELETE, "CM
         ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->
             CreateUiccApplCmdReq( cmdParams );
 TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXTDELETE, "CMmPhoneBookOperationWrite::UiccPbReqWriteExtDelete;ret=%hd", ret );
+OstTraceExt1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEEXTDELETE_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteExtDelete;ret=%hd", ret );
         }
 
     return ret ;
@@ -785,7 +793,7 @@ TInt CMmPhoneBookOperationWrite::StartWriteEntryIndex(
         CPhoneBookStoreEntry& aDataToWrite )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::StartWriteForEntryPresentInList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_STARTWRITEFORENTRYPRESENTINLIST, "CMmPhoneBookOperationWrite::StartWriteForEntryPresentInList" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_STARTWRITEFORENTRYPRESENTINLIST_TD, "CMmPhoneBookOperationWrite::StartWriteForEntryPresentInList" );
 
     TInt ret( KErrNone );
     // if Entry present in list Store it locally
@@ -860,23 +868,16 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_STARTWRITEFORENTRYPRESENTINL
 TInt CMmPhoneBookOperationWrite::UiccPbReqReadMBI( TUint8 aOffset, TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPbReqReadMBI");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQREADMBI, "CMmPhoneBookOperationWrite::UiccPbReqReadMBI" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQREADMBI_TD, "CMmPhoneBookOperationWrite::UiccPbReqReadMBI" );
         
         TInt ret ( KErrNone );
         TUiccReadLinearFixed cmdParams;
         cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*> 
                                    ( iMmPhoneBookStoreMessHandler );
-        cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
-        cmdParams.filePath.Append( APPL_FILE_ID>>8);
-        cmdParams.filePath.Append( APPL_FILE_ID);
-        
-        if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
-            {
-            cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-            cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
-            }
-        
+        cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+        cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
+        cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
         cmdParams.trId = static_cast<TUiccTrId>( aTransId );
         cmdParams.fileId = PB_MBI_FID;
         cmdParams.serviceType =  UICC_APPL_READ_LINEAR_FIXED ;
@@ -916,24 +917,17 @@ TInt CMmPhoneBookOperationWrite::UiccPBReqWriteMBIProfile(
         TUint8 aOperationType )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::UiccPBReqWriteMBIProfile");
-OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEMBIPROFILE, "CMmPhoneBookOperationWrite::UiccPBReqWriteMBIProfile" );
+OstTrace0( TRACE_FATAL,  CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEMBIPROFILE_TD, "CMmPhoneBookOperationWrite::UiccPBReqWriteMBIProfile" );
 
     TInt ret ( KErrNone );
     
     TUiccWriteLinearFixed cmdParams;
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*> 
                                ( iMmPhoneBookStoreMessHandler );
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
-    cmdParams.filePath.Append( APPL_FILE_ID>>8);
-    cmdParams.filePath.Append( APPL_FILE_ID);
-    
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
-        {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
-        }
-    
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
+    cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
     cmdParams.fileId = PB_MBI_FID;
     cmdParams.serviceType =  UICC_APPL_READ_LINEAR_FIXED ;
@@ -972,7 +966,7 @@ TBool CMmPhoneBookOperationWrite::HandleUICCPbRespL(
     TInt aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleUICCPbRespL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationWrite::HandleUICCPbRespL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationWrite::HandleUICCPbRespL" );
     
     TBool complete ( EFalse );
     TInt ret ( KErrNone );
@@ -1036,7 +1030,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMmPhone
         default:
             {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleSimPbRespL - NO such Write operation Phase supported ");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationWrite::HandleUICCPbRespL - No such write operation phase supported" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationWrite::HandleUICCPbRespL - No such write operation phase supported" );
             break;
             }
         }
@@ -1130,7 +1124,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMm
             default:
                 {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleSimPbRespL - unknown Ipc ");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL, "CMmPhoneBookOperationWrite::HandleUICCPbRespL - unknown Ipc" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONWRITE_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationWrite::HandleUICCPbRespL - unknown Ipc" );
                 break;
                 }
             }
@@ -1152,7 +1146,7 @@ TInt CMmPhoneBookOperationWrite::HandleWriteReadEntryResp(
     TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteReadEntryResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteReadEntryResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADENTRYRESP_TD, "CMmPhoneBookOperationWrite::HandleWriteReadEntryResp" );
     TInt ret ( KErrNone );
     
     if( UICC_STATUS_OK == aStatus )
@@ -1291,7 +1285,7 @@ TInt CMmPhoneBookOperationWrite::HandleWriteReadExtEntryResp(
     TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteReadExtEntryResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteReadExtEntryResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEREADEXTENTRYRESP_TD, "CMmPhoneBookOperationWrite::HandleWriteReadExtEntryResp" );
     TInt ret ( KErrNone );
     
     if( UICC_STATUS_OK == aStatus )
@@ -1404,7 +1398,7 @@ TInt CMmPhoneBookOperationWrite::HandleWriteSearchExtEntryResp(
     TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteSearchExtEntryResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITESEARCHEXTENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteSearchExtEntryResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITESEARCHEXTENTRYRESP_TD, "CMmPhoneBookOperationWrite::HandleWriteSearchExtEntryResp" );
     TInt ret ( KErrNone );
 
     if( UICC_STATUS_OK == aStatus)
@@ -1518,7 +1512,7 @@ TInt CMmPhoneBookOperationWrite::HandleWriteEntryResp(
     TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteEntryResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteEntryResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEENTRYRESP_TD, "CMmPhoneBookOperationWrite::HandleWriteEntryResp" );
     TInt ret ( KErrNone );
 
     if( UICC_STATUS_OK == aStatus )
@@ -1620,7 +1614,7 @@ TInt CMmPhoneBookOperationWrite::HandleWriteExtEntryResp(
     TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteExtEntryResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP, "CMmPhoneBookOperationWrite::HandleWriteExtEntryResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEEXTENTRYRESP_TD, "CMmPhoneBookOperationWrite::HandleWriteExtEntryResp" );
     TInt ret ( KErrNone );
     
     if( UICC_STATUS_OK  == aStatus )
@@ -1778,7 +1772,7 @@ TInt CMmPhoneBookOperationWrite::HandleWriteMBIReadResp(
     {
     TInt ret ( KErrNone );
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteMBIReadResp");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEMBIREADRESP, "CMmPhoneBookOperationWrite::HandleWriteMBIReadResp" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEMBIREADRESP_TD, "CMmPhoneBookOperationWrite::HandleWriteMBIReadResp" );
 
 
     if( UICC_STATUS_OK  == aStatus )
@@ -1814,7 +1808,7 @@ TInt CMmPhoneBookOperationWrite::HandleWriteMBIWriteResp(
     {
     TInt ret ( KErrNone );
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::HandleWriteMBIWriteResp");
-OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEMBIWRITERESP, "CMmPhoneBookOperationWrite::HandleWriteMBIWriteResp" );
+OstTrace0( TRACE_FATAL,  CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEMBIWRITERESP_TD, "CMmPhoneBookOperationWrite::HandleWriteMBIWriteResp" );
 
     if( UICC_STATUS_OK  == aStatus )
         {
@@ -1851,7 +1845,7 @@ OstTrace0( TRACE_FATAL, CMMPHONEBOOKOPERATIONWRITE_HANDLEWRITEMBIWRITERESP, "CMm
 void CMmPhoneBookOperationWrite::GetExtRecNum( TUint8 &aExtRecordNo )
 {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::GetExtRecNum");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEMSISDN, "CMmPhoneBookOperationWrite::UiccPbReqWriteMsisdn" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONWRITE_UICCPBREQWRITEMSISDN_TD, "CMmPhoneBookOperationWrite::UiccPbReqWriteMsisdn" );
 
 
     if( UICC_EF_FDN_NO_EXT_NUM_LEN < iPhoneBookEntry->iNumber->Length() )
@@ -1887,7 +1881,7 @@ TInt CMmPhoneBookOperationWrite::CheckForExtRecordNum(
         TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::CheckForExtRecordNum");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_CHECKFOREXTRECORDNUM, "CMmPhoneBookOperationWrite::CheckForExtRecordNum" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_CHECKFOREXTRECORDNUM_TD, "CMmPhoneBookOperationWrite::CheckForExtRecordNum" );
 
     TInt ret( KErrNone );
     
@@ -1933,7 +1927,7 @@ TInt CMmPhoneBookOperationWrite::ContinueWriteEntry(
         CPhoneBookStoreEntry& aDataToWrite )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::ContinueWriteEntry");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_CONTINUEWRITEENTRY, "CMmPhoneBookOperationWrite::ContinueWriteEntry" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_CONTINUEWRITEENTRY_TD, "CMmPhoneBookOperationWrite::ContinueWriteEntry" );
 
     TInt ret( KErrNone );
     
@@ -1992,7 +1986,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_CONTINUEWRITEENTRY, "CMmPhon
 void CMmPhoneBookOperationWrite::CopyData( const TDesC16& aSource, TDes16& aTarget )
 {
 TFLOGSTRING("TSY: CMmPhoneBookOperationWrite::CopyData");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONWRITE_COPYDATA, "CMmPhoneBookOperationWrite::CopyData" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONWRITE_COPYDATA_TD, "CMmPhoneBookOperationWrite::CopyData" );
 
 TInt temp ( aSource.Length() );
 TInt temp1( aTarget.MaxLength() );

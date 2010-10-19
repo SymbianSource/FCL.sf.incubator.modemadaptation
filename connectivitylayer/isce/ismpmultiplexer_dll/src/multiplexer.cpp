@@ -75,8 +75,12 @@ DMultiplexer::~DMultiplexer(
         temp = NULL;
         iShMultiplexers[ i ] = NULL;
         }
-    // No need to check, either we have it or we had reboted.
-    iShMultiplexersMutex->Close( NULL );
+        
+    if ( iShMultiplexersMutex )
+        {
+        iShMultiplexersMutex->Close( NULL );
+        }
+        
     C_TRACE( ( _T( "DMultiplexer::~DMultiplexer<" ) ) );
 
     }

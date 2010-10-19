@@ -23,9 +23,7 @@
 #include "cmmpacketservicemesshandler.h"
 #include "cmmpacketmesshandlercontextlist.h"
 #include <tisi.h>
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
 #include <nsisi.h>
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 #include "tsylogger.h"
 #include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
@@ -69,7 +67,7 @@ CMmPipeControl::CMmPipeControl()
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::CMmPipeControl");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_CMMPIPECONTROL, "CMmPipeControl::CMmPipeControl" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_CMMPIPECONTROL_TD, "CMmPipeControl::CMmPipeControl" );
     }
 
 // -----------------------------------------------------------------------------
@@ -81,7 +79,7 @@ CMmPipeControl::~CMmPipeControl()
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::~CMmPipeControl");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPIPECONTROL_CMMPIPECONTROL, "CMmPipeControl::~CMmPipeControl" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_CMMPIPECONTROL_TD, "CMmPipeControl::~CMmPipeControl" );
     }
 
 // ----------------------------------------------------------------------------
@@ -97,7 +95,7 @@ CMmPipeControl* CMmPipeControl::NewL(
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::NewL");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_NEWL, "CMmPipeControl::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_NEWL_TD, "CMmPipeControl::NewL" );
 
     CMmPipeControl* mmPipeControl = new ( ELeave ) CMmPipeControl();
 
@@ -113,6 +111,8 @@ OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_NEWL, "CMmPipeControl::NewL" );
     aPhoNetReceiver->RegisterL( mmPipeControl, PN_PIPE, PNS_PIPE_ENABLE_RESP );
     aPhoNetReceiver->RegisterL( mmPipeControl, PN_PIPE, PNS_PIPE_RESET_RESP );
     aPhoNetReceiver->RegisterL( mmPipeControl, PN_PIPE, PNS_PIPE_REMOVE_RESP );
+    aPhoNetReceiver->RegisterL( mmPipeControl, PN_PIPE, PNS_PIPE_REDIRECT_RESP );
+    aPhoNetReceiver->RegisterL( mmPipeControl, PN_PIPE, PNS_PEP_CTRL_RESP );
 
 #ifdef DUMMY_NIF_PEP_FOR_PACKET_DATA_TESTING_DOS
 
@@ -123,10 +123,6 @@ OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_NEWL, "CMmPipeControl::NewL" );
 
 #endif //DUMMY_NIF_PEP_FOR_PACKET_DATA_TESTING_DOS
 
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-   aPhoNetReceiver->
-        RegisterL( mmPipeControl, PN_NAMESERVICE, PNS_NAME_QUERY_RESP );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
     CleanupStack::Pop( mmPipeControl );
 
@@ -142,15 +138,12 @@ void CMmPipeControl::ConstructL()
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_CONSTRUCTL, "CMmPipeControl::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_CONSTRUCTL_TD, "CMmPipeControl::ConstructL" );
 
     iSecondPepDeviceId = KSecondPepDevice; // Default Device Id of second PEP
     iSecondPepObjectId = KSecondPepObject; // Default Object Id of second PEP
 
     InitLists();
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-   PnsNameQueryReq();
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
     }
 
 // -----------------------------------------------------------------------------
@@ -165,7 +158,7 @@ void CMmPipeControl::ReceiveMessageL( const TIsiReceiveC& aIsiMessage )
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
     TFLOGSTRING3("TSY: CMmPipeControl::ReceiveMessageL - resource: %d, msgId: %d", resource, messageId);
-OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_RECEIVEMESSAGEL, "CMmPipeControl::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
+OstTraceExt2( TRACE_NORMAL,  CMMPIPECONTROL_RECEIVEMESSAGEL_TD, "CMmPipeControl::ReceiveMessageL;resource=%d;messageId=%d", resource, messageId );
 
     switch ( resource )
         {
@@ -191,6 +184,16 @@ OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_RECEIVEMESSAGEL, "CMmPipeControl::Rec
                 case PNS_PIPE_REMOVE_RESP:
                     {
                     PnsPipeRemoveResp( aIsiMessage );
+                    break;
+                    }
+                case PNS_PIPE_REDIRECT_RESP:
+                    {
+                    PnsPipeRedirectResp( aIsiMessage );
+                    break;
+                    }
+                case PNS_PEP_CTRL_RESP:
+                    {
+                    PnsPepCtrlResp( aIsiMessage );
                     break;
                     }
 
@@ -221,38 +224,17 @@ OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_RECEIVEMESSAGEL, "CMmPipeControl::Rec
                     {
 
                     TFLOGSTRING2("TSY: CMmPipeControl::ReceiveMessageL - PN_PIPE - unknown msgId: %d", messageId);
-OstTrace1( TRACE_NORMAL, DUP1_CMMPIPECONTROL_RECEIVEMESSAGEL, "CMmPipeControl::ReceiveMessageL;unknown messageId=%d", messageId );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_RECEIVEMESSAGEL_TD, "CMmPipeControl::ReceiveMessageL;unknown messageId=%d", messageId );
                     break;
                     }
                 }
             break;
             }
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-        case PN_NAMESERVICE:
-            {
-            switch( messageId )
-                {
-                case PNS_NAME_QUERY_RESP:
-                    {
-                    PnsNameQueryResp( aIsiMessage );
-                    break;
-                    }
-                default:
-                    {
-
-                    TFLOGSTRING2("TSY: CMmPipeControl::ReceiveMessageL - PN_NAMESERVICE - unknown msgId: %d", messageId);
-OstTrace1( TRACE_NORMAL, DUP2_CMMPIPECONTROL_RECEIVEMESSAGEL, "CMmPipeControl::ReceiveMessageL;unknown messageId=%d", messageId );
-                    break;
-                    }
-                }
-            break;
-            }
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
         default:
             {
 
             TFLOGSTRING2("TSY: CMmPipeControl::ReceiveMessageL - unknown resource: %d", resource);
-OstTrace1( TRACE_NORMAL, DUP3_CMMPIPECONTROL_RECEIVEMESSAGEL, "CMmPipeControl::ReceiveMessageL;unknown resource=%d", resource );
+OstTrace1( TRACE_NORMAL,  DUP3_CMMPIPECONTROL_RECEIVEMESSAGEL_TD, "CMmPipeControl::ReceiveMessageL;unknown resource=%d", resource );
             break; // server not known
             }
         } // end of switch
@@ -267,7 +249,7 @@ void CMmPipeControl::InitLists()
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::InitLists");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_INITLISTS, "CMmPipeControl::InitLists" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_INITLISTS_TD, "CMmPipeControl::InitLists" );
 
     // Find PipeHandle id from Pipe Operation by PipeHandle List
     for ( TInt i = 0; i < KMmMaxNumberOfPipeHandles; i++ )
@@ -290,7 +272,7 @@ void CMmPipeControl::SetPipeHandle(
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::SetPipeHandle");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_SETPIPEHANDLE, "CMmPipeControl::SetPipeHandle" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_SETPIPEHANDLE_TD, "CMmPipeControl::SetPipeHandle" );
 
     // Find PipeHandle id from Pipe Operation by PipeHandle List
     for ( TInt i = 0; i < KMmMaxNumberOfPipeHandles; i++ )
@@ -318,7 +300,7 @@ void CMmPipeControl::SetTransactionId(
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::SetTransactionId");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_SETTRANSACTIONID, "CMmPipeControl::SetTransactionId" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_SETTRANSACTIONID_TD, "CMmPipeControl::SetTransactionId" );
 
     // Find PipeHandle id from Pipe Operation by PipeHandle List
     for ( TInt i = 0; i < KMmMaxNumberOfPipeHandles; i++ )
@@ -345,7 +327,7 @@ TUint8 CMmPipeControl::TransactionId(
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::TransactionId");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_TRANSACTIONID, "CMmPipeControl::TransactionId" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_TRANSACTIONID_TD, "CMmPipeControl::TransactionId" );
 
     TUint8 transId( 0 );
 
@@ -376,7 +358,7 @@ void CMmPipeControl::ResetPipeHandle(
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::ResetPipeHandle");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_RESETPIPEHANDLE, "CMmPipeControl::ResetPipeHandle" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_RESETPIPEHANDLE_TD, "CMmPipeControl::ResetPipeHandle" );
 
     // Find PipeHandle id from Pipe Operation by PipeHandle List
     for ( TInt i = 0; i < KMmMaxNumberOfPipeHandles; i++ )
@@ -405,7 +387,7 @@ TBool CMmPipeControl::IsOperationCalled(
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::IsOperationCalled");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_ISOPERATIONCALLED, "CMmPipeControl::IsOperationCalled" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_ISOPERATIONCALLED_TD, "CMmPipeControl::IsOperationCalled" );
 
     TBool ret( EFalse);
 
@@ -422,91 +404,6 @@ OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_ISOPERATIONCALLED, "CMmPipeControl::IsOp
     return ret;
     }
 
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-// ----------------------------------------------------------------------------
-// CMmPipeControl::PnsNameQueryReq
-// Construct a PNS_NAME_QUERY_REQ ISI-message
-// ----------------------------------------------------------------------------
-//
-TInt CMmPipeControl::PnsNameQueryReq() const
-    {
-
-    TFLOGSTRING("TSY: CMmPipeControl::PnsNameQueryReq");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_PNSNAMEQUERYREQ, "CMmPipeControl::PnsNameQueryReq" );
-
-    // create buffer for isi msg data
-    TBuf8<SIZE_PNS_NAME_QUERY_REQ> data;
-    // set message data
-    data.Append( KGpdsPadding ); // Padding byte
-    data.Append( KGpdsPadding ); // Padding byte
-    data.Append( KGpdsPadding ); // Padding byte
-    data.Append( KGpdsPadding ); // Padding byte
-    data.Append( KGpdsPadding ); // Padding byte
-    data.Append( PN_GPRS  ); // Gprs server
-    data.Append( KGpdsPadding ); // Padding byte
-    data.Append( KGpdsPadding ); // Padding byte
-    data.Append( KGpdsPadding ); // Padding byte
-    data.Append( PN_GPRS  ); // Gprs server
-
-    // set dummyTransactionId value to 0x0F
-    TUint8 dummyTransactionId( KDummyTrId );
-
-    // Sending message to phonet
-    return iPhoNetSender->Send(
-        PN_NAMESERVICE, dummyTransactionId, PNS_NAME_QUERY_REQ, data );
-    }
-
-// ----------------------------------------------------------------------------
-// CMmPipeControl::PnsNameQueryResp
-// Breaks a PNS_NAME_QUERY_RESP ISI-message
-// ----------------------------------------------------------------------------
-//
-void CMmPipeControl::PnsNameQueryResp(
-    const TIsiReceiveC& aIsiMessage )
-    {
-
-    TUint16 matchesInThisMsg( aIsiMessage.Get16bit(
-        ISI_HEADER_SIZE + PNS_NAME_QUERY_RESP_OFFSET_MATCHESINMSG ) );
-
-    TFLOGSTRING2("TSY: CMmPipeControl::PnsNameQueryResp - matches in this msg: %d", matchesInThisMsg);
-OstTraceExt1( TRACE_NORMAL, CMMPIPECONTROL_PNSNAMEQUERYRESP, "CMmPipeControl::PnsNameQueryResp;matchesInThisMsg=%hu", matchesInThisMsg );
-
-    if ( 0 < matchesInThisMsg )
-        {
-        for ( TInt i = 0; i < matchesInThisMsg; i++ )
-            {
-            // each match is represented as 8-byte record =>
-            // recordIndex = i * SIZE_PN_NAME_SRV_ITEM_STR
-            // name is 4 bytes =>
-            // last byte index = PN_NAME_SRV_ITEM_STR_OFFSET_NAME + KLastByteIndex
-            TInt recordIndex( i * SIZE_PN_NAME_SRV_ITEM_STR );
-            TUint8 name( aIsiMessage.Get8bit(
-                ISI_HEADER_SIZE + PNS_NAME_QUERY_RESP_OFFSET_NAMEENTRYTBL +
-                recordIndex + ( PN_NAME_SRV_ITEM_STR_OFFSET_NAME + KLastByteIndex ) ) );
-            if ( PN_GPRS == name )
-                {
-                // Get and store SecondPepDevice id and SecondPepObject id
-                iSecondPepDeviceId = aIsiMessage.Get8bit(
-                    ISI_HEADER_SIZE + PNS_NAME_QUERY_RESP_OFFSET_NAMEENTRYTBL +
-                    recordIndex + PN_NAME_SRV_ITEM_STR_OFFSET_DEV );
-                iSecondPepObjectId = aIsiMessage.Get8bit(
-                    ISI_HEADER_SIZE + PNS_NAME_QUERY_RESP_OFFSET_NAMEENTRYTBL +
-                    recordIndex + PN_NAME_SRV_ITEM_STR_OFFSET_OBJ );
-                // then find right server, stop finding
-                i = matchesInThisMsg;
-
-                TFLOGSTRING3("TSY: CMmPipeControl::PnsNameQueryResp. SecondPepDeviceId: %d SecondPepObjectId: %d", iSecondPepDeviceId, iSecondPepObjectId );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSNAMEQUERYRESP, "CMmPipeControl::PnsNameQueryResp;iSecondPepDeviceId=%hhu;iSecondPepObjectId=%hhu", iSecondPepDeviceId, iSecondPepObjectId );
-
-                }
-            //no else
-            }
-        }
-    //no else
-    }
-
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
 // ----------------------------------------------------------------------------
 // CMmPipeControl::PnsPipeCreateReq
 // Construct a PNS_PIPE_CREATE_REQ ISI-message
@@ -519,14 +416,11 @@ TInt CMmPipeControl::PnsPipeCreateReq(
     {
 
     TFLOGSTRING2("TSY: CMmPipeControl::PnsPipeCreateReq. TransactionId: %d", aTransId );
-OstTraceExt1( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPECREATEREQ, "CMmPipeControl::PnsPipeCreateReq;aTransId=%hhu", aTransId );
+OstTraceExt1( TRACE_NORMAL,  CMMPIPECONTROL_PNSPIPECREATEREQ_TD, "CMmPipeControl::PnsPipeCreateReq;aTransId=%hhu", aTransId );
 
     // create buffer for isi msg data
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     TBuf8<SIZE_PNS_PIPE_CREATE_REQ> data;
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PIPE_CREATE_REQ> data;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
+
     // set message data
     data.Append( aPipeState );
     data.Append( KGpdsPadding );
@@ -553,7 +447,7 @@ void CMmPipeControl::PnsPipeCreateResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmPipeControl::PnsPipeCreateResp");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPECREATERESP, "CMmPipeControl::PnsPipeCreateResp" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_PNSPIPECREATERESP_TD, "CMmPipeControl::PnsPipeCreateResp" );
 
     // Get transaction Id
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
@@ -562,35 +456,22 @@ OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPECREATERESP, "CMmPipeControl::PnsP
 
     if ( KErrNone == ret )
         {
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
         TUint8 pipeHandle( aIsiMessage.Get8bit(
             ISI_HEADER_SIZE + PNS_PIPE_CREATE_RESP_OFFSET_PIPEHANDLE ) );
         TUint8 errorCode( aIsiMessage.Get8bit(
             ISI_HEADER_SIZE + PNS_PIPE_CREATE_RESP_OFFSET_ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-        TUint8 pipeHandle( aIsiMessage.Get8bit(
-            ISI_HEADER_SIZE + CM_PIPE_CREATE_RESP_OFFSET_PIPEHANDLE ) );
-        TUint8 errorCode( aIsiMessage.Get8bit(
-            ISI_HEADER_SIZE + CM_PIPE_CREATE_RESP_OFFSET_ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
         TFLOGSTRING4("TSY: CMmPipeControl::PnsPipeCreateResp. TransactionId: %d, PipeHandle: %d, error code: %d", transId, pipeHandle, errorCode );
-OstTraceExt3( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPECREATERESP, "CMmPipeControl::PnsPipeCreateResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, pipeHandle, errorCode );
+OstTraceExt3( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPIPECREATERESP_TD, "CMmPipeControl::PnsPipeCreateResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, pipeHandle, errorCode );
 
         // Check PIPE Error Code
         if ( PN_PIPE_ERR_GENERAL == errorCode )
             {
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
             TUint8 pep1ErrorCode( aIsiMessage.Get8bit(
                 ISI_HEADER_SIZE + PNS_PIPE_CREATE_RESP_OFFSET_PEP1ERRORCODE ) );
             TUint8 pep2ErrorCode( aIsiMessage.Get8bit(
                 ISI_HEADER_SIZE + PNS_PIPE_CREATE_RESP_OFFSET_PEP2ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            TUint8 pep1ErrorCode( aIsiMessage.Get8bit(
-                ISI_HEADER_SIZE + CM_PIPE_CREATE_RESP_OFFSET_PEP1ERRORCODE ) );
-            TUint8 pep2ErrorCode( aIsiMessage.Get8bit(
-                ISI_HEADER_SIZE + CM_PIPE_CREATE_RESP_OFFSET_PEP2ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
+
              // Check PEP Error Codes
            if ( pep1ErrorCode == PN_PIPE_ERR_PEP_IN_USE ||
                  pep1ErrorCode == PN_PIPE_ERR_ALL_PIPES_IN_USE ||
@@ -599,7 +480,7 @@ OstTraceExt3( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPECREATERESP, "CMmPipeContr
                 {
 
                 TFLOGSTRING("TSY: CMmPipeControl::PnsPipeCreateResp. ErrorCode changed to PN_PIPE_ERR_ALL_PIPES_IN_USE" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMPIPECONTROL_PNSPIPECREATERESP, "CMmPipeControl::PnsPipeCreateResp, ErrorCode changed to PN_PIPE_ERR_ALL_PIPES_IN_USE" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPIPECONTROL_PNSPIPECREATERESP_TD, "CMmPipeControl::PnsPipeCreateResp, ErrorCode changed to PN_PIPE_ERR_ALL_PIPES_IN_USE" );
                 // PEP can't create more pipes (all pipes in use),
                 // error value is updated here
                 errorCode = PN_PIPE_ERR_ALL_PIPES_IN_USE;
@@ -623,46 +504,23 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPIPECONTROL_PNSPIPECREATERESP, "CMmPipeControl:
 // ----------------------------------------------------------------------------
 //
 TInt CMmPipeControl::PnsPipeEnableReq(
-    const CMmDataPackage& aPackage ) const
+    TUint8 aPipeHandle,
+    TUint8 aTransId ) const
     {
-TFLOGSTRING("TSY: CMmPipeControl::PnsPipeEnableReq");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPEENABLEREQ, "CMmPipeControl::PnsPipeEnableReq" );
-
-    TInfoName* contextName = NULL;
-    aPackage.UnPackData( &contextName );
+    TFLOGSTRING3("TSY: CMmPipeControl::PnsPipeEnableReq( aPipeHandle:0x%x, aTransId:0x%x )", aPipeHandle, aTransId );
+    OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_PNSPIPEENABLEREQ_TD, "CMmPipeControl::PnsPipeEnableReq" );
 
     TInt ret( KErrServerBusy );
-
-    if( NULL != contextName )
+    // Check if Pipe operation is not outstanding. IsOperationCalled is EFalse
+    if ( !IsOperationCalled( aPipeHandle ) )
         {
-
-        TFLOGSTRING2("TSY: CMmPipeControl::PnsPipeEnableReq - context name: %S", contextName);
-OstTraceExt1( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPEENABLEREQ, "CMmPipeControl::PnsPipeEnableReq;contextName=%S", *contextName );
-
-        TUint8 pipehandle( iContextList->PipeHandleByContextName(contextName) );
-
-        TUint8 traId( iContextList->ProxyIdByContextName( contextName ) );
-
-        TFLOGSTRING2("TSY: CMmPipeControl::PnsPipeEnableReq. PipeHandle: %d", pipehandle );
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMPIPECONTROL_PNSPIPEENABLEREQ, "CMmPipeControl::PnsPipeEnableReq;pipehandle=%hhu", pipehandle );
-
-        // Check if Pipe operation is not outstanding. IsOperationCalled is EFalse
-        if ( !IsOperationCalled( pipehandle ) )
-            {
-            // Create buffer for isi msg data
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
-            TBuf8<SIZE_PNS_PIPE_ENABLE_REQ> data;
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            TBuf8<SIZE_CM_PIPE_ENABLE_REQ> data;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            data.Append( pipehandle );
-            data.Append( KGpdsPadding );
-
-            // Send Isi message via phonet
-            ret = iPhoNetSender->Send(
-                PN_PIPE, traId, PNS_PIPE_ENABLE_REQ, data );
-            }
-        //no else
+        // Create buffer for isi msg data
+        TBuf8<SIZE_PNS_PIPE_ENABLE_REQ> data;
+        data.Append( aPipeHandle );
+        data.Append( KGpdsPadding );
+        // Send Isi message via phonet
+        ret = iPhoNetSender->Send(
+            PN_PIPE, aTransId, PNS_PIPE_ENABLE_REQ, data );
         }
     //no else
 
@@ -678,7 +536,7 @@ void CMmPipeControl::PnsPipeEnableResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmPipeControl::PnsPipeEnableResp");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPEENABLERESP, "CMmPipeControl::PnsPipeEnableResp" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPIPEENABLERESP_TD, "CMmPipeControl::PnsPipeEnableResp" );
     // Get Transaction Id from the ISI message
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
 
@@ -689,20 +547,13 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPEENABLERESP, "CMmPipeControl:
         {
         // Get Pipehandle from the ISI message
         TUint8 pipeHandle( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
             ISI_HEADER_SIZE + PNS_PIPE_ENABLE_RESP_OFFSET_PIPEHANDLE ) );
         // Get Errorcode from the ISI message
         TUint8 errorCode( aIsiMessage.Get8bit(
             ISI_HEADER_SIZE + PNS_PIPE_ENABLE_RESP_OFFSET_ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_ENABLE_RESP_OFFSET_PIPEHANDLE ) );
-        // Get Errorcode from the ISI message
-        TUint8 errorCode( aIsiMessage.Get8bit(
-            ISI_HEADER_SIZE + CM_PIPE_ENABLE_RESP_OFFSET_ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
 TFLOGSTRING4("TSY: CMmPipeControl::PnsPipeEnableResp - traId: %d, PipeHandle: %d, ErrorCode: %d", transId, pipeHandle, errorCode );
-OstTraceExt3( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPEENABLERESP, "CMmPipeControl::PnsPipeEnableResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, pipeHandle, errorCode );
+OstTraceExt3( TRACE_NORMAL,  CMMPIPECONTROL_PNSPIPEENABLERESP_TD, "CMmPipeControl::PnsPipeEnableResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, pipeHandle, errorCode );
 
         iContextMessHandler->CompletePipeOperation(
             PNS_PIPE_ENABLE_RESP,
@@ -724,7 +575,7 @@ TInt CMmPipeControl::PnsPipeResetReq(
     const TUint8 aStateAfterReset )
     {
 TFLOGSTRING2("TSY: CMmPipeControl::PnsPipeResetReq. PipeHandle: %d", aPipeHandle );
-OstTraceExt1( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPERESETREQ, "CMmPipeControl::PnsPipeResetReq;aPipeHandle=%hhu", aPipeHandle );
+OstTraceExt1( TRACE_NORMAL,  CMMPIPECONTROL_PNSPIPERESETREQ_TD, "CMmPipeControl::PnsPipeResetReq;aPipeHandle=%hhu", aPipeHandle );
 
     // Set ret to KErrServerBusy
     TInt ret( KErrServerBusy );
@@ -733,11 +584,8 @@ OstTraceExt1( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPERESETREQ, "CMmPipeControl::Pns
     if ( !IsOperationCalled( aPipeHandle ) )
         {
         // Create buffer for isi msg data
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
         TBuf8<SIZE_PNS_PIPE_RESET_REQ> data;
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-        TBuf8<SIZE_CM_PIPE_RESET_REQ> data;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
+
         data.Append( aPipeHandle );
         data.Append( aStateAfterReset );
 
@@ -765,7 +613,7 @@ void CMmPipeControl::PnsPipeResetResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmPipeControl::PnsPipeResetResp");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPIPECONTROL_PNSPIPERESETRESP, "CMmPipeControl::PnsPipeResetResp" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPIPECONTROL_PNSPIPERESETRESP_TD, "CMmPipeControl::PnsPipeResetResp" );
     // Get Transaction Id from the ISI message
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
 
@@ -776,14 +624,10 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPIPECONTROL_PNSPIPERESETRESP, "CMmPipeControl::
         {
         // Get Pipehandle from the ISI message
         TUint8 pipeHandle( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
             ISI_HEADER_SIZE + PNS_PIPE_RESET_RESP_OFFSET_PIPEHANDLE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-            ISI_HEADER_SIZE + CM_PIPE_RESET_RESP_OFFSET_PIPEHANDLE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
 TFLOGSTRING3("TSY: CMmPipeControl::PnsPipeResetResp - traId: %d, pipe handle: %d", transId, pipeHandle);
-OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPERESETRESP, "CMmPipeControl::PnsPipeResetResp;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
+OstTraceExt2( TRACE_NORMAL,  CMMPIPECONTROL_PNSPIPERESETRESP_TD, "CMmPipeControl::PnsPipeResetResp;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
 
         // Call TransactionId
         TUint8 removeTransId( TransactionId( pipeHandle ) );
@@ -803,14 +647,10 @@ OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPERESETRESP, "CMmPipeControl::Pn
         if ( KErrNone == ret )
             {
             TUint8 errorCode( aIsiMessage.Get8bit(
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
                 ISI_HEADER_SIZE + PNS_PIPE_RESET_RESP_OFFSET_ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-                ISI_HEADER_SIZE + CM_PIPE_RESET_RESP_OFFSET_ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
 TFLOGSTRING3("TSY: CMmPipeControl::PnsPipeResetResp. PipeHandle: %d ErrorCode: %d", pipeHandle, errorCode );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPERESETRESP, "CMmPipeControl::PnsPipeResetResp;pipeHandle=%hhu;errorCode=%hhu", pipeHandle, errorCode );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPIPERESETRESP_TD, "CMmPipeControl::PnsPipeResetResp;pipeHandle=%hhu;errorCode=%hhu", pipeHandle, errorCode );
             iContextMessHandler->CompletePipeOperation(
                 PNS_PIPE_RESET_RESP,
                 transId,
@@ -832,7 +672,7 @@ TInt CMmPipeControl::PnsPipeRemoveReq(
     const TUint8 aPipeHandle )
     {
 TFLOGSTRING2("TSY: CMmPipeControl::PnsPipeRemoveReq. PipeHandle: %d", aPipeHandle );
-OstTraceExt1( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPEREMOVEREQ, "CMmPipeControl::PnsPipeRemoveReq;aPipeHandle=%hhu", aPipeHandle );
+OstTraceExt1( TRACE_NORMAL,  CMMPIPECONTROL_PNSPIPEREMOVEREQ_TD, "CMmPipeControl::PnsPipeRemoveReq;aPipeHandle=%hhu", aPipeHandle );
 
     // Set ret to KErrNone
     TInt ret( KErrNone );
@@ -841,11 +681,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPEREMOVEREQ, "CMmPipeControl::Pn
     if ( !IsOperationCalled( aPipeHandle ) )
         {
         // Create buffer for isi msg data
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
         TBuf8<SIZE_PNS_PIPE_REMOVE_REQ> data;
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-        TBuf8<SIZE_CM_PIPE_REMOVE_REQ> data;
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
         data.Append( aPipeHandle );
         data.Append( KGpdsPadding );
 
@@ -880,7 +716,7 @@ void CMmPipeControl::PnsPipeRemoveResp(
     const TIsiReceiveC& aIsiMessage )
     {
 TFLOGSTRING("TSY: CMmPipeControl::PnsPipeRemoveResp");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPEREMOVERESP, "CMmPipeControl::PnsPipeRemoveResp" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPIPEREMOVERESP_TD, "CMmPipeControl::PnsPipeRemoveResp" );
     // Get Transaction Id from the ISI message
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
 
@@ -890,22 +726,14 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPEREMOVERESP, "CMmPipeControl:
     if ( KErrNone == ret )
         {
         // Get Pipehandle from the ISI message
-#ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
         TUint8 pipeHandle( aIsiMessage.Get8bit(
             ISI_HEADER_SIZE + PNS_PIPE_REMOVE_RESP_OFFSET_PIPEHANDLE ) );
         // Get Errorcode from the ISI message
         TUint8 errorCode( aIsiMessage.Get8bit(
             ISI_HEADER_SIZE + PNS_PIPE_REMOVE_RESP_OFFSET_ERRORCODE ) );
-#else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-        TUint8 pipeHandle( aIsiMessage.Get8bit(
-            ISI_HEADER_SIZE + CM_PIPE_REMOVE_RESP_OFFSET_PIPEHANDLE ) );
-        // Get Errorcode from the ISI message
-        TUint8 errorCode( aIsiMessage.Get8bit(
-            ISI_HEADER_SIZE + CM_PIPE_REMOVE_RESP_OFFSET_ERRORCODE ) );
-#endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
         TFLOGSTRING4("TSY: CMmPipeControl::PnsPipeRemoveResp - traId: %d, PipeHandle: %d, ErrorCode: %d", transId, pipeHandle, errorCode );
-    OstTraceExt3( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPEREMOVERESP, "CMmPipeControl::PnsPipeRemoveResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, pipeHandle, errorCode );
+    OstTraceExt3( TRACE_NORMAL,  CMMPIPECONTROL_PNSPIPEREMOVERESP_TD, "CMmPipeControl::PnsPipeRemoveResp;transId=%hhu;pipeHandle=%hhu;errorCode=%hhu", transId, pipeHandle, errorCode );
 
         // Call ResetPipeHandle -method from CMmPipeControl
         ResetPipeHandle( pipeHandle );
@@ -919,6 +747,157 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPEREMOVERESP, "CMmPipeControl:
     // no else
     }
 
+// ----------------------------------------------------------------------------
+// CMmPipeControl::PnsPipeRedirectReq
+// Construct a PNS_PIPE_REDIRECT_REQ ISI-message.
+// ----------------------------------------------------------------------------
+//
+TInt CMmPipeControl::PnsPipeRedirectReq(
+    TUint8 aTransId,
+    TUint8 aPipeHandle,
+    TUint8 aOldPepDevId,
+    TUint8 aOldPepObjId,
+    TUint8 aReplacementPepDevId,
+    TUint8 aReplacementPepObjId)
+    {
+    TFLOGSTRING4("TSY: CMmPipeControl::PnsPipeRedirectReq(aTransId:0x%x, aPipeHandle:0x%x, aOldPepDevId:0x%x )", aTransId, aPipeHandle, aOldPepDevId );
+    TFLOGSTRING4("TSY: CMmPipeControl::PnsPipeRedirectReq( aOldPepObjId:0x%x, aReplacementPepDevId:0x%x, aReplacementPepObjId:0x%x)", aOldPepObjId, aReplacementPepDevId, aReplacementPepObjId );
+    OstTraceExt4( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPEREDIRECTREQ_TD, "CMmPipeControl::PnsPipeRedirectReq;aTransId=%hhu;aPipeHandle=%hhu;aOldPepDevId=%hhu;aOldPepObjId=%hhu", aTransId, aPipeHandle, aOldPepDevId, aOldPepObjId );
+    OstTraceExt2( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPIPEREDIRECTREQ_TD, "CMmPipeControl::PnsPipeRedirectReq;aReplacementPepDevId=%hhu;aReplacementPepObjId=%hhu", aReplacementPepDevId, aReplacementPepObjId );
+
+    TInt ret(KErrNone);
+
+    TBuf8<SIZE_PNS_PIPE_REDIRECT_REQ> data;
+    data.Append( aPipeHandle );
+    data.Append( PN_PEP_DISABLE );
+    data.Append( aOldPepDevId );
+    data.Append( aOldPepObjId );
+    data.Append( PN_PEP_TYPE_COMMON );
+    data.Append( KGpdsPadding );
+    data.Append( aReplacementPepDevId );
+    data.Append( aReplacementPepObjId );
+    data.Append( PN_PEP_TYPE_COMMON );
+    data.Append( KGpdsPadding );
+
+    // Send Isi message via phonet
+    ret = iPhoNetSender->Send(
+        PN_PIPE,
+        aTransId,
+        PNS_PIPE_REDIRECT_REQ,
+        data );
+
+    return ret;
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPipeControl::PnsPipeRedirectResp
+// Breaks a PNS_PIPE_REDIRECT_RESP ISI-message.
+// ----------------------------------------------------------------------------
+//
+void CMmPipeControl::PnsPipeRedirectResp(
+    const TIsiReceiveC& aIsiMessage )
+    {
+    TFLOGSTRING("TSY: CMmPipeControl::PnsPipeRedirectResp");
+    OstTrace0( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPIPEREDIRECTRESP_TD, "CMmPipeControl::PnsPipeRedirectResp" );
+    // Get Transaction Id from the ISI message
+    TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
+    TUint8 pipeHandle( aIsiMessage.Get8bit(
+        ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_RESP_OFFSET_PIPEHANDLE ) );
+    // Get Errorcode from the ISI message
+    TUint8 errorCode( aIsiMessage.Get8bit(
+        ISI_HEADER_SIZE + PNS_PIPE_REDIRECT_RESP_OFFSET_ERRORCODE ) );
+
+    TFLOGSTRING4("TSY: CMmPipeControl::PnsPipeRedirectResp - transId: 0x%x, PipeHandle: 0x%x, ErrorCode: 0x%x", transId, pipeHandle, errorCode );
+    OstTraceExt3( TRACE_NORMAL, CMMPIPECONTROL_PNSPIPEREDIRECTRESP_TD, "CMmPipeControl::PnsPipeRedirectResp;transId=%u;pipeHandle=%u;errorCode=%u", transId, pipeHandle, errorCode );
+
+    iContextMessHandler->CompletePipeOperation(
+        PNS_PIPE_REDIRECT_RESP,
+        transId,
+        pipeHandle,
+        errorCode );
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPipeControl::PnsPepCtrlReq
+// Construct a PNS_PIPE_REDIRECT_REQ ISI-message.
+// ----------------------------------------------------------------------------
+//
+TInt CMmPipeControl::PnsPepCtrlReq(
+    TUint8 aDevId,
+    TUint8 aObjId,
+    TUint8 aTransId,
+    TUint8 aPipeHandle,
+    TUint8 aControlId,
+    TUint8 aStatus,
+    TUint8 aChannelId )
+    {
+    TFLOGSTRING4("TSY: CMmPipeControl::PnsPepCtrlReq( aTransId:0x%x, aPipeHandle:0x%x, aControlId:0x%x)", aTransId, aPipeHandle, aControlId );
+    TFLOGSTRING3("TSY: CMmPipeControl::PnsPepCtrlReq( aStatus:0x%x, aChannelId:0x%x)", aStatus, aChannelId );
+    OstTraceExt5( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPCTRLREQ_TD, "CMmPipeControl::PnsPepCtrlReq;aTransId=%hhu;aPipeHandle=%hhu;aControlId=%hhu;aStatus=%hhu;aChannelId=%hhu", aTransId, aPipeHandle, aControlId, aStatus, aChannelId );
+    
+    TInt ret(KErrNone);
+        
+    TInt length( ISI_HEADER_SIZE + SIZE_PNS_PEP_CTRL_REQ + 7 );
+    HBufC8* message = HBufC8::New( length );
+    if( message )
+        {
+        TPtr8 messageptr = message->Des();
+        TIsiSend isimessage( messageptr, length );
+        isimessage.Set8bit( ISI_HEADER_OFFSET_RECEIVERDEVICE, aDevId );
+        isimessage.Set8bit( ISI_HEADER_OFFSET_RECEIVEROBJECT, aObjId );
+        isimessage.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_PIPE );
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_UTID, aTransId );
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_SUBFUNCTION, PNS_PEP_CTRL_REQ );
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PIPEHANDLE , aPipeHandle );
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PEPTYPE , PN_PEP_TYPE_BCA );
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PEPCTRLID, aControlId );
+        
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PEPCTRLDATA, aStatus );
+        
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PEPCTRLDATA + 1, aChannelId );
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PEPCTRLDATA + 2, PN_PEP_SUB_TYPE_SYMBIAN_INTERNAL );
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PEPCTRLDATA + 3, PN_PEP_TYPE_COMMON );
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PEPCTRLDATA + 4, PN_PIPE );
+        
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PEPCTRLDATA + 5, aDevId );
+        isimessage.Set8bit( ISI_HEADER_SIZE + PNS_PEP_CTRL_REQ_OFFSET_PEPCTRLDATA + 6, aObjId );
+
+        ret = iPhoNetSender->Send( isimessage.Complete() );
+
+        delete message;
+        }
+          
+    return ret;
+    }
+
+// ----------------------------------------------------------------------------
+// CMmPipeControl::PnsPepCtrlResp
+// Breaks a PNS_PEP_CTRL_RESP ISI-message.
+// ----------------------------------------------------------------------------
+//
+void CMmPipeControl::PnsPepCtrlResp(
+    const TIsiReceiveC& aIsiMessage )
+    {
+    TFLOGSTRING("TSY: CMmPipeControl::PnsPepCtrlResp");
+    OstTrace0( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPEPCTRLRESP_TD, "CMmPipeControl::PnsPepCtrlResp" );
+    // Get Transaction Id from the ISI message
+    TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
+    TUint8 pipeHandle( aIsiMessage.Get8bit(
+        ISI_HEADER_SIZE + PNS_PEP_CTRL_RESP_OFFSET_PIPEHANDLE ) );
+    // Get Errorcode from the ISI message
+    TUint8 errorCode( aIsiMessage.Get8bit(
+        ISI_HEADER_SIZE + PNS_PEP_CTRL_RESP_OFFSET_ERRORCODE ) );
+
+    TFLOGSTRING4("TSY: CMmPipeControl::PnsPepCtrlResp - transId: %d, PipeHandle: %d, ErrorCode: %d", transId, pipeHandle, errorCode );
+    OstTraceExt3( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPCTRLRESP_TD, "CMmPipeControl::PnsPepCtrlResp;transId=%x;pipeHandle=%x;errorCode=%x", transId, pipeHandle, errorCode );
+
+    iContextMessHandler->CompletePipeOperation(
+        PNS_PEP_CTRL_RESP,
+        transId,
+        pipeHandle,
+        errorCode );
+    }
+
 #ifdef DUMMY_NIF_PEP_FOR_PACKET_DATA_TESTING_DOS
 // ----------------------------------------------------------------------------
 // CMmPipeControl::PnsPepConnectReq
@@ -930,7 +909,7 @@ void CMmPipeControl::PnsPepConnectReq(
     {
 
     TFLOGSTRING("TSY: CMmPipeControl::PnsPepConnectReq");
-OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPCONNECTREQ, "CMmPipeControl::PnsPepConnectReq" );
+OstTrace0( TRACE_NORMAL,  CMMPIPECONTROL_PNSPEPCONNECTREQ_TD, "CMmPipeControl::PnsPepConnectReq" );
 
     // Get Transaction Id from the ISI message
     TUint8 transId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
@@ -940,11 +919,11 @@ OstTrace0( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPCONNECTREQ, "CMmPipeControl::PnsPe
         ISI_HEADER_SIZE + PNS_PEP_CONNECT_REQ_OFFSET_PIPEHANDLE ) );
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
     TUint8 pipeHandle( aIsiMessage.Get8bit(
-        ISI_HEADER_SIZE + CM_PEP_CONNECT_REQ_OFFSET_PIPEHANDLE ) );
+        ISI_HEADER_SIZE + PNS_PEP_CONNECT_REQ_OFFSET_PIPEHANDLE ) );
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepConnectReq - traId: %d, PipeHandle: %d", transId, pipeHandle );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPEPCONNECTREQ, "CMmPipeControl::PnsPepConnectReq;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPEPCONNECTREQ_TD, "CMmPipeControl::PnsPepConnectReq;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
 
     PnsPepConnectResp( transId, pipeHandle );
     }
@@ -960,13 +939,13 @@ void CMmPipeControl::PnsPepConnectResp(
     {
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepConnectResp - traId: %d, pipe handle: %d", aTransId, aPipeHandle);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPEPCONNECTRESP, "CMmPipeControl::PnsPepConnectResp;aTransId=%hhu;aPipeHandle=%hhu", aTransId, aPipeHandle );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPEPCONNECTRESP_TD, "CMmPipeControl::PnsPepConnectResp;aTransId=%hhu;aPipeHandle=%hhu", aTransId, aPipeHandle );
 
     // Create buffer for isi msg data
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     TBuf8<SIZE_PNS_PEP_CONNECT_RESP> data;
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PEP_CONNECT_RESP> data;
+    TBuf8<SIZE_PNS_PEP_CONNECT_RESP> data;
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
    // Set message data
     data.Append( aPipeHandle );
@@ -981,7 +960,7 @@ OstTraceExt2( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPEPCONNECTRESP, "CMmPipeContr
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepConnectResp. PipeHandle: %d RetFromPhonetSender: %d", aPipeHandle, ret );
 
-OstTraceExt2( TRACE_NORMAL, DUP2_CMMPIPECONTROL_PNSPEPCONNECTRESP, "CMmPipeControl::PnsPepConnectResp;aPipeHandle=%hhu;RetFromPhonetSender=%d", aPipeHandle, ret );
+OstTraceExt2( TRACE_NORMAL,  DUP2_CMMPIPECONTROL_PNSPEPCONNECTRESP_TD, "CMmPipeControl::PnsPepConnectResp;aPipeHandle=%hhu;RetFromPhonetSender=%d", aPipeHandle, ret );
     }
 
 // ----------------------------------------------------------------------------
@@ -1000,11 +979,11 @@ void CMmPipeControl::PnsPepDisconnectReq(
         ISI_HEADER_SIZE + PNS_PEP_DISCONNECT_REQ_OFFSET_PIPEHANDLE ) );
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
     TUint8 pipeHandle( aIsiMessage.Get8bit(
-        ISI_HEADER_SIZE + CM_PEP_DISCONNECT_REQ_OFFSET_PIPEHANDLE ) );
+        ISI_HEADER_SIZE + PNS_PEP_DISCONNECT_REQ_OFFSET_PIPEHANDLE ) );
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepDisconnectReq - traId: %d, PipeHandle: %d", transId, pipeHandle );
-OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPDISCONNECTREQ, "CMmPipeControl::PnsPepDisconnectReq;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
+OstTraceExt2( TRACE_NORMAL,  CMMPIPECONTROL_PNSPEPDISCONNECTREQ_TD, "CMmPipeControl::PnsPepDisconnectReq;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
 
     PnsPepDisconnectResp( transId, pipeHandle );
     }
@@ -1020,13 +999,13 @@ void CMmPipeControl::PnsPepDisconnectResp(
     {
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepDisconnectResp - traId: %d, pipe handle: %d", aTransId, aPipeHandle);
-OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPDISCONNECTRESP, "CMmPipeControl::PnsPepDisconnectResp;aTransId=%hhu;aPipeHandle=%hhu", aTransId, aPipeHandle );
+OstTraceExt2( TRACE_NORMAL,  CMMPIPECONTROL_PNSPEPDISCONNECTRESP_TD, "CMmPipeControl::PnsPepDisconnectResp;aTransId=%hhu;aPipeHandle=%hhu", aTransId, aPipeHandle );
 
     //Create buffer for isi msg data
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     TBuf8<SIZE_PNS_PEP_DISCONNECT_RESP> data;
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PEP_DISCONNECT_RESP> data;
+    TBuf8<SIZE_PNS_PEP_DISCONNECT_RESP> data;
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
     // Set message data
     data.Append( aPipeHandle );
@@ -1037,12 +1016,12 @@ OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPDISCONNECTRESP, "CMmPipeControl
         PN_PIPE, aTransId, PNS_PEP_DISCONNECT_RESP, data ) );
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepDisconnectResp. PipeHandle: %d RetFromPhonetSender: %d", aPipeHandle, ret );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPEPDISCONNECTRESP, "CMmPipeControl::PnsPepDisconnectResp;aPipeHandle=%hhu;RetFromPhonetSender=%d", aPipeHandle, ret );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPEPDISCONNECTRESP_TD, "CMmPipeControl::PnsPepDisconnectResp;aPipeHandle=%hhu;RetFromPhonetSender=%d", aPipeHandle, ret );
     }
 
 // ----------------------------------------------------------------------------
 // CMmPipeControl::PnsPepResetReq
-// Breaks a CM_PEP_RESET_REQ ISI-message.
+// Breaks a PNS_PEP_RESET_REQ ISI-message.
 // ----------------------------------------------------------------------------
 //
 void CMmPipeControl::PnsPepResetReq(
@@ -1056,11 +1035,11 @@ void CMmPipeControl::PnsPepResetReq(
         ISI_HEADER_SIZE + PNS_PEP_RESET_REQ_OFFSET_PIPEHANDLE ) );
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
     TUint8 pipeHandle( aIsiMessage.Get8bit(
-        ISI_HEADER_SIZE + CM_PEP_RESET_REQ_OFFSET_PIPEHANDLE ) );
+        ISI_HEADER_SIZE + PNS_PEP_RESET_REQ_OFFSET_PIPEHANDLE ) );
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepResetReq - traId: %d, PipeHandle: %d", transId, pipeHandle );
-OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPRESETREQ, "CMmPipeControl::PnsPepResetReq;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
+OstTraceExt2( TRACE_NORMAL,  CMMPIPECONTROL_PNSPEPRESETREQ_TD, "CMmPipeControl::PnsPepResetReq;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
 
     PnsPepResetResp( transId, pipeHandle );
     }
@@ -1076,13 +1055,13 @@ void CMmPipeControl::PnsPepResetResp(
     {
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepResetResp - traId: %d, pipe handle: %d", aTransId, aPipeHandle);
-OstTraceExt1( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPRESETRESP, "CMmPipeControl::PnsPepResetResp;aTransId=%hhu", aTransId );
+OstTraceExt1( TRACE_NORMAL,  CMMPIPECONTROL_PNSPEPRESETRESP_TD, "CMmPipeControl::PnsPepResetResp;aTransId=%hhu", aTransId );
 
     // Create buffer for isi msg data
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     TBuf8<SIZE_PNS_PEP_RESET_RESP> data;
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PEP_RESET_RESP> data;
+    TBuf8<SIZE_PNS_PEP_RESET_RESP> data;
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
     // Set message data
     data.Append( aPipeHandle );
@@ -1093,7 +1072,7 @@ OstTraceExt1( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPRESETRESP, "CMmPipeControl::Pns
         PN_PIPE, aTransId, PNS_PEP_RESET_RESP, data ) );
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepResetResp. PipeHandle: %d RetFromPhonetSender: %d", aPipeHandle, ret );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPEPRESETRESP, "CMmPipeControl::PnsPepResetResp;aPipeHandle=%hhu;ret=%d", aPipeHandle, ret );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPEPRESETRESP_TD, "CMmPipeControl::PnsPepResetResp;aPipeHandle=%hhu;ret=%d", aPipeHandle, ret );
     }
 
 // ----------------------------------------------------------------------------
@@ -1112,11 +1091,11 @@ void CMmPipeControl::PnsPepEnableReq(
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
         ISI_HEADER_SIZE + PNS_PEP_ENABLE_REQ_OFFSET_PIPEHANDLE ) );
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-        ISI_HEADER_SIZE + CM_PEP_ENABLE_REQ_OFFSET_PIPEHANDLE ) );
+        ISI_HEADER_SIZE + PNS_PEP_ENABLE_REQ_OFFSET_PIPEHANDLE ) );
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepEnableReq - traId: %d, PipeHandle: %d", transId, pipeHandle );
-OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPENABLEREQ, "CMmPipeControl::PnsPepEnableReq;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
+OstTraceExt2( TRACE_NORMAL,  CMMPIPECONTROL_PNSPEPENABLEREQ_TD, "CMmPipeControl::PnsPepEnableReq;transId=%hhu;pipeHandle=%hhu", transId, pipeHandle );
 
     PnsPepEnableResp( transId, pipeHandle );
     }
@@ -1132,13 +1111,13 @@ void CMmPipeControl::PnsPepEnableResp(
     {
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepEnableResp - traId: %d, pipe handle: %d", aTransId, aPipeHandle);
-OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPENABLERESP, "CMmPipeControl::PnsPepEnableResp;aTransId=%hhu;aPipeHandle=%hhu", aTransId, aPipeHandle );
+OstTraceExt2( TRACE_NORMAL,  CMMPIPECONTROL_PNSPEPENABLERESP_TD, "CMmPipeControl::PnsPepEnableResp;aTransId=%hhu;aPipeHandle=%hhu", aTransId, aPipeHandle );
 
     // Create buffer for isi msg data
 #ifdef INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING
     TBuf8<SIZE_PNS_PEP_ENABLE_RESP> data;
 #else /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-    TBuf8<SIZE_CM_PEP_ENABLE_RESP> data;
+    TBuf8<SIZE_PNS_PEP_ENABLE_RESP> data;
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
     // Set message data
     data.Append( aPipeHandle );
@@ -1152,7 +1131,7 @@ OstTraceExt2( TRACE_NORMAL, CMMPIPECONTROL_PNSPEPENABLERESP, "CMmPipeControl::Pn
         data ) );
 
     TFLOGSTRING3("TSY: CMmPipeControl::PnsPepEnableResp. PipeHandle: %d RetFromPhonetSender: %d", aPipeHandle, ret );
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMPIPECONTROL_PNSPEPENABLERESP, "CMmPipeControl::PnsPepEnableResp;aPipeHandle=%hhu;RetFromPhonetSender=%d", aPipeHandle, ret );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMPIPECONTROL_PNSPEPENABLERESP_TD, "CMmPipeControl::PnsPepEnableResp;aPipeHandle=%hhu;RetFromPhonetSender=%d", aPipeHandle, ret );
     }
 
 #endif // DUMMY_NIF_PEP_FOR_PACKET_DATA_TESTING_DOS

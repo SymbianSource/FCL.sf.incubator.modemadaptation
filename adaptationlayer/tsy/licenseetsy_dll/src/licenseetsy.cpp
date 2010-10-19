@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -19,8 +19,7 @@
 
 //  INCLUDE FILES
 #include "cmmmessagerouter.h"
-// Temporarily removed for Bridge camp!
-//#include "satmessaging.h"
+#include "satmessaging.h"
 #include "licenseetsy.h"
 
 #include "tsylogger.h"
@@ -70,7 +69,7 @@ CNokiaTSYFactory::CNokiaTSYFactory
     {
     // none
 TFLOGSTRING("tsyfactory: CNokiaTSYFactory::CNokiaTSYFactory");
-OstTrace0( TRACE_NORMAL, CNOKIATSYFACTORY_CNOKIATSYFACTORY, "CNokiaTSYFactory::CNokiaTSYFactory" );
+OstTrace0( TRACE_NORMAL,  CNOKIATSYFACTORY_CNOKIATSYFACTORY_TD, "CNokiaTSYFactory::CNokiaTSYFactory" );
 
     iSatMessaging = NULL;
     iMMessageRouter = NULL;
@@ -85,7 +84,7 @@ CNokiaTSYFactory::~CNokiaTSYFactory()
     {
         
 TFLOGSTRING("tsyfactory: CNokiaTSYFactory::~CNokiaTSYFactory");
-OstTrace0( TRACE_NORMAL, DUP1_CNOKIATSYFACTORY_CNOKIATSYFACTORY, "CNokiaTSYFactory::~CNokiaTSYFactory" );
+OstTrace0( TRACE_NORMAL,  DUP1_CNOKIATSYFACTORY_CNOKIATSYFACTORY_TD, "CNokiaTSYFactory::~CNokiaTSYFactory" );
 
     delete iMMessageRouter;
     iMMessageRouter = NULL;
@@ -101,7 +100,7 @@ MLtsyFactoryBase::TCtsyInterfaceVersion CNokiaTSYFactory::Version()
     {
         
 TFLOGSTRING("tsyfactory: MLtsyFactoryBase::TCtsyInterfaceVersion");
-OstTrace0( TRACE_NORMAL, CNOKIATSYFACTORY_VERSION, "CNokiaTSYFactory::Version" );
+OstTrace0( TRACE_NORMAL,  CNOKIATSYFACTORY_VERSION_TD, "CNokiaTSYFactory::Version" );
     
     return EIfVersion1;
     }
@@ -116,7 +115,7 @@ void CNokiaTSYFactory::Release()
     {
         
 TFLOGSTRING("tsyfactory: CNokiaTSYFactory::Release");
-OstTrace0( TRACE_NORMAL, CNOKIATSYFACTORY_RELEASE, "CNokiaTSYFactory::Release" );
+OstTrace0( TRACE_NORMAL,  CNOKIATSYFACTORY_RELEASE_TD, "CNokiaTSYFactory::Release" );
 
     // Call destructor
     delete ( this );
@@ -135,7 +134,7 @@ MMessageRouter* CNokiaTSYFactory::GetMessageRouter
     {
         
 TFLOGSTRING("tsyfactory: CNokiaTSYFactory::GetMessageRouter");
-OstTrace0( TRACE_NORMAL, CNOKIATSYFACTORY_GETMESSAGEROUTER, "CNokiaTSYFactory::GetMessageRouter" );
+OstTrace0( TRACE_NORMAL,  CNOKIATSYFACTORY_GETMESSAGEROUTER_TD, "CNokiaTSYFactory::GetMessageRouter" );
 
     if ( NULL == iMMessageRouter )
         {
@@ -155,13 +154,12 @@ CTsySatMessagingBase* CNokiaTSYFactory::GetSatMessagingService( )
     {
         
 TFLOGSTRING("tsyfactory: CNokiaTSYFactory::GetSatMessagingService");
-OstTrace0( TRACE_NORMAL, CNOKIATSYFACTORY_GETSATMESSAGINGSERVICE, "CNokiaTSYFactory::GetSatMessagingService" );
+OstTrace0( TRACE_NORMAL,  CNOKIATSYFACTORY_GETSATMESSAGINGSERVICE_TD, "CNokiaTSYFactory::GetSatMessagingService" );
 
     if ( NULL == iSatMessaging )
         {
-		// Temporarily removed for Bridge camp!
-        //iSatMessaging = CTsySatMessaging::NewL( iMMessageRouter );
-        //iMMessageRouter->iSatMessaging = iSatMessaging;
+        iSatMessaging = CTsySatMessaging::NewL( iMMessageRouter );
+        iMMessageRouter->iSatMessaging = iSatMessaging;
         }
 
 
@@ -181,14 +179,13 @@ CTsySatMessagingBase* CNokiaTSYFactory::GetSatMessagingService
     {
         
 TFLOGSTRING("tsyfactory: CNokiaTSYFactory::GetSatMessagingService");
-OstTrace0( TRACE_NORMAL, DUP1_CNOKIATSYFACTORY_GETSATMESSAGINGSERVICE, "CNokiaTSYFactory::GetSatMessagingService" );
+OstTrace0( TRACE_NORMAL,  DUP1_CNOKIATSYFACTORY_GETSATMESSAGINGSERVICE_TD, "CNokiaTSYFactory::GetSatMessagingService" );
 
 
     if ( NULL == iSatMessaging )
         {
-		// Temporarily removed for Bridge camp!
-        // iSatMessaging = CTsySatMessaging::NewL( iMMessageRouter );
-        // iMMessageRouter->iSatMessaging = iSatMessaging;
+        iSatMessaging = CTsySatMessaging::NewL( iMMessageRouter );
+        iMMessageRouter->iSatMessaging = iSatMessaging;
         }
 
 
@@ -209,7 +206,7 @@ EXPORT_C MLtsyFactoryBase* LTsyFactoryL
     {
     
 TFLOGSTRING("tsyfactory: LtsyFactoryL / Created new CNokiaTSYFactory object");
-OstTrace0( TRACE_NORMAL, _LTSYFACTORYL, "::LtsyFactoryL" );
+OstTrace0( TRACE_NORMAL,  _LTSYFACTORYL_TD, "::LtsyFactoryL" );
 
     MLtsyFactoryBase* ltsyFactory = NULL;
 

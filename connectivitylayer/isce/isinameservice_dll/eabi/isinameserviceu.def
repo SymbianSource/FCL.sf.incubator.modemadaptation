@@ -1,3 +1,4 @@
 EXPORTS
 	_ZN26MISICommunicationManagerIf15IsValidResourceERK6TDesC8 @ 1 NONAME
+	_ZN26MISICommunicationManagerIf29GetDeviceIdentifierByResourceEm @ 2 NONAME
 

@@ -35,6 +35,13 @@ class MISICommunicationManagerIf
         */
         IMPORT_C static TBool IsValidResource( const TDesC8& aMessage );
 
+        /*
+        * Returns device identifier where the resource is located. 
+        * @param aResourceIdentifier
+        * @return Device Identifier of the resource
+        */
+        IMPORT_C static TUint8 GetDeviceIdentifierByResource( const TUint32 aResourceIdentifier );
+
     };
 
 #endif /* __MISICOMMUNICATIONMANAGERIF_H__ */

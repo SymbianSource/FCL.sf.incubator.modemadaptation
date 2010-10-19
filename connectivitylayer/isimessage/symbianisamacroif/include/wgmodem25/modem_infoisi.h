@@ -13,7 +13,7 @@
 * 
 * Description:
 * Name      : PN_MODEM_INFO [ 0xC5 ] Resource Modem Info Server
-* Version   : 001.002
+* Version   : 001.005
 *
 * Documentation: www.wirelessmodemapi.com
 *
@@ -24,7 +24,7 @@
 #define _SYMBIAN_ISI_INFOISI_H_
 
 #define MODEM_INFO_SERVER_ISI_VERSION_Z	 1
-#define MODEM_INFO_SERVER_ISI_VERSION_Y	 2
+#define MODEM_INFO_SERVER_ISI_VERSION_Y	 5
 
 
 //CONSTANTS
@@ -44,6 +44,7 @@
 
 //BitmaskTables for M_INFO_VERSION_TARGETS
 #define M_INFO_MODEMSW                                    	0x01                                                 	
+#define M_INFO_DO                                           0x02
 
 
 //SUBBLOCKS
@@ -68,6 +69,26 @@
 #define M_INFO_SB_PP_DATA_OFFSET_FILLERBYTE2              	4 //size 2 byte(s)
 #define M_INFO_SB_PP_DATA_OFFSET_PPFEACNT                 	6 //size 2 byte(s)
 #define SIZE_M_INFO_SB_PP_DATA                            	8
+//NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
+
+
+//Definition for M_INFO_SB_DO_NUM_VERSION
+#define M_INFO_SB_DO_NUM_VERSION                            0x02
+#define M_INFO_SB_DO_NUM_VERSION_OFFSET_SUBBLOCKID          0 //size 1 byte(s)
+#define M_INFO_SB_DO_NUM_VERSION_OFFSET_SUBBLOCKLEN         1 //size 1 byte(s)
+#define M_INFO_SB_DO_NUM_VERSION_OFFSET_FILLERBYTE1         2 //size 2 byte(s)
+#define M_INFO_SB_DO_NUM_VERSION_OFFSET_DONUMVER            4 //size 4 byte(s)
+#define SIZE_M_INFO_SB_DO_NUM_VERSION                       8
+
+
+//Definition for M_INFO_SB_DO_STR_VERSION
+#define M_INFO_SB_DO_STR_VERSION                            0x03
+#define M_INFO_SB_DO_STR_VERSION_OFFSET_SUBBLOCKID          0 //size 1 byte(s)
+#define M_INFO_SB_DO_STR_VERSION_OFFSET_SUBBLOCKLEN         1 //size 1 byte(s)
+#define M_INFO_SB_DO_STR_VERSION_OFFSET_FILLERBYTE1         2 //size 1 byte(s)
+#define M_INFO_SB_DO_STR_VERSION_OFFSET_STRLEN              3 //size 1 byte(s)
+#define M_INFO_SB_DO_STR_VERSION_OFFSET_DOSTRVER            4 //size 1 byte(s)
+#define SIZE_M_INFO_SB_DO_STR_VERSION                       5
 //NOTE: Definition contains array(s) or sequence(s). SIZE_ and offsets following array or sequence might be defined incorrectly.
 
 
@@ -126,5 +147,18 @@
 #define M_INFO_VERSION_READ_RESP_OFFSET_STATUS            	2 //size 1 byte(s)
 #define M_INFO_VERSION_READ_RESP_OFFSET_SUBBLOCKCOUNT     	3 //size 1 byte(s)
 #define SIZE_M_INFO_VERSION_READ_RESP                     	4
+
+//Definition for M_INFO_PP_DEFAULTS_RESTORE_REQ
+#define M_INFO_PP_DEFAULTS_RESTORE_REQ                          	0x06
+#define M_INFO_PP_DEFAULTS_RESTORE_REQ_OFFSET_TRANSID           	0 //size 1 byte(s)
+#define M_INFO_PP_DEFAULTS_RESTORE_REQ_OFFSET_MESSAGEID         	1 //size 1 byte(s)
+#define SIZE_M_INFO_PP_DEFAULTS_RESTORE_REQ                     	2
+
+//Definition for M_INFO_PP_DEFAULTS_RESTORE_RESP
+#define M_INFO_PP_DEFAULTS_RESTORE_RESP                          	0x07
+#define M_INFO_PP_DEFAULTS_RESTORE_RESP_OFFSET_TRANSID           	0 //size 1 byte(s)
+#define M_INFO_PP_DEFAULTS_RESTORE_RESP_OFFSET_MESSAGEID         	1 //size 1 byte(s)
+#define M_INFO_PP_DEFAULTS_RESTORE_RESP_OFFSET_STATUS           	2 //size 1 byte(s)
+#define SIZE_M_INFO_PP_DEFAULTS_RESTORE_RESP                     	3
 
 #endif

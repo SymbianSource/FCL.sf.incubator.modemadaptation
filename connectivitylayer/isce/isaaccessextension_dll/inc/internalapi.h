@@ -47,8 +47,7 @@ class MDataMessageStatus
 
 // abstract interface for both channels user & kernel 
 // called by extension, provided by extension
-class MIAD2ChannelApi : public MISIRouterObjectIf
-    {
+class MIAD2ChannelApi    {
     
     public:
 
@@ -112,8 +111,7 @@ class MIAD2ChannelApi : public MISIRouterObjectIf
 // *called by LDD
 // *provided from extension
 // *must take care of syncronization, LDD and kernel channels using this
-class MChannel2IADApi : public MISIObjectRouterIf
-    {
+class MChannel2IADApi    {
 
     public:
 
@@ -153,13 +151,11 @@ class MChannel2IADApi : public MISIObjectRouterIf
     */
     virtual TInt SendIndication( TDes8& aMessage, const TUint16 aCh ) = 0;
 
-#if (NCP_COMMON_SOS_VERSION_SUPPORT >= SOS_VERSION_95)
     virtual TInt Loan( const TUint16 aChannel, const TUint16 aRequest,
                        MIAD2ChannelApi* aCallback ) = 0;
 
     virtual TInt ReturnLoan( const TUint16 aChannel, const TUint16 aRequest,
                              MIAD2ChannelApi* aCallback ) = 0;
-#endif
 
     };
 

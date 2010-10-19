@@ -142,7 +142,7 @@ class CSatDataDownload : public CBase
         * @param aIsiMessage ISI message received by Phonetsy
         * @return None
         */
-        void SmsSimMsgIndReceived( const TIsiReceiveC& aIsiMessage );
+        void SmsSimMsgIndReceivedL( const TIsiReceiveC& aIsiMessage );
 
         /**
         * Build an SMS RECEIVE MSG  report to SMS server

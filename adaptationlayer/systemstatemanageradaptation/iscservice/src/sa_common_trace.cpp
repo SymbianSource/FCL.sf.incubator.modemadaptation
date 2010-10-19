@@ -141,7 +141,7 @@ void BuildTraceFunc( const TDesC& aPrefix )
 // -----------------------------------------------------------------------------
 void DataDumpTraceFunc( const TDesC& aPrefix, const TDesC8& aData )
     {
-    HBufC* buffer = HBufC::New( 255 ); // TODO: max line length
+    HBufC* buffer = HBufC::New( 255 ); //  max line length
 
     if ( buffer )
         {

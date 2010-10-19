@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -22,6 +22,28 @@
 #include <e32base.h>
 #include "cmodemathandler.h"
 const TUint8 KInvalidPipeHandle = 0xff;
+
+
+const TUint8 PEP_COMM_IND_ID_ESCAPE = 0x07;// Hard coded PEP constants to be included when dataport exports (DP is COMM PEP)!!
+const TUint8 PEP_COMM_CTRL_ID_ESCAPE = 0x05;
+const TUint8 PEP_COMM_SIGNAL_DTR_ON = 0x05;
+const TUint8 PEP_COMM_SIGNAL_DTR_OFF = 0x06;
+const TUint8 PEP_COMM_SIGNAL_DCD_ON = 0x07;
+const TUint8 PEP_COMM_SIGNAL_DCD_OFF = 0x08;
+const TUint8 PEP_COMM_SIGNAL_DSR_ON = 0x01;
+const TUint8 PEP_COMM_SIGNAL_DSR_OFF = 0x02;
+const TUint8 PEP_COMM_IND_ID_V24_CHANGE = 0x04;
+const TUint8 PEP_COMM_FLOW_CTRL_SW = 0x01;
+const TUint8 PEP_COMM_FLOW_CTRL_HW = 0x02;
+// const TUint8 PEP_COMM_FLOW_CTRL_BOTH = 0x03;  // Note: AT_MODEM_FLOW_CONTROL_BOTH is not supported
+const TUint8 PEP_COMM_FLOW_CTRL_NONE = 0x04;
+const TUint8 PEP_COMM_FLOW_CTRL_EXTRACT = 0x05;
+const TUint8 PEP_COMM_FLOW_CTRL_NO_EXTRACT = 0x06;
+const TUint8 PEP_COMM_CTRL_ID_FLOW_CTRL = 0x02;
+// Escape time for PEP_CTRL_REQ with PEP_COMM_CTRL_ID_ESCAPE
+// Time is given as 20 milliseconds. So real escape time is:
+// 50 * 20 milliseconds = 1000 milliseconds
+const TUint8 KEscapeTime = 50; 
 
 class TPipeInfo
 {
@@ -57,7 +79,7 @@ public:
     static CModemAtPipeController* NewL( RIscApi& aIscApi, TUint& aObjId, CModemAtHandler& aHandler );
 
     ~CModemAtPipeController();
-#ifndef NCP_COMMON_BRIDGE_FAMILY
+
     /*
      * Handles messages from PN_NAME
      * @param TIsiReceiveC& aReceivedMessage Message data
@@ -73,9 +95,8 @@ public:
     
     /**
      * Removes pipe.
-     * @param TUint8 aDteId Connection DteId   
      */
-    void RemovePipe( const TUint8 aDteId);
+    void RemovePipe();
     
     /**
      * Redirects pipe
@@ -83,7 +104,7 @@ public:
      * @param TUint8 aNewDevId New PEP
      * @param TUint8 aNewObjId New PEP
      */
-    void RedirectPipe( const TUint8 aDteId, const TUint8 aNewDevId, const TUint8 aNewObjId );
+    void RedirectPipe( const TUint8 aNewDevId, const TUint8 aNewObjId );
 
     /**
      * Queries AT MODEM object id. 
@@ -91,12 +112,38 @@ public:
     void QueryModemAtFromNameService();
 
     /**
-     * GetPipeHandle
-     * @return pipehandle
+     * GetPipeState
+     * @return pipe state
      */
-    TUint8 GetPipeHandle();
+    TPipeInfo::EPipeState GetPipeState();
 
-#endif
+    /**
+     * Sends PNS_PIPE_ENABLE_REQ
+     */
+    void SendEnablePipeReq();
+
+   /**
+    * Sends PNS_PEP_CTRL_REQ to notify dataport
+    * @param TUint8 aControlId
+    * @param TDesC8& aData
+    */
+    void SendPepCtrlReq( const TUint8 aControlId, TDesC8& aData );
+
+    /**
+     * Sends PNS_PIPE_CREATE_REQ
+     * @param TUint8 aDevId New PEP
+     * @param TUint8 aObjId New PEP
+     */
+    void SendCreatePipeMessage(const TUint8 aDevId, const TUint8 aObjId);
+    
+    /**
+     * Sends PNS_PEP_STATUS_IND + PEP_COMM_IND_ID_V24_CHANGE
+     * @param TUint8 aPepCommSignal DCD or DSR signal ON or OFF
+	 *
+	 *
+     */
+    void SendPepStatusIndSignal( const TUint8 aPepCommSignal );
+
 private:
     /**
      * Default C++ constructor.
@@ -112,12 +159,11 @@ private:
 
     void ConstructL();
 
-#ifndef NCP_COMMON_BRIDGE_FAMILY
     /**
      * Handles MatchDataportName 
      * @param TUint aName
      */
-    TUint MatchDataportName( TUint aName );
+    TBool MatchDataportName( TUint aName );
 
     /**
      * Handles PNS_NAME_ADD_IND 
@@ -136,7 +182,6 @@ private:
      * @param TIsiReceiveC& aReceivedMessage Message data 
      */
     void HandleNameQueryResp( const TIsiReceiveC& aReceivedMesssage );
-
 
     /**
      * Handles PNS_PIPE_CREATE_RESP 
@@ -167,25 +212,13 @@ private:
      * @param TIsiReceiveC& aReceivedMessage Message data 
      */
     void HandlePepStatusInd( const TIsiReceiveC& aReceivedMessage );
- 
-    /**
-     * Sends PNS_PIPE_CREATE_REQ
-     * @param TUint8 aDevId New PEP
-     * @param TUint8 aObjId New PEP
-     */
-    void SendCreatePipeMessage(const TUint8 aDevId, const TUint8 aObjId);
-    
+     
     /**
      * Sends PNS_PIPE_REMOVE_REQ
      * @param TUint8 aPipeHandle Pipehandle
      */
     void SendRemovePipeReq( const TUint8 aPipeHandle );
     
-    /**
-     * Sends PNS_PIPE_ENABLE_REQ
-     * @param TUint8 aPipeHandle Pipehandle
-     */
-    void SendEnablePipeReq( const TUint8 aPipeHandle);
 
     /**
      * ChangePipeState
@@ -193,15 +226,20 @@ private:
      */
     void ChangePipeState( TPipeInfo::EPipeState aState );
     
-#endif
+    /**
+     * HandlePepCtrlResp
+     * @param TIsiReceiveC& aReceivedMessage Message data 
+     */
+    void HandlePepCtrlResp( const TIsiReceiveC& aReceivedMessage );
+
 private:
     
     RIscApi& iIscApi;
     TUint iModemAtObjId;            //Modem AT Controller Obj-id
     TUint iModemAtDevId;            //Modem AT Controller device-id
-    TUint iDataportDevId;           //Dataport device-id
-    TUint iDataportObjId;           //Dataport obj-id
-    TPipeInfo iPipe;                //Pipehandle, pipe status and pipe id's
+    TUint iDpDevId;             //Dataport device-id
+    TUint iDpObjId;             //Dataport obj-id
+    TPipeInfo iPipe;            //Pipehandle, pipe status and pipe id's
     CModemAtHandler& iAtHandler;    //forwards AT-commands to the AT MODEM
     CActiveSchedulerWait* iSchedulerWait;
     };

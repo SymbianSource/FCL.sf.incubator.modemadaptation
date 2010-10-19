@@ -43,7 +43,6 @@
 #include <uiccisi.h>            // UICC server
 #include <gpdsisi.h>            // GPDS server
 
-#include <atk_sharedisi.h>
 #include <call_sharedisi.h>
 #include <info_sharedisi.h>
 #include "OstTraceDefinitions.h"
@@ -63,8 +62,6 @@ const TInt KNoTransactionOngoing                = -1;
 const TUint8 KTimeZoneNotAvailable              = 0xFF;
 // Access Technology unknown
 const TUint8 KAccTechUnknown                    = 0xFF;
-// This is a common length constant (2 bytes)
-const TUint8 KLengthTwoBytes                    = 0x02;
 // Maximum polling interval of legacy phones
 const TUint8 KMaxLegacyPollInterval             = 0x19; // 25 decimal
 // Size of one clut entry in bytes
@@ -118,11 +115,12 @@ CSatMessHandler::CSatMessHandler
         iTsySatMessaging( aTsySatMessaging ),
         iPnSend( aPnSend )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_CSATMESSHANDLER, "CSatMessHandler::CSatMessHandler" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_CSATMESSHANDLER_TD, "CSatMessHandler::CSatMessHandler" );
     // >= 0 if there is ongoing transaction
     iTerminalRespTraId              = KNoTransactionOngoing;
     iGetIconSimReadFieldTraId       = KNoTransactionOngoing;
     iDataDownloadSimReadFieldTraId  = KNoTransactionOngoing;
+    iCbRoutingReqTraId              = KNoTransactionOngoing;
 
     iCardId                         = KZero;
     iImeiAvailable                  = EFalse;
@@ -186,7 +184,7 @@ CSatMessHandler::CSatMessHandler
 //
 CSatMessHandler::~CSatMessHandler()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_CSATMESSHANDLER, "CSatMessHandler::~CSatMessHandler" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_CSATMESSHANDLER_TD, "CSatMessHandler::~CSatMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -200,7 +198,7 @@ CSatMessHandler* CSatMessHandler::NewL
         CMmPhoNetSender*    aPnSend
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NEWL, "CSatMessHandler::NewL" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_NEWL_TD, "CSatMessHandler::NewL" );
     TFLOGSTRING("TSY:CSatMessHandler::NewL");
 
     CSatMessHandler* self = new( ELeave ) CSatMessHandler( aTsySatMessaging,
@@ -219,7 +217,7 @@ CSatMessHandler* CSatMessHandler::NewL
 void CSatMessHandler::ConstructL()
     {
     TFLOGSTRING("TSY:CSatMessHandler::ConstructL");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_CONSTRUCTL, "CSatMessHandler::ConstructL" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_CONSTRUCTL_TD, "CSatMessHandler::ConstructL" );
 
     // This flag is set to 'true' when indication ESatUsatClientReadyIndication
     // is received from SAT server. CAT can be enabled when the state of this
@@ -255,7 +253,7 @@ void CSatMessHandler::ProactiveProcedureMessageReceivedL
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_PROACTIVEPROCEDUREMESSAGERECEIVEDL, "CSatMessHandler::ProactiveProcedureMessageReceivedL" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_PROACTIVEPROCEDUREMESSAGERECEIVEDL_TD, "CSatMessHandler::ProactiveProcedureMessageReceivedL" );
     TFLOGSTRING("TSY:CSatMessHandler::ProactiveProcedureMessageReceivedL");
 
     // handle event download and related messages
@@ -281,7 +279,7 @@ void CSatMessHandler::NetServerMessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETSERVERMESSAGERECEIVED, "CSatMessHandler::NetServerMessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_NETSERVERMESSAGERECEIVED_TD, "CSatMessHandler::NetServerMessageReceived" );
     TFLOGSTRING("TSY:CSatMessHandler::NetServerMessageReceived");
 
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
@@ -298,7 +296,7 @@ void CSatMessHandler::NetServerMessageReceived
                 {
                 TFLOGSTRING("TSY:CSatMessHandler::NetServerMessageReceived \
                     Sending delayed SMS CB routing request.");
-                OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_NETSERVERMESSAGERECEIVED, "CSatMessHandler::NetServerMessageReceived Sending delayed SMS CB routing request." );
+                OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_NETSERVERMESSAGERECEIVED_TD, "CSatMessHandler::NetServerMessageReceived Sending delayed SMS CB routing request." );
                 SmsCbRoutingReq(
                     iTsySatMessaging->GetTransactionId(), SMS_ROUTING_SET );
                 }
@@ -333,17 +331,17 @@ void CSatMessHandler::NetServerMessageReceived
     }
 
 // -----------------------------------------------------------------------------
-// CSatMessHandler::PhoneInfoMessageReceived
+// CSatMessHandler::PhoneInfoMessageReceivedL
 // Called from SatMessHandler::ReceivedL, handles Phone Info related messages
 // -----------------------------------------------------------------------------
 //
-void CSatMessHandler::PhoneInfoMessageReceived
+/*void CSatMessHandler::PhoneInfoMessageReceivedL
         (
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_PHONEINFOMESSAGERECEIVED, "CSatMessHandler::PhoneInfoMessageReceived" );
-    TFLOGSTRING("TSY:CSatMessHandler::PhoneInfoMessageReceived");
+    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_PHONEINFOMESSAGERECEIVEDL_TD, "CSatMessHandler::PhoneInfoMessageReceivedL" );
+    TFLOGSTRING("TSY:CSatMessHandler::PhoneInfoMessageReceivedL");
 
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
 
@@ -356,7 +354,7 @@ void CSatMessHandler::PhoneInfoMessageReceived
             }
         case INFO_PP_READ_RESP:
             {
-            InfoPpReadResp( aIsiMessage );
+            InfoPpReadRespL( aIsiMessage );
             break;
             }
         default:
@@ -365,7 +363,7 @@ void CSatMessHandler::PhoneInfoMessageReceived
             break;
             }
         }
-    }
+    }*/
 
 
 // -----------------------------------------------------------------------------
@@ -373,12 +371,12 @@ void CSatMessHandler::PhoneInfoMessageReceived
 // Called from SatMessHandler::ReceivedL, handles UICC Server messages
 // -----------------------------------------------------------------------------
 //
-TBool CSatMessHandler::UiccServerMessageReceived(
+TBool CSatMessHandler::UiccServerMessageReceivedL(
     const TIsiReceiveC& aIsiMessage )
     {
     TUint8 messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
-    OstTraceExt1( TRACE_NORMAL, DUP3_CSATMESSHANDLER_UICCSERVERMESSAGERECEIVED, "CSatMessHandler::UiccServerMessageReceived;messageId=%hhu", messageId );
-    TFLOGSTRING2("TSY:CSatMessHandler::UiccServerMessageReceived, message ID: %d", messageId );
+    OstTraceExt1( TRACE_NORMAL, DUP3_CSATMESSHANDLER_UICCSERVERMESSAGERECEIVEDL_TD, "CSatMessHandler::UiccServerMessageReceived;messageId=%hhu", messageId );
+    TFLOGSTRING2("TSY:CSatMessHandler::UiccServerMessageReceivedL, message ID: %d", messageId );
 
     TBool handled( EFalse );
 
@@ -386,7 +384,7 @@ TBool CSatMessHandler::UiccServerMessageReceived(
         {
         case UICC_CAT_IND:
             {
-            UiccCatInd( aIsiMessage );
+            UiccCatIndL( aIsiMessage );
             break;
             }
         case UICC_CAT_RESP:
@@ -399,7 +397,7 @@ TBool CSatMessHandler::UiccServerMessageReceived(
                     ISI_HEADER_SIZE + UICC_CAT_RESP_OFFSET_STATUS ) );
 
             TFLOGSTRING3("TSY:CSatMessHandler:: KUiccCatResp: service type %d, status %d", serviceType, status);
-            OstTraceExt2( TRACE_NORMAL, DUP2_CSATMESSHANDLER_UICCSERVERMESSAGERECEIVED, "CSatMessHandler::KUiccCatResp;serviceType=%hhu;status=%hhu", serviceType, status );
+OstTraceExt2( TRACE_NORMAL, DUP2_CSATMESSHANDLER_UICCSERVERMESSAGERECEIVEDL_TD, "CSatMessHandler::KUiccCatResp;serviceType=%hhu;status=%hhu", serviceType, status );
 
             // If terminal profile was sent succesfully and SAT is ready,
             // start fetching proactive commands
@@ -432,7 +430,7 @@ TBool CSatMessHandler::UiccServerMessageReceived(
             // Response for refresh command
             else if ( UICC_CAT_REFRESH == serviceType )
                 {
-                RefreshResult( status );
+                RefreshResultL( status );
                 }
             // Response for polling set command
             else if ( UICC_CAT_POLLING_SET == serviceType  )
@@ -478,19 +476,27 @@ TBool CSatMessHandler::UiccServerMessageReceived(
                 ISI_HEADER_SIZE + UICC_APPLICATION_IND_OFFSET_SERVICETYPE ) );
             if ( UICC_APPL_ACTIVATED == serviceType )
                 {
-                // USIM and SIM: Read SMS-PP DD and Call Control from byte 4.
-                // Only USIM: MO-SMS control from byte 4
-                UiccReadServiceTableReq( KUiccTrIdServiceTableByte4, 3 );
-
+                TInt ret( KErrNone );
                 if ( UICC_CARD_TYPE_UICC == iCardType )
                     {
+                    // USIM: Read SMS-PP DD, Call Control and MO-SMS control from byte 4.
+                    ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte4, 3 );
+                    User::LeaveIfError( ret );
                     // USIM: Read call control GPRS from byte 7
-                    UiccReadServiceTableReq( KUiccTrIdServiceTableByte7, 6 );
+                    ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte7, 6 );
+                    User::LeaveIfError( ret );
                     }
                 else if ( UICC_CARD_TYPE_ICC == iCardType )
                     {
-                    // SIM: Read MO-SMS control from byte 5
-                    UiccReadServiceTableReq( KUiccTrIdServiceTableByte5, 4 );
+                    // SIM: Read MO-SMS control from byte 10
+                    ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte10, 9 );
+                    User::LeaveIfError( ret );
+                    // SIM: Read SMS-PP DD and Call Control from byte 7
+                    ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte7, 6 );
+                    User::LeaveIfError( ret );
+                    // SIM: Read Call control in USSD from byte 11. This is supported only in SIM
+                    ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte11, 10 );
+                    User::LeaveIfError( ret );
                     }
                 }
             break;
@@ -513,7 +519,7 @@ void CSatMessHandler::SmsServerMessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message from SMS server
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SMSSERVERMESSAGERECEIVED, "CSatMessHandler::SmsServerMessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SMSSERVERMESSAGERECEIVED_TD, "CSatMessHandler::SmsServerMessageReceived" );
     TFLOGSTRING("TSY:CSatMessHandler::SmsServerMessageReceived");
 
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
@@ -534,7 +540,7 @@ void CSatMessHandler::SmsServerMessageReceived
             {
             // Take a log because result is always ok
             TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceConfRespReceived: Response for Resource confoguration Req, Receive response from SMS server");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATMOSMSCTRL_SMSRESOURCECONFRESPRECEIVED, "CSatMoSmsCtrl::SmsResourceRespReceived: Response for Resource Configuration Req, Receive response from SMS server" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATMOSMSCTRL_SMSRESOURCECONFRESPRECEIVED_TD, "CSatMoSmsCtrl::SmsResourceRespReceived: Response for Resource Configuration Req, Receive response from SMS server" );
             break;
             }
         default:
@@ -554,7 +560,7 @@ void CSatMessHandler::SsServerMessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SSSERVERMESSAGERECEIVED, "CSatMessHandler::SsServerMessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SSSERVERMESSAGERECEIVED_TD, "CSatMessHandler::SsServerMessageReceived" );
     TFLOGSTRING("TSY:CSatMessHandler::SsServerMessageReceived");
 
     TInt messageId( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
@@ -583,7 +589,7 @@ void CSatMessHandler::GsmStackServerMessageReceived
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GSMSTACKSERVERMESSAGERECEIVED, "CSatMessHandler::GsmStackServerMessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GSMSTACKSERVERMESSAGERECEIVED_TD, "CSatMessHandler::GsmStackServerMessageReceived" );
     TFLOGSTRING("TSY:CSatMessHandler::GsmStackServerMessageReceived");
 
     switch ( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) )
@@ -621,7 +627,7 @@ TInt CSatMessHandler::DisplayTextTerminalResp
         TUint8 aAdditionalInfo      // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_DISPLAYTEXTTERMINALRESP, "CSatMessHandler::DisplayTextTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_DISPLAYTEXTTERMINALRESP_TD, "CSatMessHandler::DisplayTextTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::DisplayTextTerminalResp");
 
     TTlv tlvSpecificData;
@@ -655,7 +661,7 @@ TInt CSatMessHandler::GetInkeyTerminalResp
         const RSat::TGetInkeyRspV2& aRsp  // Response packet from Etel
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GETINKEYTERMINALRESP, "CSatMessHandler::GetInkeyTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GETINKEYTERMINALRESP_TD, "CSatMessHandler::GetInkeyTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::GetInkeyTerminalRespL");
 
     TTlv tlvSpecificData;
@@ -778,7 +784,7 @@ TInt CSatMessHandler::GetInputTerminalResp
         TUint8 aDataCodingScheme    // Coding scheme
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GETINPUTTERMINALRESP, "CSatMessHandler::GetInputTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GETINPUTTERMINALRESP_TD, "CSatMessHandler::GetInputTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::GetInputTerminalResp");
 
     TTlv tlvSpecificData;
@@ -859,7 +865,7 @@ TInt CSatMessHandler::PlayToneTerminalResp
         TUint8 aAdditionalInfo      // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_PLAYTONETERMINALRESP, "CSatMessHandler::PlayToneTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_PLAYTONETERMINALRESP_TD, "CSatMessHandler::PlayToneTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::PlayToneTerminalResp");
 
     TTlv tlvSpecificData;
@@ -893,7 +899,7 @@ TInt CSatMessHandler::SetUpMenuTerminalResp
         TUint8 aAdditionalInfo      // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SETUPMENUTERMINALRESP, "CSatMessHandler::SetUpMenuTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SETUPMENUTERMINALRESP_TD, "CSatMessHandler::SetUpMenuTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SetUpMenuTerminalResp");
 
     // Create and append response data
@@ -930,7 +936,7 @@ TInt CSatMessHandler::SelectItemTerminalResp
         TUint8 aAdditionalInfo      // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SELECTITEMTERMINALRESP, "CSatMessHandler::SelectItemTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SELECTITEMTERMINALRESP_TD, "CSatMessHandler::SelectItemTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SelectItemTerminalResp");
 
     TTlv tlvSpecificData;
@@ -991,7 +997,7 @@ TInt CSatMessHandler::PollIntervalTerminalResp
         TUint8 aNumOfUnits          // Time interval
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_POLLINTERVALTERMINALRESP, "CSatMessHandler::PollIntervalTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_POLLINTERVALTERMINALRESP_TD, "CSatMessHandler::PollIntervalTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::PollIntervalTerminalResp");
 
     TTlv tlvSpecificData;
@@ -1046,7 +1052,7 @@ TInt CSatMessHandler::SendSmTerminalResp
         TUint8 aAdditionalInfo      // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SENDSMTERMINALRESP, "CSatMessHandler::SendSmTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SENDSMTERMINALRESP_TD, "CSatMessHandler::SendSmTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SendSmTerminalResp");
 
     // Create and append response data
@@ -1087,7 +1093,7 @@ TInt CSatMessHandler::SendSsTerminalResp
         TDesC8& aAdditionalInfo     // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SENDSSTERMINALRESP, "CSatMessHandler::SendSsTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SENDSSTERMINALRESP_TD, "CSatMessHandler::SendSsTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SendSsTerminalResp");
 
     // Create and append response data
@@ -1122,7 +1128,7 @@ TInt CSatMessHandler::SendDtmfTerminalResp
         TUint8 aAdditionalInfo      // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SENDDTMFTERMINALRESP, "CSatMessHandler::SendDtmfTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SENDDTMFTERMINALRESP_TD, "CSatMessHandler::SendDtmfTerminalResp" );
     TFLOGSTRING("CSatMessHandler::SendDtmfTerminalResp");
 
     TTlv tlvSpecificData;
@@ -1159,7 +1165,7 @@ TInt CSatMessHandler::SendUssdTerminalResp
         TUint8  aUssdCbsDataCodingScheme
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SENDUSSDTERMINALRESP, "CSatMessHandler::SendUssdTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SENDUSSDTERMINALRESP_TD, "CSatMessHandler::SendUssdTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SendUssdTerminalResp");
 
     TTlv tlvSpecificData;
@@ -1168,13 +1174,14 @@ TInt CSatMessHandler::SendUssdTerminalResp
     tlvSpecificData.AddTag( KTlvResultTag );
     tlvSpecificData.AddByte( aGeneralResult );
 
-    // For the general results '20', '21', '37', '38'
+    // For the general results '20', '21', '37', '38', '39'
     // it is mandatory for the ME to provide a specific
     // cause value as additional
     if ( ( RSat::KMeUnableToProcessCmd == aGeneralResult )
         || ( RSat::KNetworkUnableToProcessCmd == aGeneralResult )
         || ( RSat::KUssdReturnError == aGeneralResult)
-        || ( RSat::KMultipleCardCmdsError == aGeneralResult) )
+        || ( RSat::KMultipleCardCmdsError == aGeneralResult)
+        || ( RSat::KInteractionWithCCPermanentError == aGeneralResult ) )
         {
         tlvSpecificData.AddByte( aAdditionalInfo );
         }
@@ -1219,7 +1226,7 @@ TInt CSatMessHandler::SendUssdTerminalResp
                 // branch of the switch.
                 TFLOGSTRING("TSY:CSatMessHandler::SendUssdTerminalResp, \
                 The DCS sent by the network has a reserved value.");
-                OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_SENDUSSDTERMINALRESP, "CSatMessHandler::SendUssdTerminalResp, The DCS sent by the network has a reserved value." );
+                OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_SENDUSSDTERMINALRESP_TD, "CSatMessHandler::SendUssdTerminalResp, The DCS sent by the network has a reserved value." );
                 break;
                 }
             }
@@ -1247,7 +1254,7 @@ TInt CSatMessHandler::SetUpCallTerminalResp
         TUint8 aAdditionalInfo      // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SETUPCALLTERMINALRESP, "CSatMessHandler::SetUpCallTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SETUPCALLTERMINALRESP_TD, "CSatMessHandler::SetUpCallTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SetUpCallTerminalResp");
 
     // Create and append response data
@@ -1284,7 +1291,7 @@ TInt CSatMessHandler::RefreshTerminalResp
         TUint8 aAdditionalInfo      // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_REFRESHTERMINALRESP, "CSatMessHandler::RefreshTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_REFRESHTERMINALRESP_TD, "CSatMessHandler::RefreshTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::RefreshTerminalResp");
 
     // Create and append response data
@@ -1318,7 +1325,7 @@ void CSatMessHandler::MenuSelectionInd
         TUint8 aHelp            // Help requested status
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_MENUSELECTIONIND, "CSatMessHandler::MenuSelectionInd" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_MENUSELECTIONIND_TD, "CSatMessHandler::MenuSelectionInd" );
     TFLOGSTRING("TSY:CSatMessHandler::MenuSelectionInd");
 
     TTlv tlvSpecificData;
@@ -1353,7 +1360,7 @@ TInt CSatMessHandler::LaunchBrowserTerminalResp
         TUint8 aAdditionalInfo  // additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_LAUNCHBROWSERTERMINALRESP, "CSatMessHandler::LaunchBrowserTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_LAUNCHBROWSERTERMINALRESP_TD, "CSatMessHandler::LaunchBrowserTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::LaunchBrowserTerminalResp");
 
     TTlv tlvSpecificData;
@@ -1389,7 +1396,7 @@ TBool CSatMessHandler::CommandPerformedSuccessfully
         TUint8 aGeneralResult
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_COMMANDPERFORMEDSUCCESSFULLY, "CSatMessHandler::CommandPerformedSuccessfully" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_COMMANDPERFORMEDSUCCESSFULLY_TD, "CSatMessHandler::CommandPerformedSuccessfully" );
     TFLOGSTRING("TSY:CSatMessHandler::CommandPerformedSuccessfully");
 
     TBool ret( EFalse );
@@ -1432,7 +1439,7 @@ TInt CSatMessHandler::SetUpIdleModeTextTerminalResp
         TUint8 aAdditionalInfo      // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SETUPIDLEMODETEXTTERMINALRESP, "CSatMessHandler::SetUpIdleModeTextTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SETUPIDLEMODETEXTTERMINALRESP_TD, "CSatMessHandler::SetUpIdleModeTextTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SetUpIdleModeTextTerminalResp");
 
     TTlv tlvSpecificData;
@@ -1483,7 +1490,7 @@ TInt CSatMessHandler::UiccCatReqEnvelope
         TBool aStore            // Is envelope stored for resending
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_UICCCATREQENVELOPE, "CSatMessHandler::UiccCatReqEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_UICCCATREQENVELOPE_TD, "CSatMessHandler::UiccCatReqEnvelope" );
     TFLOGSTRING("TSY:CSatMessHandler::UiccCatReqEnvelope");
 
     TIsiSend isiMsg( iPnSend->SendBufferDes() );
@@ -1541,7 +1548,7 @@ TInt CSatMessHandler::StoreNetServiceStatus
         const TIsiReceiveC& aIsiMessage
         )
     {
-OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus" );
+OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_STORENETSERVICESTATUS_TD, "CSatMessHandler::StoreNetServiceStatus" );
 TFLOGSTRING("TSY: CSatMessHandler::StoreNetServiceStatus");
 
     // SubBlock offset
@@ -1593,7 +1600,7 @@ TFLOGSTRING("TSY: CSatMessHandler::StoreNetServiceStatus");
                 sbOffset + NET_GSM_CELL_INFO_OFFSET_SERVICESTATUS );
 
 TFLOGSTRING2("TSY: CSatMessHandler::StoreNetServiceStatus: NET_REGISTRATION_STATUS = %d", iLocInfo.iRegStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus NET_REGISTRATION_STATUS = %d", iLocInfo.iRegStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_STORENETSERVICESTATUS_TD, "CSatMessHandler::StoreNetServiceStatus NET_REGISTRATION_STATUS = %d", iLocInfo.iRegStatus );
 
             if ( NET_SERVICE == iLocInfo.iRegStatus ||
                 NET_LIMITED_SERVICE == iLocInfo.iRegStatus )
@@ -1636,7 +1643,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHa
         else
             {
 TFLOGSTRING("TSY: CSatMessHandler::StoreNetServiceStatus - NET_GSM_CELL_INFO or NET_WCDMA_CELL_INFO not found!");
-OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus NET_GSM_CELL_INFO or NET_WCDMA_CELL_INFO not found!" );
+OstTrace0( TRACE_NORMAL,  DUP2_CSATMESSHANDLER_STORENETSERVICESTATUS_TD, "CSatMessHandler::StoreNetServiceStatus NET_GSM_CELL_INFO or NET_WCDMA_CELL_INFO not found!" );
 
             retValue = KErrNotFound;
             }
@@ -1644,7 +1651,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHa
     else
         {
 TFLOGSTRING2("TSY: CSatMessHandler::StoreNetServiceStatus - Unexpected message id: %d", messageId );
-OstTrace1( TRACE_NORMAL, DUP3_CSATMESSHANDLER_STORENETSERVICESTATUS, "CSatMessHandler::StoreNetServiceStatus Unexpected message id: %d", messageId );
+OstTrace1( TRACE_NORMAL,  DUP3_CSATMESSHANDLER_STORENETSERVICESTATUS_TD, "CSatMessHandler::StoreNetServiceStatus Unexpected message id: %d", messageId );
 
         retValue = KErrNotFound;
         }
@@ -1666,7 +1673,7 @@ TInt CSatMessHandler::SetUpEventListTerminalResp
         TUint8 aAdditionalInfo       // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SETUPEVENTLISTTERMINALRESP, "CSatMessHandler::SetUpEventListTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SETUPEVENTLISTTERMINALRESP_TD, "CSatMessHandler::SetUpEventListTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SetUpEventListTerminalResp");
     // create responce data
     TTlv tlvSpecificData;
@@ -1708,7 +1715,7 @@ TInt CSatMessHandler::PollingOffTerminalResp
         TUint8 aAdditionalInfo          // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_POLLINGOFFTERMINALRESP, "CSatMessHandler::PollingOffTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_POLLINGOFFTERMINALRESP_TD, "CSatMessHandler::PollingOffTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::PollingOffTerminalResp");
 
     TTlv tlvSpecificData;
@@ -1757,7 +1764,7 @@ TInt CSatMessHandler::LocalInfoTerminalResp
         TDes& aAdditionalInfo       // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_LOCALINFOTERMINALRESP, "CSatMessHandler::LocalInfoTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_LOCALINFOTERMINALRESP_TD, "CSatMessHandler::LocalInfoTerminalResp" );
     TFLOGSTRING("TSY: CSatMessHandler::LocalInfoTerminalResp");
     // Create and append response data
     TTlv tlvData;
@@ -1913,7 +1920,7 @@ TInt CSatMessHandler::LocalInfoTerminalResp
                 {
                  TFLOGSTRING("TSY: CSatMessHandler::LocalInfoTerminalResp,\
                     TimingAdvance");
-                 OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_LOCALINFOTERMINALRESP, "CSatMessHandler::LocalInfoTerminalResp, TimingAdvance" );
+                 OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_LOCALINFOTERMINALRESP_TD, "CSatMessHandler::LocalInfoTerminalResp, TimingAdvance" );
 
                  // Timing advance result
                  tlvData.AddTag( KTlvTimingAdvanceTag );
@@ -1925,7 +1932,7 @@ TInt CSatMessHandler::LocalInfoTerminalResp
                 {
                 TFLOGSTRING("TSY: CSatMessHandler::LocalInfoTerminalResp,\
                     LocalInfoLanguage");
-                OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_LOCALINFOTERMINALRESP, "CSatMessHandler::LocalInfoTerminalResp, LocalInfoLanguage" );
+                OstTrace0( TRACE_NORMAL,  DUP2_CSATMESSHANDLER_LOCALINFOTERMINALRESP_TD, "CSatMessHandler::LocalInfoTerminalResp, LocalInfoLanguage" );
 
                 if ( aAdditionalInfo.Length() )
                     {
@@ -1941,7 +1948,7 @@ TInt CSatMessHandler::LocalInfoTerminalResp
                 {
                 TFLOGSTRING("TSY: CSatMessHandler::LocalInfoTerminalResp,\
                     Access Technology");
-                OstTrace0( TRACE_NORMAL, DUP3_CSATMESSHANDLER_LOCALINFOTERMINALRESP, "CSatMessHandler::LocalInfoTerminalResp, Access Technology" );
+                OstTrace0( TRACE_NORMAL,  DUP3_CSATMESSHANDLER_LOCALINFOTERMINALRESP_TD, "CSatMessHandler::LocalInfoTerminalResp, Access Technology" );
 
                 // Access technology result
                 tlvData.AddTag( KTlvAccessTechnologyTag );
@@ -1966,13 +1973,13 @@ TInt CSatMessHandler::LocalInfoTerminalResp
 // Called from CTsySatMessaging::ConstructL method.
 // -----------------------------------------------------------------------------
 //
-TInt CSatMessHandler::InfoSerialNumberReadReq
+/*TInt CSatMessHandler::InfoSerialNumberReadReq
         (
         TUint8 aTransId,     // Transactio id
         TUint8 aTarget
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_INFOSERIALNUMBERREADREQ, "CSatMessHandler::InfoSerialNumberReadReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_INFOSERIALNUMBERREADREQ_TD, "CSatMessHandler::InfoSerialNumberReadReq" );
     TFLOGSTRING("TSY:CSatMessHandler::InfoSerialNumberReadReq");
 
     //set infoSerialNumberReadReq to point to the send buffer
@@ -1988,19 +1995,19 @@ TInt CSatMessHandler::InfoSerialNumberReadReq
     //send message via Phonet
     return iPnSend->Send( infoSerialNumberReadReq.Complete() );
 
-    }
+    }*/
 
 // -----------------------------------------------------------------------------
 // CSatMessHandler::InfoSerialNumberReadResp
 // Breaks a INFO_SERIAL_NUMBER_READ_RESP ISI-message.
 // -----------------------------------------------------------------------------
 //
-void CSatMessHandler::InfoSerialNumberReadResp
+/*void CSatMessHandler::InfoSerialNumberReadResp
         (
         const TIsiReceiveC& aIsiMessage    // received ISI-message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_INFOSERIALNUMBERREADRESP, "CSatMessHandler::InfoSerialNumberReadResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_INFOSERIALNUMBERREADRESP_TD, "CSatMessHandler::InfoSerialNumberReadResp" );
     TFLOGSTRING("TSY:CSatMessHandler::InfoSerialNumberReadResp");
 
     TUint sbStartOffset( 0 );
@@ -2019,7 +2026,7 @@ void CSatMessHandler::InfoSerialNumberReadResp
         //Set the flag to inform that needed data has been received
         iImeiAvailable = ETrue;
 TFLOGSTRING("TSY: SAT, Imei received.");
-OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_INFOSERIALNUMBERREADRESP, "SAT, Imei received." );
+OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_INFOSERIALNUMBERREADRESP_TD, "SAT, Imei received." );
         }
     //check if INFO_SB_SN_IMEI_SV_TO_NET sub block is present
     else if ( KErrNone == aIsiMessage.FindSubBlockOffsetById(
@@ -2034,9 +2041,9 @@ OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_INFOSERIALNUMBERREADRESP, "SAT, Im
             INFO_SB_SN_IMEI_SV_TO_NET_OFFSET_STRLEN ) ) );
         iImeiSvAvailable = ETrue;
 TFLOGSTRING("TSY: CSatMessHandler::InfoSerialNumberReadResp IMEISV received");
-OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_INFOSERIALNUMBERREADRESP, "CSatMessHandler::InfoSerialNumberReadResp IMEISV received" );
+OstTrace0( TRACE_NORMAL,  DUP2_CSATMESSHANDLER_INFOSERIALNUMBERREADRESP_TD, "CSatMessHandler::InfoSerialNumberReadResp IMEISV received" );
         }
-    }
+    }*/
 
 // -----------------------------------------------------------------------------
 // CSatMessHandler::NetNeighbourCellsReq
@@ -2049,7 +2056,7 @@ TInt CSatMessHandler::NetNeighbourCellsReq
         TUint8 aCellInfoType    // Cell info type
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETNEIGHBOURCELLSREQ, "CSatMessHandler::NetNeighbourCellsReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_NETNEIGHBOURCELLSREQ_TD, "CSatMessHandler::NetNeighbourCellsReq" );
     TFLOGSTRING("TSY:CSatMessHandler::NetNeighbourCellsReq");
 
     TBuf8<1> data;
@@ -2073,7 +2080,7 @@ void CSatMessHandler::NetNeighbourCellResp
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETNEIGHBOURCELLRESP, "CSatMessHandler::NetNeighbourCellResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_NETNEIGHBOURCELLRESP_TD, "CSatMessHandler::NetNeighbourCellResp" );
     TFLOGSTRING("TSY:CSatMessHandler::NetNeighbourCellResp");
 
     TUint8 result( RSat::KSuccess );
@@ -2208,7 +2215,7 @@ TInt CSatMessHandler::CallModemResourceReq(
     )
     {
     TFLOGSTRING("TSY:CSatMessHandler::CallModemResourceReq");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_CALLMODEMRESOURCEREQ, "TSY:CSatMessHandler::CallModemResourceReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_CALLMODEMRESOURCEREQ_TD, "TSY:CSatMessHandler::CallModemResourceReq" );
 
     return iPnSend->Send( PN_MODEM_CALL, aTransId, CALL_MODEM_RESOURCE_REQ, aMsg );
     }
@@ -2223,7 +2230,7 @@ TInt CSatMessHandler::CallModemResourceConfReq(
     TUint16 aResourceIdMask )
     {
     TFLOGSTRING("TSY:CSatMessHandler::CallModemResourceConfReq");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_CALLMODEMRESOURCECONFREQ, "TSY:CSatMessHandler::CallModemResourceConfReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_CALLMODEMRESOURCECONFREQ_TD, "TSY:CSatMessHandler::CallModemResourceConfReq" );
 
     TBuf8< SIZE_CALL_MODEM_RESOURCE_CONF_REQ +
         SIZE_CALL_MODEM_SB_RESOURCE_CONF> msg;
@@ -2258,7 +2265,7 @@ TInt CSatMessHandler::CallModemResourceConfReq(
 TInt CSatMessHandler::SsResourceConfReq()
     {
     TFLOGSTRING("TSY:CSatMessHandler::SsResourceConfReq");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SSRESOURCECONFREQ, "TSY:CSatMessHandler::SsResourceConfReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SSRESOURCECONFREQ_TD, "TSY:CSatMessHandler::SsResourceConfReq" );
 
     TBuf8< SIZE_SS_RESOURCE_CONF_REQ  +
         SIZE_SS_SB_RESOURCE_CONF > msg;
@@ -2296,7 +2303,7 @@ TInt CSatMessHandler::SsResourceControlReq(
     )
     {
     TFLOGSTRING("TSY:CSatMessHandler::SsResourceControlReq");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SSRESOURCECONTROLREQ, "TSY:CSatMessHandler::SsResourceControlReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SSRESOURCECONTROLREQ_TD, "TSY:CSatMessHandler::SsResourceControlReq" );
 
     return iPnSend->Send(
         PN_SS,
@@ -2313,7 +2320,7 @@ TInt CSatMessHandler::SsResourceControlReq(
 TInt CSatMessHandler::GpdsResourceConfReq()
     {
     TFLOGSTRING("TSY:CSatMessHandler::GpdsResourceConfReq");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GPDSRESOURCECONFREQ, "TSY:CSatMessHandler::GpdsResourceConfReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GPDSRESOURCECONFREQ_TD, "TSY:CSatMessHandler::GpdsResourceConfReq" );
 
     TBuf8< SIZE_GPDS_RESOURCE_CONF_REQ  +
         SIZE_GPDS_RESOURCE_CONF > msg;
@@ -2351,7 +2358,7 @@ TInt CSatMessHandler::GpdsResourceControlReq(
     )
     {
     TFLOGSTRING("TSY:CSatMessHandler::GpdsResourceControlReq");
-OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GPDSRESOURCECONTROLREQ, "CSatMessHandler::GpdsResourceControlReq" );
+OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GPDSRESOURCECONTROLREQ_TD, "CSatMessHandler::GpdsResourceControlReq" );
 
     return iPnSend->Send(
         PN_GPDS,
@@ -2367,7 +2374,7 @@ OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GPDSRESOURCECONTROLREQ, "CSatMessHandle
 //
 void CSatMessHandler::SetPollingInterval( TUint8 aTraId, TUint8 aValue )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SETPOLLINGINTERVAL, "CSatMessHandler::SetPollingInterval" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SETPOLLINGINTERVAL_TD, "CSatMessHandler::SetPollingInterval" );
     TFLOGSTRING("TSY:CSatMessHandler::SetPollingInterval");
 
     iPollingInterval = aValue;
@@ -2426,7 +2433,7 @@ TInt CSatMessHandler::TimerMgmtTerminalResp
         TUint8 aAdditionalInfo       // Additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_TIMERMGMTTERMINALRESP, "CSatMessHandler::TimerMgmtTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_TIMERMGMTTERMINALRESP_TD, "CSatMessHandler::TimerMgmtTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::TimerMgmtTerminalResp");
 
     // Create and append response data
@@ -2472,7 +2479,7 @@ TInt CSatMessHandler::TimerMgmtTerminalResp
     else
         {
         TFLOGSTRING("TSY: CSatMessHandler::TimerMgmtTerminalResp, Unknown result.");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_TIMERMGMTTERMINALRESP, "CSatMessHandler::TimerMgmtTerminalResp, Unknown result." );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_TIMERMGMTTERMINALRESP_TD, "CSatMessHandler::TimerMgmtTerminalResp, Unknown result." );
         }
 
     return UiccCatReqTerminalResponse(
@@ -2494,7 +2501,7 @@ TInt CSatMessHandler::TimerExpirationInd
         TUint8 aTimerValue[3]   // Timer Value
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_TIMEREXPIRATIONIND, "CSatMessHandler::TimerExpirationInd" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_TIMEREXPIRATIONIND_TD, "CSatMessHandler::TimerExpirationInd" );
     TFLOGSTRING("TSY:CSatMessHandler::TimerExpirationInd");
 
     TTlv data;
@@ -2525,15 +2532,15 @@ TInt CSatMessHandler::TimerExpirationInd
     }
 
 // -----------------------------------------------------------------------------
-// CSatMessHandler::RefreshResult
+// CSatMessHandler::RefreshResultL
 // Method to analyze refresh result from SIM Server.
 // Called by CSatMessHandler::SimAtkResp.
 // -----------------------------------------------------------------------------
 //
-void CSatMessHandler::RefreshResult( TUint8 aStatus ) // UICC server status
+void CSatMessHandler::RefreshResultL( TUint8 aStatus ) // UICC server status
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_REFRESHRESULT, "CSatMessHandler::RefreshResult" );
-    TFLOGSTRING("TSY:CSatMessHandler::RefreshResult");
+    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_REFRESHRESULTL_TD, "CSatMessHandler::RefreshResultL" );
+    TFLOGSTRING("TSY:CSatMessHandler::RefreshResultL");
 
     TUint8 result( RSat::KSuccess );
     TUint8 additionalInfo( 0 );
@@ -2546,56 +2553,67 @@ void CSatMessHandler::RefreshResult( TUint8 aStatus ) // UICC server status
             case UICC_STATUS_OK:
                 {
                 // Refresh is done!
-                TFLOGSTRING("TSY: CSatMessHandler::RefreshResult, ISA has performed refresh successfully ");
-                TFLOGSTRING("TSY: CSatMessHandler::RefreshResult, Inform S60 to re-read SIM data");
-                OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_REFRESHRESULT, "CSatMessHandler::RefreshResult, ISA has performed refresh successfully " );
-                OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_REFRESHRESULT, "CSatMessHandler::RefreshResult, Inform S60 to re-read SIM data" );
+                TFLOGSTRING("TSY: CSatMessHandler::RefreshResultL, ISA has performed refresh successfully ");
+                TFLOGSTRING("TSY: CSatMessHandler::RefreshResultL, Inform S60 to re-read SIM data");
+                OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_REFRESHRESULTL_TD, "CSatMessHandler::RefreshResultL, ISA has performed refresh successfully " );
+OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_REFRESHRESULTL_TD, "CSatMessHandler::RefreshResultL, Inform S60 to re-read SIM data" );
 
                 // Read service table
                 if ( CSatNotifyRefresh::KCacheEFSST &
                     iTsySatMessaging->GetNotifyRefresh()->CachedFiles() )
                     {
+                    TInt ret( KErrNone );
                     // Re-read EF-UST
-                    // Call control in USSD is supported only in SIM, byte 6
                     if ( UICC_CARD_TYPE_ICC == iCardType )
                         {
-                        UiccReadServiceTableReq( KUiccTrIdServiceTableByte6, 5 );
+                        // Call control in USSD is supported only in SIM, from byte 10
+                        ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte11, 10 );
+                        User::LeaveIfError( ret );
+                        // SMS-PP DD and Call Control from byte 7
+                        ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte7, 6 );
+                        User::LeaveIfError( ret );
+                        }
+                    else if( UICC_CARD_TYPE_UICC == iCardType )
+                        {
+                        // Call control, MO-SMS Control and SMS PP Datadownload, from byte 4
+                        ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte4, 3 );
+                        User::LeaveIfError( ret );
                         }
 
-                    // Call control, byte 4 from service table
-                    UiccReadServiceTableReq( KUiccTrIdServiceTableByte4, 3 );
 #ifdef INFO_PP_ATK_MO_SM_CONTROL
                     // Check MO SMS control is supported by product profile
-                    // USIM: byte 4, SIM: byte 5
+                    // USIM: byte 4, SIM: byte 10
                     TUint8 serviceTableTrIdMoSms( KUiccTrIdServiceTableByte4 );
                     TUint8 serviceTableOffsetMoSms( 3 );
                     if ( UICC_CARD_TYPE_ICC == iCardType )
                         {
                         // Transaction ID and byte offset for SIM
-                        serviceTableTrIdMoSms = KUiccTrIdServiceTableByte5;
-                        serviceTableOffsetMoSms = 4;
+                        serviceTableTrIdMoSms = KUiccTrIdServiceTableByte10;
+                        serviceTableOffsetMoSms = 9;
                         }
                     if ( iMoSmsSupportedInPp )
                         {
                         // ...and by SIM service table
-                        UiccReadServiceTableReq(
+                        ret = UiccReadServiceTableReq(
                             serviceTableTrIdMoSms,
                             serviceTableOffsetMoSms );
+                        User::LeaveIfError( ret );
                         }
 #else
                     // If flag not defined, check feature availability only
                     // from USIM
-                    UiccReadServiceTableReq(
+                    ret = UiccReadServiceTableReq(
                         serviceTableTrIdMoSms,
                         serviceTableOffsetMoSms );
+                    User::LeaveIfError( ret );
 #endif // INFO_PP_ATK_MO_SM_CONTROL
                     }
                 break;
                 }
             default:
                 {
-                TFLOGSTRING2("TSY: CSatMessHandler::RefreshResult, refresh failed, UICC STATUS: 0x%x", aStatus );
-                OstTraceExt1( TRACE_NORMAL, DUP4_CSATMESSHANDLER_REFRESHRESULT, "CSatMessHandler::RefreshResult, refresh failed, UICC STATUS: 0x%hhx", aStatus );
+                TFLOGSTRING2("TSY: CSatMessHandler::RefreshResultL, refresh failed, UICC STATUS: 0x%x", aStatus );
+                OstTraceExt1( TRACE_NORMAL, DUP4_CSATMESSHANDLER_REFRESHRESULTL_TD, "CSatMessHandler::RefreshResultL, refresh failed, UICC STATUS: 0x%hhx", aStatus );
                 result = RSat::KMeUnableToProcessCmd;
                 additionalInfo = RSat::KNoSpecificMeProblem;
                 ret = KErrGeneral;
@@ -2634,7 +2652,7 @@ void CSatMessHandler::SendSmsReportReq
         TDesC8& aData
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SENDSMSREPORTREQ, "CSatMessHandler::SendSmsReportReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SENDSMSREPORTREQ_TD, "CSatMessHandler::SendSmsReportReq" );
     TFLOGSTRING("CSatMessHandler::SendSmsReportReq");
 
     iPnSend->Send( PN_SMS, aTransId, SMS_RECEIVED_MSG_REPORT_REQ, aData );
@@ -2652,7 +2670,7 @@ void CSatMessHandler::SmsResoureConfReq
         TDesC8& aData
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SMSRESOURCECONFREQ, "CSatMessHandler::SmsResourceConfReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SMSRESOURCECONFREQ_TD, "CSatMessHandler::SmsResourceConfReq" );
     TFLOGSTRING("CSatMessHandler::SmsResourceConfReq");
 
     iPnSend->Send( PN_SMS, aTransId, aMsgId, aData );
@@ -2672,7 +2690,7 @@ void CSatMessHandler::SetPollingResult(
         TUint8 aInterval
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SETPOLLINGRESULT, "CSatMessHandler::SetPollingResult" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SETPOLLINGRESULT_TD, "CSatMessHandler::SetPollingResult" );
     TFLOGSTRING("TSY:CSatMessHandler::SetPollingResult ");
 
     if ( UICC_STATUS_OK == aStatus )
@@ -2681,7 +2699,7 @@ void CSatMessHandler::SetPollingResult(
         if ( iPollingOff )
             {
             TFLOGSTRING("TSY:CSatMessHandler::SetPollingResult, iPollingOff = ETrue");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_SETPOLLINGRESULT, "CSatMessHandler::SetPollingResult, iPollingOff = ETrue" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_SETPOLLINGRESULT_TD, "CSatMessHandler::SetPollingResult, iPollingOff = ETrue" );
             PollingOffTerminalResp(
                 aTransId,
                 iTsySatMessaging->GetNotifyPollingOff()->GetCmdDetails(),
@@ -2691,7 +2709,7 @@ void CSatMessHandler::SetPollingResult(
         else
             {
             TFLOGSTRING("TSY:CSatMessHandler::SetPollingResult, iPollingOff = EFalse");
-            OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_SETPOLLINGRESULT, "CSatMessHandler::SetPollingResult, iPollingOff = EFalse" );
+            OstTrace0( TRACE_NORMAL,  DUP2_CSATMESSHANDLER_SETPOLLINGRESULT_TD, "CSatMessHandler::SetPollingResult, iPollingOff = EFalse" );
             PollIntervalTerminalResp(
                 aTransId,
                 iTsySatMessaging->GetNotifyPollInterval()->GetCmdDetails(),
@@ -2750,7 +2768,7 @@ TInt CSatMessHandler::CheckProactiveCommand
         const TIsiReceiveC& aIsiMessage // received isi message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_CHECKPROACTIVECOMMAND, "CSatMessHandler::CheckProactiveCommand" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_CHECKPROACTIVECOMMAND_TD, "CSatMessHandler::CheckProactiveCommand" );
     TFLOGSTRING("TSY:CSatMessHandler::CheckProactiveCommand");
 
     TTlv data;
@@ -2816,7 +2834,7 @@ TInt CSatMessHandler::CheckProactiveCommand
         else
             {
             TFLOGSTRING("TSY: CSatMessHandler::CheckProactiveCommand. Proactive command Ok.");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_CHECKPROACTIVECOMMAND, "CSatMessHandler::CheckProactiveCommand Proactive command Ok." );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_CHECKPROACTIVECOMMAND_TD, "CSatMessHandler::CheckProactiveCommand Proactive command Ok." );
             }
 
         if ( KErrCorrupt == ret )
@@ -2874,7 +2892,7 @@ TInt CSatMessHandler::MoreTimeTerminalResp
         TUint8 aGeneralResult       // General result
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_MORETIMETERMINALRESP, "CSatMessHandler::MoreTimeTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_MORETIMETERMINALRESP_TD, "CSatMessHandler::MoreTimeTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::MoreTimeTerminalResp");
 
     // Create and append response data
@@ -2903,32 +2921,33 @@ TInt CSatMessHandler::SmsCbRoutingReq
         TUint8 aRoutingCommand  // Routing command
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SMSCBROUTINGREQ, "CSatMessHandler::SmsCbRoutingReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SMSCBROUTINGREQ_TD, "CSatMessHandler::SmsCbRoutingReq" );
     TFLOGSTRING("TSY:CSatMessHandler::SmsRoutingReq");
 
     TInt ret( KErrNone );
+    iCbRoutingReqTraId = TInt( aTransId );
 
-        // Routing is ongoing
-        iSmsCbRoutingComplete = EFalse;
+    // Routing is ongoing
+    iSmsCbRoutingComplete = EFalse;
 
-        // TBuf8<SIZE_SMS_CB_ROUTING_REQ> because we are sending [U]SIM EF CBMID Message
-        // Subscription;
-        TBuf8<SIZE_SMS_CB_ROUTING_REQ> data;
+    // TBuf8<SIZE_SMS_CB_ROUTING_REQ> because we are sending [U]SIM EF CBMID Message
+    // Subscription;
+    TBuf8<SIZE_SMS_CB_ROUTING_REQ> data;
 
-        // Append Routing command
-        data.Append( aRoutingCommand );
-        // Append Subscription number
-        data.Append( SMS_NEW_SUBSCRIPTION );
-        // append Subscription type
-        data.Append( SMS_TYPE_SIM );
-        // Append Filler bytes
-        data.AppendFill( KPadding, 2 );
-        // Append no of Subblocks
-        data.Append( 0 );
+    // Append Routing command
+    data.Append( aRoutingCommand );
+    // Append Subscription number
+    data.Append( SMS_NEW_SUBSCRIPTION );
+    // append Subscription type
+    data.Append( SMS_TYPE_SIM );
+    // Append Filler bytes
+    data.AppendFill( KPadding, 2 );
+    // Append no of Subblocks
+    data.Append( 0 );
 
-        // Send Subscription request
-        ret = iPnSend->Send( PN_SMS, aTransId, SMS_CB_ROUTING_REQ,
-                data );
+    // Send Subscription request
+    ret = iPnSend->Send( PN_SMS, aTransId, SMS_CB_ROUTING_REQ,
+            data );
 
     return ret;
     }
@@ -2943,34 +2962,39 @@ void CSatMessHandler::SmsCbRoutingResp
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SMSCBROUTINGRESP, "CSatMessHandler::SmsCbRoutingResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SMSCBROUTINGRESP_TD, "CSatMessHandler::SmsCbRoutingResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SmsCbRoutingResp");
 
-    TUint8 cause( aIsiMessage.Get8bit(
-        ISI_HEADER_SIZE + SMS_CB_ROUTING_RESP_OFFSET_SMSCAUSE ) );
-
-    switch ( cause )
+    if ( iCbRoutingReqTraId == aIsiMessage.Get8bit(
+         ISI_HEADER_OFFSET_TRANSID ) )
         {
-        case SMS_ERR_CS_INACTIVE:
-        case SMS_ERR_SUBJECT_COUNT_OVERFLOW:
-        case SMS_ERR_DCS_COUNT_OVERFLOW:
+        TUint8 cause( aIsiMessage.Get8bit(
+            ISI_HEADER_SIZE + SMS_CB_ROUTING_RESP_OFFSET_SMSCAUSE ) );
+        iCbRoutingReqTraId = KNoTransactionOngoing;
+
+        switch ( cause )
             {
-            TFLOGSTRING2("TSY:CSatMessHandler::SmsCbRoutingResp \
-                Routing req failed on temporary problem: %d", cause );
-            OstTraceExt1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_SMSCBROUTINGRESP, "CSatMessHandler::SmsCbRoutingResp Routing req failed on temporary problem: %hhu", cause );
-            iSmsCbRoutingComplete = EFalse;
-            break;
-            }
-        case SMS_OK:
-        case SMS_ERR_INVALID_SUBSCRIPTION_NR:
-        case SMS_ERR_INVALID_PARAMETER:
-        case SMS_ERR_ALL_SUBSCRIPTIONS_ALLOCATED:
-        default:
-            {
-            // Routing req was either completed successfully, or permanent
-            // problem occured. In both cases, no need to retry.
-            iSmsCbRoutingComplete = ETrue;
-            break;
+            case SMS_ERR_CS_INACTIVE:
+            case SMS_ERR_SUBJECT_COUNT_OVERFLOW:
+            case SMS_ERR_DCS_COUNT_OVERFLOW:
+                {
+                TFLOGSTRING2("TSY:CSatMessHandler::SmsCbRoutingResp \
+                    Routing req failed on temporary problem: %d", cause );
+                OstTraceExt1( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_SMSCBROUTINGRESP_TD, "CSatMessHandler::SmsCbRoutingResp Routing req failed on temporary problem: %hhu", cause );
+                iSmsCbRoutingComplete = EFalse;
+                break;
+                }
+            case SMS_OK:
+            case SMS_ERR_INVALID_SUBSCRIPTION_NR:
+            case SMS_ERR_INVALID_PARAMETER:
+            case SMS_ERR_ALL_SUBSCRIPTIONS_ALLOCATED:
+            default:
+                {
+                // Routing req was either completed successfully, or permanent
+                // problem occured. In both cases, no need to retry.
+                iSmsCbRoutingComplete = ETrue;
+                break;
+                }
             }
         }
     }
@@ -2989,7 +3013,7 @@ void CSatMessHandler::SmsResourceConfInd
         )
     {
     TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceConfIndReceived: Response for Resource confoguration Indication, Receive Indication from SMS server");
-    OstTrace0( TRACE_NORMAL, DUP1_CSATMOSMSCTRL_SMSRESOURCECONFINDRECEIVED, "CSatMoSmsCtrl::SmsResourceRespReceived: Response for Resource Configuration Ind, Receive indication from SMS server" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATMOSMSCTRL_SMSRESOURCECONFINDRECEIVED_TD, "CSatMoSmsCtrl::SmsResourceRespReceived: Response for Resource Configuration Ind, Receive indication from SMS server" );
 
     // To check The receive indication is for startup or reconfiguration
     if ( SMS_RES_CONF_STARTUP == aIsiMessage.Get8bit( ISI_HEADER_SIZE
@@ -3015,8 +3039,8 @@ void CSatMessHandler::SmsResourceConfInd
                     }
                 else if ( UICC_CARD_TYPE_ICC == iCardType )
                     {
-                    // SIM: Read MO-SMS control from byte 5
-                    UiccReadServiceTableReq( KUiccTrIdServiceTableByte5, 4 );
+                    // SIM: Read MO-SMS control from byte 10
+                    UiccReadServiceTableReq( KUiccTrIdServiceTableByte10, 9 );
                     }
                 }
             }
@@ -3033,7 +3057,7 @@ TInt CSatMessHandler::NetCellInfoGetReq
         TUint8 aTransId
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETCELLINFOGETREQ, "CSatMessHandler::NetCellInfoGetReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_NETCELLINFOGETREQ_TD, "CSatMessHandler::NetCellInfoGetReq" );
     TFLOGSTRING("TSY:CSatMessHandler::NetCellInfoGetReq");
 
     TBuf8<1> noData;
@@ -3055,7 +3079,7 @@ void CSatMessHandler::NetCellInfoGetResp
         const TIsiReceiveC& aIsiMessage
         )
     {
-OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETCELLINFOGETRESP, "CSatMessHandler::NetCellInfoGetResp" );
+OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_NETCELLINFOGETRESP_TD, "CSatMessHandler::NetCellInfoGetResp" );
 TFLOGSTRING("TSY: CSatMessHandler::NetCellInfoGetResp");
 
     TUint8 successCode( aIsiMessage.Get8bit(
@@ -3118,7 +3142,7 @@ TFLOGSTRING("TSY: CSatMessHandler::NetCellInfoGetResp");
                 {
                 // Default result value already set
 TFLOGSTRING2("TSY: CSatMessHandler::NetCellInfoGetResp - Unexpected iRegStatus: %d", iLocInfo.iRegStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_NETCELLINFOGETRESP, "CSatMessHandler::NetCellInfoGetResp Unexpected iRegStatus: %d", iLocInfo.iRegStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_NETCELLINFOGETRESP_TD, "CSatMessHandler::NetCellInfoGetResp Unexpected iRegStatus: %d", iLocInfo.iRegStatus );
 
                 additionalInfo.Append( RSat::KNoSpecificMeProblem );
                 break;
@@ -3157,7 +3181,7 @@ TInt CSatMessHandler::GssCsServiceReq
         TUint8 aOperation         // Gss operation
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GSSCSSERVICEREQ, "CSatMessHandler::GssCsServiceReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GSSCSSERVICEREQ_TD, "CSatMessHandler::GssCsServiceReq" );
     TFLOGSTRING("TSY: CSatMessHandler::GssCsServiceReq ");
 
     TBuf8<2> data;
@@ -3176,7 +3200,7 @@ void CSatMessHandler::GssCsServiceResp
         const TIsiReceiveC& aIsiMessage // Received isi messge
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GSSCSSERVICERESP, "CSatMessHandler::GssCsServiceResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GSSCSSERVICERESP_TD, "CSatMessHandler::GssCsServiceResp" );
     TFLOGSTRING("CSatMessHandler::GssCsServiceResp ");
 
     if ( iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus() )
@@ -3219,7 +3243,7 @@ void CSatMessHandler::GssCsServiceResp
                     sbOffset + GSS_ATK_TIMING_ADVANCE_OFFSET_TASTATUS );
 
                 TFLOGSTRING2("TSY: CSatMessHandler::GssCsServiceResp iTaStatus=%d", iTaStatus);
-                OstTraceExt1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_GSSCSSERVICERESP, "CSatMessHandler::GssCsServiceResp iTaStatus: %hhu", iTaStatus );
+                OstTraceExt1( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_GSSCSSERVICERESP_TD, "CSatMessHandler::GssCsServiceResp iTaStatus: %hhu", iTaStatus );
 
                 // Store timing advance
                 iTimingAdvance = aIsiMessage.Get8bit(
@@ -3227,7 +3251,7 @@ void CSatMessHandler::GssCsServiceResp
 
                 TFLOGSTRING2("TSY: CSatMessHandler::GssCsServiceResp \
                     iTimingAdvance=%d", iTimingAdvance);
-                OstTraceExt1( TRACE_NORMAL, DUP2_CSATMESSHANDLER_GSSCSSERVICERESP, "CSatMessHandler::GssCsServiceResp iTimingAdvance: %hhu", iTimingAdvance );
+                OstTraceExt1( TRACE_NORMAL,  DUP2_CSATMESSHANDLER_GSSCSSERVICERESP_TD, "CSatMessHandler::GssCsServiceResp iTimingAdvance: %hhu", iTimingAdvance );
 
                 if ( GSS_TIMING_ADVANCE_NOT_AVAILABLE == iTimingAdvance )
                     {
@@ -3277,7 +3301,7 @@ void CSatMessHandler::GssCsServiceFailResp
         const TIsiReceiveC& aIsiMessage // Received isi messge
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GSSCSSERVICEFAILRESP, "CSatMessHandler::GssCsServiceFailResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GSSCSSERVICEFAILRESP_TD, "CSatMessHandler::GssCsServiceFailResp" );
     TFLOGSTRING("CSatMessHandler::GssCsServiceFailResp ");
 
     if ( iTsySatMessaging->GetNotifyLocalInfo()->LocalInfoStatus() )
@@ -3323,7 +3347,7 @@ TInt CSatMessHandler::LanguageNotificationTerminalResp
         TUint8 aAdditionalInfo      // additional info
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_LANGUAGENOTIFICATIONTERMINALRESP, "CSatMessHandler::LanguageNotificationTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_LANGUAGENOTIFICATIONTERMINALRESP_TD, "CSatMessHandler::LanguageNotificationTerminalResp" );
     TFLOGSTRING("TSY:CSatMessHandler::LanguageNotificationTerminalResp");
 
     TTlv tlvSpecificData;
@@ -3355,7 +3379,7 @@ void CSatMessHandler::NetTimeInd
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETTIMEIND, "CSatMessHandler::NetTimeInd" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_NETTIMEIND_TD, "CSatMessHandler::NetTimeInd" );
     TFLOGSTRING("TSY: CSatMessHandler::NetTimeInd");
 
     // NET_TIME_INFO is mandatory sub block
@@ -3377,7 +3401,7 @@ void CSatMessHandler::NetTimeInd
         // set to 1 (including B6).
         iTimeZone = aIsiMessage.Get8bit( sbOffset + NET_TIME_INFO_OFFSET_TIMEZONE );
         TFLOGSTRING2("TSY: CSatMessHandler::NetTimeInd, Time zone: 0x%x", iTimeZone );
-        OstTraceExt1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_NETTIMEIND, "CSatMessHandler::NetTimeInd Time zone: %hhu", iTimeZone );
+        OstTraceExt1( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_NETTIMEIND_TD, "CSatMessHandler::NetTimeInd Time zone: %hhu", iTimeZone );
         }
     }
 
@@ -3398,7 +3422,7 @@ TInt CSatMessHandler::OpenChannelTerminalResp
         TUint16 aBufferSize         // Buffer size
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_OPENCHANNELTERMINALRESP, "CSatMessHandler::OpenChannelTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_OPENCHANNELTERMINALRESP_TD, "CSatMessHandler::OpenChannelTerminalResp" );
     TFLOGSTRING("CSatMessHandler::OpenChannelTerminalResp");
 
     // Create and append response data
@@ -3438,7 +3462,7 @@ TInt CSatMessHandler::OpenChannelTerminalResp
     else
         {
         TFLOGSTRING("TSY: CSatMessHandler::OpenChannelTerminalResp, General result did not match.");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_OPENCHANNELTERMINALRESP, "CSatMessHandler::OpenChannelTerminalResp, General result did not match." );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_OPENCHANNELTERMINALRESP_TD, "CSatMessHandler::OpenChannelTerminalResp, General result did not match." );
         }
 
     // For any result:
@@ -3481,7 +3505,7 @@ TInt CSatMessHandler::GetChannelStatusTerminalResp
         const TDes8& aAdditionalInfo
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GETCHANNELSTATUSTERMINALRESP, "CSatMessHandler::GetChannelStatusTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GETCHANNELSTATUSTERMINALRESP_TD, "CSatMessHandler::GetChannelStatusTerminalResp" );
     TFLOGSTRING("CSatMessHandler::GetChannelStatusTerminalResp");
     TTlv tlvSpecificData;
     // Append general result tag
@@ -3513,7 +3537,7 @@ TInt CSatMessHandler::GetChannelStatusTerminalResp
     else
         {
         TFLOGSTRING("CSatMessHandler::GetChannelStatusTerminalResp - mandatory channel status missing");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_GETCHANNELSTATUSTERMINALRESP, "CSatMessHandler::GetChannelStatusTerminalResp - mandatory channel status missing" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_GETCHANNELSTATUSTERMINALRESP_TD, "CSatMessHandler::GetChannelStatusTerminalResp - mandatory channel status missing" );
         }
 
     return UiccCatReqTerminalResponse(
@@ -3536,7 +3560,7 @@ TInt CSatMessHandler::CloseChannelTerminalResp
         const TDes8& aAdditionalInfo
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_CLOSECHANNELTERMINALRESP, "CSatMessHandler::CloseChannelTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_CLOSECHANNELTERMINALRESP_TD, "CSatMessHandler::CloseChannelTerminalResp" );
     TFLOGSTRING("CSatMessHandler::CloseChannelTerminalResp");
     TTlv tlvSpecificData;
     // Append general result tag
@@ -3578,7 +3602,7 @@ TInt CSatMessHandler::SendDataTerminalResp
         TUint8 aChannelDataLength
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SENDDATATERMINALRESP, "CSatMessHandler::SendDataTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SENDDATATERMINALRESP_TD, "CSatMessHandler::SendDataTerminalResp" );
     TFLOGSTRING("CSatMessHandler::SendDataTerminalResp");
     TTlv tlvSpecificData;
     // Append general result tag
@@ -3605,7 +3629,7 @@ TInt CSatMessHandler::SendDataTerminalResp
     else
         {
         TFLOGSTRING("TSY: CSatMessHandler::SendDataTerminalResp, General result did not match.");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_SENDDATATERMINALRESP, "CSatMessHandler::SendDataTerminalResp, General result did not match." );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_SENDDATATERMINALRESP_TD, "CSatMessHandler::SendDataTerminalResp, General result did not match." );
         }
 
     return UiccCatReqTerminalResponse(
@@ -3629,7 +3653,7 @@ TInt CSatMessHandler::ReceiveDataTerminalResp
         TUint8 aChannelDataLength
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_RECEIVEDATATERMINALRESP, "CSatMessHandler::ReceiveDataTerminalResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_RECEIVEDATATERMINALRESP_TD, "CSatMessHandler::ReceiveDataTerminalResp" );
     TFLOGSTRING("CSatMessHandler::ReceiveDataTerminalResp");
     TTlv tlvSpecificData;
     // Append general result tag
@@ -3660,7 +3684,7 @@ TInt CSatMessHandler::ReceiveDataTerminalResp
     else
         {
         TFLOGSTRING("TSY: CSatMessHandler::ReceiveDataTerminalResp, General result did not match.");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_RECEIVEDATATERMINALRESP, "CSatMessHandler::ReceiveDataTerminalResp, General result did not match." );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_RECEIVEDATATERMINALRESP_TD, "CSatMessHandler::ReceiveDataTerminalResp, General result did not match." );
         }
 
     return UiccCatReqTerminalResponse(
@@ -3683,7 +3707,7 @@ TInt CSatMessHandler::SendSmsResourceReq
         TUint8 aReceiverObject
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SENDSMSRESOURCERESP, "CSatMessHandler::SendSmsResourceResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SENDSMSRESOURCERESP_TD, "CSatMessHandler::SendSmsResourceResp" );
     TFLOGSTRING("TSY:CSatMessHandler::SendSmsResourceResp");
 
     TIsiSend isimsg( iPnSend->SendBufferDes() );
@@ -3714,7 +3738,7 @@ void CSatMessHandler::SsStatusInd
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SSSTATUSIND, "CSatMessHandler::SsStatusInd" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SSSTATUSIND_TD, "CSatMessHandler::SsStatusInd" );
     TFLOGSTRING("TSY: CSatMessHandler::SsStatusInd");
 
     TUint8 ssStatus  = aIsiMessage.Get8bit( ISI_HEADER_SIZE
@@ -3746,7 +3770,7 @@ TBool CSatMessHandler::AdditionalInfoNeeded
         const TUint8 aGeneralResult
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_ADDITIONALINFONEEDED, "CSatMessHandler::AdditionalInfoNeeded" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_ADDITIONALINFONEEDED_TD, "CSatMessHandler::AdditionalInfoNeeded" );
     // NOTE: This method shall not be used with SendSS proactive command as its
     // additional info handling differs from other commands.
 
@@ -3789,7 +3813,7 @@ void CSatMessHandler::ReceiveMessageL
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_RECEIVEMESSAGEL, "CSatMessHandler::ReceiveMessageL" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_RECEIVEMESSAGEL_TD, "CSatMessHandler::ReceiveMessageL" );
     TFLOGSTRING("TSY: CSatMessHandler::ReceiveMessageL");
 
     // Get ISI message resource and id
@@ -3808,11 +3832,11 @@ void CSatMessHandler::ReceiveMessageL
             SsServerMessageReceived( aIsiMessage );
             break;
             }
-        case PN_PHONE_INFO:
+        /*case PN_PHONE_INFO:
             {
-            PhoneInfoMessageReceived( aIsiMessage );
+            PhoneInfoMessageReceivedL( aIsiMessage );
             break;
-            }
+            }*/
         case PN_MODEM_NETWORK:
             {
             NetServerMessageReceived( aIsiMessage );
@@ -3830,7 +3854,7 @@ void CSatMessHandler::ReceiveMessageL
             }
         case PN_UICC:
             {
-            handled = UiccServerMessageReceived( aIsiMessage );
+            handled = UiccServerMessageReceivedL( aIsiMessage );
             break;
             }
         default:
@@ -3858,7 +3882,7 @@ void CSatMessHandler::HandleError
         TInt /*aErrorCode*/
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_HANDLEERROR, "CSatMessHandler::HandleError" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_HANDLEERROR_TD, "CSatMessHandler::HandleError" );
     // No implementation
     }
 
@@ -3873,7 +3897,7 @@ void CSatMessHandler::NetRatInd
         const TIsiReceiveC& aIsiMessage // ISI message
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_NETRATIND, "CSatMessHandler::NetRatInd" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_NETRATIND_TD, "CSatMessHandler::NetRatInd" );
     TFLOGSTRING("TSY:CSatMessHandler::NetRatInd");
 
     // Check the presence of subblocks
@@ -3921,7 +3945,7 @@ void CSatMessHandler::NetRatInd
                 }
             }
         TFLOGSTRING2("TSY:CSatMessHandler::NetRatInd - Current Acc Tech: %d",iCurrentAccTech);
-        OstTraceExt1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_NETRATIND, "CSatMessHandler::NetRatInd - Current Acc Tech: %hhu", iCurrentAccTech );
+        OstTraceExt1( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_NETRATIND_TD, "CSatMessHandler::NetRatInd - Current Acc Tech: %hhu", iCurrentAccTech );
         }
 
     }
@@ -3933,7 +3957,7 @@ void CSatMessHandler::NetRatInd
 //
 const CSatMessHandler::TLocationInfo& CSatMessHandler::LocationInfo()
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_LOCATIONINFO, "CSatMessHandler::LocationInfo" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_LOCATIONINFO_TD, "CSatMessHandler::LocationInfo" );
     // Extended Cell Id is provided only if both USIM and
     // 3G network are present.
     if ( KNetworkModeUtran != iCurrentAccTech
@@ -3952,47 +3976,6 @@ const CSatMessHandler::TLocationInfo& CSatMessHandler::LocationInfo()
     }
 
 // -----------------------------------------------------------------------------
-// CSatMessHandler::SendPnAtkMessage
-// Sends a PN_ATK message with the given data, sets also possible filler bytes
-// -----------------------------------------------------------------------------
-//
-TInt CSatMessHandler::SendPnAtkMessage
-        (
-        const TUint8 aReceiverObject,
-        const TUint8 aTransactionId,
-        const TInt aMessageId,
-        const TDesC8& aData
-        )
-    {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SENDPNATKMESSAGE, "CSatMessHandler::SendPnAtkMessage" );
-    TFLOGSTRING("TSY:CSatMessHandler::SendPnAtkMessage");
-
-    TBuf8<KLengthTwoBytes> data;
-    data.Append( aTransactionId );
-    data.Append( aMessageId );
-
-    // Create send buffer (sets the msg length to NULL)
-    TIsiSend isimsg( iPnSend->SendBufferDes() );
-
-    // Set the receiver object and resource ID
-    isimsg.Set8bit( ISI_HEADER_OFFSET_RECEIVEROBJECT, aReceiverObject );
-    isimsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_ATK );
-    // Set Transaction ID and Msg ID at the end of the message buffer
-    isimsg.CopyData( ISI_HEADER_SIZE, data );
-    // Copy the message data at the end of the message buffer
-    isimsg.CopyData( ( ISI_HEADER_SIZE + KLengthTwoBytes ), aData );
-
-    // Add padding(s)
-    while ( iPnSend->SendBufferDes().Length() % 4 )
-        {
-        iPnSend->SendBufferDes().Append( 0x00 );
-        }
-
-    // Send message
-    return iPnSend->Send( isimsg.Complete() );
-    }
-
-// -----------------------------------------------------------------------------
 // CSatMessHandler::UiccApplCmdResp
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
@@ -4000,7 +3983,7 @@ TInt CSatMessHandler::SendPnAtkMessage
 void CSatMessHandler::UiccApplCmdResp( const TIsiReceiveC& aIsiMessage )
     {
     TFLOGSTRING("TSY: CSatMessHandler::UiccApplCmdResp");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_UICCAPPLCMDRESP, "CSatMessHandler::UiccApplCmdResp" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_UICCAPPLCMDRESP_TD, "CSatMessHandler::UiccApplCmdResp" );
 
     TInt error( KErrNone );
     // Get transaction ID, status and service type
@@ -4035,7 +4018,7 @@ void CSatMessHandler::UiccApplCmdResp( const TIsiReceiveC& aIsiMessage )
     else // Subblock is mandatory
         {
         TFLOGSTRING("TSY: CSatMessHandler::UiccApplCmdResp - Mandatory subblock UICC_SB_FILE_DATA not found");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_UICCAPPLCMDRESP, "CSatMessHandler::UiccApplCmdResp - Mandatory subblock UICC_SB_FILE_DATA not found" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_UICCAPPLCMDRESP_TD, "CSatMessHandler::UiccApplCmdResp - Mandatory subblock UICC_SB_FILE_DATA not found" );
         error = KErrNotFound;
         }
 
@@ -4046,37 +4029,45 @@ void CSatMessHandler::UiccApplCmdResp( const TIsiReceiveC& aIsiMessage )
             {
             if ( KErrNone == error )
                 {
-                TUint8 usedBitMaskSmsPpDd( KSmsPpDdBitMaskUsim );
-                if ( UICC_CARD_TYPE_ICC == iCardType )
-                    {
-                    usedBitMaskSmsPpDd = KSmsPpDdBitMaskSim;
-                    }
-                else
-                    {
-                    // MO SMS control status, only in case of USIM
-                    SimMoSmsControlAvail(
-                        fileData[0] & KMoSmsControlBitMaskUsim );
-                    }
-                // Get status of SMS PP DD and report to DataDownload
-                iTsySatMessaging->GetDataDownload()->SmsPpDlSupported(
-                    ( fileData[0] & usedBitMaskSmsPpDd ) ? ETrue : EFalse );
+                // MO SMS control status, only in case of USIM
+                SimMoSmsControlAvail(
+                    fileData[0] & KMoSmsControlBitMaskUsim );
+
+                iTsySatMessaging->GetDataDownload()->SmsPpDlSupported( 
+                    fileData[0] & KSmsPpDdBitMaskUsim );
                 }
             break;
             }
         // MO SMS control ( this transaction ID is used for SIM only )
-        case KUiccTrIdServiceTableByte5:
+        case KUiccTrIdServiceTableByte10:
             {
             if ( KErrNone == error )
                 {
-                SimMoSmsControlAvail( fileData[0] & KMoSmsControlBitMaskSim );
+                // MO SMS control status, only in case of USIM
+                SimMoSmsControlAvail( 
+                    KMoSmsControlBitMaskSim == ( fileData[0] & KMoSmsControlBitMaskSim ) );
                 }
             break;
             }
         // USSD in Call Control ( this transaction ID is used for SIM only )
-        case KUiccTrIdServiceTableByte6:
+        case KUiccTrIdServiceTableByte11:
             {
             iTsySatMessaging->SetStatusOfUssdSupport(
-                fileData[0] & KMoUssdCallControlBitMaskSim );
+                KMoUssdCallControlBitMaskSim == ( fileData[0] & KMoUssdCallControlBitMaskSim ) );
+            break;
+            }
+        // SMS PP Datadownload ( this transaction ID is used for SIM only )
+        case KUiccTrIdServiceTableByte7:
+            {
+            if ( UICC_CARD_TYPE_UICC == iCardType )
+                {
+                TBool ppDdSupported( EFalse );
+                if( KSmsPpDdBitMaskSim == ( fileData[0] & KSmsPpDdBitMaskSim ) )
+                    {
+                    ppDdSupported = ETrue;
+                    }
+                iTsySatMessaging->GetDataDownload()->SmsPpDlSupported( ppDdSupported );
+                }
             break;
             }
         // SAT icon
@@ -4168,17 +4159,17 @@ void CSatMessHandler::UiccApplCmdResp( const TIsiReceiveC& aIsiMessage )
 
 
 // -----------------------------------------------------------------------------
-// CSatMessHandler::UiccCatInd
+// CSatMessHandler::UiccCatIndL
 // Breaks UICC_CAT_IND ISI-message.
 // -----------------------------------------------------------------------------
 //
-void CSatMessHandler::UiccCatInd
+void CSatMessHandler::UiccCatIndL
     (
     const TIsiReceiveC& aIsiMessage // Received ISI message
     )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_UICCCATIND, "CSatMessHandler::UiccCatInd" );
-    TFLOGSTRING("TSY: CSatMessHandler::UiccCatInd");
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_UICCCATINDL_TD, "CSatMessHandler::UiccCatIndL" );
+    TFLOGSTRING("TSY: CSatMessHandler::UiccCatIndL");
 
     // UICC status
     TUint8 serviceType( aIsiMessage.Get8bit(
@@ -4221,8 +4212,8 @@ void CSatMessHandler::UiccCatInd
             }
         else
             {
-            TFLOGSTRING("TSY: Received SAT message was not valid!");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_UICCCATIND, "CSatMessHandler::UiccCatInd. Received SAT message was not valid!" );
+            TFLOGSTRING("TSY: CSatMessHandler::UiccCatIndL: Received SAT message was not valid!");
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_UICCCATINDL_TD, "CSatMessHandler::UiccCatIndL. Received SAT message was not valid!" );
             }
         }
     }
@@ -4232,12 +4223,12 @@ void CSatMessHandler::UiccCatInd
 // Construct a INFO_PP_READ_REQ ISI message
 // -----------------------------------------------------------------------------
 //
-TInt CSatMessHandler::InfoPpReadReq
+/*TInt CSatMessHandler::InfoPpReadReq
         (
         const TUint8 aReqType // request type
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_INFOPPREADREQ, "CSatMessHandler::InfoPpReadReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_INFOPPREADREQ_TD, "CSatMessHandler::InfoPpReadReq" );
     TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadReq" );
 
     // Construct INFO_PP_READ_REQ message (INFO_BATCH_TYPE +
@@ -4287,20 +4278,20 @@ TInt CSatMessHandler::InfoPpReadReq
         tempTraId,
         INFO_PP_READ_REQ,
         infoPpReadReq );
-    }
+    }*/
 
 // -----------------------------------------------------------------------------
-// CSatMessHandler::InfoPpReadResp
+// CSatMessHandler::InfoPpReadRespL
 // Breaks a INFO_PP_READ_RESP ISI-message.
 // -----------------------------------------------------------------------------
 //
-void CSatMessHandler::InfoPpReadResp
+/*void CSatMessHandler::InfoPpReadRespL
         (
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp" );
-    TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadResp" );
+    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL" );
+    TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadRespL" );
 
     TUint8 traId( aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                             INFO_PP_READ_RESP_OFFSET_TRANSID ) );
@@ -4308,9 +4299,9 @@ void CSatMessHandler::InfoPpReadResp
     TUint8 status( aIsiMessage.Get8bit( ISI_HEADER_SIZE +
                             INFO_PP_READ_RESP_OFFSET_STATUS ) );
 
-    TFLOGSTRING2("TSY: CSatMessHandler::InfoPpReadResp - Status: %d",
+    TFLOGSTRING2("TSY: CSatMessHandler::InfoPpReadRespL - Status: %d",
         status );
-    OstTraceExt1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp - Status: %hhu", status );
+OstTraceExt1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL - Status: %hhu", status );
 
 
     switch ( status )
@@ -4346,26 +4337,29 @@ void CSatMessHandler::InfoPpReadResp
                         //Get the value of the MO SMS control feature
                         if ( INFO_PP_FALSE != pPFeatures [1] )
                             {
-                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadResp, MO SMS control supported by ME product profile" );
-                            OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp, MO SMS control supported by ME product profile" );
+                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadRespL, MO SMS control supported by ME product profile" );
+                            OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL, MO SMS control supported by ME product profile" );
                             iMoSmsSupportedInPp = ETrue;
+                            TInt ret( KErrNone );
                             // Continue MO SMS control check by checking
                             // feature availability from USIM
                             if ( UICC_CARD_TYPE_UICC == iCardType )
                                 {
                                 // USIM: Read MO-SMS control from byte 4
-                                UiccReadServiceTableReq( KUiccTrIdServiceTableByte4, 5 );
+                                ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte4, 3 );
+                                User::LeaveIfError( ret );
                                 }
                             else if ( UICC_CARD_TYPE_ICC == iCardType )
                                 {
-                                // SIM: Read MO-SMS control from byte 5
-                                UiccReadServiceTableReq( KUiccTrIdServiceTableByte5, 6 );
+                                // SIM: Read MO-SMS control from byte 10
+                                ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte10, 9 );
+                                User::LeaveIfError( ret );
                                 }
                             }
                         else
                             {
-                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadResp, MO SMS control not supported by ME product profile" );
-                            OstTrace0( TRACE_NORMAL, DUP3_CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp, MO SMS control not supported by ME product profile" );
+                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadRespL, MO SMS control not supported by ME product profile" );
+                            OstTrace0( TRACE_NORMAL, DUP3_CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL, MO SMS control not supported by ME product profile" );
                             iMoSmsSupportedInPp = EFalse;
                             // Feature was not activated in product profile
                             // Set MoSmsCtrl object큦 member
@@ -4381,14 +4375,14 @@ void CSatMessHandler::InfoPpReadResp
                         //Get the value of the ENS feature
                         if ( INFO_PP_FALSE != pPFeatures [1] )
                             {
-                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadResp, INFO_PP_ENHANCED_NETWORK_SELECTION supported by ME product profile" );
-                            OstTrace0( TRACE_NORMAL, DUP8_CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp, INFO_PP_ENHANCED_NETWORK_SELECTION supported by ME product profile" );
+                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadRespL, INFO_PP_ENHANCED_NETWORK_SELECTION supported by ME product profile" );
+                            OstTrace0( TRACE_NORMAL, DUP8_CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL, INFO_PP_ENHANCED_NETWORK_SELECTION supported by ME product profile" );
                             iEnsSupportedInPp = ETrue;
                             }
                         else
                             {
-                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadResp, INFO_PP_ENHANCED_NETWORK_SELECTION not supported by ME product profile" );
-                            OstTrace0( TRACE_NORMAL, DUP9_CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp, INFO_PP_ENHANCED_NETWORK_SELECTION not supported by ME product profile" );
+                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadRespL, INFO_PP_ENHANCED_NETWORK_SELECTION not supported by ME product profile" );
+                            OstTrace0( TRACE_NORMAL, DUP9_CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL, INFO_PP_ENHANCED_NETWORK_SELECTION not supported by ME product profile" );
                             iEnsSupportedInPp = EFalse;
                             }
                         }
@@ -4400,14 +4394,14 @@ void CSatMessHandler::InfoPpReadResp
                         //Get the value of the SIM_POLL_INTERVAL control feature
                         if ( INFO_PP_FALSE != pPFeatures [1] )
                             {
-                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadResp, INFO_PP_SIM_OLD_POLL_INTERVAL supported by ME product profile" );
-                            OstTrace0( TRACE_NORMAL, DUP4_CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp, INFO_PP_SIM_OLD_POLL_INTERVAL supported by ME product profile" );
+                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadRespL, INFO_PP_SIM_OLD_POLL_INTERVAL supported by ME product profile" );
+                            OstTrace0( TRACE_NORMAL, DUP4_CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL, INFO_PP_SIM_OLD_POLL_INTERVAL supported by ME product profile" );
                             iOldPollIntervalSupportedInPp = ETrue;
                             }
                         else
                             {
-                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadResp, INFO_PP_SIM_OLD_POLL_INTERVAL not supported by ME product profile" );
-                            OstTrace0( TRACE_NORMAL, DUP5_CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp, INFO_PP_SIM_OLD_POLL_INTERVAL not supported by ME product profile" );
+                            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadRespL, INFO_PP_SIM_OLD_POLL_INTERVAL not supported by ME product profile" );
+                            OstTrace0( TRACE_NORMAL, DUP5_CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL, INFO_PP_SIM_OLD_POLL_INTERVAL not supported by ME product profile" );
                             iOldPollIntervalSupportedInPp = EFalse;
                             }
                         }
@@ -4419,8 +4413,8 @@ void CSatMessHandler::InfoPpReadResp
             }
         case INFO_NO_NUMBER:
             {
-            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadResp, Requested feature not defined in product profile" );
-            OstTrace0( TRACE_NORMAL, DUP6_CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp, Requested feature not defined in product profile" );
+            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadRespL, Requested feature not defined in product profile" );
+OstTrace0( TRACE_NORMAL, DUP6_CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL, Requested feature not defined in product profile" );
 #ifdef INFO_PP_ATK_MO_SM_CONTROL
             // Request was for INFO_PP_ATK_MO_SM_CONTROL
             if ( traId == iInfoPpMoSmsTraId )
@@ -4428,16 +4422,19 @@ void CSatMessHandler::InfoPpReadResp
                 // If the MO SMS feature is not defined in product profile,
                 // internal Boolean used as feature supported ( for refresh )
                 iMoSmsSupportedInPp = ETrue;
+                TInt ret( KErrNone );
                 // Continue as usual by checking feature avalability from USIM
                 if ( UICC_CARD_TYPE_UICC == iCardType )
                     {
                     // USIM: Read MO-SMS control from byte 4
-                    UiccReadServiceTableReq( KUiccTrIdServiceTableByte4, 5 );
+                    ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte4, 3 );
+                    User::LeaveIfError( ret );
                     }
                 else if ( UICC_CARD_TYPE_ICC == iCardType )
                     {
-                    // SIM: Read MO-SMS control from byte 5
-                    UiccReadServiceTableReq( KUiccTrIdServiceTableByte5, 6 );
+                    // SIM: Read MO-SMS control from byte 10
+                    ret = UiccReadServiceTableReq( KUiccTrIdServiceTableByte10, 9 );
+                    User::LeaveIfError( ret );
                     }
                 }
 #endif // INFO_PP_ATK_MO_SM_CONTROL
@@ -4447,8 +4444,8 @@ void CSatMessHandler::InfoPpReadResp
         case INFO_FAIL:
         default:
             {
-            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadResp, - default Requested feature not supported by ME product profile" );
-            OstTrace0( TRACE_NORMAL, DUP7_CSATMESSHANDLER_INFOPPREADRESP, "CSatMessHandler::InfoPpReadResp, - default Requested feature not supported by ME product profile" );
+            TFLOGSTRING("TSY: CSatMessHandler::InfoPpReadRespL, - default Requested feature not supported by ME product profile" );
+OstTrace0( TRACE_NORMAL, DUP7_CSATMESSHANDLER_INFOPPREADRESPL_TD, "CSatMessHandler::InfoPpReadRespL, - default Requested feature not supported by ME product profile" );
 #ifdef INFO_PP_ATK_MO_SM_CONTROL
             // Request was for INFO_PP_ATK_MO_SM_CONTROL
             if ( traId == iInfoPpMoSmsTraId )
@@ -4466,7 +4463,7 @@ void CSatMessHandler::InfoPpReadResp
         {
         iInfoPpMoSmsTraId = 0;
         }
-    }
+    }*/
 
 
 // -----------------------------------------------------------------------------
@@ -4477,7 +4474,7 @@ void CSatMessHandler::InfoPpReadResp
 TInt CSatMessHandler::CheckTlvObjects( CBerTlv& berTlv )
     {
     TFLOGSTRING("TSY: CSatMessHandler::CheckTlvObjects" );
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_CHECKTLVOBJECTS, "CSatMessHandler::CheckTlvObjects" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_CHECKTLVOBJECTS_TD, "CSatMessHandler::CheckTlvObjects" );
 
     TInt ret( KErrNone );
     TPtrC8 dataPtr = berTlv.Data();
@@ -4520,7 +4517,7 @@ TInt CSatMessHandler::CheckTlvObjects( CBerTlv& berTlv )
             if( 0x80 > dataPtr[index] || 0xFF < dataPtr[index] )
                 {
                 TFLOGSTRING2("TSY: CSatMessHandler::CheckTlvObjects: corrupted simple tlv obj, len: %d even it should be 128-255", dataPtr[index] );
-OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_CHECKTLVOBJECTS, "CSatMessHandler::CheckTlvObjects; corrupted simple tlv obj, len: %d even it should be 128-255", dataPtr[index] );
+OstTrace1( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_CHECKTLVOBJECTS_TD, "CSatMessHandler::CheckTlvObjects; corrupted simple tlv obj, len: %d even it should be 128-255", dataPtr[index] );
                 ret = KErrCorrupt;
                 break;
                 }
@@ -4534,7 +4531,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_CHECKTLVOBJECTS, "CSatMessHandler:
             if( 0x80 <= dataPtr[index] )
                 {
                 TFLOGSTRING2("TSY: CSatMessHandler::CheckTlvObjects: corrupted simple tlv obj, len: %d even it should be 0-127", dataPtr[index] );
-OstTrace1( TRACE_NORMAL, DUP2_CSATMESSHANDLER_CHECKTLVOBJECTS, "CSatMessHandler::CheckTlvObjects; corrupted simple tlv obj, len: %d even it should be 0-127", dataPtr[index] );
+OstTrace1( TRACE_NORMAL,  DUP2_CSATMESSHANDLER_CHECKTLVOBJECTS_TD, "CSatMessHandler::CheckTlvObjects; corrupted simple tlv obj, len: %d even it should be 0-127", dataPtr[index] );
                 ret = KErrCorrupt;
                 break;
                 }
@@ -4555,7 +4552,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CSATMESSHANDLER_CHECKTLVOBJECTS, "CSatMessHandler:
     if( berTlvLength != totalLength )
         {
         TFLOGSTRING3("TSY: CSatMessHandler::CheckTlvObjects: proactive command len (%d) and calculated len (%d) doesn't match", berTlvLength, totalLength );
-OstTraceExt2( TRACE_NORMAL, DUP3_CSATMESSHANDLER_CHECKTLVOBJECTS, "CSatMessHandler::CheckTlvObjects; proactive command len (%d) and calculated len (%d) doesn't match", berTlvLength, totalLength );
+OstTraceExt2( TRACE_NORMAL,  DUP3_CSATMESSHANDLER_CHECKTLVOBJECTS_TD, "CSatMessHandler::CheckTlvObjects; proactive command len (%d) and calculated len (%d) doesn't match", berTlvLength, totalLength );
         ret = KErrCorrupt;
         }
 
@@ -4571,41 +4568,41 @@ OstTraceExt2( TRACE_NORMAL, DUP3_CSATMESSHANDLER_CHECKTLVOBJECTS, "CSatMessHandl
 void CSatMessHandler::SimMoSmsControlAvail( TUint8 aStatus )
     {
     TFLOGSTRING("TSY: CSatMessHandler::SimMoSmsControlAvail" );
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SIMMOSMSCONTROLAVAIL, "CSatMessHandler::SimMoSmsControlAvail" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SIMMOSMSCONTROLAVAIL_TD, "CSatMessHandler::SimMoSmsControlAvail" );
 
-    if( SIM_SERV_OK == aStatus )
+    // Activate the MO-SMS Control in SMS server. This is done by
+    // sending a request SMS_RESOURCE_CONF_REQ to SMS server
+    TBuf8<SIZE_SMS_RESOURCE_CONF_REQ + SIZE_SMS_SB_RESOURCE_CONF> data;
+    // Append Configuration operation
+    data.Append( SMS_RES_CONF_SET );
+    // Number of Subblocks
+    data.Append( 1 );
+    // Add Subblock
+    TIsiSubBlock ResourceConfReqSb(
+        data,
+        SMS_SB_RESOURCE_CONF,
+        EIsiSubBlockTypeId16Len16 );
+
+    if( aStatus )
         {
         // Set MoSmsCtrl object큦 member iIsMoSmsCtrlActivated to ETrue
         iTsySatMessaging->GetMoSmsCtrl()->Activate();
-        // Activate the MO-SMS Control in SMS server. This is done by
-        // sending a request SMS_RESOURCE_CONF_REQ to SMS server
-        TBuf8<SIZE_SMS_RESOURCE_CONF_REQ + SIZE_SMS_SB_RESOURCE_CONF> data;
-        // Append Configuration operation
-        data.Append( SMS_RES_CONF_SET );
-        // Number of Subblocks
-        data.Append( 1 );
-        // Add Subblock
-        //SMS_RESOURCE_IDS to zero SMS_RES_ID_MASK_MO_SM_INIT 
-        TIsiSubBlock ResourceConfReqSb(
-            data,
-            SMS_SB_RESOURCE_CONF,
-            EIsiSubBlockTypeId16Len16 );
-    
         TSatUtility::AppendWord( SMS_RES_ID_MO_SM_INIT, data );
-        TSatUtility::AppendWord( SMS_RES_ID_MASK_MO_SM_INIT, data);
-
-        ResourceConfReqSb.CompleteSubBlock();
-        SmsResoureConfReq(
-            iTsySatMessaging->GetTransactionId(),
-            SMS_RESOURCE_CONF_REQ,
-            data );
-      }
-    // should not send SMS_RESOURCE_CONF_REQ if there is no MO SMS control enabled in SIM card
+        }
     else
-      {
-      // Set MoSmsCtrl object큦 member IsMoSmsCtrlDeActivated to EFalse
-      iTsySatMessaging->GetMoSmsCtrl()->Deactivate();
-      }
+        {
+        // Set MoSmsCtrl object큦 member IsMoSmsCtrlDeActivated to EFalse
+        iTsySatMessaging->GetMoSmsCtrl()->Deactivate();
+        TSatUtility::AppendWord( 0x0000, data);
+        }
+    // SMS_RES_ID_MASK_MO_SM_INIT is the only "official" value for mask
+    TSatUtility::AppendWord( SMS_RES_ID_MASK_MO_SM_INIT, data);
+
+    ResourceConfReqSb.CompleteSubBlock();
+    SmsResoureConfReq(
+        iTsySatMessaging->GetTransactionId(),
+        SMS_RESOURCE_CONF_REQ,
+        data );
     }
 
 // -----------------------------------------------------------------------------
@@ -4615,7 +4612,7 @@ void CSatMessHandler::SimMoSmsControlAvail( TUint8 aStatus )
 //
 void CSatMessHandler::UiccTerminalProfileReq()
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_UICCTERMINALPROFILEREQ, "CSatMessHandler::UiccTerminalProfileReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_UICCTERMINALPROFILEREQ_TD, "CSatMessHandler::UiccTerminalProfileReq" );
     TFLOGSTRING("TSY: CSatMessHandler::UiccTerminalProfileReq");
 
     // Pointer to terminal profile buffer
@@ -4685,7 +4682,7 @@ TInt CSatMessHandler::UiccReadServiceTableReq(
     TUint16 aFileOffset )
     {
     TFLOGSTRING2("TSY: CSatMessHandler::UiccReadServiceTableReq, transaction ID: %d", aTrId );
-    OstTraceExt1( TRACE_NORMAL, CSATMESSHANDLER_UICCREADSERVICETABLE, "CSatMessHandler::UiccReadServiceTableReq;aTrId=%hhu", aTrId );
+    OstTraceExt1( TRACE_NORMAL,  CSATMESSHANDLER_UICCREADSERVICETABLE_TD, "CSatMessHandler::UiccReadServiceTableReq;aTrId=%hhu", aTrId );
 
     TIsiSend isiMsg( iPnSend->SendBufferDes() );
     isiMsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_UICC );
@@ -4984,7 +4981,7 @@ TInt CSatMessHandler::UiccReadSatIconInstanceReq( TUint16 aFileId )
 TInt CSatMessHandler::UiccCatReq( TUint8 aCommand )
     {
     TFLOGSTRING("TSY: CSatMessHandler::UiccCatReq");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_UICCCATREQ, "CSatMessHandler::UiccCatReq" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_UICCCATREQ_TD, "CSatMessHandler::UiccCatReq" );
 
     TIsiSend isiMsg( iPnSend->SendBufferDes() );
     isiMsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_UICC );
@@ -5019,7 +5016,7 @@ TInt CSatMessHandler::UiccCatReqRefresh(
     const TDesC8& aAid )          // Application ID (USIM)
     {
     TFLOGSTRING("TSY: CSatMessHandler::UiccCatReqRefresh");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_UICCCATREQREFRESH, "CSatMessHandler::UiccCatReqRefresh" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_UICCCATREQREFRESH_TD, "CSatMessHandler::UiccCatReqRefresh" );
 
     TUint8 numOfSubblocks( 1 ); // One mandatory subblock UICC_SB_REFRESH
     TUint8 uiccSbOffset(
@@ -5085,12 +5082,14 @@ TInt CSatMessHandler::UiccCatReqRefresh(
             {
             // File path is corrupted
             TFLOGSTRING("TSY: CSatMessHandler::SimAtkReq, File path is corrupted");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_UICCCATREQREFRESH, "CSatMessHandler::UiccCatReqRefresh,File path is corrupted" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_UICCCATREQREFRESH_TD, "CSatMessHandler::UiccCatReqRefresh,File path is corrupted" );
             break;
             }
 
-        // Length of file path
+        // Length of whole file path (file path + file id)
         TUint8 length( (TUint8) ( aFileList.Length() - position ) );
+        // length of file path (without file id)
+        TUint8 pathLength( (TUint8) ( length - KUiccFileIdLength ) );
         // File path
         TBuf8<KUiccFilePathLength> filePath(
             aFileList.Mid( position, length ) );
@@ -5111,11 +5110,11 @@ TInt CSatMessHandler::UiccCatReqRefresh(
         // Filler
         uiccSbApplPathBuf.Append( KUiccPadding );
         // File path length in bytes
-        uiccSbApplPathBuf.Append( length );
+        uiccSbApplPathBuf.Append( pathLength );
         // Filler
         uiccSbApplPathBuf.Append( KUiccPadding );
         // File path
-        uiccSbApplPathBuf.Append( filePath );
+        uiccSbApplPathBuf.Append( filePath.Mid( 0, pathLength ) );
         // Append subblock to ISI message
         isiMsg.CopyData( uiccSbOffset, uiccSbApplPath.CompleteSubBlock() );
         // Update subblock offset
@@ -5149,7 +5148,7 @@ TInt CSatMessHandler::UiccCatReqTerminalResponse(
     const TUint8 aTransId )
     {
     TFLOGSTRING("TSY: CSatMessHandler::UiccCatReqTerminalResponse");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_UICCCATREQTERMINALRESPONSE, "CSatMessHandler::UiccCatReqTerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_UICCCATREQTERMINALRESPONSE_TD, "CSatMessHandler::UiccCatReqTerminalResponse" );
 
     TIsiSend isiMsg( iPnSend->SendBufferDes() );
     isiMsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_UICC );
@@ -5212,7 +5211,7 @@ TInt CSatMessHandler::UiccCatReqTerminalResponse(
     // Save terminal resp transaction id
     iTerminalRespTraId = aTransId;
     TFLOGSTRING2("TSY: CSatMessHandler::UiccCatReqTerminalResponse iTerminalRespTraId=%d", iTerminalRespTraId);
-    OstTrace1( TRACE_NORMAL, DUP1_CSATMESSHANDLER_UICCCATREQTERMINALRESPONSE, "CSatMessHandler::UiccCatReqTerminalResponse;iTerminalRespTraId=%d", iTerminalRespTraId );
+    OstTrace1( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_UICCCATREQTERMINALRESPONSE_TD, "CSatMessHandler::UiccCatReqTerminalResponse;iTerminalRespTraId=%d", iTerminalRespTraId );
 
     // Append subblock to ISI message
     isiMsg.CopyData(
@@ -5229,7 +5228,7 @@ TInt CSatMessHandler::UiccCatReqTerminalResponse(
 //
 TBool CSatMessHandler::UiccCatRespEnvelope( const TIsiReceiveC& aIsiMessage )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_UICCCATENVELOPERESP, "CSatMessHandler::UiccCatRespEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_UICCCATENVELOPERESP_TD, "CSatMessHandler::UiccCatRespEnvelope" );
     TFLOGSTRING("TSY:CSatMessHandler::UiccCatRespEnvelope");
 
     TBool handled( EFalse );
@@ -5257,6 +5256,12 @@ TBool CSatMessHandler::UiccCatRespEnvelope( const TIsiReceiveC& aIsiMessage )
             {
             // SIM responded OK. Remove stored envelope.
             iTsySatMessaging->GetSatTimer()->RemoveEnvelope( trId );
+
+            if ( iTerminalRespTraId == trId )
+                {
+                iTsySatMessaging->SessionEnd( aIsiMessage );
+                iTerminalRespTraId = KNoTransactionOngoing;
+                }
             }
         else
             {
@@ -5265,7 +5270,7 @@ TBool CSatMessHandler::UiccCatRespEnvelope( const TIsiReceiveC& aIsiMessage )
                 ActivateEnvelopeResend( trId, sw1 ) )
                 {
                 TFLOGSTRING( "TSY:CSatMessHandler::UiccCatRespEnvelope, resending of envelope" );
-                OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_UICCCATENVELOPERESP, "CSatMessHandler::UiccCatRespEnvelope,resending of envelope" );
+                OstTrace0( TRACE_NORMAL,  DUP2_CSATMESSHANDLER_UICCCATENVELOPERESP_TD, "CSatMessHandler::UiccCatRespEnvelope,resending of envelope" );
                 // Envelope will be resent, mark as handled
                 handled = ETrue;
                 }
@@ -5274,7 +5279,7 @@ TBool CSatMessHandler::UiccCatRespEnvelope( const TIsiReceiveC& aIsiMessage )
     else // Subblock is mandatory
         {
         TFLOGSTRING("TSY: CSatMessHandler::UiccCatRespEnvelope - Mandatory subblock UICC_SB_APDU not found");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_UICCCATENVELOPERESP, "CSatMessHandler::UiccCatRespEnvelope- Mandatory subblock UICC_SB_APDU not found" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_UICCCATENVELOPERESP_TD, "CSatMessHandler::UiccCatRespEnvelope- Mandatory subblock UICC_SB_APDU not found" );
         }
 
     return handled;
@@ -5289,7 +5294,7 @@ TBool CSatMessHandler::UiccCatRespEnvelope( const TIsiReceiveC& aIsiMessage )
 TBool CSatMessHandler::UiccCatRespTerminalResponse(
     const TIsiReceiveC& aIsiMessage )
     {
-    OstTrace0( TRACE_NORMAL, DUP2_CSATMESSHANDLER_UICCCATRESPTERMINALRESPONSE, "CSatMessHandler::UiccCatRespTerminalResponse" );
+    OstTrace0( TRACE_NORMAL,  DUP2_CSATMESSHANDLER_UICCCATRESPTERMINALRESPONSE_TD, "CSatMessHandler::UiccCatRespTerminalResponse" );
     TFLOGSTRING("TSY:CSatMessHandler::UiccCatRespTerminalResponse");
 
     TBool handled( EFalse );
@@ -5316,7 +5321,7 @@ TBool CSatMessHandler::UiccCatRespTerminalResponse(
             && KAtkSwDataNtfSw2NormalEnding == sw2 )
             {
             TFLOGSTRING("CSatMessHandler::UiccCatRespTerminalResponse, - SIM SESSION END, 90 00 -");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATMESSHANDLER_UICCCATRESPTERMINALRESPONSE, "CSatMessHandler::UiccCatRespTerminalResponse" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATMESSHANDLER_UICCCATRESPTERMINALRESPONSE_TD, "CSatMessHandler::UiccCatRespTerminalResponse" );
 
             iTsySatMessaging->SessionEnd( aIsiMessage );
 
@@ -5324,6 +5329,7 @@ TBool CSatMessHandler::UiccCatRespTerminalResponse(
             // processed by the SIM with status '90 00'.
             iTsySatMessaging->GetSatTimer()->
                 SetProactiveCommandOnGoingStatus( EFalse );
+            iTerminalRespTraId = KNoTransactionOngoing;
             }
         handled = ETrue;
 
@@ -5339,7 +5345,7 @@ TBool CSatMessHandler::UiccCatRespTerminalResponse(
     else // Subblock is not found
         {
         TFLOGSTRING("TSY: CSatMessHandler::UiccCatRespTerminalResponse - Subblock UICC_SB_APDU not found");
-        OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_UICCCATRESPTERMINALRESPONSE, "CSatMessHandler::UiccCatRespTerminalResponse" );
+        OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_UICCCATRESPTERMINALRESPONSE_TD, "CSatMessHandler::UiccCatRespTerminalResponse" );
         }
 
     return handled;
@@ -5354,7 +5360,7 @@ TBool CSatMessHandler::UiccCatRespTerminalResponse(
 const TDesC8& CSatMessHandler::GetApplicationFileId()
     {
     TFLOGSTRING("TSY: CSatMessHandler::GetApplicationId");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GETAPPLICATIONID, "CSatMessHandler::GetApplicationId" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GETAPPLICATIONID_TD, "CSatMessHandler::GetApplicationId" );
     return iApplFileId;
     }
 
@@ -5366,7 +5372,7 @@ const TDesC8& CSatMessHandler::GetApplicationFileId()
 //
 void CSatMessHandler::SetSatReadyStatus( TBool aSatReadyStatus )
     {
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_SETSATREADYSTATUS, "CSatMessHandler::SetSatReadyStatus" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_SETSATREADYSTATUS_TD, "CSatMessHandler::SetSatReadyStatus" );
     TFLOGSTRING("TSY: CSatMessHandler::SetSatReadyStatus");
     iSatReady = aSatReadyStatus;
     }
@@ -5380,7 +5386,7 @@ void CSatMessHandler::SetSatReadyStatus( TBool aSatReadyStatus )
 TBool CSatMessHandler::GetSatReadyStatus()
     {
     TFLOGSTRING("TSY: CSatMessHandler::GetSatReadyStatus");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GETSATREADYSTATUS, "CSatMessHandler::GetSatReadyStatus" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GETSATREADYSTATUS_TD, "CSatMessHandler::GetSatReadyStatus" );
     return iSatReady;
     }
 
@@ -5393,7 +5399,7 @@ TBool CSatMessHandler::GetSatReadyStatus()
 TBool CSatMessHandler::GetTerminalProfileStatus()
     {
     TFLOGSTRING("TSY: CSatMessHandler::GetTerminalProfileStatus");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GETTERMINALPROFILESTATUS, "CSatMessHandler::GetTerminalProfileStatus" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GETTERMINALPROFILESTATUS_TD, "CSatMessHandler::GetTerminalProfileStatus" );
     return iTerminalProfileSent;
     }
 
@@ -5406,7 +5412,7 @@ TBool CSatMessHandler::GetTerminalProfileStatus()
 const TDesC8& CSatMessHandler::GetClut()
     {
     TFLOGSTRING("TSY: CSatMessHandler::SetImageInstanceRequestStatus");
-    OstTrace0( TRACE_NORMAL, CSATMESSHANDLER_GETCLUT, "CSatMessHandler::GetClut" );
+    OstTrace0( TRACE_NORMAL,  CSATMESSHANDLER_GETCLUT_TD, "CSatMessHandler::GetClut" );
     return iClutData;
     }
 

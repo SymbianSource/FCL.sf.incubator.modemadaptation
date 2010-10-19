@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -15,8 +15,6 @@
 *
 */
 
-
-
 // INCLUDE FILES
 #include "cmmuiccmesshandler.h"
 #include "cmmphonetsender.h"
@@ -24,6 +22,7 @@
 #include "cmmmessagerouter.h"
 #include "cmmstaticutility.h"
 #include "cmmphonemesshandler.h"
+#include "terminalprofile.h"    // terminal profile
 
 #include <ctsy/serviceapi/mmtsy_ipcdefs.h>
 #include <e32cmn.h>
@@ -47,7 +46,15 @@ const TUint8 KUiccApduReqSubblockOffset(ISI_HEADER_SIZE + SIZE_UICC_APDU_REQ);
 const TUint8 KUiccSbApduLengthOffset( 6 );
 const TUint8 KUiccSbApduDataOffset( 8 );
 const TUint16 KUiccSbApduSize( SIZE_UICC_SB_APDU + KApduDataLength );
+// Truncated AID length
+const TUint8 KTruncatedAidLength = 7;
+// Truncated AID ( 3GPP USIM RID + app code )
+// RID 'A000000087'
+// App code '1002'
+_LIT8( KTruncatedAID, "\xA0\x00\x00\x00\x87\x10\x02" );
+const TUint8 KSizeOfTerminalProfileSb           = 40;
 
+const TInt KCardStatusFieldLength = 1;
 
 // ============================= LOCAL FUNCTIONS ===============================
 
@@ -56,9 +63,28 @@ void CMmUiccMessHandler::SendTerminalProfile()
     // Temporary for testing purposes, terminal profile sending will be moved
     // to SAT TSY
 TFLOGSTRING("TSY: CMmUiccMessHandler::SendTerminalProfile TEMPORARY SOLUTION FOR TESTING");
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_SENDTERMINALPROFILE, "CMmUiccMessHandler::SendTerminalProfile TEMPORARY SOLUTION FOR TESTING" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_SENDTERMINALPROFILE_TD, "CMmUiccMessHandler::SendTerminalProfile TEMPORARY SOLUTION FOR TESTING" );
 
-    // Create UICC_CAT_TERMINAL_PROFILE message
+
+    // Pointer to terminal profile buffer
+    const TUint8* terminalProfilePtr( NULL );
+    // Size of terminal profile
+    TInt sizeofTerminalProfile( 0 );
+
+    if( UICC_CARD_TYPE_UICC == iCardType )
+        {
+        terminalProfilePtr = &KTerminalProfileUicc[0];
+        sizeofTerminalProfile = sizeof( KTerminalProfileUicc );
+TFLOGSTRING("TSY: CMmUiccMessHandler::SendTerminalProfile TEMPORARY SOLUTION FOR TESTING - Card type UICC");
+        }
+    else // ICC type
+        {
+        terminalProfilePtr = &KTerminalProfileIcc[0];
+        sizeofTerminalProfile = sizeof( KTerminalProfileIcc );
+TFLOGSTRING("TSY: CMmUiccMessHandler::SendTerminalProfile TEMPORARY SOLUTION FOR TESTING - Card type ICC");
+        }
+
+    // Create UICC_CAT_REQ message
     TIsiSend isiMsg( iPhoNetSender->SendBufferDes() );
     isiMsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_UICC );
     isiMsg.Set8bit( ISI_HEADER_SIZE, UICC_CAT_REQ_OFFSET_TRANSID ); // transaction id
@@ -66,8 +92,8 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_SENDTERMINALPROFILE, "CMmUiccMessHan
     isiMsg.Set8bit( ISI_HEADER_SIZE + UICC_CAT_REQ_OFFSET_SERVICETYPE, UICC_CAT_TERMINAL_PROFILE );
     isiMsg.Set8bit( ISI_HEADER_SIZE + UICC_CAT_REQ_OFFSET_NSB, 1 ); // num of subblocks
 
-    // Create subblock
-    TBuf8<30> terminalProfileBuf( 0 );
+    // Create UICC_SB_TERMINAL_PROFILE subblock
+    TBuf8<KSizeOfTerminalProfileSb> terminalProfileBuf( 0 );
     TIsiSubBlock uiccSbTerminalProfile(
         terminalProfileBuf,
         UICC_SB_TERMINAL_PROFILE,
@@ -78,13 +104,15 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_SENDTERMINALPROFILE, "CMmUiccMessHan
     terminalProfileBuf.Append( KUiccPadding );
 
     // Terminal profile length (16-bit)
-    terminalProfileBuf.Append( KUiccPadding );
-    terminalProfileBuf.Append( 1 );
     terminalProfileBuf.Append( 0 );
+    terminalProfileBuf.Append( sizeofTerminalProfile );
+
+    // Terminal profile
+    terminalProfileBuf.Append( terminalProfilePtr, sizeofTerminalProfile );
 
     // Append subblock to ISI message
     isiMsg.CopyData(
-        ISI_HEADER_SIZE + 4,
+        ISI_HEADER_SIZE + SIZE_UICC_CAT_REQ,
         uiccSbTerminalProfile.CompleteSubBlock() );
 
     iPhoNetSender->Send( isiMsg.Complete() );
@@ -200,7 +228,7 @@ void CMmUiccMessHandler::ConstructL(
     CMmPhoNetReceiver* aPhoNetReceiver)
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CONSTRUCTL, "CMmUiccMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CONSTRUCTL_TD, "CMmUiccMessHandler::ConstructL" );
 
     // Reset the pointer array
     iMessHandlerPrtList.Reset();
@@ -226,6 +254,12 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CONSTRUCTL, "CMmUiccMessHandler::Con
     // Initialized for USIM application
     iApplFileId.Append( 0x7F );
     iApplFileId.Append( 0xFF );
+
+    TUiccParamsApduReq params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdGetCardStatus;
+    params.serviceType = UICC_CARD_STATUS_GET;
+    CreateUiccCardReq( params );
     }
 
 // -----------------------------------------------------------------------------
@@ -239,7 +273,7 @@ CMmUiccMessHandler* CMmUiccMessHandler::NewL(
     CMmMessageRouter* aMessageRouter )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::NewL");
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_NEWL, "CMmUiccMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_NEWL_TD, "CMmUiccMessHandler::NewL" );
 
     CMmUiccMessHandler* uiccMessHandler( new ( ELeave ) CMmUiccMessHandler() );
     CleanupStack::PushL( uiccMessHandler );
@@ -257,7 +291,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_NEWL, "CMmUiccMessHandler::NewL" );
 CMmUiccMessHandler::~CMmUiccMessHandler()
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::~CMmUiccMessHandler");
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CMMUICCMESSHANDLER, "CMmUiccMessHandler::~CMmUiccMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CMMUICCMESSHANDLER_TD, "CMmUiccMessHandler::~CMmUiccMessHandler" );
     }
 
 // -----------------------------------------------------------------------------
@@ -268,7 +302,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CMMUICCMESSHANDLER, "CMmUiccMessHand
 //
 void CMmUiccMessHandler::ReceiveMessageL( const TIsiReceiveC& aIsiMsg )
     {
-    TInt status( KErrNone );
+    TUint8 status( UICC_STATUS_FAIL );
     TUint8 details ( UICC_NO_DETAILS );
     TUint8 messageId( aIsiMsg.Get8bit( ISI_HEADER_OFFSET_MESSAGEID ) );
     TUint8 trId( aIsiMsg.Get8bit( ISI_HEADER_OFFSET_TRANSID ) );
@@ -276,68 +310,83 @@ void CMmUiccMessHandler::ReceiveMessageL( const TIsiReceiveC& aIsiMsg )
     TPtrC8 fileData;
 
 TFLOGSTRING3("TSY: CMmUiccMessHandler::ReceiveMessageL, message ID :0x%x, transaction ID: %d", messageId, trId );
-OstTraceExt2( TRACE_NORMAL, CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMessHandler::ReceiveMessageL;messageId=%hhx;trId=%hhu", messageId, trId );
+OstTraceExt2( TRACE_NORMAL,  CMMUICCMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmUiccMessHandler::ReceiveMessageL;messageId=%hhx;trId=%hhu", messageId, trId );
 
+    MUiccOperationBase* messHandler( NULL );
     // Get the correct message handler for this operation
-    MUiccOperationBase* messHandler( iMessHandlerPrtList.At( trId ) );
+    if( trId < iMessHandlerPrtList.Count() )
+        {
+        messHandler = iMessHandlerPrtList.At( trId );
+        }
 
     switch( messageId )
         {
         case UICC_CAT_IND:
             {
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL:UICC_CAT_IND");
             // Send terminal profile ( to be moved to SAT TSY later )
-            SendTerminalProfile();
+            serviceType = aIsiMsg.Get8bit(
+            ISI_HEADER_SIZE + UICC_CAT_IND_OFFSET_SERVICETYPE );
+            if( UICC_READY == serviceType )
+                {
+                SendTerminalProfile();
+                }
             break;
             }
         case UICC_CAT_RESP:
             {
             // To be moved to SAT TSY later
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_CAT_RESP");
             break;
             }
         case UICC_CARD_IND:
             {
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_CARD_IND");
             serviceType = aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_CARD_IND_OFFSET_SERVICETYPE );
             // Start application activation procedure if the card is ready and
             // the application is not active yet
-            if ( UICC_CARD_READY == serviceType &&
+            if (UICC_CARD_READY == serviceType &&
                 UICC_STATUS_APPL_ACTIVE != iApplicationStatus )
                 {
                 TUiccParamsBase params;
                 params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
                 params.trId = ETrIdGetUiccApplication;
-                CreateUiccApplicationReq( params, UICC_APPL_LIST );
+                CreateUiccApplicationReq( params, UICC_APPL_LIST, iCardType );
                 }
             // No else. Application was active already
             break;
             }
         case UICC_RESP:
             {
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_RESP");
             iUiccServerStatus = HandleUiccResp( aIsiMsg );
-            // Start application activation procedure if the card is ready and
-            // the application is not active yet
+            // Start application activation procedure if UICC server is ready
+            // but appplication activations is not done by TSY
             if ( UICC_STATUS_START_UP_COMPLETED == iUiccServerStatus &&
-                UICC_STATUS_APPL_ACTIVE != iApplicationStatus)
+                UICC_STATUS_APPL_ACTIVE != iApplicationStatus )
                 {
                 // Read the application ID
                 TUiccParamsBase params;
                 params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
                 params.trId = ETrIdGetUiccApplication;
-                CreateUiccApplicationReq( params, UICC_APPL_LIST );
+                //CreateUiccApplicationReq( params, UICC_APPL_LIST, iCardType );
                 }
             break;
             }
         case UICC_APPLICATION_RESP:
             {
-            status = HandleUiccApplicationResp( aIsiMsg );
+            status = aIsiMsg.Get8bit(
+                       ISI_HEADER_SIZE + UICC_APPLICATION_RESP_OFFSET_STATUS );
+            HandleUiccApplicationResp( aIsiMsg );
             break;
             }
         case UICC_APPLICATION_IND:
             {
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_APPLICATION_IND");
             TInt8 serviceType( aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_APPLICATION_IND_OFFSET_SERVICETYPE ) );
 
-            iApplicationStatus = UICC_STATUS_APPL_ACTIVE;
             // Application activation indication with service type
             // UICC_APPL_ACTIVATED, as part of PowerOnSim sequence.
             // Transaction id is set to ETrIdSimPowerOn and operation
@@ -345,7 +394,7 @@ OstTraceExt2( TRACE_NORMAL, CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMessHand
             if( UICC_APPL_ACTIVATED == serviceType )
                 {
                 iDoNotRemoveTransactionID = EFalse;
-                status = KErrNone;
+                status = UICC_STATUS_OK;
                 trId = ETrIdSimPowerOn;
                 messHandler = iMessHandlerPrtList.At( trId );
                 }
@@ -353,31 +402,33 @@ OstTraceExt2( TRACE_NORMAL, CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMessHand
             }
         case UICC_APPL_CMD_RESP:
             {
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_APPL_CMD_RESP");
             status = aIsiMsg.Get8bit(
-                ISI_HEADER_SIZE + UICC_APPL_CMD_RESP_OFFSET_STATUS );
-            
+                    ISI_HEADER_SIZE + UICC_APPL_CMD_RESP_OFFSET_STATUS );
+
             details = aIsiMsg.Get8bit(
                     ISI_HEADER_SIZE + UICC_APPL_CMD_RESP_OFFSET_DETAILS );
             
-            TInt8 serviceType( aIsiMsg.Get8bit(
+            TUint8 serviceType( aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_APPL_CMD_RESP_OFFSET_SERVICETYPE ) );
 
             if ( UICC_STATUS_OK == status )
                 {
                 // If READ operation was required, read data from subblock
                 if ( UICC_APPL_READ_TRANSPARENT == serviceType ||
-                   UICC_APPL_READ_LINEAR_FIXED == serviceType )
+                     UICC_APPL_READ_LINEAR_FIXED == serviceType )
                     {
                     fileData.Set( GetFileData( aIsiMsg ) );
                     }
-                if ( UICC_APPL_FILE_INFO == serviceType )
+                else if ( UICC_APPL_FILE_INFO == serviceType )
                     {
                     fileData.Set( GetFileFCI( aIsiMsg ) );
                     }
-                if ( UICC_APPL_APDU_SEND == serviceType )
+                else if ( UICC_APPL_APDU_SEND == serviceType )
                     {
                     fileData.Set( GetApduData( aIsiMsg ) );
                     }
+                // No else
                 }
             else
                 {
@@ -388,9 +439,10 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMes
             }
         case UICC_APDU_RESP:
             {
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_APDU_RESP");
             status = aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_APDU_RESP_OFFSET_STATUS );
-            TInt8 serviceType( aIsiMsg.Get8bit(
+            TUint8 serviceType( aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_APDU_RESP_OFFSET_SERVICETYPE ) );
 
             // Extract actual APDU from SB_APDU
@@ -406,7 +458,8 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMes
             }
         case UICC_APDU_RESET_IND:
             {
-            TInt8 serviceType( aIsiMsg.Get8bit(
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_APDU_RESET_IND");
+            TUint8 serviceType( aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_APDU_RESET_IND_OFFSET_SERVICETYPE ) );
 
             // Indication that SAP APDU interface is activated
@@ -420,23 +473,31 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMes
             }
         case UICC_CONNECTOR_RESP:
             {
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_CONNECTOR_RESP");
             status = aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_CONNECTOR_RESP_OFFSET_STATUS );
-            }
             break;
+            }
         case UICC_CARD_RESP:
             {
+TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_CARD_RESP");
             status = aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_CARD_RESP_OFFSET_STATUS );
             TUint8 serviceType( aIsiMsg.Get8bit(
                 ISI_HEADER_SIZE + UICC_CARD_RESP_OFFSET_SERVICETYPE ) );
 
+            iCardType = aIsiMsg.Get8bit(
+                ISI_HEADER_SIZE + UICC_CARD_RESP_OFFSET_CARDTYPE );
+TFLOGSTRING2("TSY: CMmUiccMessHandler::ReceiveMessageL: UICC_CARD_RESP iCardType = %d", iCardType );
+                
             if( UICC_STATUS_OK == status
                 && UICC_CARD_STATUS_GET  == serviceType )
                 {
+                UiccCardRespStatus( aIsiMsg );
+                }
                 // File data from SIZE_UICC_SB_CARD_STATUS
                 TUint uiccSbFileDataOffset( 0 );
-                TInt cardStatusFieldLength( 1 );
+
 
                 if ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
                     ISI_HEADER_SIZE + SIZE_UICC_CARD_RESP,
@@ -447,15 +508,15 @@ OstTraceExt1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMes
                     fileData.Set(aIsiMsg.GetData(
                         uiccSbFileDataOffset +
                         UICC_SB_CARD_STATUS_OFFSET_CARDSTATUS,
-                        cardStatusFieldLength) );
+                        KCardStatusFieldLength ) );
                     }
-                }
-            }
+                      
             break;
+            }
         default:
             {
 TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL, default" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMessHandler::ReceiveMessageL, default" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMUICCMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmUiccMessHandler::ReceiveMessageL, default" );
             break;
             }
         }
@@ -471,7 +532,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMessHa
     else
         {
 TFLOGSTRING("TSY: CMmUiccMessHandler::ReceiveMessageL, message handler not found -> no further handling of this message" );
-OstTrace0( TRACE_NORMAL, DUP3_CMMUICCMESSHANDLER_RECEIVEMESSAGEL, "CMmUiccMessHandler::ReceiveMessageL, message handler not found -> no further handling of this message" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMUICCMESSHANDLER_RECEIVEMESSAGEL_TD, "CMmUiccMessHandler::ReceiveMessageL, message handler not found -> no further handling of this message" );
         }
     }
 
@@ -491,7 +552,7 @@ TInt CMmUiccMessHandler::CreateUiccApplCmdReq(
     TUint8 sizeOfApplPathSubblock( 0 );
 
 TFLOGSTRING2("TSY: CMmUiccMessHandler::CreateUiccApplCmdReq, transaction ID: %d", trId );
-OstTrace1( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCAPPLCMDREQ, "CMmUiccMessHandler::CreateUiccApplCmdReq;trId=%d", trId );
+OstTrace1( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCAPPLCMDREQ_TD, "CMmUiccMessHandler::CreateUiccApplCmdReq;trId=%d", trId );
 
     TUint8 applId( aApplType == UICC_APPL_TYPE_UICC_ISIM ?
         iIsimApplicationId : iApplicationId );
@@ -641,7 +702,8 @@ OstTrace1( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCAPPLCMDREQ, "CMmUiccMessHa
                     KUiccApplCmdReqOffset + SIZE_UICC_SB_CLIENT,
                     sizeOfApplPathSubblock );
                 // Create and append UICC_SB_APDU
-                const TUiccSendApdu* tmpPtr = static_cast<const TUiccSendApdu*>( &aParams );
+                const TUiccSendApdu* tmpPtr = 
+                    static_cast<const TUiccSendApdu*>( &aParams );
                 CreateUiccSbApdu(
                     isiMsg,
                     KUiccApplCmdReqOffset + SIZE_UICC_SB_CLIENT +
@@ -653,7 +715,7 @@ OstTrace1( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCAPPLCMDREQ, "CMmUiccMessHa
                 {
                 ret = KErrArgument;
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccApplCmdReq, unknown service type!" );
-OstTrace0( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_CREATEUICCAPPLCMDREQ, "CMmUiccMessHandler::CreateUiccApplCmdReq, unknown service type!" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMUICCMESSHANDLER_CREATEUICCAPPLCMDREQ_TD, "CMmUiccMessHandler::CreateUiccApplCmdReq, unknown service type!" );
                 break;
                 }
             } // End of switch ( serviceType )
@@ -670,7 +732,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_CREATEUICCAPPLCMDREQ, "CMmUiccM
     else
         {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccApplCmdReq, cannot handle the request, server busy!" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_CREATEUICCAPPLCMDREQ, "CMmUiccMessHandler::CreateUiccApplCmdReq, cannot handle the request, server busy!" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_CREATEUICCAPPLCMDREQ_TD, "CMmUiccMessHandler::CreateUiccApplCmdReq, cannot handle the request, server busy!" );
         ret = KErrServerBusy;
         }
     return ret;
@@ -687,7 +749,7 @@ TInt CMmUiccMessHandler::CreateUiccApplicationReq(
     TUint8 aApplType )
     {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::CreateUiccApplicationReq, service type: %d", aServiceType );
-OstTraceExt1( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCAPPLICATIONREQ, "CMmUiccMessHandler::CreateUiccApplicationReq;aServiceType=%hhu", aServiceType );
+OstTraceExt1( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCAPPLICATIONREQ_TD, "CMmUiccMessHandler::CreateUiccApplicationReq;aServiceType=%hhu", aServiceType );
 
     TInt ret (KErrGeneral);
     TUiccTrId trId( aParams.trId );
@@ -710,7 +772,7 @@ OstTraceExt1( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCAPPLICATIONREQ, "CMmUic
         isiMsg.Set8bit(
             ISI_HEADER_SIZE + UICC_APPLICATION_REQ_OFFSET_SERVICETYPE,
             aServiceType );
-
+ 
         switch ( aServiceType )
             {
             case UICC_APPL_LIST:
@@ -720,11 +782,32 @@ OstTraceExt1( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCAPPLICATIONREQ, "CMmUic
                 }
             case UICC_APPL_HOST_ACTIVATE:
                 {
-                numOfSubblocks = 1;
+                CreateUiccSbApplInfo(
+                    isiMsg,
+                    ISI_HEADER_SIZE + SIZE_UICC_APPLICATION_REQ );
                 CreateUiccSbApplication(
                     isiMsg,
-                    ISI_HEADER_SIZE + SIZE_UICC_APPLICATION_REQ,
+                    ISI_HEADER_SIZE + SIZE_UICC_APPLICATION_REQ +
+                        SIZE_UICC_SB_APPL_INFO,
                     aApplType );
+
+                if ( UICC_APPL_LAST == iApplicationId )
+                    {
+TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccApplicationReq - need to add UICC_SB_AID subblock" );
+
+                    CreateUiccSbAid(
+                        isiMsg,
+                        ISI_HEADER_SIZE +
+                        SIZE_UICC_APPLICATION_REQ +
+                        SIZE_UICC_SB_APPL_INFO +
+                        SIZE_UICC_SB_APPLICATION );
+
+                    numOfSubblocks = 3;
+                    }
+                else
+                    {
+                    numOfSubblocks = 2;
+                    }
                 break;
                 }
             default:
@@ -745,7 +828,7 @@ OstTraceExt1( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCAPPLICATIONREQ, "CMmUic
     else
         {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccApplicationReq, cannot handle the request, server busy!" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_CREATEUICCAPPLICATIONREQ, "CMmUiccMessHandler::CreateUiccApplicationReq, cannot handle the request, server busy!" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_CREATEUICCAPPLICATIONREQ_TD, "CMmUiccMessHandler::CreateUiccApplicationReq, cannot handle the request, server busy!" );
         ret = KErrServerBusy;
         }
     return ret;
@@ -759,7 +842,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_CREATEUICCAPPLICATIONREQ, "CMmU
 TUint8 CMmUiccMessHandler::GetApplicationId() const
     {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::GetApplicationId, application ID: %d", iApplicationId );
-OstTraceExt1( TRACE_NORMAL, CMMUICCMESSHANDLER_GETAPPLICATIONID, "CMmUiccMessHandler::GetApplicationId;aApplId=%hhu", iApplicationId );
+OstTraceExt1( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETAPPLICATIONID_TD, "CMmUiccMessHandler::GetApplicationId;aApplId=%hhu", iApplicationId );
     return iApplicationId;
     }
 
@@ -771,7 +854,7 @@ OstTraceExt1( TRACE_NORMAL, CMMUICCMESSHANDLER_GETAPPLICATIONID, "CMmUiccMessHan
 TUint8 CMmUiccMessHandler::GetApplicationType() const
     {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::GetApplicationType, application type: %d", iApplicationType );
-OstTraceExt1( TRACE_NORMAL, CMMUICCMESSHANDLER_GETAPPLICATIONTYPE, "CMmUiccMessHandler::GetApplicationType;aApplType=%hhu", iApplicationType );
+OstTraceExt1( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETAPPLICATIONTYPE_TD, "CMmUiccMessHandler::GetApplicationType;aApplType=%hhu", iApplicationType );
     return iApplicationType;
     }
 
@@ -783,7 +866,7 @@ OstTraceExt1( TRACE_NORMAL, CMMUICCMESSHANDLER_GETAPPLICATIONTYPE, "CMmUiccMessH
 const TDesC8& CMmUiccMessHandler::GetApplicationFileId() const
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetApplicationFileId" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETAPPLICATIONFILEID, "CMmUiccMessHandler::GetApplicationFileId" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETAPPLICATIONFILEID_TD, "CMmUiccMessHandler::GetApplicationFileId" );
     return iApplFileId;
     }
 
@@ -795,7 +878,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETAPPLICATIONFILEID, "CMmUiccMessHa
 TUint8 CMmUiccMessHandler::GetCardType() const
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetCardType" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETCARDTYPE, "CMmUiccMessHandler::GetCardType" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETCARDTYPE_TD, "CMmUiccMessHandler::GetCardType" );
     return iCardType;
     }
 
@@ -807,7 +890,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETCARDTYPE, "CMmUiccMessHandler::Ge
 TUint8 CMmUiccMessHandler::GetIsimApplicationStatus() const
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetIsimApplicationStatus" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETISIMAPPLICATIONSTATUS, "CMmUiccMessHandler::GetIsimApplicationStatus" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETISIMAPPLICATIONSTATUS_TD, "CMmUiccMessHandler::GetIsimApplicationStatus" );
     return iIsimApplicationStatus;
     }
 
@@ -819,7 +902,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETISIMAPPLICATIONSTATUS, "CMmUiccMe
 TBool CMmUiccMessHandler::IsIsimApplicationFound() const
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::IsIsimApplicationFound" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_ISISIMAPPLICATIONFOUND, "CMmUiccMessHandler::IsIsimApplicationFound" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_ISISIMAPPLICATIONFOUND_TD, "CMmUiccMessHandler::IsIsimApplicationFound" );
     return iIsimApplicationFound;
     }
 
@@ -831,7 +914,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_ISISIMAPPLICATIONFOUND, "CMmUiccMess
 const RMobilePhone::TAID& CMmUiccMessHandler::GetAid() const
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetAid" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_GETAPPLICATIONFILEID, "CMmUiccMessHandler::GetApplicationFileId" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_GETAPPLICATIONFILEID_TD, "CMmUiccMessHandler::GetApplicationFileId" );
     return iAid;
     }
 // -----------------------------------------------------------------------------
@@ -846,7 +929,7 @@ void CMmUiccMessHandler::CreateUiccSbApplPath(
     TUint8& aSizeOfSubblock )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbApplPath" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCSBAPPLPATH, "CMmUiccMessHandler::CreateUiccSbApplPath" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCSBAPPLPATH_TD, "CMmUiccMessHandler::CreateUiccSbApplPath" );
 
     // UICC_SB_APPL_PATH subblock
     TBuf8<KUiccSbApplPathSize> uiccSbApplPathBuf( 0 );
@@ -885,7 +968,7 @@ void CMmUiccMessHandler::CreateUiccSbClient(
     const TUint8 aApplType )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbClient" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCSBCLIENT, "CMmUiccMessHandler::CreateUiccSbClient" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCSBCLIENT_TD, "CMmUiccMessHandler::CreateUiccSbClient" );
 
     // UICC_SB_CLIENT subblock
     TBuf8<SIZE_UICC_SB_CLIENT> uiccSbClientBuf( 0 );
@@ -919,7 +1002,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCSBCLIENT, "CMmUiccMessHand
     else
         {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::CreateUiccSbClient: unknown appl type: 0x%x", aApplType );
-OstTrace1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_CREATEUICCSBCLIENT, "CMmUiccMessHandler::CreateUiccSbClient: unknown appl type: 0x%x", aApplType );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_CREATEUICCSBCLIENT_TD, "CMmUiccMessHandler::CreateUiccSbClient: unknown appl type: 0x%x", aApplType );
         }
     }
 
@@ -934,7 +1017,7 @@ void CMmUiccMessHandler::CreateUiccSbTransparent(
     TUint8 aMsgOffset )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbTransparent" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCSBTRANSPARENT, "CMmUiccMessHandler::CreateUiccSbTransparent" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCSBTRANSPARENT_TD, "CMmUiccMessHandler::CreateUiccSbTransparent" );
 
     // UICC_SB_TRANSPARENT subblock
     TBuf8<SIZE_UICC_SB_TRANSPARENT> uiccSbTransparentBuf( 0 );
@@ -967,7 +1050,7 @@ void CMmUiccMessHandler::CreateUiccSbLinearFixed(
     TUint8 aMsgOffset )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbLinearFixed" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCSBLINEARFIXED, "CMmUiccMessHandler::CreateUiccSbLinearFixed" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCSBLINEARFIXED_TD, "CMmUiccMessHandler::CreateUiccSbLinearFixed" );
 
     // UICC_SB_LINEAR_FIXED subblock
     TBuf8<SIZE_UICC_SB_LINEAR_FIXED> uiccSbLinearFixedBuf( 0 );
@@ -999,7 +1082,7 @@ void CMmUiccMessHandler::CreateUiccSbFileData(
     )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbFileData" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCSBFILEDATA, "CMmUiccMessHandler::CreateUiccSbFileData" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCSBFILEDATA_TD, "CMmUiccMessHandler::CreateUiccSbFileData" );
 
     // UICC_SB_FILE_DATA subblock
     TBuf8<KUiccSbFileDataSize> uiccSbFileDataBuf( 0 );
@@ -1033,7 +1116,7 @@ void CMmUiccMessHandler::CreateUiccSbApplication(
     TUint8 aApplType )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbApplication" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCSBAPPLICATION, "CMmUiccMessHandler::CreateUiccSbApplication" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCSBAPPLICATION_TD, "CMmUiccMessHandler::CreateUiccSbApplication" );
 
     // SIZE_UICC_SB_APPLICATION_STR
     TBuf8<SIZE_UICC_SB_APPLICATION> uiccSbApplicationBuf( 0 );
@@ -1072,8 +1155,61 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCSBAPPLICATION, "CMmUiccMes
     else
         {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::CreateUiccSbApplication: unknown application type: 0x%x", aApplType );
-OstTrace1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_CREATEUICCSBAPPLICATION, "CMmUiccMessHandler::CreateUiccSbApplication: unknown application type: 0x%x", aApplType );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_CREATEUICCSBAPPLICATION_TD, "CMmUiccMessHandler::CreateUiccSbApplication: unknown application type: 0x%x", aApplType );
         }
+    }
+
+
+// -----------------------------------------------------------------------------
+// CMmUiccMessHandler::CreateUiccSbApplInfo
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+void CMmUiccMessHandler::CreateUiccSbApplInfo(
+    TIsiSend& aIsiMsg,
+    TUint8 aMsgOffset )
+    {
+TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbApplInfo" );
+OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCSBAPPLINFO_TD, "CMmUiccMessHandler::CreateUiccSbApplInfo" );
+
+    TBuf8<SIZE_UICC_SB_APPL_INFO> uiccSbApplInfoBuf( 0 );
+    TIsiSubBlock uiccSbApplInfo(
+        uiccSbApplInfoBuf,
+        UICC_SB_APPL_INFO,
+        EIsiSubBlockTypeId16Len16 );
+
+    uiccSbApplInfoBuf.Append( KUiccPadding );
+    uiccSbApplInfoBuf.Append( KUiccPadding );
+    uiccSbApplInfoBuf.Append( KUiccPadding );
+    
+    uiccSbApplInfoBuf.Append( UICC_APPL_START_UP_NO_INIT_PROC );
+
+    aIsiMsg.CopyData( aMsgOffset, uiccSbApplInfo.CompleteSubBlock() );
+    }
+
+// -----------------------------------------------------------------------------
+// CMmUiccMessHandler::CreateUiccSbAid
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+void CMmUiccMessHandler::CreateUiccSbAid(
+    TIsiSend& aIsiMsg,
+    TUint8 aMsgOffset )
+    {
+TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbAid" );
+
+    TBuf8<SIZE_UICC_SB_AID + KTruncatedAidLength> uiccSbAidBuf( 0 );
+    TIsiSubBlock uiccSbAid(
+        uiccSbAidBuf,
+        UICC_SB_AID,
+        EIsiSubBlockTypeId16Len16 );
+
+    // Add truncated AID length
+    uiccSbAidBuf.Append( KTruncatedAidLength );
+    // Add 3GPP USIM RID and app code
+    uiccSbAidBuf.Append( KTruncatedAID );
+
+    aIsiMsg.CopyData( aMsgOffset, uiccSbAid.CompleteSubBlock() );
     }
 
 // -----------------------------------------------------------------------------
@@ -1084,7 +1220,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_CREATEUICCSBAPPLICATION, "CMmUi
 const TPtrC8 CMmUiccMessHandler::GetFileData( const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetFileData" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETFILEDATA, "CMmUiccMessHandler::GetFileData" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETFILEDATA_TD, "CMmUiccMessHandler::GetFileData" );
 
     TPtrC8 data( KNullDesC8 );
 
@@ -1113,7 +1249,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETFILEDATA, "CMmUiccMessHandler::Ge
 TUint8 CMmUiccMessHandler::HandleUiccResp( const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccResp" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_HANDLEUICCRESP, "CMmUiccMessHandler::HandleUiccResp" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_HANDLEUICCRESP_TD, "CMmUiccMessHandler::HandleUiccResp" );
 
     TUint8 serverStatus( UICC_STATUS_NOT_READY );
     // Check the service type
@@ -1134,6 +1270,282 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_HANDLEUICCRESP, "CMmUiccMessHandler:
     return serverStatus;
     }
 
+
+
+// -----------------------------------------------------------------------------
+// CMmUiccMessHandler::HandleUiccApplListResp
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt CMmUiccMessHandler::HandleUiccApplListResp(
+    const TIsiReceiveC& aIsiMsg )
+    {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplListResp" );
+OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_HANDLEUICCAPPLLISTRESP, "CMmUiccMessHandler::HandleUiccApplListResp" );
+
+    TInt ret( KErrNone );
+    TUint16 startIndex( ISI_HEADER_SIZE + SIZE_UICC_APPLICATION_RESP );
+
+    // Check if UICC_SB_APPL_DATA_OBJECT is included => UICC application
+    TUint uiccSbApplDataObjectOffset( 0 );
+    TUint8 applicationType( 0 );
+    TUint16 sbLen( 0 );
+
+    TBool usimOrSimApplFound( EFalse );
+
+    while ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
+        startIndex,
+        UICC_SB_APPL_DATA_OBJECT,
+        EIsiSubBlockTypeId16Len16,
+        uiccSbApplDataObjectOffset ) )
+        {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplListResp-UICC_APPL_LIST FIND_SB" );
+OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_HANDLEUICCAPPLLISTRESP, "CMmUiccMessHandler::HandleUiccApplListResp - UICC_APPL_LIST FIND_SB" );
+        applicationType = aIsiMsg.Get8bit(
+            uiccSbApplDataObjectOffset +
+            UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLICATIONTYPE );
+
+        sbLen = aIsiMsg.Get16bit(
+            uiccSbApplDataObjectOffset +
+            UICC_SB_APPL_DATA_OBJECT_OFFSET_SBLEN );
+
+        if ( ( UICC_APPL_TYPE_UICC_USIM == applicationType ||
+            UICC_APPL_TYPE_ICC_SIM == applicationType ) &&
+            EFalse == usimOrSimApplFound )
+            {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplListResp-UICC_APPL_LIST FOUND_U/SIM" );
+OstTrace0( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_HANDLEUICCAPPLLISTRESP, "CMmUiccMessHandler::HandleUiccApplListResp - UICC_APPL_LIST FOUND_U/SIM" );
+
+            iApplicationType = applicationType;
+
+            iApplicationId = aIsiMsg.Get8bit(
+                uiccSbApplDataObjectOffset +
+                UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLID );
+
+            TUint8 length( aIsiMsg.Get8bit(
+                uiccSbApplDataObjectOffset +
+                UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLDOLEN ) );
+
+            // Application data object contains EFdir data,
+            // 5 bytes are mandatory. See TS 102.221 V7.11.0 table 13.2
+            if ( 5 <= length )
+                {
+                TPtrC8 applDataObject( aIsiMsg.GetData(
+                    uiccSbApplDataObjectOffset +
+                    UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLDO,
+                    length ) );
+                // Length of AID is located in index 3
+                TUint8 aidLength( applDataObject[3] );
+                // Copy actual AID
+                iAid.Copy( applDataObject.Mid( 4, aidLength ) );
+                }
+
+            usimOrSimApplFound = ETrue;
+            }
+        else if( UICC_APPL_TYPE_UICC_ISIM == applicationType &&
+            EFalse == iIsimApplicationFound )
+            {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplListResp-UICC_APPL_LIST FOUND_ISIM" );
+OstTrace0( TRACE_NORMAL, DUP3_CMMUICCMESSHANDLER_HANDLEUICCAPPLLISTRESP, "CMmUiccMessHandler::HandleUiccApplListResp - UICC_APPL_LIST FOUND_ISIM" );
+            iIsimApplicationFound = ETrue;
+
+            iIsimApplicationId = aIsiMsg.Get8bit(
+                uiccSbApplDataObjectOffset +
+                UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLID );
+            iIsimApplicationStatus = aIsiMsg.Get8bit(
+                uiccSbApplDataObjectOffset +
+                UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLSTATUS );
+            }
+        startIndex = uiccSbApplDataObjectOffset + sbLen;
+        }
+
+    if ( !usimOrSimApplFound &&
+        UICC_CARD_TYPE_UICC == iCardType )
+        {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplListResp-UICC_APPL_LIST, NO SUBBLOCK - handle USIM" );
+OstTrace0( TRACE_NORMAL, DUP4_CMMUICCMESSHANDLER_HANDLEUICCAPPLLISTRESP, "CMmUiccMessHandler::HandleUiccApplListResp - UICC_APPL_LIST, NO SUBBLOCK - handle USIM" );
+        applicationType = UICC_APPL_TYPE_UICC_USIM;
+        iApplicationType = applicationType;
+        iApplicationId = UICC_APPL_LAST;
+        }
+    else if ( !usimOrSimApplFound &&
+        UICC_CARD_TYPE_ICC == iCardType )
+        {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplListResp-UICC_APPL_LIST, NO SUBBLOCK - handle SIM" );
+OstTrace0( TRACE_NORMAL, DUP5_CMMUICCMESSHANDLER_HANDLEUICCAPPLLISTRESP, "CMmUiccMessHandler::HandleUiccApplListResp - UICC_APPL_LIST, NO SUBBLOCK - handle SIM" );
+        applicationType = UICC_APPL_TYPE_ICC_SIM;
+        iApplicationType = applicationType;
+        iApplicationId = UICC_APPL_ID_UNKNOWN;
+        }
+    // No else
+
+    if ( UICC_CARD_TYPE_ICC == iCardType )
+        {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplListResp-UICC_APPL_LIST FOUND_SIM" );
+OstTrace0( TRACE_NORMAL, DUP6_CMMUICCMESSHANDLER_HANDLEUICCAPPLLISTRESP, "CMmUiccMessHandler::HandleUiccApplListResp - UICC_APPL_LIST FOUND_SIM" );
+
+        // Application file ID for GSM
+        TBuf8<2> gsmFileId;
+        gsmFileId.Append( 0x7F );
+        gsmFileId.Append( 0x20 );
+        iApplFileId.Copy( gsmFileId );
+        }
+
+    // Activate the application
+    TUiccParamsBase params;
+    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+    params.trId = ETrIdActivateUiccApplication;
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplListResp-UICC_APPL_LIST HOST_ACTI" );
+OstTrace0( TRACE_NORMAL, DUP7_CMMUICCMESSHANDLER_HANDLEUICCAPPLLISTRESP, "CMmUiccMessHandler::HandleUiccApplListResp - UICC_APPL_LIST HOST_ACTI" );
+
+    ret = CreateUiccApplicationReq(
+        params,
+        UICC_APPL_HOST_ACTIVATE,
+        iApplicationType );
+
+    return ret;
+    }
+
+
+
+
+
+
+
+// -----------------------------------------------------------------------------
+// CMmUiccMessHandler::HandleUiccApplHostActivate
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TInt CMmUiccMessHandler::HandleUiccApplHostActivate( const TIsiReceiveC& aIsiMsg )
+    {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplHostActivate" );
+OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_HANDLEUICCAPPLHOSTACTIVATE, "CMmUiccMessHandler::HandleUiccApplHostActivate" );
+
+    TInt ret( KErrNone );
+    TUint16 startIndex( ISI_HEADER_SIZE + SIZE_UICC_APPLICATION_RESP );
+    TUint8 trId( aIsiMsg.Get8bit(
+        ISI_HEADER_SIZE + UICC_APPLICATION_RESP_OFFSET_TRANSID ) );
+
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplicationResp-HOST_ACTI" );
+OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_HANDLEUICCAPPLHOSTACTIVATE, "CMmUiccMessHandler::HandleUiccApplHostActivate - HOST_ACTI" );
+
+    TUint uiccSbClientOffset( 0 );
+    if ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
+            startIndex,
+            UICC_SB_CLIENT,
+            EIsiSubBlockTypeId16Len16,
+            uiccSbClientOffset ) )
+        {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplHostActivate - UICC_SB_CLIENT" );
+OstTrace0( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_HANDLEUICCAPPLHOSTACTIVATE, "CMmUiccMessHandler::HandleUiccApplHostActivate - UICC_SB_CLIENT" );
+        if( ETrIdActivateUiccApplication == trId )
+            {
+            iUiccClientId = aIsiMsg.Get8bit(
+                    uiccSbClientOffset +
+                    UICC_SB_CLIENT_OFFSET_CLIENTID );
+            }
+        else if( ETrIdActivateIsimApplication == trId )
+            {
+            iUiccIsimClientId = aIsiMsg.Get8bit(
+                    uiccSbClientOffset +
+                    UICC_SB_CLIENT_OFFSET_CLIENTID );
+            }
+        }
+
+    // UICC_SB_FCI contains PIN key references
+    TUint uiccSbFciOffset( 0 );
+    if ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
+            ISI_HEADER_SIZE + SIZE_UICC_APPLICATION_RESP,
+            UICC_SB_FCI,
+            EIsiSubBlockTypeId16Len16,
+            uiccSbFciOffset ) )
+        {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplHostActivate - UICC_SB_FCI" );
+OstTrace0( TRACE_NORMAL, DUP3_CMMUICCMESSHANDLER_HANDLEUICCAPPLHOSTACTIVATE, "CMmUiccMessHandler::HandleUiccApplHostActivate - UICC_SB_FCI" );
+
+        // Check is the SIM UICC
+        TPtrC8 data( KNullDesC8 );
+
+        // The whole sub block is returned
+        TInt sbLength( aIsiMsg.Get16bit(
+                uiccSbFciOffset + UICC_SB_FCI_OFFSET_SBLEN ) );
+        data.Set( aIsiMsg.GetData(
+                uiccSbFciOffset,
+                sbLength ) );
+
+        TFci fci( data );
+        if( UICC_CARD_TYPE_UICC == fci.GetTypeOfCard() )
+            {
+            StorePinKeyReferences( data );
+            }
+        }
+
+    // In case of ICC there is two UICC_SB_CHV subblocks
+    // that contain PIN IDs for ICC application
+    TUint uiccSbChvOffset( 0 );
+    while ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
+            startIndex,
+            UICC_SB_CHV,
+            EIsiSubBlockTypeId16Len16,
+            uiccSbChvOffset ) )
+        {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplHostActivate - UICC_SB_CHV" );
+OstTrace0( TRACE_NORMAL, DUP4_CMMUICCMESSHANDLER_HANDLEUICCAPPLHOSTACTIVATE, "CMmUiccMessHandler::HandleUiccApplHostActivate - UICC_SB_CHV" );
+
+        TUint8 chvQualifier( aIsiMsg.Get8bit(
+                uiccSbChvOffset +
+                UICC_SB_CHV_OFFSET_CHVQUALIFIER ) );
+        if ( UICC_CHV1 == chvQualifier ) // PIN1
+            {
+            iPin1Id = aIsiMsg.Get8bit(
+                    uiccSbChvOffset + UICC_SB_CHV_OFFSET_PINID );
+            }
+        else // PIN2
+            {
+            iPin2Id = aIsiMsg.Get8bit(
+                    uiccSbChvOffset + UICC_SB_CHV_OFFSET_PINID );
+            }
+        startIndex = uiccSbChvOffset + SIZE_UICC_SB_CHV;
+        }
+
+    // In case EFdir was empty or didn't exist in APPL_LIST
+    // response, HOST_ACTIVATE request is done differently.
+    // Response for HOST_ACTIVATE include UICC_SB_APPLICATION
+    // subblock.
+    TUint uiccSbApplicationOffset( 0 );
+    if ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
+            ISI_HEADER_SIZE + SIZE_UICC_APPLICATION_RESP,
+            UICC_SB_APPLICATION,
+            EIsiSubBlockTypeId16Len16,
+            uiccSbApplicationOffset ) )
+        {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplHostActivate - UICC_SB_APPLICATION" );
+OstTrace0( TRACE_NORMAL, DUP5_CMMUICCMESSHANDLER_HANDLEUICCAPPLHOSTACTIVATE, "CMmUiccMessHandler::HandleUiccApplHostActivate - UICC_SB_APPLICATION" );
+
+         // Update AID
+         iAid.Copy( KTruncatedAID );
+
+         // Update Application type
+         iApplicationType = aIsiMsg.Get8bit(
+                 uiccSbApplicationOffset +
+                 UICC_SB_APPLICATION_OFFSET_APPLICATIONTYPE );
+
+         // Update Appl ID
+         iApplicationId = aIsiMsg.Get8bit(
+                 uiccSbApplicationOffset +
+                 UICC_SB_APPLICATION_OFFSET_APPLID );
+        }
+
+    // Application is now ready to start receiving commands
+    iApplicationStatus = UICC_STATUS_APPL_ACTIVE;
+    InitializeSimServiceTableCache();
+    InitializeCphsInformationCache();
+
+    return ret;
+    }
+
+
 // -----------------------------------------------------------------------------
 // CMmUiccMessHandler::HandleUiccApplicationResp
 // (other items were commented in a header).
@@ -1143,7 +1555,7 @@ TInt CMmUiccMessHandler::HandleUiccApplicationResp(
     const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplicationResp" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_HANDLEUICCAPPLICATIONRESP, "CMmUiccMessHandler::HandleUiccApplicationResp" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_HANDLEUICCAPPLICATIONRESP_TD, "CMmUiccMessHandler::HandleUiccApplicationResp" );
 
     TInt ret( KErrNone );
     // Get service type and status
@@ -1155,7 +1567,6 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_HANDLEUICCAPPLICATIONRESP, "CMmUiccM
         ISI_HEADER_SIZE + UICC_APPLICATION_RESP_OFFSET_CARDTYPE );
     TUint8 trId( aIsiMsg.Get8bit(
         ISI_HEADER_SIZE + UICC_APPLICATION_RESP_OFFSET_TRANSID ) );
-    TUint16 startIndex( ISI_HEADER_SIZE + SIZE_UICC_APPLICATION_RESP );
 
     if ( UICC_STATUS_OK == status )
         {
@@ -1163,168 +1574,17 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_HANDLEUICCAPPLICATIONRESP, "CMmUiccM
             {
             case UICC_APPL_LIST:
                 {
-                // Check if UICC_SB_APPL_DATA_OBJECT is included => UICC application
-                TUint uiccSbApplDataObjectOffset( 0 );
-                TUint8 applicationType( 0 );
-                TUint16 sbLen( 0 );
-
-                TBool usimApplFound( EFalse );
-
-                while ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
-                    startIndex,
-                    UICC_SB_APPL_DATA_OBJECT,
-                    EIsiSubBlockTypeId16Len16,
-                    uiccSbApplDataObjectOffset ) )
-                    {
-                    applicationType = aIsiMsg.Get8bit(
-                        uiccSbApplDataObjectOffset +
-                        UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLICATIONTYPE );
-
-                    sbLen = aIsiMsg.Get16bit(
-                        uiccSbApplDataObjectOffset +
-                        UICC_SB_APPL_DATA_OBJECT_OFFSET_SBLEN );
-
-                    if ( UICC_APPL_TYPE_UICC_USIM == applicationType &&
-                        EFalse == usimApplFound )
-                        {
-                        iApplicationType = applicationType;
-
-                        iApplicationId = aIsiMsg.Get8bit(
-                            uiccSbApplDataObjectOffset +
-                            UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLID );
-                        iApplicationStatus = aIsiMsg.Get8bit(
-                            uiccSbApplDataObjectOffset +
-                            UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLSTATUS );
-
-                        TUint8 length( aIsiMsg.Get8bit(
-                            uiccSbApplDataObjectOffset +
-                            UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLDOLEN ) );
-
-                        // Application data object contains EF dir data,
-                        // 5 bytes are mandatory. See TS 102.221 V7.11.0 table 13.2
-                        if ( 5 <= length )
-                            {
-                            TPtrC8 applDataObject( aIsiMsg.GetData(
-                                uiccSbApplDataObjectOffset +
-                                UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLDO,
-                                length ) );
-                            // Length of AID is located in index 3
-                            TUint8 aidLength( applDataObject[3] );
-                            // Copy actual AID
-                            iAid.Copy( applDataObject.Mid( 4, aidLength ) );
-                            }
-
-                        usimApplFound = ETrue;
-                        }
-                    else if( UICC_APPL_TYPE_UICC_ISIM == applicationType &&
-                        EFalse == iIsimApplicationFound )
-                        {
-                        iIsimApplicationFound = ETrue;
-
-                        iIsimApplicationId = aIsiMsg.Get8bit(
-                            uiccSbApplDataObjectOffset +
-                            UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLID );
-                        iIsimApplicationStatus = aIsiMsg.Get8bit(
-                            uiccSbApplDataObjectOffset +
-                            UICC_SB_APPL_DATA_OBJECT_OFFSET_APPLSTATUS );
-                        }
-                    startIndex = uiccSbApplDataObjectOffset + sbLen;
-                    }
-                if ( EFalse == usimApplFound ) // ICC application
-                    {
-                    iApplicationType = UICC_APPL_TYPE_ICC_SIM;
-                    iApplicationId =  UICC_APPL_ID_UNKNOWN;
-                    // Application file ID for GSM
-                    TBuf8<2> gsmFileId;
-                    gsmFileId.Append( 0x7F );
-                    gsmFileId.Append( 0x20 );
-                    iApplFileId.Copy( gsmFileId );
-                    }
-                // Activate the application
-                if ( UICC_STATUS_APPL_ACTIVE != iApplicationStatus )
-                    {
-                    TUiccParamsBase params;
-                    params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
-                    params.trId = ETrIdActivateUiccApplication;
-                    ret = CreateUiccApplicationReq( params, UICC_APPL_HOST_ACTIVATE );
-                    }
+                ret = HandleUiccApplListResp( aIsiMsg );
                 break;
                 }
             case UICC_APPL_HOST_ACTIVATE:
                 {
-                TUint uiccSbClientOffset( 0 );
-                if ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
-                    startIndex,
-                    UICC_SB_CLIENT,
-                    EIsiSubBlockTypeId16Len16,
-                    uiccSbClientOffset ) )
-                    {
-                    if( ETrIdActivateUiccApplication == trId )
-                        {
-                        iUiccClientId = aIsiMsg.Get8bit(
-                            uiccSbClientOffset +
-                            UICC_SB_CLIENT_OFFSET_CLIENTID );
-                        }
-                    else if( ETrIdActivateIsimApplication == trId )
-                        {
-                        iUiccIsimClientId = aIsiMsg.Get8bit(
-                            uiccSbClientOffset +
-                            UICC_SB_CLIENT_OFFSET_CLIENTID );
-                        }
-                    }
-                // UICC_SB_FCI contains PIN key references
-                TUint uiccSbFciOffset( 0 );
-                if ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
-                    ISI_HEADER_SIZE + SIZE_UICC_APPLICATION_RESP,
-                    UICC_SB_FCI,
-                    EIsiSubBlockTypeId16Len16,
-                    uiccSbFciOffset ) )
-                    {
-                    // Check is the SIM UICC
-                    TPtrC8 data( KNullDesC8 );
-
-                    // The whole sub block is returned
-                    TInt sbLength( aIsiMsg.Get16bit(
-                        uiccSbFciOffset + UICC_SB_FCI_OFFSET_SBLEN ) );
-                    data.Set( aIsiMsg.GetData(
-                        uiccSbFciOffset,
-                        sbLength ) );
-
-                    TFci fci( data );
-                    if( UICC_CARD_TYPE_UICC == fci.GetTypeOfCard() )
-                        {
-                        StorePinKeyReferences( data );
-                        }
-                    }
-
-                // In case of ICC there is two UICC_SB_CHV subblocks
-                // that contain PIN IDs for ICC application
-                TUint uiccSbChvOffset( 0 );
-                while ( KErrNone == aIsiMsg.FindSubBlockOffsetById(
-                    startIndex,
-                    UICC_SB_CHV,
-                    EIsiSubBlockTypeId16Len16,
-                    uiccSbChvOffset ) )
-                    {
-                    TUint8 chvQualifier( aIsiMsg.Get8bit(
-                        uiccSbChvOffset +
-                        UICC_SB_CHV_OFFSET_CHVQUALIFIER ) );
-                    if ( UICC_CHV1 == chvQualifier ) // PIN1
-                        {
-                        iPin1Id = aIsiMsg.Get8bit(
-                            uiccSbChvOffset + UICC_SB_CHV_OFFSET_PINID );
-                        }
-                    else // PIN2
-                        {
-                        iPin2Id = aIsiMsg.Get8bit(
-                            uiccSbChvOffset + UICC_SB_CHV_OFFSET_PINID );
-                        }
-                    startIndex = uiccSbChvOffset + SIZE_UICC_SB_CHV;
-                    }
+                ret = HandleUiccApplHostActivate( aIsiMsg );
                 break;
                 }
             default:
                 {
+TFLOGSTRING("TSY: CMmUiccMessHandler::HandleUiccApplicationResp - default");
                 break;
                 }
             }
@@ -1346,7 +1606,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_HANDLEUICCAPPLICATIONRESP, "CMmUiccM
 const TPtrC8 CMmUiccMessHandler::GetFileFCI( const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetFileFCI");
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETFILEFCI, "CMmUiccMessHandler::GetFileFCI" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETFILEFCI_TD, "CMmUiccMessHandler::GetFileFCI" );
 
     TPtrC8 data( KNullDesC8 );
     TUint uiccSbFileDataOffset( 0 );
@@ -1376,7 +1636,7 @@ TInt CMmUiccMessHandler::CreateUiccConnectorReq(
     const TUiccParamsBase& aParams )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccConnectorReq");
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCCONNREQ, "CMmUiccMessHandler::CreateUiccConnectorReq" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCCONNREQ_TD, "CMmUiccMessHandler::CreateUiccConnectorReq" );
 
     TInt ret (KErrGeneral);
     TInt trId( aParams.trId );
@@ -1418,7 +1678,9 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCCONNREQ, "CMmUiccMessHandl
                 break;
                 }
             default:
+                {
                 break;
+                }
             }
 
         isiMsg.Set8bit(
@@ -1442,7 +1704,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCCONNREQ, "CMmUiccMessHandl
 TInt CMmUiccMessHandler::CreateUiccApduReq( const TUiccParamsApduReq& aParams )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccApduReq");
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCAPDUREQ, "CMmUiccMessHandler::CreateUiccApduReq" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCAPDUREQ_TD, "CMmUiccMessHandler::CreateUiccApduReq" );
 
     TInt ret (KErrGeneral);
     TInt trId( aParams.trId );
@@ -1525,7 +1787,7 @@ void CMmUiccMessHandler::CreateUiccSbApduActions(
     TUint8 aAction )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbApduActions");
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCASBPDUACTION, "CMmUiccMessHandler::CreateUiccSbApduActions" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATEUICCASBPDUACTION_TD, "CMmUiccMessHandler::CreateUiccSbApduActions" );
 
     // SIZE_UICC_SB_APPLICATION_STR
     TBuf8<SIZE_UICC_SB_APDU_ACTIONS> uiccSbApduActionBuf( 0 );
@@ -1555,7 +1817,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCASBPDUACTION, "CMmUiccMess
 const TPtrC8 CMmUiccMessHandler::GetApduData( const TIsiReceiveC& aIsiMsg )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetApduData");
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETAPDUDATA, "CMmUiccMessHandler::GetApduData" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETAPDUDATA_TD, "CMmUiccMessHandler::GetApduData" );
 
     TPtrC8 data( KNullDesC8 );
 
@@ -1588,7 +1850,7 @@ void CMmUiccMessHandler::CreateUiccSbApdu(
         const TDesC8& aAPDUData)
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccSbApdu" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATESBAPDU, "CMmUiccMessHandler::CreateUiccSbApdu" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATESBAPDU_TD, "CMmUiccMessHandler::CreateUiccSbApdu" );
 
     // UICC_SB_APDU subblock
     TBuf8<KUiccSbApduSize> uiccSbApduBuf( 0 );
@@ -1623,7 +1885,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATESBAPDU, "CMmUiccMessHandler::C
 TInt CMmUiccMessHandler::CreateUiccCardReq( const TUiccParamsBase& aParams )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccCardReq" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATECARDREQ, "CMmUiccMessHandler::CreateUiccCardReq" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CREATECARDREQ_TD, "CMmUiccMessHandler::CreateUiccCardReq" );
 
     TInt ret ( KErrGeneral );
     TInt trId( aParams.trId );
@@ -1667,7 +1929,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATECARDREQ, "CMmUiccMessHandler::
 void CMmUiccMessHandler::InitializeSimServiceTableCache( TBool aComplete )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::InitializeSimServiceTableCache" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_INITIALIZESIMSERVICETABLECACHE, "CMmUiccMessHandler::InitializeSimServiceTableCache" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_INITIALIZESIMSERVICETABLECACHE_TD, "CMmUiccMessHandler::InitializeSimServiceTableCache" );
 
     // Service table internal cacheing is done during strtup  and SIM refresh.
     // Completing of IPC EMmTsyBootNotifySimStatusReadyIPC is done only
@@ -1705,7 +1967,7 @@ void CMmUiccMessHandler::SimServiceTableCacheResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::SimServiceTableCacheResp" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_SIMSERVICETABLECACHERESP, "CMmUiccMessHandler::SimServiceTableCacheResp" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_SIMSERVICETABLECACHERESP_TD, "CMmUiccMessHandler::SimServiceTableCacheResp" );
 
     if ( UICC_STATUS_OK == aStatus )
         {
@@ -1722,13 +1984,13 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_SIMSERVICETABLECACHERESP, "CMmUiccMe
         else
             {
 TFLOGSTRING("TSY: CMmUiccMessHandler::SimServiceTableCacheResp unknown card type, cache not done" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_SIMSERVICETABLECACHERESP, "CMmUiccMessHandler::SimServiceTableCacheResp unknown card type, cache not done" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_SIMSERVICETABLECACHERESP_TD, "CMmUiccMessHandler::SimServiceTableCacheResp unknown card type, cache not done" );
             }
         }
     else
         {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::SimServiceTableCacheResp: reading failed (0x%x)", aStatus );
-OstTrace1( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_SIMSERVICETABLECACHERESP, "CMmUiccMessHandler::SimServiceTableCacheResp: reading failed (%x)", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMUICCMESSHANDLER_SIMSERVICETABLECACHERESP_TD, "CMmUiccMessHandler::SimServiceTableCacheResp: reading failed (%x)", aStatus );
         }
 
     // Cacheing during startup
@@ -1754,7 +2016,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_SIMSERVICETABLECACHERESP, "CMmU
 TBool CMmUiccMessHandler::GetServiceStatus( TUint8 aServiceNo )
     {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::GetServiceStatus for card: ox%x", iCardType );
-OstTrace1( TRACE_NORMAL, CMMUICCMESSHANDLER_GETSERVICESTATUS, "CMmUiccMessHandler::GetServiceStatus for card: ox%x", iCardType );
+OstTrace1( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETSERVICESTATUS_TD, "CMmUiccMessHandler::GetServiceStatus for card: ox%x", iCardType );
 
     TBool ret( EFalse );
 
@@ -1785,7 +2047,7 @@ OstTrace1( TRACE_NORMAL, CMMUICCMESSHANDLER_GETSERVICESTATUS, "CMmUiccMessHandle
             if( iUSTFile[index] & mask )
                 {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::GetServiceStatus: UICC service (%d) supported", aServiceNo );
-OstTrace1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_GETSERVICESTATUS, "CMmUiccMessHandler::GetServiceStatus: UICC service (%d) supported", aServiceNo );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_GETSERVICESTATUS_TD, "CMmUiccMessHandler::GetServiceStatus: UICC service (%d) supported", aServiceNo );
                 ret = ETrue;
                 }
             }
@@ -1822,7 +2084,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_GETSERVICESTATUS, "CMmUiccMessH
             if( ( iSSTFile[index] & mask ) == mask )
                 {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::GetServiceStatus: ICC service (%d) supported", aServiceNo );
-OstTrace1( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_GETSERVICESTATUS, "CMmUiccMessHandler::GetServiceStatus: ICC service (%d) supported", aServiceNo );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMUICCMESSHANDLER_GETSERVICESTATUS_TD, "CMmUiccMessHandler::GetServiceStatus: ICC service (%d) supported", aServiceNo );
                 ret = ETrue;
                 }
             }
@@ -1842,8 +2104,8 @@ TInt CMmUiccMessHandler::ProcessUiccMsg(
     const TDesC8& aFileData )
     {
 TFLOGSTRING3("TSY: CMmUiccMessHandler::ProcessUiccMsg, transaction ID: %d, status: %d", aTraId, aStatus );
-OstTrace1( TRACE_NORMAL, CMMUICCMESSHANDLER_PROCESSUICCMSG, "CMmUiccMessHandler::ProcessUiccMsg, transaction ID: %d", aTraId );
-OstTrace1( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_PROCESSUICCMSG, "CMmUiccMessHandler::ProcessUiccMsg, status: %d", aStatus );
+OstTrace1( TRACE_NORMAL,  CMMUICCMESSHANDLER_PROCESSUICCMSG_TD, "CMmUiccMessHandler::ProcessUiccMsg, transaction ID: %d", aTraId );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMUICCMESSHANDLER_PROCESSUICCMSG_TD, "CMmUiccMessHandler::ProcessUiccMsg, status: %d", aStatus );
 
     TInt ret( KErrNone );
 
@@ -1862,7 +2124,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_PROCESSUICCMSG, "CMmUiccMessHan
         default:
             {
 TFLOGSTRING("TSY: CMmUiccMessHandler::ProcessUiccMsg, unknown transaction ID" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_PROCESSUICCMSG, "CMmUiccMessHandler::ProcessUiccMsg, unknown transaction ID" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_PROCESSUICCMSG_TD, "CMmUiccMessHandler::ProcessUiccMsg, unknown transaction ID" );
             break;
             }
         }
@@ -1878,7 +2140,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_PROCESSUICCMSG, "CMmUiccMessHan
 void CMmUiccMessHandler::StorePinKeyReferences( const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::StorePinKeyReferences" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_STOREPINKEYREFERENCES, "CMmUiccMessHandler::StorePinKeyReferences" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_STOREPINKEYREFERENCES_TD, "CMmUiccMessHandler::StorePinKeyReferences" );
 
     // Get offset for PIN Status Template DO
     TFci fci( aFileData );
@@ -1955,7 +2217,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_STOREPINKEYREFERENCES, "CMmUiccMessH
 TUint8 CMmUiccMessHandler::GetPin1KeyReference()
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetPin1KeyReference" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETPIN1KEYREFERENCE, "CMmUiccMessHandler::GetPin1KeyReference" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETPIN1KEYREFERENCE_TD, "CMmUiccMessHandler::GetPin1KeyReference" );
     return iPin1Id;
     }
 
@@ -1967,7 +2229,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETPIN1KEYREFERENCE, "CMmUiccMessHan
 TUint8 CMmUiccMessHandler::GetPin2KeyReference()
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetPin2KeyReference" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETPIN2KEYREFERENCE, "CMmUiccMessHandler::GetPin2KeyReference" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETPIN2KEYREFERENCE_TD, "CMmUiccMessHandler::GetPin2KeyReference" );
     return iPin2Id;
     }
 
@@ -1979,7 +2241,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETPIN2KEYREFERENCE, "CMmUiccMessHan
 RMobilePhone::TMobilePhoneSecurityCode CMmUiccMessHandler::GetActivePin()
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetActivePin" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETACTIVEPIN, "CMmUiccMessHandler::GetActivePin" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETACTIVEPIN_TD, "CMmUiccMessHandler::GetActivePin" );
     return iActivePin;
     }
 
@@ -1991,7 +2253,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETACTIVEPIN, "CMmUiccMessHandler::G
 void CMmUiccMessHandler::ChangeActivePin()
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::ChangeActivePin" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CHANGEACTIVEPIN, "CMmUiccMessHandler::ChangeActivePin" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CHANGEACTIVEPIN_TD, "CMmUiccMessHandler::ChangeActivePin" );
     // Change the internal flag indicating which PIN is active
     if ( RMobilePhone::ESecurityCodePin1 == iActivePin )
         {
@@ -2011,7 +2273,7 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CHANGEACTIVEPIN, "CMmUiccMessHandler
 void CMmUiccMessHandler::InitializeCphsInformationCache()
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::InitializeCphsInformationCache" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_INITIALIZECPHSINFORMATIONCACHE, "CMmUiccMessHandler::InitializeCphsInformationCache" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_INITIALIZECPHSINFORMATIONCACHE_TD, "CMmUiccMessHandler::InitializeCphsInformationCache" );
 
     // CPHS information is read only in case of ICC card
     if( UICC_CARD_TYPE_ICC == iCardType )
@@ -2045,7 +2307,7 @@ void CMmUiccMessHandler::CphsInformationCacheResp(
     const TDesC8& aFileData )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::CphsInformationCacheResp" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP, "CMmUiccMessHandler::CphsInformationCacheResp" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP_TD, "CMmUiccMessHandler::CphsInformationCacheResp" );
 
     if ( UICC_STATUS_OK == aStatus )
         {
@@ -2060,15 +2322,15 @@ OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP, "CMmUiccMe
         else
             {
 TFLOGSTRING3("TSY: CMmUiccMessHandler::CphsInformationCacheResp: buffer too small (expected: %d, actual: %d), cannot store CPHS info", dataSize, iCPHSInformation.Length() );
-OstTrace0( TRACE_NORMAL, DUP3_CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP, "CMmUiccMessHandler::CphsInformationCacheResp: buffer too small, cannot store CPHS info" );
-OstTrace1( TRACE_NORMAL, DUP2_CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP, "CMmUiccMessHandler::CphsInformationCacheResp: expected size: %d", dataSize );
-OstTrace1( TRACE_NORMAL, DUP4_CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP, "CMmUiccMessHandler::CphsInformationCacheResp: actual size: %d", iCPHSInformation.Length() );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP_TD, "CMmUiccMessHandler::CphsInformationCacheResp: buffer too small, cannot store CPHS info" );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP_TD, "CMmUiccMessHandler::CphsInformationCacheResp: expected size: %d", dataSize );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP_TD, "CMmUiccMessHandler::CphsInformationCacheResp: actual size: %d", iCPHSInformation.Length() );
             }
         }
     else
         {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::CphsInformationCacheResp: reading failed (0x%x)", aStatus );
-OstTrace1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP, "CMmUiccMessHandler::CphsInformationCacheResp: reading failed (0x%x)", aStatus );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP_TD, "CMmUiccMessHandler::CphsInformationCacheResp: reading failed (0x%x)", aStatus );
         }
     }
 
@@ -2080,7 +2342,7 @@ OstTrace1( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_CPHSINFORMATIONCACHERESP, "CMmU
 TBool CMmUiccMessHandler::GetCphsInformationStatus( TUint8 aServiceNo )
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetCphsInformationStatus" );
-OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_GETCPHSINFORMATIONSTATUS, "CMmUiccMessHandler::GetCphsInformationStatus" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMUICCMESSHANDLER_GETCPHSINFORMATIONSTATUS_TD, "CMmUiccMessHandler::GetCphsInformationStatus" );
 
     TBool ret( EFalse );
 
@@ -2113,7 +2375,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMUICCMESSHANDLER_GETCPHSINFORMATIONSTATUS, "CMmU
         if( ( iCPHSInformation[index] & mask ) == mask )
             {
 TFLOGSTRING2("TSY: CMmUiccMessHandler::GetCphsInformationStatus: CPHS service (%d) supported", aServiceNo );
-OstTrace1( TRACE_NORMAL, CMMUICCMESSHANDLER_GETCPHSINFORMATIONSTATUS, "CMmUiccMessHandler::GetCphsInformationStatus: CPHS service (%d) supported", aServiceNo );
+OstTrace1( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETCPHSINFORMATIONSTATUS_TD, "CMmUiccMessHandler::GetCphsInformationStatus: CPHS service (%d) supported", aServiceNo );
             ret = ETrue;
             }
         }
@@ -2132,7 +2394,7 @@ TInt TFci::GetLength()
     lengthOfFCISb = CMmStaticUtility::Get16Bit( iData,
                                                 UICC_SB_FCI_OFFSET_SBLEN );
 TFLOGSTRING2("TSY: TFci::GetLength lengthOfFCISb = %d", lengthOfFCISb );
-OstTrace1( TRACE_NORMAL, TFCI_GETLENGTH, "TFci::GetLength;lengthOfFCISb=%d", lengthOfFCISb );
+OstTrace1( TRACE_NORMAL,  TFCI_GETLENGTH_TD, "TFci::GetLength;lengthOfFCISb=%d", lengthOfFCISb );
 
     return lengthOfFCISb;
     }
@@ -2146,7 +2408,7 @@ TUint8 TFci::GetTypeOfCard()
     {
     TUint8 uiccCardType( iData[UICC_SB_FCI_OFFSET_CARDTYPE] );
 TFLOGSTRING2("TSY: TFci::GetTypeOfCard uiccCardType = %d", uiccCardType );
-OstTraceExt1( TRACE_NORMAL, TFCI_GETTYPEOFCARD, "TFci::GetTypeOfCard;uiccCardType=%hhu", uiccCardType );
+OstTraceExt1( TRACE_NORMAL,  TFCI_GETTYPEOFCARD_TD, "TFci::GetTypeOfCard;uiccCardType=%hhu", uiccCardType );
 
     return uiccCardType;
     }
@@ -2159,7 +2421,7 @@ OstTraceExt1( TRACE_NORMAL, TFCI_GETTYPEOFCARD, "TFci::GetTypeOfCard;uiccCardTyp
 TInt TFci::GetOffsetOfTLV( const TUint8 aDescription )
     {
 TFLOGSTRING("TSY: TFci::::GetOffsetOfTLV" );
-OstTrace0( TRACE_NORMAL, TFCI_GETOFFSETOFTLV, "TFci::GetOffsetOfTLV" );
+OstTrace0( TRACE_NORMAL,  TFCI_GETOFFSETOFTLV_TD, "TFci::GetOffsetOfTLV" );
 
     TInt indexOfData( 0 );
     TInt length( GetLength() );
@@ -2211,7 +2473,7 @@ OstTrace0( TRACE_NORMAL, TFCI_GETOFFSETOFTLV, "TFci::GetOffsetOfTLV" );
 TInt TFci::GetNumberOfRecords()
     {
 TFLOGSTRING("TSY: TFci::GetNumberOfRecords" );
-OstTrace0( TRACE_NORMAL, TFCI_GETNUMBEROFRECORDS, "TFci::GetNumberOfRecords" );
+OstTrace0( TRACE_NORMAL,  TFCI_GETNUMBEROFRECORDS_TD, "TFci::GetNumberOfRecords" );
 
     TInt numberOfRecords( 0 );
     TUint8 uiccCardType( GetTypeOfCard());
@@ -2248,11 +2510,11 @@ OstTrace0( TRACE_NORMAL, TFCI_GETNUMBEROFRECORDS, "TFci::GetNumberOfRecords" );
     else
         {
 TFLOGSTRING("TSY: TFci::GetNumberOfRecords: UNKNOWN CARD TYPE" );
-OstTrace0( TRACE_NORMAL, DUP2_TFCI_GETNUMBEROFRECORDS, "TFci::GetNumberOfRecords: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL,  DUP2_TFCI_GETNUMBEROFRECORDS_TD, "TFci::GetNumberOfRecords: UNKNOWN CARD TYPE" );
         }
 
 TFLOGSTRING2("TSY: TFci::GetNumberOfRecords numberOfRecords = %d", numberOfRecords );
-OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETNUMBEROFRECORDS, "TFci::GetNumberOfRecords;numberOfRecords=%d", numberOfRecords );
+OstTrace1( TRACE_NORMAL,  DUP1_TFCI_GETNUMBEROFRECORDS_TD, "TFci::GetNumberOfRecords;numberOfRecords=%d", numberOfRecords );
 
     return numberOfRecords;
     }
@@ -2265,7 +2527,7 @@ OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETNUMBEROFRECORDS, "TFci::GetNumberOfRecords
 TInt TFci::GetRecordLength()
     {
 TFLOGSTRING("TSY: TFci::GetRecordLength" );
-OstTrace0( TRACE_NORMAL, TFCI_GETRECORDLENGTH, "TFci::GetRecordLength" );
+OstTrace0( TRACE_NORMAL,  TFCI_GETRECORDLENGTH_TD, "TFci::GetRecordLength" );
 
     TInt recordLength( 0 );
     TUint8 uiccCardType( GetTypeOfCard());
@@ -2295,11 +2557,11 @@ OstTrace0( TRACE_NORMAL, TFCI_GETRECORDLENGTH, "TFci::GetRecordLength" );
     else
         {
 TFLOGSTRING("TSY: TFci::GetRecordLength: UNKNOWN CARD TYPE" );
-OstTrace0( TRACE_NORMAL, DUP2_TFCI_GETRECORDLENGTH, "TFci::GetRecordLength: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL,  DUP2_TFCI_GETRECORDLENGTH_TD, "TFci::GetRecordLength: UNKNOWN CARD TYPE" );
         }
 
 TFLOGSTRING2("TSY: TFci::GetRecordLength recordLength = %d", recordLength );
-OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETRECORDLENGTH, "TFci::GetRecordLength;recordLength=%d", recordLength );
+OstTrace1( TRACE_NORMAL,  DUP1_TFCI_GETRECORDLENGTH_TD, "TFci::GetRecordLength;recordLength=%d", recordLength );
 
     return recordLength;
     }
@@ -2312,7 +2574,7 @@ OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETRECORDLENGTH, "TFci::GetRecordLength;recor
 TInt TFci::GetSizeOfFile()
     {
 TFLOGSTRING("TSY: TFci::GetSizeOfFile" );
-OstTrace0( TRACE_NORMAL, TFCI_GETSIZEOFFILE, "TFci::GetSizeOfFile" );
+OstTrace0( TRACE_NORMAL,  TFCI_GETSIZEOFFILE_TD, "TFci::GetSizeOfFile" );
 
     TInt fileSize( 0 );
     TUint8 uiccCardType( GetTypeOfCard() );
@@ -2342,12 +2604,12 @@ OstTrace0( TRACE_NORMAL, TFCI_GETSIZEOFFILE, "TFci::GetSizeOfFile" );
     else
         {
 TFLOGSTRING("TSY: TFci::GetFileSize: UNKNOWN CARD TYPE" );
-OstTrace0( TRACE_NORMAL, DUP2_TFCI_GETSIZEOFFILE, "TFci::GetSizeOfFile: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL,  DUP2_TFCI_GETSIZEOFFILE_TD, "TFci::GetSizeOfFile: UNKNOWN CARD TYPE" );
         }
 
 
 TFLOGSTRING2("TSY: TFci::GetSizeOfFile fileSize = %d", fileSize );
-OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETSIZEOFFILE, "TFci::GetSizeOfFile;fileSize=%d", fileSize );
+OstTrace1( TRACE_NORMAL,  DUP1_TFCI_GETSIZEOFFILE_TD, "TFci::GetSizeOfFile;fileSize=%d", fileSize );
 
     return fileSize;
     }
@@ -2360,7 +2622,7 @@ OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETSIZEOFFILE, "TFci::GetSizeOfFile;fileSize=
 TInt TFci::GetFileIdentifier()
     {
 TFLOGSTRING("TSY: TFci::GetFileIdentifier" );
-OstTrace0( TRACE_NORMAL, TFCI_GETFILEIDENTIFIER, "TFci::GetFileIdentifier" );
+OstTrace0( TRACE_NORMAL,  TFCI_GETFILEIDENTIFIER_TD, "TFci::GetFileIdentifier" );
 
     TInt fileIdentifier( 0 );
     TUint8 uiccCardType( GetTypeOfCard());
@@ -2392,11 +2654,11 @@ OstTrace0( TRACE_NORMAL, TFCI_GETFILEIDENTIFIER, "TFci::GetFileIdentifier" );
     else
         {
 TFLOGSTRING("TSY: TFci::GetFileIdentifier: UNKNOWN CARD TYPE" );
-OstTrace0( TRACE_NORMAL, DUP2_TFCI_GETFILEIDENTIFIER, "TFci::GetFileIdentifier: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL,  DUP2_TFCI_GETFILEIDENTIFIER_TD, "TFci::GetFileIdentifier: UNKNOWN CARD TYPE" );
         }
 
 TFLOGSTRING2("TSY: TFci::GetFileIdentifier fileIdentifier = %d", fileIdentifier );
-OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETFILEIDENTIFIER, "TFci::GetFileIdentifier;fileIdentifier=%d", fileIdentifier );
+OstTrace1( TRACE_NORMAL,  DUP1_TFCI_GETFILEIDENTIFIER_TD, "TFci::GetFileIdentifier;fileIdentifier=%d", fileIdentifier );
 
     return fileIdentifier;
     }
@@ -2409,7 +2671,7 @@ OstTrace1( TRACE_NORMAL, DUP1_TFCI_GETFILEIDENTIFIER, "TFci::GetFileIdentifier;f
 TUint8 TFci::GetFileStatus()
     {
 TFLOGSTRING("TSY: TFci::GetFileStatus" );
-OstTrace0( TRACE_NORMAL, TFCI_GETFILESTATUS, "TFci::GetFileStatus" );
+OstTrace0( TRACE_NORMAL,  TFCI_GETFILESTATUS_TD, "TFci::GetFileStatus" );
 
     TUint8 fileStatus( 0 );
     TUint8 uiccCardType( GetTypeOfCard());
@@ -2426,11 +2688,11 @@ OstTrace0( TRACE_NORMAL, TFCI_GETFILESTATUS, "TFci::GetFileStatus" );
     else
         {
 TFLOGSTRING("TSY: TFci::GetFileStatus: UNKNOWN CARD TYPE" );
-OstTrace0( TRACE_NORMAL, DUP1_TFCI_GETFILESTATUS, "TFci::GetFileStatus: UNKNOWN CARD TYPE" );
+OstTrace0( TRACE_NORMAL,  DUP1_TFCI_GETFILESTATUS_TD, "TFci::GetFileStatus: UNKNOWN CARD TYPE" );
         }
 
 TFLOGSTRING2("TSY: TFci::GetFileStatus fileStatus = %d", fileStatus );
-OstTraceExt1( TRACE_NORMAL, DUP2_TFCI_GETFILESTATUS, "TFci::GetFileStatus;fileStatus=%hhu", fileStatus );
+OstTraceExt1( TRACE_NORMAL,  DUP2_TFCI_GETFILESTATUS_TD, "TFci::GetFileStatus;fileStatus=%hhu", fileStatus );
 
     return fileStatus;
     }
@@ -2443,8 +2705,90 @@ OstTraceExt1( TRACE_NORMAL, DUP2_TFCI_GETFILESTATUS, "TFci::GetFileStatus;fileSt
 TUint8 CMmUiccMessHandler::GetUiccClientId()
     {
 TFLOGSTRING("TSY: CMmUiccMessHandler::GetUiccClientId" );
-OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETUICCCLIENTID, "CMmUiccMessHandler::GetUiccClientId" );
+OstTrace0( TRACE_NORMAL,  CMMUICCMESSHANDLER_GETUICCCLIENTID_TD, "CMmUiccMessHandler::GetUiccClientId" );
     return iUiccClientId;
+    }
+
+// -----------------------------------------------------------------------------
+// CMmUiccMessHandler::GetUiccApplicationStatus
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+TUint8 CMmUiccMessHandler::GetUiccApplicationStatus()
+    {
+TFLOGSTRING("TSY: CMmUiccMessHandler::GetUiccApplicationStatus" );
+OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_GETUICCAPPLICATIONSTATUS_TD, "CMmUiccMessHandler::GetUiccApplicationStatus" );
+    return iApplicationStatus;
+    }
+
+
+// -----------------------------------------------------------------------------
+// CMmUiccMessHandler::CreateUiccReq
+// Builds UICC_REQ ISI message and sends it via phonet
+// -----------------------------------------------------------------------------
+//
+TInt CMmUiccMessHandler::CreateUiccReq()
+    {
+TFLOGSTRING("TSY: CMmUiccMessHandler::CreateUiccReq");
+OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_CREATEUICCREQ_TD, "CMmUiccMessHandler::CreateUiccReq" );
+
+    // Create UICC_REQ message for querying card status
+    TIsiSend isiMsg( iPhoNetSender->SendBufferDes() );
+    isiMsg.Set8bit( ISI_HEADER_OFFSET_RESOURCEID, PN_UICC );
+    isiMsg.Set8bit( ISI_HEADER_OFFSET_TRANSID, ETrIdGetUiccStatus );
+    isiMsg.Set8bit( ISI_HEADER_OFFSET_MESSAGEID, UICC_REQ );
+    isiMsg.Set8bit( ISI_HEADER_SIZE + UICC_REQ_OFFSET_SERVICETYPE,
+        UICC_STATUS_GET );
+    // THERE IS NO OFFSET FOR SB COUNT CURRENTLY IN THE ISI HEADER
+    isiMsg.Set8bit( ISI_HEADER_SIZE + UICC_REQ_OFFSET_SERVICETYPE + 1, 0x00 );
+
+    return iPhoNetSender->Send( isiMsg.Complete() );
+    }
+
+// -----------------------------------------------------------------------------
+// CMmUiccMessHandler::UiccCardRespStatus
+// Uicc card response card status handling
+// -----------------------------------------------------------------------------
+//
+void CMmUiccMessHandler::UiccCardRespStatus( const TIsiReceiveC& aIsiMsg )
+    {
+TFLOGSTRING("TSY: CMmUiccMessHandler::UiccCardRespStatus");
+OstTrace0( TRACE_NORMAL, CMMUICCMESSHANDLER_UICCCARDRESPSTATUS_TD, "CMmUiccMessHandler::UiccCardRespStatus" );
+
+    TUint8 nbOfSubBlocks( aIsiMsg.Get8bit(
+        ISI_HEADER_SIZE + UICC_CARD_RESP_OFFSET_NSB ) );
+    if( nbOfSubBlocks )
+        {
+
+        TUint uiccSbFileDataOffset( 0 );
+        if( KErrNone == aIsiMsg.FindSubBlockOffsetById(
+            ISI_HEADER_SIZE + SIZE_UICC_CARD_RESP,
+            UICC_SB_CARD_STATUS,
+            EIsiSubBlockTypeId16Len16,
+            uiccSbFileDataOffset ) )
+            {
+
+            TInt cardStatus( aIsiMsg.Get8bit(
+                 uiccSbFileDataOffset +
+                 UICC_SB_CARD_STATUS_OFFSET_CARDSTATUS ) );
+TFLOGSTRING2("TSY: CMmUiccMessHandler::UiccCardRespStatus: UICC_CARD_RESP cardstatus = %d", cardStatus );
+            if( UICC_STATUS_CARD_NOT_READY == cardStatus )
+                {
+                SendTerminalProfile();
+                }                                
+            else if( UICC_STATUS_CARD_READY == cardStatus && 
+                UICC_APPL_ID_UNKNOWN == iApplicationId )
+                {
+TFLOGSTRING("TSY: CMmUiccMessHandler::UiccCardRespStatus: UICC_CARD_RESP ACTIVATE");
+                // Activate the application
+                TUiccParamsBase params;
+                params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
+                params.trId = ETrIdGetUiccApplication;
+                CreateUiccApplicationReq( params, UICC_APPL_LIST, iCardType );
+
+                }
+            }
+        }
     }
 
 //  End of File

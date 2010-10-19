@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -50,6 +50,8 @@ const TUint8 KParamIndicatorsLength     = 1;
 const TUint8 KMaxInfoLength             = 82;
 // SMS Delivery report buffer size
 const TUint8 KDeliveryReportSize        = 248;
+// Length of sw1 and sw2
+const TUint8 KSw1Sw2Length              = 2;
 
 
 // ==================== MEMBER FUNCTIONS ====================================
@@ -74,7 +76,7 @@ CSatDataDownload::CSatDataDownload
         iSmsPpDdOngoing( EFalse ), // No SMS PP DD on going during construction
         iSmsPpDdSupported( ETrue ) // Most likely SIM supports SMS PP DD
     {
-    OstTrace0( TRACE_NORMAL, CSATDATADOWNLOAD_CSATDATADOWNLOAD, "CSatDataDownload::CSatDataDownload" );
+    OstTrace0( TRACE_NORMAL,  CSATDATADOWNLOAD_CSATDATADOWNLOAD_TD, "CSatDataDownload::CSatDataDownload" );
     }
 
 
@@ -85,7 +87,7 @@ CSatDataDownload::CSatDataDownload
 //
 void CSatDataDownload::ConstructL()
     {
-    OstTrace0( TRACE_NORMAL, CSATDATADOWNLOAD_CONSTRUCTL, "CSatDataDownload::ConstructL" );
+    OstTrace0( TRACE_NORMAL,  CSATDATADOWNLOAD_CONSTRUCTL_TD, "CSatDataDownload::ConstructL" );
     }
 
 // -----------------------------------------------------------------------------
@@ -99,7 +101,7 @@ CSatDataDownload* CSatDataDownload::NewL
         CTsySatMessaging*   aSatMessaging
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATDATADOWNLOAD_NEWL, "CSatDataDownload::NewL" );
+    OstTrace0( TRACE_NORMAL,  CSATDATADOWNLOAD_NEWL_TD, "CSatDataDownload::NewL" );
     TFLOGSTRING("TSY: CSatDataDownload::NewL");
 
     CSatDataDownload* self =
@@ -120,7 +122,7 @@ CSatDataDownload* CSatDataDownload::NewL
 //
 CSatDataDownload::~CSatDataDownload()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATDATADOWNLOAD_CSATDATADOWNLOAD, "CSatDataDownload::~CSatDataDownload" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATDATADOWNLOAD_CSATDATADOWNLOAD_TD, "CSatDataDownload::~CSatDataDownload" );
     TFLOGSTRING("TSY: CSatDataDownload::~CSatDataDownload");
     }
 
@@ -134,7 +136,7 @@ void CSatDataDownload::UiccCatRespEnvelopeReceived(
     const TIsiReceiveC& aIsiMessage
     )
     {
-    OstTrace0( TRACE_NORMAL, CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED, "CSatDataDownload::UiccCatRespEnvelopeReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED_TD, "CSatDataDownload::UiccCatRespEnvelopeReceived" );
     TFLOGSTRING("TSY:CSatDataDownload::UiccCatRespEnvelopeReceived");
 
     TUint8 status( aIsiMessage.Get8bit(
@@ -158,35 +160,49 @@ void CSatDataDownload::UiccCatRespEnvelopeReceived(
             apduData.Set( aIsiMessage.GetData(
                 uiccSbApduOffset + UICC_SB_APDU_OFFSET_APDU,
                 apduLength ) );
-            // Status bytes are two last bytes in APDU
-            TUint8 sw1( apduData[apduLength - 2] );
-            TUint8 sw2( apduData[apduLength - 1] );
+            if( KSw1Sw2Length <= apduLength )
+                {
+                // Status bytes are two last bytes in APDU
+                sw1 = apduData[apduLength - 2];
+                sw2 = apduData[apduLength - 1];
+                }
             }
         else // Subblock is mandatory
             {
             TFLOGSTRING("TSY: CSatMessHandler::UiccCatRespEnvelopeReceived - Mandatory subblock UICC_SB_APDU not found");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED, "CSatDataDownload::UiccCatRespEnvelopeReceived- Mandatory subblock UICC_SB_APDU not found" );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED_TD, "CSatDataDownload::UiccCatRespEnvelopeReceived- Mandatory subblock UICC_SB_APDU not found" );
             }
         }
+
+    TTpFailure result;
 
     // Create delivery report according to SW result
     if ( KError != TSatUtility::Sw1Sw2Check( sw1, sw2 ) )
         {
         TFLOGSTRING("TSY: CSatDataDownload::UiccCatRespEnvelopeReceived, OK");
-        OstTrace0( TRACE_NORMAL, DUP2_CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED, "CSatDataDownload::UiccCatRespEnvelopeReceived" );
-        BuildSimMsgReport( ENone, apduData );
+        OstTrace0( TRACE_NORMAL,  DUP2_CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED_TD, "CSatDataDownload::UiccCatRespEnvelopeReceived" );
+        result = ENone;
         }
     else if ( KAtkSwDataNtfSw1busy == sw1 )
         {
         TFLOGSTRING("TSY:CSatDataDownload::UiccCatRespEnvelopeReceived, SIM Busy");
-        OstTrace0( TRACE_NORMAL, DUP3_CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED, "CSatDataDownload::UiccCatRespEnvelopeReceived" );
-        BuildSimMsgReport( ESatBusy, apduData );
+        OstTrace0( TRACE_NORMAL,  DUP3_CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED_TD, "CSatDataDownload::UiccCatRespEnvelopeReceived" );
+        result = ESatBusy;
         }
     else
         {
         TFLOGSTRING("TSY:CSatDataDownload::UiccCatRespEnvelopeReceived, Data Download Error");
-        OstTrace0( TRACE_NORMAL, DUP4_CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED, "CSatDataDownload::UiccCatRespEnvelopeReceived" );
-        BuildSimMsgReport( ESatDlError, apduData );
+        OstTrace0( TRACE_NORMAL,  DUP4_CSATDATADOWNLOAD_UICCCATRESPENVELOPERECEIVED_TD, "CSatDataDownload::UiccCatRespEnvelopeReceived" );
+        result = ESatDlError;
+        }
+
+    if( KSw1Sw2Length <= apduData.Length() )
+        {
+        BuildSimMsgReport( result, apduData.Mid( 0, apduData.Length() - KSw1Sw2Length ) );
+        }
+    else
+        {
+        BuildSimMsgReport( result, KNullDesC8 );
         }
     }
 
@@ -204,7 +220,7 @@ void CSatDataDownload::BuildSimMsgReport
         const TDesC8& aUserData
         )
     {
-    OstTraceExt2( TRACE_NORMAL, CSATDATADOWNLOAD_BUILDSIMMSGREPORT, "CSatDataDownload::BuildSimMsgReport TpFailure: %{TTpFailure}, UserDataLen: %d", aTpFailure, aUserData.Length() );
+    OstTraceExt2( TRACE_NORMAL,  CSATDATADOWNLOAD_BUILDSIMMSGREPORT_TD, "CSatDataDownload::BuildSimMsgReport TpFailure: %{TTpFailure}, UserDataLen: %d", aTpFailure, aUserData.Length() );
     TFLOGSTRING3("TSY:CSatDataDownload::BuildSimMsgReport TpFailure: %x, UserDataLen: %d", aTpFailure, aUserData.Length() );
 
     // Select Cause and CauseType according to routing result
@@ -237,12 +253,12 @@ void CSatDataDownload::BuildSimMsgReport
     msgBuffer.Append( 0 );           // no of sublocks
 
     // Add SMS_SB_DELIVER_REPORT subblock if any failure is there
-    if( ENone != aTpFailure || 
+    if( ENone != aTpFailure ||
         0 < dataLen )
         {
         TFLOGSTRING("TSY:CSatDataDownload::BuildSimMsgReport \
                  Adding SMS_SB_DELIVER_REPORT" );
-        OstTrace0( TRACE_NORMAL, DUP1_CSATDATADOWNLOAD_BUILDSIMMSGREPORT, "CSatDataDownload::BuildSimMsgReport Adding SMS_SB_DELIVER_REPORT" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATDATADOWNLOAD_BUILDSIMMSGREPORT_TD, "CSatDataDownload::BuildSimMsgReport Adding SMS_SB_DELIVER_REPORT" );
 
         TIsiSubBlock deliverReport( msgBuffer, SMS_SB_DELIVER_REPORT,EIsiSubBlockTypeId16Len16 );
 
@@ -264,7 +280,7 @@ void CSatDataDownload::BuildSimMsgReport
         {
         TFLOGSTRING("TSY:CSatDataDownload::BuildSimMsgReport \
               Adding SMS_SB_PARAM_INDICATOR & SMS_SB_USER_DATA" );
-        OstTrace0( TRACE_NORMAL, DUP2_CSATDATADOWNLOAD_BUILDSIMMSGREPORT, "CSatDataDownload::BuildSimMsgReport Adding SMS_SB_PARAM_INDICATOR AND SMS_SB_USER_DATA" );
+        OstTrace0( TRACE_NORMAL,  DUP2_CSATDATADOWNLOAD_BUILDSIMMSGREPORT_TD, "CSatDataDownload::BuildSimMsgReport Adding SMS_SB_PARAM_INDICATOR AND SMS_SB_USER_DATA" );
 
         // Add two more Sublock:
         // SMS_SB_PARAM_INDICATOR
@@ -339,7 +355,7 @@ void CSatDataDownload::CellBroadcastReceived
         const TIsiReceiveC& aIsiMessage // SMS_GSM(_TEMP)_CB_ROUTING_NTF
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATDATADOWNLOAD_CELLBROADCASTRECEIVED, "CSatDataDownload::CellBroadcastReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATDATADOWNLOAD_CELLBROADCASTRECEIVED_TD, "CSatDataDownload::CellBroadcastReceived" );
     TFLOGSTRING( "TSY:CSatDataDownload::CellBroadcastReceived" );
 
     TBuf8<KCbsMsgMaxLength> cbsMsg;
@@ -423,19 +439,19 @@ void CSatDataDownload::CellBroadcastReceived
     }
 
 // -----------------------------------------------------------------------------
-// CSatDataDownload::SmsSimMsgIndReceived
+// CSatDataDownload::SmsSimMsgIndReceivedL
 // Breaks a sms point to point isi message
 // Sends envelope
 // -----------------------------------------------------------------------------
 //
 
-void CSatDataDownload::SmsSimMsgIndReceived
+void CSatDataDownload::SmsSimMsgIndReceivedL
         (
          const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATDATADOWNLOAD_SMSSIMMSGINDRECEIVED, "CSatDataDownload::SmsSimMsgIndReceived" );
-    TFLOGSTRING( "TSY:CSatDataDownload::SmsSimMsgIndReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATDATADOWNLOAD_SMSSIMMSGINDRECEIVEDL_TD, "CSatDataDownload::SmsSimMsgIndReceivedL" );
+    TFLOGSTRING( "TSY:CSatDataDownload::SmsSimMsgIndReceivedL" );
 
     TBuf8<KAddrMaxLength> bcdSmscAddress;          // to store Service centre number
     TBuf8<KTtpduMaxSize> smsTpdu;                  // Temporary buffer to store TPDU data
@@ -478,13 +494,13 @@ void CSatDataDownload::SmsSimMsgIndReceived
         smsTpdu.Append( aIsiMessage.GetData(
             sbDeliver + SMS_SB_TPDU_OFFSET_DATABYTES, userDataLen ));
         // Destination Address Length
-        // 1st Byte of destination address contains no os semioctets 
+        // 1st Byte of destination address contains no os semioctets
         //in address bytes
 
         // +1 to calculate correct nos of bytes in address
         // divide by 2 to convert semioctets to no of octets
         // +2 to add type of address byte and no of
-        TUint8 tpduIndexCalc( ( ( smsTpdu[1] + 1 )/2 ) + 2 ); 
+        TUint8 tpduIndexCalc( ( ( smsTpdu[1] + 1 )/2 ) + 2 );
 
         // Storing protocol id and datacoding scheme from TPDU data buffer
         iSmsPpProtocolId = smsTpdu[ tpduIndexCalc + 1 ];
@@ -496,8 +512,8 @@ void CSatDataDownload::SmsSimMsgIndReceived
 
     if( iSmsPpDdSupported ) // Check for SMS PP-DATA Download supported
         {
-        TFLOGSTRING( "TSY:CSatDataDownload::SmsSimMsgIndReceived SMS SIM Supported, sending Envelope..." );
-        OstTrace0( TRACE_NORMAL, DUP1_CSATDATADOWNLOAD_SMSSIMMSGINDRECEIVED, "CSatDataDownload::SmsSimMsgIndReceived SMS Sim Supported, sending Envelope..." );
+        TFLOGSTRING( "TSY:CSatDataDownload::SmsSimMsgIndReceivedL SMS SIM Supported, sending Envelope..." );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATDATADOWNLOAD_SMSSIMMSGINDRECEIVEDL_TD, "CSatDataDownload::SmsSimMsgIndReceivedL SMS Sim Supported, sending Envelope..." );
 
         iSmsPpTransactionId = iSatMessaging->GetTransactionId();
         // Data Download supported, send envelope
@@ -508,8 +524,8 @@ void CSatDataDownload::SmsSimMsgIndReceived
         }
     else
         {
-        TFLOGSTRING( "TSY:CSatDataDownload::SmsSimMsgIndReceived SMS SIM not supported, storing SMS..." );
-        OstTrace0( TRACE_NORMAL, DUP2_CSATDATADOWNLOAD_SMSSIMMSGINDRECEIVED, "CSatDataDownload::SmsSimMsgIndReceived SMS SIM not supported, storing SMS..." );
+        TFLOGSTRING( "TSY:CSatDataDownload::SmsSimMsgIndReceivedL SMS SIM not supported, storing SMS..." );
+        OstTrace0( TRACE_NORMAL,  DUP2_CSATDATADOWNLOAD_SMSSIMMSGINDRECEIVEDL_TD, "CSatDataDownload::SmsSimMsgIndReceivedL SMS SIM not supported, storing SMS..." );
 
         // Save the SMS instead.
         RMobileSmsStore::TMobileGsmSmsEntryV1 smsEntry;
@@ -553,7 +569,7 @@ void CSatDataDownload::SendCellBroadcastDdlEnvelope
         TDesC8& aPdu
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATDATADOWNLOAD_SENDCELLBROADCASTDDLENVELOPE, "CSatDataDownload::SendCellBroadcastDdlEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATDATADOWNLOAD_SENDCELLBROADCASTDDLENVELOPE_TD, "CSatDataDownload::SendCellBroadcastDdlEnvelope" );
     TFLOGSTRING( "TSY:CSatDataDownload::SendEnvelopeForCellBroadcast" );
 
     TTlv envelope;
@@ -583,7 +599,7 @@ void CSatDataDownload::SendSmsPpDdlEnvelope
         TDesC8& aPdu
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATDATADOWNLOAD_SENDSMSPPDDLENVELOPE, "CSatDataDownload::SendSmsPpDdlEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATDATADOWNLOAD_SENDSMSPPDDLENVELOPE_TD, "CSatDataDownload::SendSmsPpDdlEnvelope" );
     TFLOGSTRING( "TSY:CSatDataDownload::SendEnvelopeForSmsPpDownload" );
 
     TTlv envelope;
@@ -612,7 +628,7 @@ void CSatDataDownload::SmsPpDlSupported
         TBool aStatus
         )
     {
-    OstTrace1( TRACE_NORMAL, CSATDATADOWNLOAD_SMSPPDLSUPPORTED, "CSatDataDownload::SmsPpDlSupported: %d", aStatus );
+    OstTrace1( TRACE_NORMAL,  CSATDATADOWNLOAD_SMSPPDLSUPPORTED_TD, "CSatDataDownload::SmsPpDlSupported: %d", aStatus );
     TFLOGSTRING2( "TSY: CSatDataDownload::SmsPpDlSupported: %d", aStatus );
 
     iSmsPpDdSupported = aStatus;
@@ -630,7 +646,7 @@ void CSatDataDownload::MessageReceivedL
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATDATADOWNLOAD_MESSAGERECEIVEDL, "CSatDataDownload::MessageReceivedL" );
+    OstTrace0( TRACE_NORMAL,  CSATDATADOWNLOAD_MESSAGERECEIVEDL_TD, "CSatDataDownload::MessageReceivedL" );
     TFLOGSTRING( "TSY:CSatDataDownload::MessageReceivedL" );
 
     TInt resource( aIsiMessage.Get8bit( ISI_HEADER_OFFSET_RESOURCEID ) );
@@ -653,7 +669,7 @@ void CSatDataDownload::MessageReceivedL
                 {
                 // Receive SMS PP Data Download Indication , Send by SMS Server
                 // on reception of message on network
-                SmsSimMsgIndReceived(aIsiMessage);
+                SmsSimMsgIndReceivedL(aIsiMessage);
                 break;
                 }
             default:

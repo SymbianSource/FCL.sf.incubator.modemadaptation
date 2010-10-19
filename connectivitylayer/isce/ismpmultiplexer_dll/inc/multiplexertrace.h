@@ -59,7 +59,7 @@ const TUint8 KClassIdentifierShift( 8 );
 #define ASSERT_THREAD_CONTEXT_ALWAYS( a )ASSERT_RESET_ALWAYS( NKern::CurrentContext() == NKern::EThread, a );
 
 // IST API asserts
-#define ISTAPI_ASSERT_KERNEL_THREAD_CONTEXT_ALWAYS NKern::CurrentContext() == NKern::EThread /* TODO Kernel thread context && ( Kern::CurrentThread().iThreadType!=EThreadUser || Kern::CurrentThread().iNThread.iCsCount > 0 )*/
+#define ISTAPI_ASSERT_KERNEL_THREAD_CONTEXT_ALWAYS NKern::CurrentContext() == NKern::EThread /*  Kernel thread context && ( Kern::CurrentThread().iThreadType!=EThreadUser || Kern::CurrentThread().iNThread.iCsCount > 0 )*/
 
 #endif // __MUX_TRACE_H__
 

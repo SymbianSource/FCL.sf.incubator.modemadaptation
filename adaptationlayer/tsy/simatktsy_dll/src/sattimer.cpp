@@ -61,7 +61,7 @@ CSatTimer::CSatTimer
         iEnvelopeTable( NULL )
 
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_CSATTIMER, "CSatTimer::CSatTimer" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_CSATTIMER_TD, "CSatTimer::CSatTimer" );
     }
 
 
@@ -72,7 +72,7 @@ CSatTimer::CSatTimer
 //
 void CSatTimer::ConstructL()
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_CONSTRUCTL, "CSatTimer::ConstructL" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_CONSTRUCTL_TD, "CSatTimer::ConstructL" );
     TFLOGSTRING("TSY: CSatTimer::ConstructL");
 
     iTimerTable = new ( ELeave ) RArray<TTimer>( 8 );
@@ -94,7 +94,7 @@ CSatTimer* CSatTimer::NewL
         CTsySatMessaging*   aSatMessaging
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_NEWL, "CSatTimer::NewL" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_NEWL_TD, "CSatTimer::NewL" );
     TFLOGSTRING("TSY: CSatTimer::NewL");
 
     CSatTimer* self = new( ELeave ) CSatTimer( aSatMessHandler, aSatMessaging );
@@ -114,7 +114,7 @@ CSatTimer* CSatTimer::NewL
 //
 CSatTimer::~CSatTimer()
     {
-    OstTrace0( TRACE_DETAILED, DUP1_CSATTIMER_CSATTIMER, "CSatTimer::~CSatTimer" );
+    OstTrace0( TRACE_INTERNALS,  DUP1_CSATTIMER_CSATTIMER_TD, "CSatTimer::~CSatTimer" );
     TFLOGSTRING("TSY: CSatTimer::~CSatTimer");
 
     if ( iTimer )
@@ -145,12 +145,12 @@ CSatTimer::~CSatTimer()
 //
 void CSatTimer::Start()
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_START, "CSatTimer::Start" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_START_TD, "CSatTimer::Start" );
     //Check if timer is active just in case
     if ( !iTimer->IsActive() )
         {
         TFLOGSTRING("TSY: CSatTimer::Start: Timer started");
-        OstTrace0( TRACE_DETAILED, DUP1_CSATTIMER_START, "CSatTimer::Start: Timer started" );
+        OstTrace0( TRACE_INTERNALS,  DUP1_CSATTIMER_START_TD, "CSatTimer::Start: Timer started" );
         //Timer will tick every half second
         TCallBack callback( Tick, this );
         iTimer->Start( KTick, KTick, callback );
@@ -169,7 +169,7 @@ TInt CSatTimer::StartTimer
         TUint32 aTimerValue
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_STARTTIMER, "CSatTimer::StartTimer" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_STARTTIMER_TD, "CSatTimer::StartTimer" );
     TFLOGSTRING("TSY: CSatTimer::StartTimer");
     TInt ret( KErrNone );
     // Check if the entry is already in the table and delete if found.
@@ -206,7 +206,7 @@ TInt CSatTimer::RestartTimer
         TInt aTimerId
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_RESTARTTIMER, "CSatTimer::RestartTimer" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_RESTARTTIMER_TD, "CSatTimer::RestartTimer" );
     TFLOGSTRING("TSY: CSatTimer::RestartTimer");
     TInt ret( KErrNone );
 
@@ -234,7 +234,7 @@ TInt CSatTimer::RestartTimer
         {
         TFLOGSTRING2("TSY: CSatTimer::ReStart - Requested ID (%d) not found!",
             aTimerId);
-        OstTrace1( TRACE_DETAILED, DUP1_CSATTIMER_RESTARTTIMER, "CSatTimer::RestartTimer - Requested ID (%d) not found!", aTimerId );
+        OstTrace1( TRACE_INTERNALS,  DUP1_CSATTIMER_RESTARTTIMER_TD, "CSatTimer::RestartTimer - Requested ID (%d) not found!", aTimerId );
 
         ret = KErrNotFound;
         }
@@ -251,7 +251,7 @@ TInt CSatTimer::RestartTimer
 //
 void CSatTimer::Stop()
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_STOP, "CSatTimer::Stop" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_STOP_TD, "CSatTimer::Stop" );
     // If both timer and envelope arrays are empty, stop the timer.
     // Also if timer table is empty, clear the second counter.
     if ( iTimer->IsActive () )
@@ -260,13 +260,13 @@ void CSatTimer::Stop()
           && !iTimerTable->Count() )
             {
             TFLOGSTRING("TSY: CSatTimer::Stop: Timer stopped");
-            OstTrace0( TRACE_DETAILED, DUP1_CSATTIMER_STOP, "CSatTimer::Stop: Timer stopped" );
+            OstTrace0( TRACE_INTERNALS,  DUP1_CSATTIMER_STOP_TD, "CSatTimer::Stop: Timer stopped" );
             iTimer->Cancel();
             }
         if ( !iTimerTable->Count() )
             {
             TFLOGSTRING("TSY: CSatTimer::Stop: Second counters cleared");
-            OstTrace0( TRACE_DETAILED, DUP2_CSATTIMER_STOP, "CSatTimer::Stop: Second counters cleared" );
+            OstTrace0( TRACE_INTERNALS,  DUP2_CSATTIMER_STOP_TD, "CSatTimer::Stop: Second counters cleared" );
             iSecondsPassed = 0;
             iHalfSecondTick = EFalse;
             }
@@ -302,7 +302,7 @@ TInt CSatTimer::Tick
 
         TFLOGSTRING2("TSY: CSatTimer::Tick, seconds %d",
             satTimer->iSecondsPassed );
-        OstTrace1( TRACE_DETAILED, CSATTIMER_TICK, "CSatTimer::Tick, seconds %u", satTimer->iSecondsPassed );
+        OstTrace1( TRACE_INTERNALS,  CSATTIMER_TICK_TD, "CSatTimer::Tick, seconds %u", satTimer->iSecondsPassed );
 
         for( TInt i = tableSize - 1; KZero <= i; i-- )
             {
@@ -349,7 +349,7 @@ TInt CSatTimer::Tick
                     {
                     TFLOGSTRING2("TSY: CSatTimer::Tick: \
                         Resending type %x envelope", current.iType );
-                    OstTraceExt1( TRACE_DETAILED, DUP1_CSATTIMER_TICK, "CSatTimer::Tick Resending type %hhu envelope", current.iType );
+                    OstTraceExt1( TRACE_INTERNALS,  DUP1_CSATTIMER_TICK_TD, "CSatTimer::Tick Resending type %hhu envelope", current.iType );
 
                     // Deactivate envelope just in case. Get new transaction
                     // if for envelope and resend it. Finally remove the
@@ -383,7 +383,7 @@ TBool CSatTimer::CheckTimerTable
         TInt aTimerId
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_CHECKTIMERTABLE, "CSatTimer::CheckTimerTable" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_CHECKTIMERTABLE_TD, "CSatTimer::CheckTimerTable" );
     TFLOGSTRING("TSY: CSatTimer::CheckTimerTable");
 
     TBool ret( EFalse );
@@ -411,7 +411,7 @@ TInt CSatTimer::DeleteTimerById
         TInt aTimerId // Timer identifier
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_DELETETIMERBYID, "CSatTimer::DeleteTimerById" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_DELETETIMERBYID_TD, "CSatTimer::DeleteTimerById" );
     TFLOGSTRING("TSY: CSatTimer::DeleteTimerById");
 
     TInt ret( KErrNotFound );
@@ -449,7 +449,7 @@ TUint32 CSatTimer::GetCurrentValueOfTimerById
         TInt aTimerId // Timer identifier
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_GETCURRENTVALUEOFTIMERBYID, "CSatTimer::GetCurrentValueOfTimerById" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_GETCURRENTVALUEOFTIMERBYID_TD, "CSatTimer::GetCurrentValueOfTimerById" );
     TFLOGSTRING("TSY: CSatTimer::GetCurrentValueOfTimerById");
 
     TInt ret( KErrNotFound );
@@ -492,7 +492,7 @@ TInt CSatTimer::StoreEnvelope
         const TDesC8& aEnvelope
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_STOREENVELOPE, "CSatTimer::StoreEnvelope" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_STOREENVELOPE_TD, "CSatTimer::StoreEnvelope" );
     TFLOGSTRING("TSY: CSatTimer::StoreEnvelope");
 
     TInt ret( KErrNone );
@@ -525,14 +525,14 @@ TInt CSatTimer::StoreEnvelope
 
             TFLOGSTRING2("CSatTimer::StoreEnvelope \
                 Stored envelopes: % d", iEnvelopeTable->Count() );
-            OstTrace1( TRACE_DETAILED, DUP1_CSATTIMER_STOREENVELOPE, "CSatTimer::StoreEnvelope Stored envelopes: %d", iEnvelopeTable->Count() );
+            OstTrace1( TRACE_INTERNALS,  DUP1_CSATTIMER_STOREENVELOPE_TD, "CSatTimer::StoreEnvelope Stored envelopes: %d", iEnvelopeTable->Count() );
 
             }
         else
             {
             TFLOGSTRING2("CSatTimer::StoreEnvelope \
                 Storing failed, not an envelope! %x", aEnvelope[KZero] );
-            OstTraceExt1( TRACE_DETAILED, DUP2_CSATTIMER_STOREENVELOPE, "CSatTimer::StoreEnvelope Storing failed, not an envelope! %s", aEnvelope[KZero] );
+            OstTraceExt1( TRACE_INTERNALS,  DUP2_CSATTIMER_STOREENVELOPE_TD, "CSatTimer::StoreEnvelope Storing failed, not an envelope! %s", aEnvelope[KZero] );
             ret = KErrArgument;
             }
 
@@ -541,7 +541,7 @@ TInt CSatTimer::StoreEnvelope
         {
         TFLOGSTRING2(" CSatTimer::StoreEnvelope \
             Envelope with requested ID %d already exist!", aTId );
-        OstTraceExt1( TRACE_DETAILED, DUP3_CSATTIMER_STOREENVELOPE, "CSatTimer::StoreEnvelope Envelope with requested ID %hhd already exists!", aTId );
+        OstTraceExt1( TRACE_INTERNALS,  DUP3_CSATTIMER_STOREENVELOPE_TD, "CSatTimer::StoreEnvelope Envelope with requested ID %hhd already exists!", aTId );
         ret = KErrAlreadyExists;
         }
 
@@ -561,7 +561,7 @@ TInt CSatTimer::ActivateEnvelopeResend
         const TUint8 aCause
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_ACTIVATEENVELOPERESEND, "CSatTimer::ActivateEnvelopeResend" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_ACTIVATEENVELOPERESEND_TD, "CSatTimer::ActivateEnvelopeResend" );
     TFLOGSTRING("TSY: CSatTimer::ActivateEnvelopeResend");
 
     TInt ret( LocateEnvelope( aTId ) );
@@ -626,7 +626,7 @@ TInt CSatTimer::ActivateEnvelopeResend
             {
             TFLOGSTRING("TSY: CSatTimer::ActivateEnvelopeResend \
                 Resending activated");
-            OstTrace0( TRACE_DETAILED, DUP1_CSATTIMER_ACTIVATEENVELOPERESEND, "CSatTimer::ActivateEnvelopeResend Resending activated" );
+            OstTrace0( TRACE_INTERNALS,  DUP1_CSATTIMER_ACTIVATEENVELOPERESEND_TD, "CSatTimer::ActivateEnvelopeResend Resending activated" );
             // (Re)start the timer if needed
             Start();
             }
@@ -634,7 +634,7 @@ TInt CSatTimer::ActivateEnvelopeResend
             {
             TFLOGSTRING2("TSY: CSatTimer::ActivateEnvelopeResend \
                 Resending NOT activated. Cause: %x", aCause );
-            OstTraceExt1( TRACE_DETAILED, DUP2_CSATTIMER_ACTIVATEENVELOPERESEND, "CSatTimer::ActivateEnvelopeResend Resending NOT activated. Cause: %hhu", aCause );
+            OstTraceExt1( TRACE_INTERNALS,  DUP2_CSATTIMER_ACTIVATEENVELOPERESEND_TD, "CSatTimer::ActivateEnvelopeResend Resending NOT activated. Cause: %hhu", aCause );
             RemoveEnvelope( aTId );
             }
         }
@@ -656,7 +656,7 @@ TInt CSatTimer::RemoveEnvelope
         TBool aRemoveTimer
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_REMOVEENVELOPE, "CSatTimer::RemoveEnvelope" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_REMOVEENVELOPE_TD, "CSatTimer::RemoveEnvelope" );
     TFLOGSTRING("TSY: CSatTimer::RemoveEnvelope");
 
     TInt ret( LocateEnvelope( aTId ) );
@@ -697,7 +697,7 @@ TInt CSatTimer::LocateEnvelope
         const TUint8 aTId
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_LOCATEENVELOPE, "CSatTimer::LocateEnvelope" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_LOCATEENVELOPE_TD, "CSatTimer::LocateEnvelope" );
     TFLOGSTRING("TSY: CSatTimer::LocateEnvelope");
 
     TInt ret( KErrNotFound );
@@ -709,7 +709,7 @@ TInt CSatTimer::LocateEnvelope
             {
             TFLOGSTRING2("TSY: CSatTimer::LocateEnvelope \
                 Requested envelope was found at index %d", i );
-            OstTrace1( TRACE_DETAILED, DUP1_CSATTIMER_LOCATEENVELOPE, "CSatTimer::LocateEnvelope Requested envelope was found at index %d", i );
+            OstTrace1( TRACE_INTERNALS,  DUP1_CSATTIMER_LOCATEENVELOPE_TD, "CSatTimer::LocateEnvelope Requested envelope was found at index %d", i );
             ret = i;
             }
         }
@@ -729,7 +729,7 @@ void CSatTimer::SetProactiveCommandOnGoingStatus
         TBool aStatus
         )
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_SETPROACTIVECOMMANDONGOINGSTATUS, "CSatTimer::SetProactiveCommandOnGoingStatus" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_SETPROACTIVECOMMANDONGOINGSTATUS_TD, "CSatTimer::SetProactiveCommandOnGoingStatus" );
     iProactiveCommandOnGoing = aStatus;
 
     TInt tableSize( iTimerTable->Count() );
@@ -760,7 +760,7 @@ void CSatTimer::SetProactiveCommandOnGoingStatus
 //
 void CSatTimer::ClearTimerTable()
     {
-    OstTrace0( TRACE_DETAILED, CSATTIMER_CLEARTIMERTABLE, "CSatTimer::ClearTimerTable" );
+    OstTrace0( TRACE_INTERNALS,  CSATTIMER_CLEARTIMERTABLE_TD, "CSatTimer::ClearTimerTable" );
 
     if ( KZero != iTimerTable->Count() )
         {

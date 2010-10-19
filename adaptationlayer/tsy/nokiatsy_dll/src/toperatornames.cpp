@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -37,7 +37,8 @@
     //None
 
 // CONSTANTS
-    //None
+const TUint8 KMccLeadingZero = 0;
+const TUint8 KMncLeadingZero = 0;
 
 // MACROS
     //None
@@ -64,7 +65,7 @@
 template <class T> void CopyToDes( TDes& aDest, const T* str )
     {
 TFLOGSTRING("TSY: CopyToDes");
-OstTrace0( TRACE_NORMAL, _COPYTODES, "::CopyToDes" );
+OstTrace0( TRACE_NORMAL,  _COPYTODES_TD, "::CopyToDes" );
 
     aDest.Zero();
     while ( *str && aDest.Length() < aDest.MaxLength() )
@@ -81,7 +82,7 @@ OstTrace0( TRACE_NORMAL, _COPYTODES, "::CopyToDes" );
 const TCountry* FindCountry( const TUint aMCC )
     {
 TFLOGSTRING("TSY: FindCountry");
-OstTrace0( TRACE_NORMAL, _FINDCOUNTRY, "::FindCountry" );
+OstTrace0( TRACE_NORMAL,  _FINDCOUNTRY_TD, "::FindCountry" );
 
     const TCountry* country( NULL );
 
@@ -105,7 +106,7 @@ OstTrace0( TRACE_NORMAL, _FINDCOUNTRY, "::FindCountry" );
 const TOperator* FindOperator( const TUint aMCC, const TUint aMNC )
     {
 TFLOGSTRING("TSY: FindOperator");
-OstTrace0( TRACE_NORMAL, _FINDOPERATOR, "::FindOperator" );
+OstTrace0( TRACE_NORMAL,  _FINDOPERATOR_TD, "::FindOperator" );
 
     const TOperator* oper( NULL );
     const TCountry* country( FindCountry( aMCC ) );
@@ -137,7 +138,7 @@ TInt TOperatorNames::GetCountryID(
     TDes& aCountryId )
     {
 TFLOGSTRING("TSY: TOperatorNames::GetCountryID");
-OstTrace0( TRACE_NORMAL, TOPERATORNAMES_GETCOUNTRYID, "TOperatorNames::GetCountryID" );
+OstTrace0( TRACE_NORMAL,  TOPERATORNAMES_GETCOUNTRYID_TD, "TOperatorNames::GetCountryID" );
 
     TInt ret( KErrNotFound );
     const TCountry* country( FindCountry( aMCC ) );
@@ -162,7 +163,7 @@ TInt TOperatorNames::GetLatinName(
     TDes& aOperatorName )
     {
 TFLOGSTRING("TSY: TOperatorNames::GetLatinName");
-OstTrace0( TRACE_NORMAL, TOPERATORNAMES_GETLATINNAME, "TOperatorNames::GetLatinName" );
+OstTrace0( TRACE_NORMAL,  TOPERATORNAMES_GETLATINNAME_TD, "TOperatorNames::GetLatinName" );
 
     TInt ret( KErrNotFound );
     const TOperator* oper( FindOperator( aMCC, aMNC ) );
@@ -187,7 +188,7 @@ TInt TOperatorNames::GetUnicodeName(
     TDes& aOperatorName )
     {
 TFLOGSTRING("TSY: TOperatorNames::GetUnicodeName");
-OstTrace0( TRACE_NORMAL, TOPERATORNAMES_GETUNICODENAME, "TOperatorNames::GetUnicodeName" );
+OstTrace0( TRACE_NORMAL,  TOPERATORNAMES_GETUNICODENAME_TD, "TOperatorNames::GetUnicodeName" );
 
     TInt ret( KErrNotFound );
     const TOperator* oper( FindOperator( aMCC, aMNC ) );
@@ -212,7 +213,7 @@ TInt TOperatorNames::GetCountryMNCName(
     TDes& aOperatorName )
     {
 TFLOGSTRING("TSY: TOperatorNames::GetCountryMNCName");
-OstTrace0( TRACE_NORMAL, TOPERATORNAMES_GETCOUNTRYMNCNAME, "TOperatorNames::GetCountryMNCName" );
+OstTrace0( TRACE_NORMAL,  TOPERATORNAMES_GETCOUNTRYMNCNAME_TD, "TOperatorNames::GetCountryMNCName" );
 
     TInt ret( KErrNotFound );
     const TCountry* country( FindCountry( aMCC ) );
@@ -221,7 +222,17 @@ OstTrace0( TRACE_NORMAL, TOPERATORNAMES_GETCOUNTRYMNCNAME, "TOperatorNames::GetC
         {
         CopyToDes( aOperatorName, country->iCountryId );
         aOperatorName.Append(' '); // space
-        aOperatorName.AppendNum( aMNC );
+
+        if ( aMNC < 10 )
+            {
+            aOperatorName.AppendNum( KMncLeadingZero );
+            aOperatorName.AppendNum( aMNC );
+            }
+        else
+            {
+            aOperatorName.AppendNum( aMNC );
+            }
+
         ret = KErrNone;
         }
 
@@ -239,15 +250,34 @@ void TOperatorNames::GetMCCMNCName(
     TDes& aOperatorName )
     {
 TFLOGSTRING("TSY: TOperatorNames::GetMCCMNCName");
-OstTrace0( TRACE_NORMAL, TOPERATORNAMES_GETMCCMNCNAME, "TOperatorNames::GetMCCMNCName" );
+OstTrace0( TRACE_NORMAL,  TOPERATORNAMES_GETMCCMNCNAME_TD, "TOperatorNames::GetMCCMNCName" );
 
     aOperatorName.Zero();
 
     if ( aMCC != 0 || aMNC != 0 )
         {
-        aOperatorName.AppendNum( aMCC );
+        if ( aMCC < 10 )
+            {
+            aOperatorName.AppendNum( KMccLeadingZero );
+            aOperatorName.AppendNum( KMccLeadingZero );
+            aOperatorName.AppendNum( aMCC );
+            }
+        else
+            {
+            aOperatorName.AppendNum( aMCC );
+            }
+
         aOperatorName.Append(' '); // space
-        aOperatorName.AppendNum( aMNC );
+
+        if ( aMNC < 10 )
+            {
+            aOperatorName.AppendNum( KMncLeadingZero );
+            aOperatorName.AppendNum( aMNC );
+            }
+        else
+            {
+            aOperatorName.AppendNum( aMNC );
+            }
         }
     }
 
@@ -262,7 +292,7 @@ TInt TOperatorNames::GetName(
     TDes& aOperatorName )
     {
 TFLOGSTRING("TSY: TOperatorNames::GetName");
-OstTrace0( TRACE_NORMAL, TOPERATORNAMES_GETNAME, "TOperatorNames::GetName" );
+OstTrace0( TRACE_NORMAL,  TOPERATORNAMES_GETNAME_TD, "TOperatorNames::GetName" );
 
     TInt ret( KErrNotFound );
 

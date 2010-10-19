@@ -28,7 +28,6 @@
 #include <tisi.h>               // isi message
 #include <uiccisi.h>            // UICC server
 #include <smsisi.h>             // sms server
-#include <atk_sharedisi.h>
 #include "OstTraceDefinitions.h"
 #ifdef OST_TRACE_COMPILER_IN_USE
 #include "satmosmsctrlTraces.h"
@@ -46,6 +45,12 @@ const TUint8 KSmControlAllowed          = 0;
 const TUint8 KSmControlNotAllowed       = 1;
 const TUint8 KSmControlAllowedWithModif = 2;
 const TUint8 KSmsSubmitAddrDataIndex    = 3;
+const TUint8 KMessageParamsIndex        = 0;
+const TUint8 KCommandTypeMask           = 0x03;
+const TUint8 KSmsCommandAddrIndex       = 5;
+const TUint8 KSmsSubmitAddrIndex        = 2;
+const TUint8 KTpDaTonNpiIndex           = 1;
+const TUint8 KTpDaTonNpiSize            = 1;
 
 // ==================== MEMBER FUNCTIONS ====================================
 
@@ -69,7 +74,7 @@ CSatMoSmsCtrl::CSatMoSmsCtrl
         iMoSmsCtrlReqTransactionId( KZero ),
         iSenderObject( KZero )
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_CSATMOSMSCTRL, "CSatMoSmsCtrl::CSatMoSmsCtrl" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_CSATMOSMSCTRL_TD, "CSatMoSmsCtrl::CSatMoSmsCtrl" );
     }
 
 
@@ -80,8 +85,8 @@ CSatMoSmsCtrl::CSatMoSmsCtrl
 //
 void CSatMoSmsCtrl::ConstructL()
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_CONSTRUCTL, "CSatMoSmsCtrl::ConstructL" );
-#ifdef INFO_PP_ATK_MO_SM_CONTROL
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_CONSTRUCTL_TD, "CSatMoSmsCtrl::ConstructL" );
+/*#ifdef INFO_PP_ATK_MO_SM_CONTROL
     // Check MO SMS control is supported by ME's Product Profile
     iSatMessHandler->InfoPpReadReq( INFO_PP_ATK_MO_SM_CONTROL );
 #else
@@ -89,7 +94,7 @@ void CSatMoSmsCtrl::ConstructL()
     // This is done by sending a request SimReadTableReq to Sim server, with
     // service type KSimStMoSmsSimControlAvail
     iSatMessHandler->SimReadTableReq( SIM_ST_MO_SMS_SIM_CONTROL_AVAIL );
-#endif // INFO_PP_ATK_MO_SM_CONTROL
+#endif // INFO_PP_ATK_MO_SM_CONTROL*/
     }
 
 
@@ -104,7 +109,7 @@ CSatMoSmsCtrl* CSatMoSmsCtrl::NewL
         CTsySatMessaging*   aSatMessaging
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_NEWL, "CSatMoSmsCtrl::NewL" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_NEWL_TD, "CSatMoSmsCtrl::NewL" );
     TFLOGSTRING("TSY: CSatMoSmsCtrl::NewL");
 
     CSatMoSmsCtrl* self =
@@ -125,7 +130,7 @@ CSatMoSmsCtrl* CSatMoSmsCtrl::NewL
 //
 CSatMoSmsCtrl::~CSatMoSmsCtrl()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATMOSMSCTRL_CSATMOSMSCTRL, "CSatMoSmsCtrl::~CSatMoSmsCtrl" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATMOSMSCTRL_CSATMOSMSCTRL_TD, "CSatMoSmsCtrl::~CSatMoSmsCtrl" );
     TFLOGSTRING("TSY: CSatMoSmsCtrl::~CSatMoSmsCtrl");
     }
 
@@ -137,7 +142,7 @@ CSatMoSmsCtrl::~CSatMoSmsCtrl()
 //
 TBool CSatMoSmsCtrl::IsActivated()
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_ISACTIVATED, "CSatMoSmsCtrl::IsActivated" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_ISACTIVATED_TD, "CSatMoSmsCtrl::IsActivated" );
     TFLOGSTRING("TSY: CSatMoSmsCtrl::IsActivated");
     return iIsMoSmsCtrlActivated;
     }
@@ -149,7 +154,7 @@ TBool CSatMoSmsCtrl::IsActivated()
 //
 void CSatMoSmsCtrl::Activate()
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_ACTIVATE, "CSatMoSmsCtrl::Activate" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_ACTIVATE_TD, "CSatMoSmsCtrl::Activate" );
     TFLOGSTRING("TSY: CSatMoSmsCtrl::Activate");
     iIsMoSmsCtrlActivated = ETrue;
     }
@@ -161,7 +166,7 @@ void CSatMoSmsCtrl::Activate()
 //
 void CSatMoSmsCtrl::Deactivate()
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_DEACTIVATE, "CSatMoSmsCtrl::Deactivate" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_DEACTIVATE_TD, "CSatMoSmsCtrl::Deactivate" );
     TFLOGSTRING("TSY: CSatMoSmsCtrl::Deactivate");
     iIsMoSmsCtrlActivated = EFalse;
     }
@@ -176,7 +181,7 @@ TInt CSatMoSmsCtrl::UiccCatRespEnvelopeReceived
         const TIsiReceiveC& aIsiMessage //Received data notification
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_UICCCATRESPENVELOPERECEIVED, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_UICCCATRESPENVELOPERECEIVED_TD, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived" );
     TFLOGSTRING("TSY:CSatMoSmsCtrl::UiccCatRespEnvelopeReceived");
     TBuf8<KMaxLengthOfAtkSwDataNtf> addr1;
     TBuf8<KMaxLengthOfAtkSwDataNtf> addr2;
@@ -221,7 +226,7 @@ TInt CSatMoSmsCtrl::UiccCatRespEnvelopeReceived
             if ( KError != atkResult ) // If ATK result is OK
                 {
                 TFLOGSTRING("TSY:CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, Ok");
-                OstTrace0( TRACE_NORMAL, DUP1_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, Ok" );
+                OstTrace0( TRACE_NORMAL,  DUP1_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED_TD, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, Ok" );
                 RSat::TAlphaId alphaId;
                 alphaId.iAlphaId.Zero();
                 TBool isAlphaIdEmpty( EFalse );
@@ -229,7 +234,7 @@ TInt CSatMoSmsCtrl::UiccCatRespEnvelopeReceived
                 if ( KMaxLengthOfAtkSwDataNtf < apduLength ) // If data length greater than 255
                     {
                     TFLOGSTRING("TSY:CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, the length of Sim resp data is > 255" );
-                    OstTrace0( TRACE_NORMAL, DUP2_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, the length of Sim resp data is > 255" );
+                    OstTrace0( TRACE_NORMAL,  DUP2_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED_TD, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, the length of Sim resp data is > 255" );
                     // Data is not consistent, so not allowed condition
                     if( KSmControlNotAllowed == apduData[0] )
                         {
@@ -253,7 +258,7 @@ TInt CSatMoSmsCtrl::UiccCatRespEnvelopeReceived
                 else if ( apduLength ) // If data length in non zero and less than 255
                     {
                     TFLOGSTRING("TSY:CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, atkData.Length()!=0 ");
-                    OstTrace0( TRACE_NORMAL, DUP3_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, atkData.Length()!=0 " );
+                    OstTrace0( TRACE_NORMAL,  DUP3_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED_TD, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, atkData.Length()!=0 " );
 
                     // Note: The alpha id can be provided by the SIM even if the addresses
                     // have not been modified.
@@ -275,12 +280,12 @@ TInt CSatMoSmsCtrl::UiccCatRespEnvelopeReceived
                             }
                         FormSmsResourceReqSb( resourceStatus, dataResp, addr1, addr2 );
                         TFLOGSTRING2("TSY:CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, apduData[0]: %d",apduData[0] );
-                        OstTrace1( TRACE_NORMAL, DUP4_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, apduData[0]: %d", apduData[0] );
+                        OstTrace1( TRACE_NORMAL,  DUP4_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED_TD, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, apduData[0]: %d", apduData[0] );
                        }
                     else
                        {
                        TFLOGSTRING("TSY:CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, Sim response data not consistent" );
-                       OstTrace0( TRACE_NORMAL, DUP5_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, Sim response data not consistent" );
+                       OstTrace0( TRACE_NORMAL,  DUP5_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED_TD, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, Sim response data not consistent" );
                        if( KSmControlNotAllowed == apduData[0] )
                            {
                            resourceStatus = SMS_RESOURCE_DENIED;
@@ -305,7 +310,7 @@ TInt CSatMoSmsCtrl::UiccCatRespEnvelopeReceived
                 else  // block for data length zero
                     {
                     TFLOGSTRING("TSY:CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, atkData.Length()=0 ");
-                    OstTrace0( TRACE_NORMAL, DUP6_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, atkData.Length()=0" );
+                    OstTrace0( TRACE_NORMAL,  DUP6_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED_TD, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, atkData.Length()=0" );
                     TUint8 resourceStatus( SMS_RESOURCE_ALLOWED );
                     FormSmsResourceReqSb( resourceStatus, dataResp, addr1, addr2 );
                     }// end of block with data length zero
@@ -349,7 +354,7 @@ TInt CSatMoSmsCtrl::UiccCatRespEnvelopeReceived
         else // else for UICC status not ok
             {
             TFLOGSTRING("TSY:CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, KAtkError = atkResult ");
-            OstTrace0( TRACE_NORMAL, DUP7_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, KAtkError = atkResult" );
+            OstTrace0( TRACE_NORMAL,  DUP7_CSATMOSMSCTRL_ATKSWDATANTFRECEIVED_TD, "CSatMoSmsCtrl::UiccCatRespEnvelopeReceived, KAtkError = atkResult" );
             TUint8 resourceStatus = SMS_RESOURCE_DENIED;
             FormSmsResourceReqSb( resourceStatus, dataResp, addr1, addr2 );
             }
@@ -377,7 +382,7 @@ void CSatMoSmsCtrl::SmsResourceIndReceivedL
         )
     {
     TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceivedL");
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_SMSRESOURCEINDRECEIVEDL, "CSatMoSmsCtrl::SmsResourceIndReceivedL" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_SMSRESOURCEINDRECEIVEDL_TD, "CSatMoSmsCtrl::SmsResourceIndReceivedL" );
 
     TUint sbOffset;
 
@@ -453,189 +458,36 @@ void CSatMoSmsCtrl::SmsResourceIndReceivedL
          iUserDataSubblock.Zero();
          }
 
-     //Check if location data is present. Otherwise response to SmsResourceInd
-     //is always ALLOWED.
-     if ( !iSatMessHandler->ServiceAvailable() )
-         {
-         TBuf8<KMaxLengthOfResourceReq> dataResp;
-         TIsiSend resourceReq( dataResp );
+    //Check if location data is present. Otherwise response to SmsResourceInd
+    //is always ALLOWED.
+    if ( !iSatMessHandler->ServiceAvailable() )
+        {
+        TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceivedL: Not Allowed Condition, Send response to SMS server");
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATMOSMSCTRL_SMSRESOURCEINDRECEIVEDL_TD, "CSatMoSmsCtrl::SmsResourceIndReceivedL: Not Allowed conditon, Send response to SMS server" );
 
-         dataResp.AppendFill( KPadding, 1);       // filer byte
-         dataResp.Append( 5 );                // no of Subblocks
-
-         // Add first SB Resource Subblock
-         TIsiSubBlock resource( dataResp, SMS_SB_RESOURCE ,
-             EIsiSubBlockTypeId16Len16 );                      // Message ID and Subblock length
-
-         dataResp.Append( iResourceId >> 8 );        // SMS Resource IDs MSB
-
-         dataResp.Append( iResourceId );           // SMS resource IDs LSB
-
-         dataResp.AppendFill( KPadding,2 );           // Filler Bytes
-         resource.CompleteSubBlock();
-
-         // Add 2nd resource sequence ID subblock
-
-         TIsiSubBlock resourceSeqId( dataResp, SMS_SB_RESOURCE_SEQ_ID ,
-             EIsiSubBlockTypeId16Len16 );
-         dataResp.Append(iSequenceId);                // Sequence ID
-         dataResp.AppendFill( KPadding, 3 );
-         resourceSeqId.CompleteSubBlock();
-
-
-         // Add Third subblock SMS_SB_RESOURCE_STATUS
-
-         TIsiSubBlock resourceStatus( dataResp, SMS_SB_RESOURCE_STATUS ,
-             EIsiSubBlockTypeId16Len16 );
-         dataResp.Append( SMS_RESOURCE_ALLOWED );            // Resource status
-         dataResp.AppendFill( KPadding, 3 );
-         resourceStatus.CompleteSubBlock();
-
-         // Add 4th subblock SMS_SB_ADDRESS (SMSC)
-         TIsiSubBlock addressSb( dataResp, SMS_SB_ADDRESS ,
-             EIsiSubBlockTypeId16Len16 );
-         dataResp.Append( SMS_SMSC_ADDRESS );            // Addrees Type
-         dataResp.Append( iAddressSubblock.Length() );
-         dataResp.Append( iAddressSubblock );
-
-         // Filler bytes calculation for SMSC address subblock
-         TUint8 fillbytes = 0;
-         while(( iAddressSubblock.Length()+ 6 + fillbytes )%4)
-             {
-             fillbytes++;
-             }
-
-         dataResp.AppendFill( KPadding,fillbytes );
-         addressSb.CompleteSubBlock();
-
-   // Add 5th Subblock SMS_SB_TPDU (Destination address)
-
-         TIsiSubBlock userDataSb( dataResp, SMS_SB_TPDU ,
-             EIsiSubBlockTypeId16Len16 );
-         dataResp.Append( iUserDataSubblock.Length() );            // Addrees Length
-         dataResp.Append( KPadding );
-         dataResp.Append( iUserDataSubblock );
-
-         // Filler bytes calculation for user data subblock
-         fillbytes = 0;
-         while(( iUserDataSubblock.Length()+ 6 + fillbytes )%4 )
-             {
-             fillbytes++;
-             }
-
-         dataResp.AppendFill( KPadding,fillbytes );
-         userDataSb.CompleteSubBlock();
-
-          TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceived: Not Allowed Condition, Send response to SMS server");
-          OstTrace0( TRACE_NORMAL, DUP1_CSATMOSMSCTRL_SMSRESOURCEINDRECEIVED, "CSatMoSmsCtrl::SmsResourceIndReceived: Not Allowed conditon, Send response to SMS server" );
-
-          // Send Req to Sms server with allowed status
-          iSatMessHandler->SendSmsResourceReq(
-              iMoSmsCtrlReqTransactionId,
-              dataResp,
-              iSenderObject );
-         }
-     else
-         {
+        SendSmsResourceReq(
+            SMS_RESOURCE_ALLOWED,
+            SMS_CAUSE_TYPE_COMMON,
+            SMS_OK );
+        }
+    else
+        {
         if( iIsMoSmsCtrlActivated )    // Check is MO SMS is activated or not
             {
-            TPtrC8 addressData2;
-
-            if ( iUserDataSubblock.Length() )
-                {
-                // check for message type
-                // Whether its a command type message or Submit type
-                if(KSmsCommandType == ( iUserDataSubblock[0]& 0x03 ))
-                    {
-                    iMessageType = KSmsCommandType;
-                    TPtrC8 phoneNumber = &iUserDataSubblock[5];
-                    // Addition of two for Type of number semi octet
-                    addressData2.Set(
-                        phoneNumber.Mid( 1, (iUserDataSubblock[5]/2)+1 ) );
-                    }
-                else if( KSmsSubmitType == ( iUserDataSubblock[0] & 0x03 ) )
-                    {
-                    iMessageType = KSmsSubmitType;
-                    TPtrC8 phoneNumber = &iUserDataSubblock[2];
-                    // Addition of two for Type of number semi octet
-                    addressData2.Set(
-                        phoneNumber.Mid( 1, (iUserDataSubblock[2]/2)+1 ) );
-                    }
-                }
-            // Dialled Number String, the length has to be removed (first byte)
+TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceivedL, Send envelope");
+OstTrace0( TRACE_NORMAL,  DUP3_CSATMOSMSCTRL_SMSRESOURCEINDRECEIVEDL_TD, "CSatMoSmsCtrl::SmsResourceIndReceivedL, Send envelope" );
 
             iMoSmsCtrlEnvelopeTransactionId = iSatMessaging->GetTransactionId();
-
-TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceIndReceived, Send envelope");
-OstTrace0( TRACE_NORMAL, DUP3_CSATMOSMSCTRL_SMSRESOURCEINDRECEIVED, "CSatMoSmsCtrl::SmsResourceIndReceived, Send envelope" );
-
-            // The envelope is sent if MO SMS is activated
-            // iAddressSubblock is not sent as it's received
-            // from SMS server because of iAddressSubblock's first
-            // byte is length of the address data and MO SMS Control envelope
-            // is NOT allowed to contain that in address data. So length
-            // field is skipped
-            SendMoSmsCtrlEnvelope(
-                iMoSmsCtrlEnvelopeTransactionId,
-                iAddressSubblock.Mid( 1, iAddressSubblock.Length() - 1 ),
-                addressData2
-                );
+            FormMoSmsCtrlEnvelope();
             }
         else        // If MO SMS is not activated
             {
-            TBuf8<KMaxLengthOfResourceReq> dataResp;
-            TIsiSend resourceReq( dataResp );
-
-            dataResp.AppendFill( KPadding, 1 );       // filer byte
-            dataResp.Append( 4 );                // no of Subblocks
-
-            // Add first SB Resource Subblock
-            TIsiSubBlock resource( dataResp, SMS_SB_RESOURCE ,
-                EIsiSubBlockTypeId16Len16 );          // Message ID and Subblock length
-
-            dataResp.Append( iResourceId >> 8 );        // SMS Resource IDs MSB
-
-            dataResp.Append( iResourceId );             // SMS resource IDs LSB
-
-            dataResp.AppendFill( KPadding, 2 );         // Filler Bytes
-            resource.CompleteSubBlock();
-
-            // Add 2nd resource sequence ID subblock
-
-            TIsiSubBlock resourceSeqId( dataResp, SMS_SB_RESOURCE_SEQ_ID ,
-                EIsiSubBlockTypeId16Len16 );
-            dataResp.Append( iSequenceId );              // Sequence ID
-            dataResp.AppendFill( KPadding, 3 );
-            resourceSeqId.CompleteSubBlock();
-
-            // Add Third subblock
-
-            TIsiSubBlock resourceStatus( dataResp, SMS_SB_RESOURCE_STATUS ,
-                EIsiSubBlockTypeId16Len16 );
-            dataResp.Append( SMS_RESOURCE_DENIED );      // Resource status
-            dataResp.AppendFill( KPadding, 3 );
-            resourceStatus.CompleteSubBlock();
-
-            // No address and User data Subblocks because Here resource ID is not the activated
-
-            // Add cause subblock
-
-            TIsiSubBlock sbCause( dataResp,SMS_SB_CAUSE,
-                    EIsiSubBlockTypeId16Len16 );
-
-            dataResp.Append( SMS_CAUSE_TYPE_COMMON );
-            dataResp.Append( SMS_ERR_ROUTE_NOT_ALLOWED );
-            dataResp.Append( KPadding, 2 );
-
-            // Send resp to Sms server with not allowed status
-            iSatMessHandler->SendSmsResourceReq(
-                iMoSmsCtrlReqTransactionId,
-                dataResp,
-                iSenderObject );
-
+            SendSmsResourceReq(
+                SMS_RESOURCE_DENIED,
+                SMS_CAUSE_TYPE_COMMON,
+                SMS_ERR_ROUTE_NOT_ALLOWED );
             }
         }
-
     }
 
 // -----------------------------------------------------------------------------
@@ -652,7 +504,7 @@ void CSatMoSmsCtrl::SendMoSmsCtrlEnvelope
         const TDesC8& aAddressData2
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_SENDMOSMSCTRLENVELOPE, "CSatMoSmsCtrl::SendMoSmsCtrlEnvelope" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_SENDMOSMSCTRLENVELOPE_TD, "CSatMoSmsCtrl::SendMoSmsCtrlEnvelope" );
     TFLOGSTRING("TSY:CSatMoSmsCtrl::SendMoSmsCtrlEnvelope");
 
     // Get location info
@@ -711,7 +563,7 @@ void CSatMoSmsCtrl::ParseAtkSwDataNtf
         TBool& aEmptyAlphaId
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_PARSEATKSWDATANTF, "CSatMoSmsCtrl::ParseAtkSwDataNtf" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_PARSEATKSWDATANTF_TD, "CSatMoSmsCtrl::ParseAtkSwDataNtf" );
     TFLOGSTRING("TSY:CSatMoSmsCtrl::ParseAtkSwDataNtf");
 
     // Input data:
@@ -738,7 +590,8 @@ void CSatMoSmsCtrl::ParseAtkSwDataNtf
     TInt n( (KTwoByteLengthCoding == tag)?1:0 );
     lengthBerTlv = aAtkData[1 + n];
     indexInBerTlv = 2 + n;
-
+    // MO SMS control result
+    TUint8 moSmsResult( aAtkData[0] );
     // Extract TLVs and fill in output variables
     TBool address1_got( EFalse );
     while( lengthBerTlv )
@@ -751,7 +604,8 @@ void CSatMoSmsCtrl::ParseAtkSwDataNtf
         TInt lengthTlv( aAtkData[indexInBerTlv+nn+1] );
         // Check what TLV is received
         if ( ( KTlvAddressTag == tag )
-            && ( !address1_got ) )
+            && ( !address1_got )
+            && KSmControlAllowedWithModif == moSmsResult )
             {
             // RP address first
             address1_got = ETrue;
@@ -764,7 +618,8 @@ void CSatMoSmsCtrl::ParseAtkSwDataNtf
                 CleanAddressData( aAddr1 );
                 }
             }
-        else if ( KTlvAddressTag == tag )
+        else if ( KTlvAddressTag == tag
+            && KSmControlAllowedWithModif == moSmsResult )
             {
             // TP address
             // Copy data to output variable
@@ -794,7 +649,7 @@ void CSatMoSmsCtrl::ParseAtkSwDataNtf
         else
             {
             TFLOGSTRING("TSY: CSatMoSmsCtrl::ParseAtkSwDataNtf, Tlv tag was not address/alpha id tag.");
-            OstTrace0( TRACE_NORMAL, DUP1_CSATMOSMSCTRL_PARSEATKSWDATANTF, "CSatMoSmsCtrl::ParseAtkSwDataNtf, Tlv tag was not address/alpha id tag." );
+            OstTrace0( TRACE_NORMAL,  DUP1_CSATMOSMSCTRL_PARSEATKSWDATANTF_TD, "CSatMoSmsCtrl::ParseAtkSwDataNtf, Tlv tag was not address/alpha id tag." );
 
             }
 
@@ -816,7 +671,7 @@ void CSatMoSmsCtrl::CleanAddressData
         TDes8& aAddr
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_CLEANADDRESSDATA, "CSatMoSmsCtrl::CleanAddressData" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_CLEANADDRESSDATA_TD, "CSatMoSmsCtrl::CleanAddressData" );
     TFLOGSTRING("TSY: CSatMoSmsCtrl::CleanAddressData");
     // Starts from index 1, since index 0 is for TON/NPI
     for ( TInt i=1; i < aAddr.Length(); i++ )
@@ -850,7 +705,7 @@ TBool CSatMoSmsCtrl::VerifySimRespData
         TDes8& aTPAddr
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_VERIFYSIMRESPDATA, "CSatMoSmsCtrl::VerifySimRespData" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_VERIFYSIMRESPDATA_TD, "CSatMoSmsCtrl::VerifySimRespData" );
     TBool ret( ETrue );
     if ( ( 0==aRPAddr.Length() && 0==aTPAddr.Length() )
        || ( KMaxLengthAddr1Addr2 <= ( aRPAddr.Length()+aTPAddr.Length() ) )
@@ -927,8 +782,8 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
               data[1]++;
               // Copy address subblocks from Indication message
               // Add Address Subblock
-              TIsiSubBlock address( 
-                  data, 
+              TIsiSubBlock address(
+                  data,
                   SMS_SB_ADDRESS ,
                   EIsiSubBlockTypeId16Len16 );
               data.Append( SMS_SMSC_ADDRESS );            // Address type
@@ -940,8 +795,8 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
               // increment subblock
               data[1]++;
               // Add User Data Subblock
-              TIsiSubBlock userData( 
-                  data, 
+              TIsiSubBlock userData(
+                  data,
                   SMS_SB_TPDU ,
                   EIsiSubBlockTypeId16Len16 );
               data.Append( iUserDataSubblock.Length() );        // data Length
@@ -958,8 +813,8 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
                   // Add Address subblock
                   data[1]++;          // increase no of subblocks
 
-                  TIsiSubBlock address( 
-                      data, 
+                  TIsiSubBlock address(
+                      data,
                       SMS_SB_ADDRESS ,
                       EIsiSubBlockTypeId16Len16 );
                   data.Append(SMS_SMSC_ADDRESS);            // Address Type
@@ -968,9 +823,9 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
                   // First byte is the address length in 3GPP, GSM_0411 format
                   // "data length in bytes, including TON & NPI".
                   data.Append( address1.Length() + 1 );
-                  // Actual address data. 
+                  // Actual address data.
                   data.Append( address1.Length());
-                  data.Append( address1 ); 
+                  data.Append( address1 );
                   address.CompleteSubBlock();
                   }       // end of Service centre Address Subblock
 
@@ -981,8 +836,8 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
                       data[1]++;
 
                       // For User Data Subblock
-                      TIsiSubBlock userDataSb( 
-                          data, 
+                      TIsiSubBlock userDataSb(
+                          data,
                           SMS_SB_TPDU,
                           EIsiSubBlockTypeId16Len16 );
 
@@ -1054,10 +909,10 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
 
                               // old addresss needs to be deleted before new one can be inserted
                               // to the tpdu
-                              iUserDataSubblock.Delete( 
-                                  KSmsSubmitAddrDataIndex, 
+                              iUserDataSubblock.Delete(
+                                  KSmsSubmitAddrDataIndex,
                                   oldAddrLen + 1 );
-                              iUserDataSubblock.Insert( 
+                              iUserDataSubblock.Insert(
                                   KSmsSubmitAddrDataIndex,
                                   address2 );
                               break;
@@ -1077,8 +932,8 @@ void CSatMoSmsCtrl::FormSmsResourceReqSb
             {
             // Add SMS_SB_CAUSE subblock
             data[1]++;           //Increment no of subblocks
-            TIsiSubBlock cause( 
-                data, 
+            TIsiSubBlock cause(
+                data,
                 SMS_SB_CAUSE ,
                 EIsiSubBlockTypeId16Len16 );
             data.Append( SMS_CAUSE_TYPE_COMMON );            // Cause type
@@ -1097,7 +952,7 @@ TInt CSatMoSmsCtrl::MessageReceivedL
         const TIsiReceiveC& aIsiMessage
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_MESSAGERECEIVED, "CSatMoSmsCtrl::MessageReceived" );
+    OstTrace0( TRACE_NORMAL,  CSATMOSMSCTRL_MESSAGERECEIVED_TD, "CSatMoSmsCtrl::MessageReceived" );
     TFLOGSTRING("TSY: CSatMoSmsCtrl::MessageReceived");
     // SMS server -> SimAtkTsy  : MO-SMS request sent to SAT (KSmsResourceReq)
     // UICC server <- SimAtkTsy  : Envelope sent to UICC server (KAtkEnvelopeNtf)
@@ -1126,7 +981,7 @@ TInt CSatMoSmsCtrl::MessageReceivedL
                 {
                 // Take a log
                 TFLOGSTRING("TSY:CSatMoSmsCtrl::SmsResourceRespReceived: Response for Resource Req, Receive response from SMS server");
-                OstTrace0( TRACE_NORMAL, DUP1_CSATMOSMSCTRL_SMSRESOURCERESPRECEIVED, "CSatMoSmsCtrl::SmsResourceRespReceived: Response for Resource Req, Receive response from SMS server" );
+                OstTrace0( TRACE_NORMAL,  DUP1_CSATMOSMSCTRL_SMSRESOURCERESPRECEIVED_TD, "CSatMoSmsCtrl::SmsResourceRespReceived: Response for Resource Req, Receive response from SMS server" );
 
                 break;
                 }
@@ -1172,4 +1027,177 @@ TInt CSatMoSmsCtrl::MessageReceivedL
     return KErrNone;
     }
 
+// -----------------------------------------------------------------------------
+// CSatMoSmsCtrl::SendSmsResourceReq
+// Constructs and sends SMS_RESOURCE_REQ
+// -----------------------------------------------------------------------------
+//
+void CSatMoSmsCtrl::SendSmsResourceReq(
+    TUint8 aResourceStatus,
+    TUint8 aCauseType,
+    TUint8 aCause )
+    {
+    TFLOGSTRING("TSY: CSatMoSmsCtrl::SendSmsResourceReq");
+    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_SENDSMSRESOURCEREQ_TD, "CSatMoSmsCtrl::SendSmsResourceReq" );
+
+    TBuf8<KMaxLengthOfResourceReq> dataResp;
+    TIsiSend resourceReq( dataResp );
+
+    dataResp.AppendFill( KPadding, 1 );       // filler byte
+    TUint8 sbCount( 0 );
+    if ( SMS_RESOURCE_ALLOWED == aResourceStatus )
+        {
+        sbCount = 5; // in ok case there are 5 subblocks
+        }
+    else
+        {
+        sbCount = 4; // otherwise 4
+        }
+    dataResp.Append( sbCount );                // no of Subblocks
+
+    // Add first SB Resource Subblock
+    TIsiSubBlock resource(
+        dataResp,
+        SMS_SB_RESOURCE ,
+        EIsiSubBlockTypeId16Len16 );                      // Message ID and Subblock length
+
+    dataResp.Append( iResourceId >> 8 );        // SMS Resource IDs MSB
+    dataResp.Append( iResourceId );           // SMS resource IDs LSB
+    resource.CompleteSubBlock();
+
+    // Add 2nd resource sequence ID subblock
+    TIsiSubBlock resourceSeqId(
+        dataResp,
+        SMS_SB_RESOURCE_SEQ_ID ,
+        EIsiSubBlockTypeId16Len16 );
+
+    dataResp.Append(iSequenceId);                // Sequence ID
+    resourceSeqId.CompleteSubBlock();
+
+    // Add Third subblock SMS_SB_RESOURCE_STATUS
+    TIsiSubBlock resourceStatus(
+        dataResp,
+        SMS_SB_RESOURCE_STATUS ,
+        EIsiSubBlockTypeId16Len16 );
+
+    dataResp.Append( aResourceStatus );            // Resource status
+    resourceStatus.CompleteSubBlock();
+
+    if ( SMS_RESOURCE_ALLOWED == aResourceStatus )
+        {
+        // Add 4th subblock SMS_SB_ADDRESS (SMSC)
+        TIsiSubBlock addressSb(
+            dataResp,
+            SMS_SB_ADDRESS ,
+            EIsiSubBlockTypeId16Len16 );
+
+        dataResp.Append( SMS_SMSC_ADDRESS );            // Addrees Type
+        dataResp.Append( iAddressSubblock.Length() );
+        dataResp.Append( iAddressSubblock );
+        addressSb.CompleteSubBlock();
+
+        // Add 5th Subblock SMS_SB_TPDU (Destination address)
+        TIsiSubBlock userDataSb(
+            dataResp,
+            SMS_SB_TPDU ,
+            EIsiSubBlockTypeId16Len16 );
+
+        dataResp.Append( iUserDataSubblock.Length() );            // Addrees Length
+        dataResp.Append( KPadding );
+        dataResp.Append( iUserDataSubblock );
+        userDataSb.CompleteSubBlock();
+        }
+    else
+        {
+        // Add cause subblock
+        TIsiSubBlock sbCause(
+            dataResp,
+            SMS_SB_CAUSE,
+            EIsiSubBlockTypeId16Len16 );
+
+        dataResp.Append( aCauseType );
+        dataResp.Append( aCause );
+        sbCause.CompleteSubBlock();
+        }
+
+    // Send resp to Sms server with not allowed status
+    iSatMessHandler->SendSmsResourceReq(
+        iMoSmsCtrlReqTransactionId,
+        dataResp,
+        iSenderObject );
+    }
+// -----------------------------------------------------------------------------
+// CSatMoSmsCtrl::FormMoSmsCtrlEnvelope
+// Forms and sends MO SMS Control envelope
+// -----------------------------------------------------------------------------
+//
+void CSatMoSmsCtrl::FormMoSmsCtrlEnvelope()
+    {
+    TFLOGSTRING("TSY: CSatMoSmsCtrl::FormMoSmsCtrlEnvelope");
+    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_FORMMOSMSCTRLENVELOPE_TD, "CSatMoSmsCtrl::FormMoSmsCtrlEnvelope" );
+
+    TPtrC8 addressData2;
+    if ( iUserDataSubblock.Length() )
+        {
+        iMessageType = FetchTpDa( iUserDataSubblock, addressData2 );
+        }
+    // no else
+
+    // Dialled Number String, the length has to be removed (first byte)
+    // The envelope is sent if MO SMS is activated
+    // iAddressSubblock is not sent as it's received
+    // from SMS server because of iAddressSubblock's first
+    // byte is length of the address data and MO SMS Control envelope
+    // is NOT allowed to contain that in address data. So length
+    // field is skipped
+    SendMoSmsCtrlEnvelope(
+        iMoSmsCtrlEnvelopeTransactionId,
+        iAddressSubblock.Mid( 1, iAddressSubblock.Length() - 1 ),
+        addressData2 );
+    }
+
+// -----------------------------------------------------------------------------
+// CSatMoSmsCtrl::FetchTpDa
+// Fetches TP-DA contents from TPDU
+// -----------------------------------------------------------------------------
+//
+TUint8 CSatMoSmsCtrl::FetchTpDa( const TDesC8& aTpdu, TPtrC8& aTpda )
+    {
+    TFLOGSTRING("TSY: CSatMoSmsCtrl::FetchTpDa");
+    OstTrace0( TRACE_NORMAL, CSATMOSMSCTRL_FETCHTPDA_TD, "CSatMoSmsCtrl::FetchTpDa" );
+
+    TUint8 ret( 0 );
+
+    // TP-DA has the following structure
+    // (see 3GPP TS 23.040 clause 9.1.2.5)
+    //      [0]     Address-Length
+    //      [1]     TonNpi
+    //      [2..]   Address-Value       ADN encoding
+    // resulting descriptor contains TonNpi+Address-Value
+    // 'Address-Length' does not count filler byte if it is present, so it
+    // can be odd value. If it is we need to add 1 and then divide by 2 to
+    // calculate number of bytes. Although if it is even, then adding 1 will
+    // give us odd value which gives the same number of bytes after integer
+    // division by 2.
+    // So we always add 1 to Address-Length inside TP-DA
+    if ( KSmsCommandType == ( aTpdu[KMessageParamsIndex] & KCommandTypeMask ) )
+        {
+        ret = KSmsCommandType;
+        TUint8 addressLength = aTpdu[KSmsCommandAddrIndex] + 1;
+        aTpda.Set( aTpdu.Mid(
+            KSmsCommandAddrIndex + KTpDaTonNpiIndex,
+            addressLength/2 + KTpDaTonNpiSize ) );
+        }
+    else if ( KSmsSubmitType == ( aTpdu[KMessageParamsIndex] & KCommandTypeMask ) )
+        {
+        ret = KSmsSubmitType;
+        TUint8 addressLength = aTpdu[KSmsSubmitAddrIndex] + 1;
+        aTpda.Set( aTpdu.Mid(
+            KSmsSubmitAddrIndex + KTpDaTonNpiIndex,
+            addressLength/2 + KTpDaTonNpiSize ) );
+        }
+    // no else
+
+    return ret;
+    }
 // End of File

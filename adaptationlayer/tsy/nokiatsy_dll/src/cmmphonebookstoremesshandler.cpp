@@ -89,7 +89,7 @@ const TUint8 KOffsetOther( 3 );
 TPrimitiveInitInfo::TPrimitiveInitInfo()
     {
 TFLOGSTRING("TSY: TPrimitiveInitInfo::TPrimitiveInitInfo");
-OstTrace0( TRACE_NORMAL, TPRIMITIVEINITINFO_TPRIMITIVEINITINFO, "TPrimitiveInitInfo::TPrimitiveInitInfo" );
+OstTrace0( TRACE_NORMAL,  TPRIMITIVEINITINFO_TPRIMITIVEINITINFO_TD, "TPrimitiveInitInfo::TPrimitiveInitInfo" );
 
 
     iNoOfRecords = 0;          // 2 byte long
@@ -123,7 +123,7 @@ void TPrimitiveInitInfo::GetPBEntryFromUICCData(
             nameLength = endOfAlphaString;
             }
 TFLOGSTRING("TSY: TPrimitiveInitInfo::GetPBEntryFromUICCData. Saving name.");
-OstTrace0( TRACE_NORMAL, TPRIMITIVEINITINFO_GETPBENTRYFROMUICCDATA, "TPrimitiveInitInfo::GetPBEntryFromUICCData. Saving Name" );
+OstTrace0( TRACE_NORMAL,  TPRIMITIVEINITINFO_GETPBENTRYFROMUICCDATA_TD, "TPrimitiveInitInfo::GetPBEntryFromUICCData. Saving Name" );
         aName.Copy( aFileData.Mid( 0, nameLength ) );
         }
     // No else. Alpha string length is 0 and it is not copied
@@ -140,7 +140,7 @@ OstTrace0( TRACE_NORMAL, TPRIMITIVEINITINFO_GETPBENTRYFROMUICCDATA, "TPrimitiveI
     if ( KMinLength < numLength )
         {
 TFLOGSTRING("TSY: TPrimitiveInitInfo::GetPBEntryFromUICCData. Saving number.");
-OstTrace0( TRACE_NORMAL, DUP1_TPRIMITIVEINITINFO_GETPBENTRYFROMUICCDATA, "TPrimitiveInitInfo::GetPBEntryFromUICCData. Save Number" );
+OstTrace0( TRACE_NORMAL,  DUP1_TPRIMITIVEINITINFO_GETPBENTRYFROMUICCDATA_TD, "TPrimitiveInitInfo::GetPBEntryFromUICCData. Save Number" );
 
         // Store number in buffer4
         // Start for number
@@ -159,7 +159,7 @@ OstTrace0( TRACE_NORMAL, DUP1_TPRIMITIVEINITINFO_GETPBENTRYFROMUICCDATA, "TPrimi
 CMmPhoneBookStoreMessHandler::CMmPhoneBookStoreMessHandler()
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::CMmPhoneBookStoreMessHandler.");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_CMMPHONEBOOKSTOREMESSHANDLER, "CMmPhoneBookStoreMessHandler::CMmPhoneBookStoreMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_CMMPHONEBOOKSTOREMESSHANDLER_TD, "CMmPhoneBookStoreMessHandler::CMmPhoneBookStoreMessHandler" );
     }
 
 // ---------------------------------------------------------------------------
@@ -170,7 +170,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_CMMPHONEBOOKSTOREMESSHANDL
 CMmPhoneBookStoreMessHandler::~CMmPhoneBookStoreMessHandler()
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::~CMmPhoneBookStoreMessHandler.");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREMESSHANDLER_CMMPHONEBOOKSTOREMESSHANDLER, "CMmPhoneBookStoreMessHandler::~CMmPhoneBookStoreMessHandler" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKSTOREMESSHANDLER_CMMPHONEBOOKSTOREMESSHANDLER_TD, "CMmPhoneBookStoreMessHandler::~CMmPhoneBookStoreMessHandler" );
 
 // Delete all the entries
     for( TInt pbCount = 0; pbCount < iPBEntryList.Count(); pbCount++ )
@@ -196,7 +196,7 @@ CMmPhoneBookStoreMessHandler* CMmPhoneBookStoreMessHandler::NewL(
     CMmUiccMessHandler* aUiccMessHandler) //Pointer to the Uicc Message handler
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::NewL.");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_NEWL, "CMmPhoneBookStoreMessHandler::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_NEWL_TD, "CMmPhoneBookStoreMessHandler::NewL" );
 
     // Create PhoneBookStore messagehandler
     CMmPhoneBookStoreMessHandler* mmPhoneBookStoreMessHandler =
@@ -227,7 +227,7 @@ void CMmPhoneBookStoreMessHandler::ConstructL(
     CMmUiccMessHandler* aUiccMessHandler)
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_CONSTRUCTL, "CMmPhoneBookStoreMessHandler::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_CONSTRUCTL_TD, "CMmPhoneBookStoreMessHandler::ConstructL" );
 
     iOperationlist = CMmPhoneBookStoreOperationList::NewL( this , aUiccMessHandler );
     iNumberOfFdnInfoResps = 0;
@@ -243,7 +243,7 @@ TInt CMmPhoneBookStoreMessHandler::ExtFuncL(
     const CMmDataPackage* aDataPackage )
     {
 TFLOGSTRING2("TSY: CMmPhoneBookStoreMessHandler::ExtFuncL - arrived. IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_EXTFUNCL, "CMmPhoneBookStoreMessHandler::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_EXTFUNCL_TD, "CMmPhoneBookStoreMessHandler::ExtFuncL;aIpc=%d", aIpc );
 
     TInt ret( KErrNone );
     CMmPhoneBookStoreOperationBase* operation( NULL );
@@ -283,7 +283,7 @@ OstTrace1( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_EXTFUNCL, "CMmPhoneBookSto
             if ( KErrNone != ret)
                 {
 TFLOGSTRING2("TSY: CMmPhoneBookStoreMessHandler::ExtFuncL;CreateReq returns %d", ret);
-OstTrace1( TRACE_NORMAL, DUP11_CMMPHONEBOOKSTOREMESSHANDLER_EXTFUNCL, "CMmPhoneBookStoreMessHandler::ExtFuncL;CreateReq returns %d", ret );
+OstTrace1( TRACE_NORMAL,  DUP11_CMMPHONEBOOKSTOREMESSHANDLER_EXTFUNCL_TD, "CMmPhoneBookStoreMessHandler::ExtFuncL;CreateReq returns %d", ret );
 
                 iOperationlist->RemoveOperationFromList( transId );
                 }
@@ -291,7 +291,7 @@ OstTrace1( TRACE_NORMAL, DUP11_CMMPHONEBOOKSTOREMESSHANDLER_EXTFUNCL, "CMmPhoneB
         else
             {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::ExtFuncL - Server Busy ");
-OstTrace0( TRACE_NORMAL, DUP3_CMMPHONEBOOKSTOREMESSHANDLER_EXTFUNCL, "CMmPhoneBookStoreMessHandler::ExtFuncL - Server Busy " );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMPHONEBOOKSTOREMESSHANDLER_EXTFUNCL_TD, "CMmPhoneBookStoreMessHandler::ExtFuncL - Server Busy " );
 
             ret = KErrServerBusy;
             }
@@ -316,7 +316,7 @@ TInt CMmPhoneBookStoreMessHandler::ProcessUiccMsg(
     TInt ret(KErrNone);
 
 TFLOGSTRING2("TSY: CMmPhoneBookStoreMessHandler::ProcessUiccMsg. transactId:%d", aTraId);
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG, "CMmPhoneBookStoreMessHandler::ProcessUiccMsg" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG_TD, "CMmPhoneBookStoreMessHandler::ProcessUiccMsg" );
 
     if ( ETrIdReadMailboxIdentifier != aTraId )
         {
@@ -328,7 +328,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG, "CMmPhoneB
             if( operation->HandleUICCPbRespL( aStatus, aDetails, aFileData, aTraId ))
                 {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Remove Operation from the list ");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG, "CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Remove operation from the list " );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG_TD, "CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Remove operation from the list " );
 
                 // remove operation From the list
                 iOperationlist->RemoveOperationFromList( aTraId );
@@ -337,7 +337,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG, "CMmP
         else
             {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Operation not Found ");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG, "CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Operation not found " );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKSTOREMESSHANDLER_PROCESSUICCMSG_TD, "CMmPhoneBookStoreMessHandler::ProcessUiccMsg. Operation not found " );
             }
         }
     else // Mailbox identifiers is special case
@@ -360,7 +360,7 @@ CMmPhoneBookStoreOperationBase* CMmPhoneBookStoreMessHandler::CreateNewOperation
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationList::CreateNewOperation");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CREATENEWOPERATION, "CMmPhoneBookStoreOperationList::CreateNewOperation" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONLIST_CREATENEWOPERATION_TD, "CMmPhoneBookStoreOperationList::CreateNewOperation" );
 
     CMmPhoneBookStoreOperationBase* pointer( NULL );
 
@@ -514,7 +514,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONLIST_CREATENEWOPERATION, "CMm
             {
             // Nothing to do here
 TFLOGSTRING2("TSY: CMmPhoneBookStoreMessHandler::ExtFuncL - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKSTOREOPERATIONLIST_BUILDL, "CMmPhoneBookStoreOperationList::BuildL;Unknown aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPHONEBOOKSTOREOPERATIONLIST_BUILDL_TD, "CMmPhoneBookStoreOperationList::BuildL;Unknown aIpc=%d", aIpc );
             break;
             }
         }
@@ -542,7 +542,7 @@ void CMmPhoneBookStoreMessHandler::StorePhonebookEntryL(
     // Save Name
 
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::SeparatePhoneBookEntryFromIsiMsgL. Saving name in commonTSY Array.");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_STOREPHONEBOOKENTRY, "CMmPhoneBookStoreOperationBase::StorePhonebookEntry. Save name to commonTSY Array" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREOPERATIONBASE_STOREPHONEBOOKENTRY_TD, "CMmPhoneBookStoreOperationBase::StorePhonebookEntry. Save name to commonTSY Array" );
 
 
     aEntry.iText = HBufC::NewL( aName.Length() );
@@ -562,7 +562,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREOPERATIONBASE_STOREPHONEBOOKENTRY, "CM
     // Store Number
 
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::SeparatePhoneBookEntryFromIsiMsgL. Saving number in commonTSY Array.");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_STOREPHONEBOOKENTRY, "CMmPhoneBookStoreOperationBase::StorePhonebookEntry. Save number to commonTSY Array" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKSTOREOPERATIONBASE_STOREPHONEBOOKENTRY_TD, "CMmPhoneBookStoreOperationBase::StorePhonebookEntry. Save number to commonTSY Array" );
 
     TInt numLength = aNumber.Length();
     if(KMinLength < numLength)
@@ -606,7 +606,7 @@ void CMmPhoneBookStoreMessHandler::StoreAnrToPhonebookEntryL(
     const TUint16 aFileId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::StoreAnrToPhonebookEntryL.");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_STOREANRTOPHONEBOOKENTRYL, "CMmPhoneBookStoreMessHandler::StoreAnrToPhonebookEntryL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_STOREANRTOPHONEBOOKENTRYL_TD, "CMmPhoneBookStoreMessHandler::StoreAnrToPhonebookEntryL" );
 
     TInt anrLength( aAnr.Length() );
     if ( KMaxAnrLength < anrLength )
@@ -635,7 +635,7 @@ void CMmPhoneBookStoreMessHandler::StoreSneEmailToPbEntryL(
     TUint8 aFileTypeTag )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::StoreSneToPbEntry.");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_STORESNETOPBENTRY, "CMmPhoneBookStoreMessHandler::StoreSneToPbEntry" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_STORESNETOPBENTRY_TD, "CMmPhoneBookStoreMessHandler::StoreSneToPbEntry" );
 
     if ( aString.Length() )
         {
@@ -677,7 +677,7 @@ void CMmPhoneBookStoreMessHandler::ConvertToUcs2FromBCD
         )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToUcs2FromBCD");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_CONVERTTOUCS2FROMBCD, "CMmPhoneBookStoreMessHandler::ConvertToUcs2FromBCD" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_CONVERTTOUCS2FROMBCD_TD, "CMmPhoneBookStoreMessHandler::ConvertToUcs2FromBCD" );
 
     TInt maxLength(0);
     TUint8 data;
@@ -844,7 +844,7 @@ TInt CMmPhoneBookStoreMessHandler::ConvertToBCDFromUCS2
         TUint16 aFileId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreOperationBase::ConvertToBCDFromUCS2");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_CONVERTTOBCDFROMUCS2, "CMmPhoneBookStoreMessHandler::ConvertToBCDFromUCS2" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_CONVERTTOBCDFROMUCS2_TD, "CMmPhoneBookStoreMessHandler::ConvertToBCDFromUCS2" );
 
     TInt ret ( KErrNone );
     TInt count( 0 );
@@ -914,7 +914,7 @@ TInt CMmPhoneBookStoreMessHandler::GetBCDCodeforUCS(
          TUint16 aFileId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::GetBCDCodeforUCS");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETBCDCODEFORUCS, "CMmPhoneBookStoreMessHandler::GetBCDCodeforUCS" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_GETBCDCODEFORUCS_TD, "CMmPhoneBookStoreMessHandler::GetBCDCodeforUCS" );
     TInt bcdNumber( -1 );
 
     if ( aUCSCharacter >= '0' && aUCSCharacter <='9')
@@ -937,7 +937,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETBCDCODEFORUCS, "CMmPhon
 void CMmPhoneBookStoreMessHandler::StoreEntryToPhoneBookList( TPBEntry* aStoreEntry, TUint8 aPBIndex )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::StoreEntryToPhoenBookList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_STOREENTRYTOPHOENBOOKLIST, "CMmPhoneBookStoreMessHandler::StoreEntryToPhoenBookList" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_STOREENTRYTOPHOENBOOKLIST_TD, "CMmPhoneBookStoreMessHandler::StoreEntryToPhoenBookList" );
 
     iPBEntryList[aPBIndex].iEntryList.Append( aStoreEntry );
     }
@@ -952,7 +952,7 @@ void CMmPhoneBookStoreMessHandler::ResetEntryInPhoneBookList(
     TInt aEntryIndex )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::ResetEntryInPhoneBookList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_RESETENTRYINPHONEBOOKLIST, "CMmPhoneBookStoreMessHandler::ResetEntryInPhoneBookList" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_RESETENTRYINPHONEBOOKLIST_TD, "CMmPhoneBookStoreMessHandler::ResetEntryInPhoneBookList" );
     TInt numOfEntries( iPBEntryList[aPbIndex].iEntryList.Count() );
     for( TInt i( 0 ); i < numOfEntries; i++)
         {
@@ -979,7 +979,7 @@ TBool CMmPhoneBookStoreMessHandler::IndexCheckInPBList(
                     TPBEntry& aEntry )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::IndexCheckInPBList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_INDEXCHECKINPBLIST, "CMmPhoneBookStoreMessHandler::IndexCheckInPBList" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_INDEXCHECKINPBLIST_TD, "CMmPhoneBookStoreMessHandler::IndexCheckInPBList" );
 
     TBool entryFound( EFalse );
 
@@ -1005,7 +1005,7 @@ TInt CMmPhoneBookStoreMessHandler::GetIndexForPresentEntry(
                     TUint8 aPBIndex )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::GetIndexForPresentEntry");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETINDEXFORPRESENTENTRY, "CMmPhoneBookStoreMessHandler::GetIndexForPresentEntry" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_GETINDEXFORPRESENTENTRY_TD, "CMmPhoneBookStoreMessHandler::GetIndexForPresentEntry" );
 
     TInt count( -1 );
     for( ;( count+1 ) < iPBEntryList[aPBIndex].iEntryList.Count(); count++)
@@ -1027,7 +1027,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETINDEXFORPRESENTENTRY, "
 TInt CMmPhoneBookStoreMessHandler::EmptyEntryCheckInPBList( TUint8 aPBIndex )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::EmptyEntryCheckInPBList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_EMPTYENTRYCHECKINPBLIST, "CMmPhoneBookStoreMessHandler::EmptyEntryCheckInPBList" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_EMPTYENTRYCHECKINPBLIST_TD, "CMmPhoneBookStoreMessHandler::EmptyEntryCheckInPBList" );
 
     TInt entryNumber( 0 );
 
@@ -1055,7 +1055,7 @@ void CMmPhoneBookStoreMessHandler::UpdateEntryFromList(
              TUint8 aPBIndex)
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::RemoveEntryFromList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_REMOVEENTRYFROMLIST, "CMmPhoneBookStoreMessHandler::RemoveEntryFromList" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_REMOVEENTRYFROMLIST_TD, "CMmPhoneBookStoreMessHandler::RemoveEntryFromList" );
 
     iPBEntryList[aPBIndex].iEntryList[aIndex] = aEntry;
 
@@ -1072,7 +1072,7 @@ void CMmPhoneBookStoreMessHandler::RemoveExtEntryFromList(
                TUint8 aPBIndex)
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::RemoveExtEntryFromList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_REMOVEEXTENTRYFROMLIST, "CMmPhoneBookStoreMessHandler::RemoveExtEntryFromList" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_REMOVEEXTENTRYFROMLIST_TD, "CMmPhoneBookStoreMessHandler::RemoveExtEntryFromList" );
 
     TInt count = iPBEntryList[aPBIndex].iEntryList[aIndex]->PBEntryExtRecord.Count();
     if( 0 < count )
@@ -1091,7 +1091,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_REMOVEEXTENTRYFROMLIST, "C
 CMmMessageRouter* CMmPhoneBookStoreMessHandler::MessageRouter()
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::MessageRouter");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_MESSAGEROUTER, "CMmPhoneBookStoreMessHandler::MessageRouter" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_MESSAGEROUTER_TD, "CMmPhoneBookStoreMessHandler::MessageRouter" );
 
     return iMessageRouter;
     }
@@ -1106,7 +1106,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_MESSAGEROUTER, "CMmPhoneBo
 CMmUiccMessHandler* CMmPhoneBookStoreMessHandler::UiccMessHandler()
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::UiccMessHandler");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_UICCMESSHANDLER, "CMmPhoneBookStoreMessHandler::UiccMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_UICCMESSHANDLER_TD, "CMmPhoneBookStoreMessHandler::UiccMessHandler" );
 
     return iMmUiccMessHandler;
     }
@@ -1120,7 +1120,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_UICCMESSHANDLER, "CMmPhone
 CMmPhoNetSender* CMmPhoneBookStoreMessHandler::PhoNetSender()
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::PhoNetSender");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_PHONETSENDER, "CMmPhoneBookStoreMessHandler::PhoNetSender" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_PHONETSENDER_TD, "CMmPhoneBookStoreMessHandler::PhoNetSender" );
 
     return iPhoNetSender;
     }
@@ -1135,7 +1135,7 @@ TPBEntry* CMmPhoneBookStoreMessHandler::FindEntryFromPbList(
                  TUint8 aRecordNo )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::FindEntryFromPbList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_FINDENTRYFROMPBLIST, "CMmPhoneBookStoreMessHandler::FindEntryFromPbList" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_FINDENTRYFROMPBLIST_TD, "CMmPhoneBookStoreMessHandler::FindEntryFromPbList" );
 
     TPBEntry* ret( NULL );
 
@@ -1162,7 +1162,7 @@ void CMmPhoneBookStoreMessHandler::GetEntriesForType2FileId(
     RArray<TInt>& aArray )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::GetEntryForType2FileId");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETENTRYFORTYPE2FILEID, "CMmPhoneBookStoreMessHandler::GetEntryForType2FileId" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_GETENTRYFORTYPE2FILEID_TD, "CMmPhoneBookStoreMessHandler::GetEntryForType2FileId" );
     TInt numOfEntries( iPBEntryList[EPhonebookTypeAdn].iEntryList.Count() );
 
     // Loop all entries that have been created
@@ -1195,7 +1195,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETENTRYFORTYPE2FILEID, "C
 TInt CMmPhoneBookStoreMessHandler::GetMailboxIdentifiers()
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::GetMailboxIdentifiers");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETMAILBOXNUMBERS, "CMmPhoneBookStoreMessHandler::GetMailboxIdentifiers" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_GETMAILBOXNUMBERS_TD, "CMmPhoneBookStoreMessHandler::GetMailboxIdentifiers" );
     // Set parameters for UICC_APPL_CMD_REQ message
     TUiccReadLinearFixed params;
     params.messHandlerPtr = static_cast<MUiccOperationBase*>( this );
@@ -1227,7 +1227,7 @@ void CMmPhoneBookStoreMessHandler::HandleGetMailboxIdentifiers(
     const TDesC8 &aFileData )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::HandleGetMailboxIdentifiers");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_HANDLEGETMAILBOXIDENTIFIERS, "CMmPhoneBookStoreMessHandler::HandleGetMailboxIdentifiers" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_HANDLEGETMAILBOXIDENTIFIERS_TD, "CMmPhoneBookStoreMessHandler::HandleGetMailboxIdentifiers" );
 
     RMobilePhone::TMobilePhoneVoicemailIdsV3* voicemailIds(
         new ( ELeave ) RMobilePhone::TMobilePhoneVoicemailIdsV3() );
@@ -1271,7 +1271,7 @@ TInt CMmPhoneBookStoreMessHandler::GetPBRRecordNum(
     TUint8 &aPBRRecNum )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::GetPBRRecordNum");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETPBRRECORDNUM, "CMmPhoneBookStoreMessHandler::GetPBRRecordNum" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_GETPBRRECORDNUM_TD, "CMmPhoneBookStoreMessHandler::GetPBRRecordNum" );
 
     TInt ret( KErrNone );
 
@@ -1315,7 +1315,7 @@ TInt CMmPhoneBookStoreMessHandler::GetCurrentEfRecNum(
     TInt aIndexToRead )
     {
 TFLOGSTRING("TSY: CMmPhoneBookStoreMessHandler::GetCurrentEfRecNum");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKSTOREMESSHANDLER_GETCURRENTEFRECNUM, "CMmPhoneBookStoreMessHandler::GetCurrentEfRecNum" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKSTOREMESSHANDLER_GETCURRENTEFRECNUM_TD, "CMmPhoneBookStoreMessHandler::GetCurrentEfRecNum" );
 
     TInt ret( KErrNone );
     // get ADN anf PBR Max no of records

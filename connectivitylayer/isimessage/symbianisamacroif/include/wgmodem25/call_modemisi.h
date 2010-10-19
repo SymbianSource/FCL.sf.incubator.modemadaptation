@@ -14,7 +14,7 @@
 * 
 * Description:
 * Name      : PN_MODEM_CALL [ 0xC9 ] Resource Modem Call Server
-* Version   : 002.002
+* Version   : 002.004
 *
 * Documentation: www.wirelessmodemapi.com
 *
@@ -25,7 +25,7 @@
 #define _SYMBIAN_ISI_CALL_MODEMISI_H_
 
 #define MODEM_CALL_SERVER_ISI_VERSION_Z	 2
-#define MODEM_CALL_SERVER_ISI_VERSION_Y	 2
+#define MODEM_CALL_SERVER_ISI_VERSION_Y	 5
 
 
 //CONSTANTS
@@ -36,6 +36,8 @@
 #define CALL_MODEM_NO_LINK_ID                             	0x00                                                 	
 #define CALL_MODEM_DTMF_DEFAULT                           	0x00                                                 	
 #define CALL_MODEM_DTMF_NO_DELAY                          	0x01                                                 	
+#define CALL_MODEM_NULL                                   	0x00                                                 	
+#define CALL_MODEM_STATUS_SWAP_INITIATED                  	0x10                                              	
 
 
 //TABLES
@@ -188,7 +190,6 @@
 #define CALL_MODEM_STATUS_HOLD                            	0x0C                                                 	
 #define CALL_MODEM_STATUS_RETRIEVE_INITIATED              	0x0D                                                 	
 #define CALL_MODEM_STATUS_RECONNECT_PENDING               	0x0E                                                 	
-#define CALL_MODEM_STATUS_SWAP_INITIATED                  	0x10                                              	
 
 //BitmaskTables for CALL_MODEM_PRESENT_INFO
 #define CALL_MODEM_PRESENT                                	0x00                                                 	
@@ -1213,6 +1214,19 @@
 #define CALL_MODEM_SB_REQ_INFO_OFFSET_TRID                	2 //size 1 byte(s)
 #define CALL_MODEM_SB_REQ_INFO_OFFSET_FILLERBYTE1         	3 //size 1 byte(s)
 #define SIZE_CALL_MODEM_SB_REQ_INFO                       	4
+
+
+//Definition for CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO
+#define CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO               	0x4C                                              	
+#define CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO_OFFSET_SUBBLOCKID	0 //size 1 byte(s)
+#define CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO_OFFSET_SUBBLOCKLEN	1 //size 1 byte(s)
+#define CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO_OFFSET_LINKID 	2 //size 1 byte(s)
+#define CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO_OFFSET_SERVCATEGORY	3 //size 1 byte(s)
+#define CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO_OFFSET_MCCDIGIT1	4 //size 1 byte(s)
+#define CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO_OFFSET_MCCDIGIT2	5 //size 1 byte(s)
+#define CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO_OFFSET_MCCDIGIT3	6 //size 1 byte(s)
+#define CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO_OFFSET_MCCRANGE	7 //size 1 byte(s)
+#define SIZE_CALL_MODEM_SB_EMERG_NUMBER_MOD_INFO          	8
 
 
 //MESSAGES

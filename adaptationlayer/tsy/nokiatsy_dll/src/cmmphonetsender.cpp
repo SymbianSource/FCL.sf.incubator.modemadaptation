@@ -127,23 +127,23 @@ static void TFLOG_PRINT_ISIMESSAGE( const TDesC8& aBuf )
                ( ( i + 1 ) == length ) ) // All bytes collected and traced
               {
               firstTime = EFalse;
-OstTraceExt1( TRACE_NORMAL, _TFLOG_PRINT_ISIMESSAGE, "Phonet Sender: [ %s]", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  _TFLOG_PRINT_ISIMESSAGE_TD, "Phonet Sender: [ %s]", trace_msg );
                 trace_msg.SetLength( 0 );
               }
             else if ( firstTime ) // 1st line of the trace
               {
               firstTime = EFalse;
-OstTraceExt1( TRACE_NORMAL, DUP1__TFLOG_PRINT_ISIMESSAGE, "Phonet Sender: [ %s", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP1__TFLOG_PRINT_ISIMESSAGE_TD, "Phonet Sender: [ %s", trace_msg );
                 trace_msg.SetLength( 0 );
               }
             else if ( ( i + 1 ) == length ) // The last line
               {
-OstTraceExt1( TRACE_NORMAL, DUP4__TFLOG_PRINT_ISIMESSAGE, "Phonet Sender:   %s]", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP4__TFLOG_PRINT_ISIMESSAGE_TD, "Phonet Sender:   %s]", trace_msg );
                 trace_msg.SetLength( 0 );
               }
             else // just print bytes
               {
-OstTraceExt1( TRACE_NORMAL, DUP5__TFLOG_PRINT_ISIMESSAGE, "Phonet Sender:   %s", trace_msg );
+OstTraceExt1( TRACE_NORMAL,  DUP5__TFLOG_PRINT_ISIMESSAGE_TD, "Phonet Sender:   %s", trace_msg );
                 trace_msg.SetLength( 0 );
               }
             counter = 0;
@@ -171,7 +171,7 @@ CMmPhoNetSender::CMmPhoNetSender()
         iSendBufferPtr( 0,0 )
     {
     TFLOGSTRING("TSY: CMmPhoNetSender::CMmPhoNetSender");
-OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_CMMPHONETSENDER, "CMmPhoNetSender::CMmPhoNetSender" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETSENDER_CMMPHONETSENDER_TD, "CMmPhoNetSender::CMmPhoNetSender" );
     }
 
 // -----------------------------------------------------------------------------
@@ -182,7 +182,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_CMMPHONETSENDER, "CMmPhoNetSender::CMmP
 CMmPhoNetSender::~CMmPhoNetSender()
     {
     TFLOGSTRING("TSY: CMmPhoNetSender::~CMmPhoNetSender");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONETSENDER_CMMPHONETSENDER, "CMmPhoNetSender::~CMmPhoNetSender" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONETSENDER_CMMPHONETSENDER_TD, "CMmPhoNetSender::~CMmPhoNetSender" );
     delete iSendBuffer;
     }
 
@@ -197,7 +197,7 @@ CMmPhoNetSender* CMmPhoNetSender::NewL
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetSender::NewL");
-OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_NEWL, "CMmPhoNetSender::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETSENDER_NEWL_TD, "CMmPhoNetSender::NewL" );
 
     CMmPhoNetSender* phoNetSender = NULL;
 
@@ -221,16 +221,16 @@ OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_NEWL, "CMmPhoNetSender::NewL" );
 void CMmPhoNetSender::ConstructL()
     {
     TFLOGSTRING("TSY: CMmPhoNetSender::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_CONSTRUCTL, "CMmPhoNetSender::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETSENDER_CONSTRUCTL_TD, "CMmPhoNetSender::ConstructL" );
     iSendBuffer = HBufC8::NewL( KMaxSendBufferSize );
     iSendBufferPtr.Set( iSendBuffer->Des() );
 
     TFLOGSTRING2("TSY: iSendBuffer len=%d", iSendBuffer->Length());
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONETSENDER_CONSTRUCTL, "CMmPhoNetSender::ConstructL;iSendBuffer->Length=%d", iSendBuffer->Length() );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONETSENDER_CONSTRUCTL_TD, "CMmPhoNetSender::ConstructL;iSendBuffer->Length=%d", iSendBuffer->Length() );
     TFLOGSTRING3("TSY: iSendBufferPtr len=%d maxlen=%d",
         iSendBufferPtr.Length(),
         iSendBufferPtr.MaxLength());
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONETSENDER_CONSTRUCTL, "CMmPhoNetSender::ConstructL;iSendBufferPtr.MaxLength=%d", iSendBufferPtr.MaxLength() );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPHONETSENDER_CONSTRUCTL_TD, "CMmPhoNetSender::ConstructL;iSendBufferPtr.MaxLength=%d", iSendBufferPtr.MaxLength() );
     }
 
 // -----------------------------------------------------------------------------
@@ -241,7 +241,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMPHONETSENDER_CONSTRUCTL, "CMmPhoNetSender::Cons
 //
 TDes8& CMmPhoNetSender::SendBufferDes()
     {
-OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_SENDBUFFERDES, "CMmPhoNetSender::SendBufferDes" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETSENDER_SENDBUFFERDES_TD, "CMmPhoNetSender::SendBufferDes" );
     return iSendBufferPtr;
     }
 
@@ -258,7 +258,7 @@ TInt CMmPhoNetSender::Send
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetSender::Send");
-OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_SEND, "CMmPhoNetSender::Send" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETSENDER_SEND_TD, "CMmPhoNetSender::Send" );
 
     TInt ret( KErrServerBusy );
 
@@ -293,7 +293,7 @@ TInt CMmPhoNetSender::Send
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetSender::Send (resource+transaction+data)");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONETSENDER_SEND, "CMmPhoNetSender::Send (resource+transaction+data)" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONETSENDER_SEND_TD, "CMmPhoNetSender::Send (resource+transaction+data)" );
 
     // We shall use send buffer
     TDes8& buffer( SendBufferDes() );
@@ -325,7 +325,7 @@ TInt CMmPhoNetSender::EventSend
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetSender::EventSend");
-OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_EVENTSEND, "CMmPhoNetSender::EventSend" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETSENDER_EVENTSEND_TD, "CMmPhoNetSender::EventSend" );
 
     return iPhoNet->CustomFunction( EIscNokiaEventSend, (TDes8*)&aEvent );
     }
@@ -341,7 +341,7 @@ TInt CMmPhoNetSender::SubscribeEvents
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetSender::SubscribeEvents");
-OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_SUBSCRIBEEVENTS, "CMmPhoNetSender::SubscribeEvents" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETSENDER_SUBSCRIBEEVENTS_TD, "CMmPhoNetSender::SubscribeEvents" );
 
     return iPhoNet->CustomFunction( EIscNokiaEventSubscribe, (TDes8*)&aEvents );
     }
@@ -358,7 +358,7 @@ TInt CMmPhoNetSender::GetChannelInfo
         )
     {
     TFLOGSTRING("TSY: CMmPhoNetSender::GetChannelInfo");
-OstTrace0( TRACE_NORMAL, CMMPHONETSENDER_GETCHANNELINFO, "CMmPhoNetSender::GetChannelInfo" );
+OstTrace0( TRACE_NORMAL,  CMMPHONETSENDER_GETCHANNELINFO_TD, "CMmPhoNetSender::GetChannelInfo" );
 
     return iPhoNet->GetChannelInfo( aChannel, aInfo );
     }

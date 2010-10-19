@@ -205,6 +205,8 @@ enum TUiccTrId
     ETrIdEnStoreRead,
     ETrIdEnStoreGetInfo,
     ETrIdEMmTsyONStoreGetInfo,
+    ETrIdGetUiccStatus,
+	ETrIdGetCardStatus,
     ENumOfUiccTrIds
     };
 
@@ -432,7 +434,7 @@ class CMmUiccMessHandler :
         TInt CreateUiccApplicationReq(
             const TUiccParamsBase& aParams,
             TUint8 aServiceType,
-            TUint8 aApplType = UICC_APPL_TYPE_UICC_USIM );
+            TUint8 aApplType );
 
         /**
         * Provide UICC application ID
@@ -621,6 +623,18 @@ class CMmUiccMessHandler :
         * @return UICC client ID
         */
         TUint8 GetUiccClientId();
+        
+        /**
+        * Get UICC application status
+        * @return UICC application status
+        */
+        TUint8 GetUiccApplicationStatus();
+        
+        /**
+        * Forms UICC_REQ ISI message
+        * return Error code
+        */
+        TInt CreateUiccReq();
 
     public: // Functions from base classes
 
@@ -716,6 +730,26 @@ class CMmUiccMessHandler :
             TIsiSend& aIsiMsg,
             TUint8 aMsgOffset,
             TUint8 aApplType = UICC_APPL_TYPE_UICC_USIM );
+        
+        /**
+        * Create and append UICC_SB_APPL_INFO
+        * @param aIsiMsg ISI message
+        * @param aMsgOffset Offset where subblock is appended
+        * @return void
+        */
+        void CreateUiccSbApplInfo(
+            TIsiSend& aIsiMsg,
+            TUint8 aMsgOffset );
+
+        /**
+        * Create and append UICC_SB_AID
+        * @param aIsiMsg ISI message
+        * @param aMsgOffset Offset where subblock is appended
+        * @return void
+        */
+        void CreateUiccSbAid(
+            TIsiSend& aIsiMsg,
+            TUint8 aMsgOffset );
 
         /**
         * Get file data
@@ -753,6 +787,20 @@ class CMmUiccMessHandler :
         * @return KErrNone or error code
         */
         TInt HandleUiccApplicationResp( const TIsiReceiveC& aIsiMsg );
+
+        /**
+        * Handle UICC_APPLICATION_RESP ISI message for service type UICC_APPL_LIST
+        * @param aIsiMsg ISI message
+        * @return KErrNone or error code
+        */
+        TInt HandleUiccApplListResp( const TIsiReceiveC& aIsiMsg );
+
+        /**
+        * Handle UICC_APPLICATION_RESP ISI message for service type UICC_APPL_HOST_ACTIVATE
+        * @param aIsiMsg ISI message
+        * @return KErrNone or error code
+        */
+        TInt HandleUiccApplHostActivate( const TIsiReceiveC& aIsiMsg );
 
         /**
         * Get apdu data
@@ -799,6 +847,13 @@ class CMmUiccMessHandler :
         void CphsInformationCacheResp(
             TInt aStatus,
             const TDesC8& aFileData );
+        
+        /**
+        * Handles card response according card status
+        * @param aIsiMsg ISI message
+        * @return none 
+        */
+        void UiccCardRespStatus( const TIsiReceiveC& aIsiMsg );
 
 
     private:    // Data

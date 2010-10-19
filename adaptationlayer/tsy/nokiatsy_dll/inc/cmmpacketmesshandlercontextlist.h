@@ -73,6 +73,10 @@ const TInt KTIntNotDefined = 0xFF;
 
             RIscApi iIscApi;
             TBool iChannelOpened;
+
+            TBool iLoanReturning;
+            TUint8 iExtDevId;
+            TUint8 iExtObjId;
         };
 
 // FUNCTION PROTOTYPES
@@ -281,6 +285,15 @@ class CMmPacketContextMesshandlerList : public CBase
         TInt SetActivationTraId(
             const TUint8 aContextId,
             const TUint8 aTransactionId );
+
+        /**
+        * Gets transaction used in activation
+        * @param aContextId: context id
+        * @return TUint8: activation transaction id
+        *     (KUInt8NotDefined if not found)
+        */
+        TUint8 GetActivationTraId(
+            TUint8 aContextId );
 
         /**
         * Gets and resets transaction used in activation
@@ -615,6 +628,51 @@ class CMmPacketContextMesshandlerList : public CBase
         * @return TUint8: context type
         */
         TUint8 GetContextTypeById( const TUint8 aContextId );
+
+        /**
+        * Sets boolean to indicate returning of pipe loan.
+        * @param aPipeHandle: pipe handle
+        * @param aFlag: ETrue if returning loan, otherwise EFalse
+        * @return TBool: ETrue if set, EFalse if context not found
+        */
+        TBool SetLoanReturning(
+            TUint8 aPipeHandle,
+            TBool aFlag );
+
+        /**
+        * Gets boolean indicating about pipe loan returning.
+        * @param aPipeHandle: pipe handle
+        * @return TBool: ETrue if set, EFalse if context not found
+        */
+        TBool IsLoanReturning(
+            TUint8 aPipeHandle ) const;
+
+        /**
+        * Sets deviceId and objectId of loaning pep.
+        * @param aChannelId: channel id
+        * @param aDevId: device id
+        * @param aObjId: object id
+        * @return TInt: KErrNone if succesful,
+        * KErrNotFound if no matching channels in context list.
+        */
+        TInt SetExternalDevice( 
+            TUint8 aChannelId, 
+            TUint8 aDevId, 
+            TUint8 aObjId );
+
+        /**
+        * Gets deviceId and objectId of loaning pep.
+        * @param aChannelId: channel id
+        * @param aDevId: device id
+        * @param aObjId: object id
+        * @return TInt: KErrNone if succesful,
+        * KErrNotFound if no matching channels in context list.
+        */
+        TInt GetExternalDevice( 
+            TUint8 aChannelId, 
+            TUint8& aDevId, 
+            TUint8& aObjId );
+
 
         /**
         * Initialize context info list

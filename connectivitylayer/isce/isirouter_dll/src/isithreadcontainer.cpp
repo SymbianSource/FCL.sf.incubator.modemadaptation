@@ -99,20 +99,20 @@ DISIThreadContainer::~DISIThreadContainer()
     C_TRACE( ( _T( "DISIThreadContainer::~DISIThreadContainer<" ) ) );
     }
 
-TDfcQue* DISIThreadContainer::AllocateThread( const MISIChannelRouterIf::TISIDfcQThreadType aType )
+TDfcQue* DISIThreadContainer::AllocateThread( const MISIObjectRouterIf::TISIDfcQThreadType aType )
     {
     C_TRACE( ( _T( "DISIThreadContainer::AllocateThread %d>" ), aType ) );
     TDfcQue* tmpPtr( NULL );
     switch( aType )
         {
-        case MISIChannelRouterIf::EISIKernelMainThread:  
-        case MISIChannelRouterIf::EISIKernelRequestCompletionThread:
+        case MISIObjectRouterIf::EISIKernelMainThread:  
+        case MISIObjectRouterIf::EISIKernelRequestCompletionThread:
             {
             tmpPtr = ReserveKernelThread();
             break;
             }
-        case MISIChannelRouterIf::EISIUserMainThread:
-        case MISIChannelRouterIf::EISIUserRequestCompletionThread:
+        case MISIObjectRouterIf::EISIUserMainThread:
+        case MISIObjectRouterIf::EISIUserRequestCompletionThread:
             {
             tmpPtr = ReserveUserThread();
             break;

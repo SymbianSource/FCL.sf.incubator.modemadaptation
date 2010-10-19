@@ -48,6 +48,29 @@ inline void CDpPif::SetPipeHandle(
     iPipeHandle = aPipeHandle;
     }
 
+#ifdef PIPECAMP_DATAPORT_PNS_PEP_STATUS_IND_PHONET_ADDRESS_FROM_PNS_PEP_CTRL_REQ // 20100523_1300    
+inline void CDpPif::SetPipeControllerDeviceIdentifier(
+    const TUint8 aDeviceId )
+    {
+    iPipeControllerDevId = aDeviceId;
+    }
+
+inline void CDpPif::SetPipeControllerObjectIdentifier(
+    const TUint8 aObjectId )
+    {
+    iPipeControllerObjId = aObjectId;
+    }
+
+inline TUint8 CDpPif::GetPipeControllerDeviceIdentifier()
+    {
+    return iPipeControllerDevId;
+    }
+
+inline TUint8 CDpPif::GetPipeControllerObjectIdentifier()
+    {
+    return iPipeControllerObjId;
+    }
+#endif
 // ---------------------------------------------------------
 // CDpPif::SetPipeState
 // This method sets pipe state.

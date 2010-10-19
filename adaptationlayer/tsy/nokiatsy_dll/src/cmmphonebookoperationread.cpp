@@ -64,7 +64,7 @@
 CMmPhoneBookOperationRead::CMmPhoneBookOperationRead()
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::CMmPhoneBookOperationRead");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_CMMPHONEBOOKOPERATIONREAD, "CMmPhoneBookOperationRead::CMmPhoneBookOperationRead" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_CMMPHONEBOOKOPERATIONREAD_TD, "CMmPhoneBookOperationRead::CMmPhoneBookOperationRead" );
 
     iNumOfEntriesToRead = 0;
     iNumOfEntriesFilled = 0;
@@ -83,7 +83,7 @@ CMmPhoneBookOperationRead::~CMmPhoneBookOperationRead
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::~CMmPhoneBookOperationRead");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD_CMMPHONEBOOKOPERATIONREAD, "CMmPhoneBookOperationRead::~CMmPhoneBookOperationRead" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD_CMMPHONEBOOKOPERATIONREAD_TD, "CMmPhoneBookOperationRead::~CMmPhoneBookOperationRead" );
     }
 
 // -----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ CMmPhoneBookOperationRead* CMmPhoneBookOperationRead::NewL
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::NewL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_NEWL, "CMmPhoneBookOperationRead::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_NEWL_TD, "CMmPhoneBookOperationRead::NewL" );
 
     CMmPhoneBookOperationRead* mmPhoneBookOperationRead =
         new( ELeave ) CMmPhoneBookOperationRead();
@@ -140,7 +140,7 @@ void CMmPhoneBookOperationRead::ConstructL
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::ConstructL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_CONSTRUCTL, "CMmPhoneBookOperationRead::ConstructL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_CONSTRUCTL_TD, "CMmPhoneBookOperationRead::ConstructL" );
     }
 
 
@@ -159,7 +159,7 @@ TInt CMmPhoneBookOperationRead::UICCCreateReq
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::UICCCreateReq");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_UICCCREATEREQ, "CMmPhoneBookOperationRead::UICCCreateReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_UICCCREATEREQ_TD, "CMmPhoneBookOperationRead::UICCCreateReq" );
 
     TInt ret( KErrNotSupported );
 
@@ -216,7 +216,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_UICCCREATEREQ, "CMmPhoneBookO
             {
             // Nothing to do here
 TFLOGSTRING2("TSY: CMmPhoneBookOperationRead::UICCCreateReq - Unknown IPC: %d", aIpc);
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD_UICCCREATEREQ, "CMmPhoneBookOperationRead::UICCCreateReq;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD_UICCCREATEREQ_TD, "CMmPhoneBookOperationRead::UICCCreateReq;aIpc=%d", aIpc );
             break;
             }
         } // switch-case
@@ -237,7 +237,7 @@ TInt CMmPhoneBookOperationRead::USimPbReqRead
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::USimPbReqRead");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD, "CMmPhoneBookOperationRead::USimPbReqRead" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD_TD, "CMmPhoneBookOperationRead::USimPbReqRead" );
 
     TInt ret( KErrNone );
     TUiccReadLinearFixed cmdParams;
@@ -245,17 +245,9 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD, "CMmPhoneBookO
     cmdParams.messHandlerPtr  = static_cast<MUiccOperationBase*> 
                                ( iMmPhoneBookStoreMessHandler );
 
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE >> 8 ));
-    cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
-    cmdParams.filePath.Append( APPL_FILE_ID>>8);
-    cmdParams.filePath.Append( APPL_FILE_ID);
-    
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
-        {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
-        }
-    
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE >> 8 ));
+    cmdParams.filePath.Append(static_cast<TUint8>( MF_FILE ));
+
     cmdParams.serviceType = UICC_APPL_READ_LINEAR_FIXED;
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
 
@@ -263,6 +255,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD, "CMmPhoneBookO
     if( ( PB_MBDN_FID == iFileId ) &&
         ( EStartRead == iTypeOfReading ) )
         {
+        cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
         // Check id MBI file index is valid
         if( ( iIndexToRead <= iMmPhoneBookStoreMessHandler->
                 iPBStoreConf[iArrayIndex].iMbiRecLen ) &&
@@ -285,6 +278,18 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD, "CMmPhoneBookO
         }
     else
         {
+        if( ( PB_MBDN_FID == iFileId ) || 
+            ( PB_EXT5_FID == iExtFileId ) || 
+            ( PB_EXT6_FID == iExtFileId ) )
+            {
+            cmdParams.filePath.Append( iMmUiccMessHandler->GetApplicationFileId() );
+            }
+        else
+            {
+            cmdParams.filePath.Append( APPL_FILE_ID >> 8 );
+            cmdParams.filePath.Append( APPL_FILE_ID );
+            }
+
         if( EStartRead == iTypeOfReading )
             {
             iTypeOfReading = EBasicEfRead;
@@ -324,7 +329,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD, "CMmPhoneBookO
         ret = iMmPhoneBookStoreMessHandler->UiccMessHandler()->
             CreateUiccApplCmdReq( cmdParams );
 TFLOGSTRING2("TSY: CreateUiccApplCmdReq returns %d", ret);
-OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD, "CMmPhoneBookOperationRead::USimPbReqRead;ret=%d", ret );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD_TD, "CMmPhoneBookOperationRead::USimPbReqRead;ret=%d", ret );
         }  // no else
     
     return ret;
@@ -341,7 +346,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD_USIMPBREQREAD, "CMmPhone
 TInt CMmPhoneBookOperationRead::USimReadWriteSizeReq( TUint8 aTransId )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::USimReadWriteSizeReq");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZEREQ, "CMmPhoneBookOperationRead::USimReadWriteSizeReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZEREQ_TD, "CMmPhoneBookOperationRead::USimReadWriteSizeReq" );
 
     TInt ret( KErrNone );
     
@@ -353,13 +358,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZEREQ, "CMmPho
     cmdParams.filePath.Append( static_cast<TUint8>( MF_FILE ));
     cmdParams.filePath.Append( APPL_FILE_ID>>8);
     cmdParams.filePath.Append( APPL_FILE_ID);
-    
-    if( UICC_CARD_TYPE_UICC == iMmUiccMessHandler->GetCardType() )
-        {
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK >> 8 ));
-        cmdParams.filePath.Append( static_cast<TUint8>( DF_PHONEBOOK ));
-        }
-    
+
     cmdParams.fileId = PB_MSISDN_FID;
     cmdParams.serviceType = UICC_APPL_FILE_INFO;
     cmdParams.trId = static_cast<TUiccTrId>( aTransId );
@@ -379,7 +378,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZEREQ, "CMmPho
 TInt CMmPhoneBookOperationRead::AddParamToReadReq( TUiccReadLinearFixed& aParams )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::AddParamToReadReq");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_ADDPARAMTOREADREQ, "CMmPhoneBookOperationRead::AddParamToReadReq" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_ADDPARAMTOREADREQ_TD, "CMmPhoneBookOperationRead::AddParamToReadReq" );
 
     TInt ret( KErrNone );
     // Check for the record Number to be read is valid record number
@@ -429,7 +428,7 @@ TBool CMmPhoneBookOperationRead::HandleUICCPbRespL
     )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::HandleUICCPbRespL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL, "CMmPhoneBookOperationRead::HandleUICCPbRespL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationRead::HandleUICCPbRespL" );
 
     TBool complete( EFalse );
     TInt ret(KErrNone);
@@ -441,7 +440,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL, "CMmPhoneB
     if ( UICC_STATUS_OK != aStatus )
         {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::HandleUICCPbRespL-Unsuccessfully completed by UICC");
-OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL, "CMmPhoneBookOperationRead::HandleUICCPbRespL.  Unsuccessfully completed by UICC" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationRead::HandleUICCPbRespL.  Unsuccessfully completed by UICC" );
         
         ret = CMmStaticUtility::UICCCSCauseToEpocError(aStatus );
         }
@@ -467,7 +466,7 @@ OstTrace0( TRACE_NORMAL, DUP2_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL, "CMmP
             {
             // Nothing to do here
 TFLOGSTRING2("TSY: CMmPhoneBookOperationRead::HandleUICCPbRespL - Unknown IPC: %d", iSavedIPCForComplete);
-OstTrace1( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL, "CMmPhoneBookOperationRead::HandleUICCPbRespL - Unknown Ipc : %d", iSavedIPCForComplete );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationRead::HandleUICCPbRespL - Unknown Ipc : %d", iSavedIPCForComplete );
             break;
             }
         }
@@ -489,7 +488,7 @@ TBool CMmPhoneBookOperationRead:: USimPbReadRespL( TInt aStatus,
         const TDesC8 &aFileData )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::USimPbReadRespL");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMPBREADRESPL, "CMmPhoneBookOperationRead::USimPbReadRespL" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_USIMPBREADRESPL_TD, "CMmPhoneBookOperationRead::USimPbReadRespL" );
 
     TInt ret ( aStatus );
     TBool complete( EFalse );
@@ -573,7 +572,7 @@ void CMmPhoneBookOperationRead::HandleReadResp(
         TBool &aEntryStore )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::HandleReadResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_HANDLEREADRESP, "CMmPhoneBookOperationRead::HandleReadResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_HANDLEREADRESP_TD, "CMmPhoneBookOperationRead::HandleReadResp" );
     
     iStoreEntry = new ( ELeave ) TPBEntry();
     // update Entry Data
@@ -639,7 +638,7 @@ void CMmPhoneBookOperationRead::HandleEntryPresentResp(
         TBool &aEntryStore )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::HandleEntryPresentResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_HANDLEENTRYPRESENTRESP, "CMmPhoneBookOperationRead::HandleEntryPresentResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_HANDLEENTRYPRESENTRESP_TD, "CMmPhoneBookOperationRead::HandleEntryPresentResp" );
 
     // Check for Is there any extension data
     // And the Extension data record number is valid
@@ -661,7 +660,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_HANDLEENTRYPRESENTRESP, "CMmP
             iNumOfEntriesFilled++;
             }
 TFLOGSTRING2("TSY: CMmPhoneBookOperationRead::HandleUSimPbRespL - Append entries into array %i",iNumOfEntriesFilled);
-OstTrace1( TRACE_NORMAL, DUP4_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL, "CMmPhoneBookOperationRead::HandleUICCPbRespL;iNumOfEntriesFilled=%d", iNumOfEntriesFilled );
+OstTrace1( TRACE_NORMAL,  DUP4_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationRead::HandleUICCPbRespL;iNumOfEntriesFilled=%d", iNumOfEntriesFilled );
         } // End of if Ext Data is not Present
     else
         {
@@ -696,7 +695,7 @@ void CMmPhoneBookOperationRead::HandleExtReadResp(
         TBool &aEntryStored )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::HandleExtReadResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_HANDLEEXTREADRESP, "CMmPhoneBookOperationRead::HandleExtReadResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_HANDLEEXTREADRESP_TD, "CMmPhoneBookOperationRead::HandleExtReadResp" );
 
     // Check for next extension data record
     if ( 0xFF != aFileData[UICC_EXT_REC_NO_OFFSET] )    
@@ -728,9 +727,9 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_HANDLEEXTREADRESP, "CMmPhoneB
             TInt offset = aFileData.Find(&KTagUnusedbyte,1);
             // store Data
             iNumberBuf.Append(aFileData.Mid(1,( offset - 1 )));
-            
-            if( ( EMmTsyONStoreReadEntryIPC == iSavedIPCForComplete ) &&
-                    ( EMmTsyONStoreReadIPC == iSavedIPCForComplete ) )
+
+            if( ( EMmTsyONStoreReadEntryIPC != iSavedIPCForComplete ) &&
+                    ( EMmTsyONStoreReadIPC != iSavedIPCForComplete ) )
                 {
                 StoreEntryToListL( aEntryStored );
                 }
@@ -741,7 +740,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_HANDLEEXTREADRESP, "CMmPhoneB
                 iNumOfEntriesFilled++;
                 }
 TFLOGSTRING2("TSY: CMmPhoneBookOperationRead::HandleUSimPbRespL - Append entries into array %i",iNumOfEntriesFilled);
-OstTrace1( TRACE_NORMAL, DUP5_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL, "CMmPhoneBookOperationRead::HandleUICCPbRespL;iNumOfEntriesFilled=%d", iNumOfEntriesFilled );
+OstTrace1( TRACE_NORMAL,  DUP5_CMMPHONEBOOKOPERATIONREAD_HANDLEUICCPBRESPL_TD, "CMmPhoneBookOperationRead::HandleUICCPbRespL;iNumOfEntriesFilled=%d", iNumOfEntriesFilled );
             }
         }
     }
@@ -757,7 +756,7 @@ TBool CMmPhoneBookOperationRead::USimReadWriteSizeResp( const TDesC8 &aFileData,
         TInt aStatus )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::USimReadWriteSizeResp");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZERESP, "CMmPhoneBookOperationRead::USimReadWriteSizeResp" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZERESP_TD, "CMmPhoneBookOperationRead::USimReadWriteSizeResp" );
 
     TInt ret( aStatus );
     TInt numOfEntries(0);
@@ -775,7 +774,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZERESP, "CMmPh
     else
         {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::USimReadWriteSizeResp - FileInfo read Fail");
-OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZERESP, "CMmPhoneBookOperationRead::USimReadWriteSizeResp - FileInfo Read Fail" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZERESP_TD, "CMmPhoneBookOperationRead::USimReadWriteSizeResp - FileInfo Read Fail" );
         
         ret = KErrArgument;
         }
@@ -803,7 +802,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMPHONEBOOKOPERATIONREAD_USIMREADWRITESIZERESP, "
 void CMmPhoneBookOperationRead::StoreEntryToListL( TBool &aEntryStored )
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::StoreEntryToList");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_STOREENTRYTOLIST, "CMmPhoneBookOperationRead::StoreEntryToList" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_STOREENTRYTOLIST_TD, "CMmPhoneBookOperationRead::StoreEntryToList" );
  
     iMmPhoneBookStoreMessHandler->StoreEntryToPhoneBookList(
                   iStoreEntry,
@@ -844,7 +843,7 @@ OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_STOREENTRYTOLIST, "CMmPhoneBo
 void CMmPhoneBookOperationRead::StoreAndCompleteOwnNumber( TInt aRet , TInt aEmptyEntry)
     {
 TFLOGSTRING("TSY: CMmPhoneBookOperationRead::StoreAndCompleteOwnNumber");
-OstTrace0( TRACE_NORMAL, CMMPHONEBOOKOPERATIONREAD_STOREANDCOMPLETEOWNNUMBER, "CMmPhoneBookOperationRead::StoreAndCompleteOwnNumber" );
+OstTrace0( TRACE_NORMAL,  CMMPHONEBOOKOPERATIONREAD_STOREANDCOMPLETEOWNNUMBER_TD, "CMmPhoneBookOperationRead::StoreAndCompleteOwnNumber" );
  
     if( ( EMmTsyONStoreReadEntryIPC == iSavedIPCForComplete ) &&
             ( ( KErrNone != aEmptyEntry ) || ( KErrNone != aRet ) ) )

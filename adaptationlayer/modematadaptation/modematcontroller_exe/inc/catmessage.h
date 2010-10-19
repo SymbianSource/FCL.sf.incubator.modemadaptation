@@ -44,7 +44,7 @@ public:
     /** GetBuffer
      * @return Pointer to the buffer
      */
-    TPtr8 GetBuffer();
+    TPtr8& GetBuffer();
     
     /** GetMessageType
      * @return messagetype
@@ -54,9 +54,10 @@ public:
     /** ReceiveATResponse
      * @param aResponse Response to AT-command
      * @param aComplete Intermediate data is not completed until it has a response. AT command is completed.
+     * @param aCompleteCode Complete code.
      * @return
      */
-    void ReceiveATResponse( const TDesC8& aResponse, TBool aComplete );
+    void ReceiveATResponse( const TDesC8& aResponse, TBool aComplete, TInt aCompleteCode );
 	  
 	  /** CancelRequest
      * 

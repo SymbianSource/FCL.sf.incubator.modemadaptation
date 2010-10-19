@@ -70,7 +70,7 @@ CSatFlightModeStatus* CSatFlightModeStatus::NewL
         CTsySatMessaging* aSatMessaging
         )
     {
-    OstTrace0( TRACE_NORMAL, CSATFLIGHTMODESTATUS_NEWL, "CSatFlightModeStatus::NewL" );
+    OstTrace0( TRACE_NORMAL,  CSATFLIGHTMODESTATUS_NEWL_TD, "CSatFlightModeStatus::NewL" );
     TFLOGSTRING("TSY: CSatFlightModeStatus::NewL");
 
     CSatFlightModeStatus* self =
@@ -97,7 +97,7 @@ CSatFlightModeStatus::CSatFlightModeStatus(
     ,iSatMessHandler( aSatMessHandler )
     ,iSatMessaging( aSatMessaging )
     {
-    OstTrace0( TRACE_NORMAL, CSATFLIGHTMODESTATUS_CSATFLIGHTMODESTATUS, "CSatFlightModeStatus::CSatFlightModeStatus" );
+    OstTrace0( TRACE_NORMAL,  CSATFLIGHTMODESTATUS_CSATFLIGHTMODESTATUS_TD, "CSatFlightModeStatus::CSatFlightModeStatus" );
     TFLOGSTRING("TSY: CSatFlightModeStatus::CSatFlightModeStatus");
 
     CActiveScheduler::Add( this );
@@ -110,7 +110,7 @@ CSatFlightModeStatus::CSatFlightModeStatus(
 //
 CSatFlightModeStatus::~CSatFlightModeStatus()
     {
-    OstTrace0( TRACE_NORMAL, DUP1_CSATFLIGHTMODESTATUS_CSATFLIGHTMODESTATUS, "CSatFlightModeStatus::~CSatFlightModeStatus" );
+    OstTrace0( TRACE_NORMAL,  DUP1_CSATFLIGHTMODESTATUS_CSATFLIGHTMODESTATUS_TD, "CSatFlightModeStatus::~CSatFlightModeStatus" );
     TFLOGSTRING("TSY: CSatFlightModeStatus::~CSatFlightModeStatus");
 
     Cancel();
@@ -125,7 +125,7 @@ CSatFlightModeStatus::~CSatFlightModeStatus()
 //
 void CSatFlightModeStatus::ConstructL()
     {
-    OstTrace0( TRACE_NORMAL, CSATFLIGHTMODESTATUS_CONSTRUCTL, "CSatFlightModeStatus::ConstructL" );
+    OstTrace0( TRACE_NORMAL,  CSATFLIGHTMODESTATUS_CONSTRUCTL_TD, "CSatFlightModeStatus::ConstructL" );
     TFLOGSTRING("TSY: CSatFlightModeStatus::ConstructL");
 
     // Initialization
@@ -143,7 +143,7 @@ void CSatFlightModeStatus::ConstructL()
     if ( KErrNone == errValue && ESwStateNormalRfOn == systemStateValue )
         {
         TFLOGSTRING("TSY: CSatFlightModeStatus::ConstructL - RF status already RF ON");
-        OstTrace0( TRACE_NORMAL, DUP1_CSATFLIGHTMODESTATUS_CONSTRUCTL, "CSatFlightModeStatus::ConstructL - RF status already RF ON" );
+        OstTrace0( TRACE_NORMAL,  DUP1_CSATFLIGHTMODESTATUS_CONSTRUCTL_TD, "CSatFlightModeStatus::ConstructL - RF status already RF ON" );
 
         // Flight mode Off, RF On.
         iFlightModeActive = EFalse;
@@ -162,7 +162,7 @@ void CSatFlightModeStatus::ConstructL()
 //
 void CSatFlightModeStatus::DoCancel()
     {
-    OstTrace0( TRACE_NORMAL, CSATFLIGHTMODESTATUS_DOCANCEL, "CSatFlightModeStatus::DoCancel" );
+    OstTrace0( TRACE_NORMAL,  CSATFLIGHTMODESTATUS_DOCANCEL_TD, "CSatFlightModeStatus::DoCancel" );
     TFLOGSTRING("TSY: CSatFlightModeStatus::DoCancel");
 
     // Cancels an outstanding subscription request for this property handle.
@@ -176,7 +176,7 @@ void CSatFlightModeStatus::DoCancel()
 //
 void CSatFlightModeStatus::RunL()
     {
-    OstTrace0( TRACE_NORMAL, CSATFLIGHTMODESTATUS_RUNL, "CSatFlightModeStatus::RunL" );
+    OstTrace0( TRACE_NORMAL,  CSATFLIGHTMODESTATUS_RUNL_TD, "CSatFlightModeStatus::RunL" );
     TFLOGSTRING("TSY: CSatFlightModeStatus::RunL");
 
     // Check possible error.
@@ -199,7 +199,7 @@ void CSatFlightModeStatus::RunL()
 //
 TInt CSatFlightModeStatus::RunError( TInt aError )
     {
-    OstTrace1( TRACE_NORMAL, CSATFLIGHTMODESTATUS_RUNERROR, "CSatFlightModeStatus::RunError %d", aError );
+    OstTrace1( TRACE_NORMAL,  CSATFLIGHTMODESTATUS_RUNERROR_TD, "CSatFlightModeStatus::RunError %d", aError );
     TFLOGSTRING2("TSY: CSatFlightModeStatus::RunError %d", aError);
 
     if ( KErrCancel != aError && !IsActive() )
@@ -219,7 +219,7 @@ TInt CSatFlightModeStatus::RunError( TInt aError )
 //
 void CSatFlightModeStatus::CheckStatusChange()
     {
-    OstTrace0( TRACE_NORMAL, CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE, "CSatFlightModeStatus::CheckStatusChange" );
+    OstTrace0( TRACE_NORMAL,  CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE_TD, "CSatFlightModeStatus::CheckStatusChange" );
     TFLOGSTRING("TSY: CSatFlightModeStatus::CheckStatusChange");
 
     // Gets system state value of this property.
@@ -239,7 +239,7 @@ void CSatFlightModeStatus::CheckStatusChange()
                 if ( iSatMessHandler->GetSatReadyStatus() )
                     {
                     TFLOGSTRING("TSY: CSatFlightModeStatus::CheckStatusChange - RF ON - ENHANCED FETCH HANDLING ENABLED");
-                    OstTrace0( TRACE_NORMAL, DUP1_CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE, "CSatFlightModeStatus::CheckStatusChange - RF ON - ENHANCED FETCH HANDLING ENABLED" );
+                    OstTrace0( TRACE_NORMAL,  DUP1_CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE_TD, "CSatFlightModeStatus::CheckStatusChange - RF ON - ENHANCED FETCH HANDLING ENABLED" );
 
                     // Enable CAT support.
                     iSatMessHandler->UiccCatReq( UICC_CAT_ENABLE );
@@ -254,7 +254,7 @@ void CSatFlightModeStatus::CheckStatusChange()
                 if ( iSatMessHandler->GetSatReadyStatus() )
                     {
                     TFLOGSTRING("TSY: CSatFlightModeStatus::CheckStatusChange - RF OFF - ENHANCED FETCH HANDLING DISABLED");
-                    OstTrace0( TRACE_NORMAL, DUP2_CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE, "CSatFlightModeStatus::CheckStatusChange - RF OFF - ENHANCED FETCH HANDLING DISABLED" );
+                    OstTrace0( TRACE_NORMAL,  DUP2_CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE_TD, "CSatFlightModeStatus::CheckStatusChange - RF OFF - ENHANCED FETCH HANDLING DISABLED" );
 
                     // Disable CAT support.
                     iSatMessHandler->UiccCatReq( UICC_CAT_DISABLE );
@@ -264,7 +264,7 @@ void CSatFlightModeStatus::CheckStatusChange()
             default:
                 {
                 TFLOGSTRING("TSY: CSatFlightModeStatus::CheckStatusChange - Default - state value not interested");
-                OstTrace0( TRACE_NORMAL, DUP3_CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE, "CSatFlightModeStatus::CheckStatusChange - Default - state value not interested" );
+                OstTrace0( TRACE_NORMAL,  DUP3_CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE_TD, "CSatFlightModeStatus::CheckStatusChange - Default - state value not interested" );
 
                 // we are not interested of other state changes.
                 break;
@@ -275,7 +275,7 @@ void CSatFlightModeStatus::CheckStatusChange()
         {
         // There was error when getting system state value. Just continue.
         TFLOGSTRING2("TSY: CSatFlightModeStatus::CheckStatusChange - Error= %d", errValue);
-        OstTrace1( TRACE_NORMAL, DUP4_CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE, "CSatFlightModeStatus::CheckStatusChange - Error= %d", errValue );
+        OstTrace1( TRACE_NORMAL,  DUP4_CSATFLIGHTMODESTATUS_CHECKSTATUSCHANGE_TD, "CSatFlightModeStatus::CheckStatusChange - Error= %d", errValue );
         } // End of if.
     }
 
@@ -286,7 +286,7 @@ void CSatFlightModeStatus::CheckStatusChange()
 //
 TBool CSatFlightModeStatus::FlightModeStatusValue()
     {
-    OstTrace0( TRACE_NORMAL, CSATFLIGHTMODESTATUS_FLIGHTMODESTATUSVALUE, "CSatFlightModeStatus::FlightModeStatusValue" );
+    OstTrace0( TRACE_NORMAL,  CSATFLIGHTMODESTATUS_FLIGHTMODESTATUSVALUE_TD, "CSatFlightModeStatus::FlightModeStatusValue" );
     TFLOGSTRING("TSY: CSatFlightModeStatus::FlightModeStatusValue");
     return iFlightModeActive;
     }

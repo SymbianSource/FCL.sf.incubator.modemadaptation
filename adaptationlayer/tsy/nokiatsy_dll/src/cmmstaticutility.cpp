@@ -88,7 +88,7 @@ TInt CMmStaticUtility::CSCauseToEpocError
         )
     {
 TFLOGSTRING4("TSY: CMmStaticUtility::CSCauseToEpocError - resource: %d, cause type: %d, cause value: %d", aResource, aIsiCauseType, aIsiCauseValue);
-OstTraceExt3( TRACE_NORMAL, CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;aResource=%d;aIsiCauseType=%hhu;aIsiCauseValue=%hhu", aResource, aIsiCauseType, aIsiCauseValue );
+OstTraceExt3( TRACE_NORMAL,  CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;aResource=%d;aIsiCauseType=%hhu;aIsiCauseValue=%hhu", aResource, aIsiCauseType, aIsiCauseValue );
     TInt epocError = ( KErrGeneral & 0x0000FFFF ) | ( KErrNotFound << 16 );
 
     if ( 0 == aIsiCauseValue && 0 == aIsiCauseType )
@@ -274,7 +274,7 @@ OstTraceExt3( TRACE_NORMAL, CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtili
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_MODEM_CALL - common error, default, ISI cause value: %d", aIsiCauseValue);
-                        OstTraceExt1( TRACE_NORMAL, DUP1_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_MODEM_CALL - common error, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+                        OstTraceExt1( TRACE_NORMAL,  DUP1_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_MODEM_CALL - common error, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -586,7 +586,7 @@ TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_MODEM_CALL - common
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_MODEM_CALL - Network specific error, unknown ISI cause value: %d", aIsiCauseValue);
-                        OstTraceExt1( TRACE_NORMAL, DUP2_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_MODEM_CALL - Network specific error, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+                        OstTraceExt1( TRACE_NORMAL,  DUP2_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_MODEM_CALL - Network specific error, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -725,7 +725,7 @@ TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_MODEM_CALL - Networ
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_MODEM_NETWORK, default, ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP3_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_MODEM_NETWORK, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP3_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_MODEM_NETWORK, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -860,7 +860,7 @@ OstTraceExt1( TRACE_NORMAL, DUP3_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStatic
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_MODEM_NETWORK - GSM specific error, unknown ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP4_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_MODEM_NETWORK - GSM specific error, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP4_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_MODEM_NETWORK - GSM specific error, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrGeneral );
                         break;
@@ -1030,7 +1030,7 @@ OstTraceExt1( TRACE_NORMAL, DUP4_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStatic
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS, unknown ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP5_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP5_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1052,7 +1052,7 @@ OstTraceExt1( TRACE_NORMAL, DUP5_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStatic
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS - GSM_INDICATE_PASSWORD_ERROR, unknown ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP6_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_INDICATE_PASSWORD_ERROR, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP6_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_INDICATE_PASSWORD_ERROR, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1070,7 +1070,7 @@ OstTraceExt1( TRACE_NORMAL, DUP6_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStatic
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS - GSM_INDICATE_MSG_ERROR, default, ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP7_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_INDICATE_MSG_ERROR, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP7_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_INDICATE_MSG_ERROR, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1110,7 +1110,7 @@ OstTraceExt1( TRACE_NORMAL, DUP7_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStatic
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS - OTHER_ERROR, default, ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP8_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS - OTHER_ERROR, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP8_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS - OTHER_ERROR, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1128,7 +1128,7 @@ OstTraceExt1( TRACE_NORMAL, DUP8_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStatic
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS - service not supprted, default, ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP9_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS - service not supprted, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP9_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS - service not supprted, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1145,7 +1145,7 @@ OstTraceExt1( TRACE_NORMAL, DUP9_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStatic
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS - GSM_GENERAL_PROBLEM, default, ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP10_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_GENERAL_PROBLEM, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP10_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_GENERAL_PROBLEM, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1172,7 +1172,7 @@ OstTraceExt1( TRACE_NORMAL, DUP10_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStati
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS - GSM_INVOKE_PROBLEM, default, ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP11_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_INVOKE_PROBLEM, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP11_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_INVOKE_PROBLEM, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1189,7 +1189,7 @@ OstTraceExt1( TRACE_NORMAL, DUP11_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStati
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS - GSM_RETURN_RESULT_PROBLEM, default, ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP12_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_RETURN_RESULT_PROBLEM, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP12_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_RETURN_RESULT_PROBLEM, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1207,7 +1207,7 @@ OstTraceExt1( TRACE_NORMAL, DUP12_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStati
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS - GSM_RETURN_ERROR_PROBLEM, default, ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP13_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_RETURN_ERROR_PROBLEM, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP13_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_RETURN_ERROR_PROBLEM, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1234,7 +1234,7 @@ OstTraceExt1( TRACE_NORMAL, DUP13_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStati
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SS - GSM_MM_RELEASED, default, ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP14_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_MM_RELEASED, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP14_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SS - GSM_MM_RELEASED, default, ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1332,7 +1332,7 @@ OstTraceExt1( TRACE_NORMAL, DUP14_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStati
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SMS - common error, unknown ISI cause value: %d",aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP15_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SMS - common error, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP15_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SMS - common error, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1530,7 +1530,7 @@ OstTraceExt1( TRACE_NORMAL, DUP15_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStati
                     case SMS_EXT_ERR_CS_BARRED:
                         {
 TFLOGSTRING("TSY: CMmStaticUtility::CSCauseToEpocError - DSAC: SMS was rejected because of barred CS" );
-OstTrace0( TRACE_NORMAL, DUP22_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError - DSAC: SMS was rejected because of barred CS" );
+OstTrace0( TRACE_NORMAL,  DUP22_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError - DSAC: SMS was rejected because of barred CS" );
                         epocError = EpocErrorCode(
                             KErrGeneral, KErrGsmCSConnectionBarred );
                         break;
@@ -1539,7 +1539,7 @@ OstTrace0( TRACE_NORMAL, DUP22_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUt
                     default:
                         {
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError - PN_SMS - GSM specific error, unknown ISI cause value: %d",aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP16_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;PN_SMS - GSM specific error, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP16_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;PN_SMS - GSM specific error, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                         epocError = EpocErrorCode( KErrGeneral,
                             KErrNotFound );
                         break;
@@ -1609,7 +1609,7 @@ OstTraceExt1( TRACE_NORMAL, DUP16_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStati
                     TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError\
                         - PN_CSD, deafault, ISI cause value: %d",
                         aIsiCauseValue);
-OstTrace1( TRACE_NORMAL, DUP23_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;aIsiCauseValue=%d", aIsiCauseValue );
+OstTrace1( TRACE_NORMAL,  DUP23_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;aIsiCauseValue=%d", aIsiCauseValue );
 
                     epocError = EpocErrorCode( KErrGeneral, KErrNotFound );
                     break;
@@ -1620,10 +1620,10 @@ OstTrace1( TRACE_NORMAL, DUP23_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUt
         }
 
 TFLOGSTRING2("TSY: CMmStaticUtility::CSCauseToEpocError, Error was originated by ISA Server, Resource ID: 0x%x", aResource);
-OstTrace1( TRACE_NORMAL, DUP20_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;Error was originated by ISA Server, Resource ID=%x", aResource );
+OstTrace1( TRACE_NORMAL,  DUP20_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;Error was originated by ISA Server, Resource ID=%x", aResource );
 
 TFLOGSTRING3("TSY: CMmStaticUtility::CSCauseToEpocError,ISA Error type: %d, ISA Error value: %d", aIsiCauseType, aIsiCauseValue);
-OstTraceExt2( TRACE_NORMAL, DUP21_CMMSTATICUTILITY_CSCAUSETOEPOCERROR, "CMmStaticUtility::CSCauseToEpocError;ISA Error type=%hhu; ISA Error value=%hhu", aIsiCauseType, aIsiCauseValue );
+OstTraceExt2( TRACE_NORMAL,  DUP21_CMMSTATICUTILITY_CSCAUSETOEPOCERROR_TD, "CMmStaticUtility::CSCauseToEpocError;ISA Error type=%hhu; ISA Error value=%hhu", aIsiCauseType, aIsiCauseValue );
 
     return epocError;
     }
@@ -1642,7 +1642,7 @@ TInt CMmStaticUtility::UICCCSCauseToEpocError
         )
     {
 TFLOGSTRING2("TSY: CMmStaticUtility::UICCCSCauseToEpocError - cause value: %d", aIsiCauseValue);
-//OstTraceExt2( TRACE_NORMAL, CMMSTATICUTILITY_SIMCSCAUSETOEPOCERROR, "CMmStaticUtility::SimCSCauseToEpocError;aIsiCauseValue=%hhu", aIsiCauseValue );
+//OstTraceExt2( TRACE_NORMAL,  CMMSTATICUTILITY_SIMCSCAUSETOEPOCERROR_TD, "CMmStaticUtility::SimCSCauseToEpocError;aIsiCauseValue=%hhu", aIsiCauseValue );
 
     TInt epocError = ( KErrGeneral & 0x0000FFFF ) | ( KErrNotFound << 16 );
 
@@ -1724,7 +1724,7 @@ TFLOGSTRING2("TSY: CMmStaticUtility::UICCCSCauseToEpocError - cause value: %d", 
             default:
                 {
 TFLOGSTRING2("TSY: CMmStaticUtility::UICCCSCauseToEpocError -  UICC_STATUS_TABLE, unknown ISI cause value: %d", aIsiCauseValue);
-OstTraceExt1( TRACE_NORMAL, DUP2_CMMSTATICUTILITY_UICCCSCAUSETOEPOCERROR, "CMmStaticUtility::UICCCSCauseToEpocError; - UICC_STATUS_TABLE, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP2_CMMSTATICUTILITY_UICCCSCAUSETOEPOCERROR_TD, "CMmStaticUtility::UICCCSCauseToEpocError; - UICC_STATUS_TABLE, unknown ISI cause value aIsiCauseValue=%hhu", aIsiCauseValue );
                 epocError = EpocErrorCode( KErrGeneral,
                     KErrNotFound );
                 break;
@@ -1732,10 +1732,10 @@ OstTraceExt1( TRACE_NORMAL, DUP2_CMMSTATICUTILITY_UICCCSCAUSETOEPOCERROR, "CMmSt
             }
 
 TFLOGSTRING("TSY: CMmStaticUtility::UiccCSCauseToEpocError, Error was originated by UICC Server - Resource ID: PN_SIM");
-OstTrace0( TRACE_NORMAL, DUP11_CMMSTATICUTILITY_SIMCSCAUSETOEPOCERROR, "CMmStaticUtility::SimCSCauseToEpocError, Error was originated by ISA Server - Resource ID: PN_SIM" );
+OstTrace0( TRACE_NORMAL,  DUP11_CMMSTATICUTILITY_SIMCSCAUSETOEPOCERROR_TD, "CMmStaticUtility::SimCSCauseToEpocError, Error was originated by ISA Server - Resource ID: PN_SIM" );
 
 TFLOGSTRING2("TSY: CMmStaticUtility::UiccCSCauseToEpocError, UICC Error value: %d", aIsiCauseValue );
-OstTraceExt1( TRACE_NORMAL, DUP12_CMMSTATICUTILITY_UICCCSCAUSETOEPOCERROR, "CMmStaticUtility::UiccCSCauseToEpocError;UICC Error value:aIsiCauseValue=%hhu", aIsiCauseValue );
+OstTraceExt1( TRACE_NORMAL,  DUP12_CMMSTATICUTILITY_UICCCSCAUSETOEPOCERROR_TD, "CMmStaticUtility::UiccCSCauseToEpocError;UICC Error value:aIsiCauseValue=%hhu", aIsiCauseValue );
 
     return epocError;
     }
@@ -1754,7 +1754,7 @@ TInt CMmStaticUtility::PacketDataCSCauseToEpocError
         )
     {
 TFLOGSTRING4("TSY: CMmStaticUtility::PacketDataCSCauseToEpocError - resource: %d, cause type: %d, cause value: %d", aResource, aIsiCauseType, aIsiCauseValue);
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_PACKETDATACSCAUSETOEPOCERROR, "CMmStaticUtility::PacketDataCSCauseToEpocError" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_PACKETDATACSCAUSETOEPOCERROR_TD, "CMmStaticUtility::PacketDataCSCauseToEpocError" );
 
     TInt epocError( KErrGeneral );
 
@@ -2075,7 +2075,7 @@ OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_PACKETDATACSCAUSETOEPOCERROR, "CMmStat
             }
         }
 TFLOGSTRING2("TSY: CMmStaticUtility::PacketDataCSCauseToEpocError - epoc error to be returned: %d", epocError);
-OstTrace1( TRACE_NORMAL, DUP1_CMMSTATICUTILITY_PACKETDATACSCAUSETOEPOCERROR, "CMmStaticUtility::PacketDataCSCauseToEpocError;epocError=%d", epocError );
+OstTrace1( TRACE_NORMAL,  DUP1_CMMSTATICUTILITY_PACKETDATACSCAUSETOEPOCERROR_TD, "CMmStaticUtility::PacketDataCSCauseToEpocError;epocError=%d", epocError );
 
     return epocError;
     }
@@ -2094,7 +2094,7 @@ void CMmStaticUtility::MapPdpTypeToClient
         )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::MapPdpTypeToClient");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_MAPPDPTYPETOCLIENT, "CMmStaticUtility::MapPdpTypeToClient" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_MAPPDPTYPETOCLIENT_TD, "CMmStaticUtility::MapPdpTypeToClient" );
 
     if ( GPDS_PDP_TYPE_PPP == aPdpTypeServer )
         {
@@ -2124,7 +2124,7 @@ void CMmStaticUtility::ConvertIPAddressToClient
         )
     {
     TFLOGSTRING2("TSY: CMmStaticUtility::ConvertIPAddressToClient - %S", &aGPDSAddres);
-    OstTraceExt1( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTIPADDRESSTOCLIENT, "CMmStaticUtility::ConvertIPAddressToClient;aGPDSAddress=%s", aGPDSAddres );
+    OstTraceExt1( TRACE_NORMAL,  CMMSTATICUTILITY_CONVERTIPADDRESSTOCLIENT_TD, "CMmStaticUtility::ConvertIPAddressToClient;aGPDSAddress=%s", aGPDSAddres );
 
     aInetAddr.Zero();
 
@@ -2185,7 +2185,7 @@ TInt CMmStaticUtility::ConvertIPAddressFromClient
         )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::ConvertIPAddressFromClient");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT, "CMmStaticUtility::ConvertIPAddressFromClient" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT_TD, "CMmStaticUtility::ConvertIPAddressFromClient" );
     TInt ret(KErrNone);
 
     TBuf<RPacketContext::KMaxPDPAddressLength> tmpClientAddress;
@@ -2216,14 +2216,14 @@ OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT, "CMmStatic
         else
             {
 TFLOGSTRING2("TSY: CMmStaticUtility::ConvertIPAddressFromClient; not supported family(%d)", inetAddr.Family());
-OstTrace1( TRACE_NORMAL, DUP2_CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT, "CMmStaticUtility::ConvertIPAddressFromClient; not supported family(%d)", inetAddr.Family() );
+OstTrace1( TRACE_NORMAL,  DUP2_CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT_TD, "CMmStaticUtility::ConvertIPAddressFromClient; not supported family(%d)", inetAddr.Family() );
             ret = KErrNotSupported;
             }
         }
     else
         {
 TFLOGSTRING("TSY: CMmStaticUtility::ConvertIPAddressFromClient; TInetAddr::Input failed");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT, "CMmStaticUtility::ConvertIPAddressFromClient; TInetAddr::Input failed" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSTATICUTILITY_CONVERTIPADDRESSFROMCLIENT_TD, "CMmStaticUtility::ConvertIPAddressFromClient; TInetAddr::Input failed" );
         }
 
     return ret;
@@ -2242,7 +2242,7 @@ void CMmStaticUtility::GetIntFromDescriptor
         )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::GetIntFromDescriptor");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GETINTFROMDESCRIPTOR, "CMmStaticUtility::GetIntFromDescriptor" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_GETINTFROMDESCRIPTOR_TD, "CMmStaticUtility::GetIntFromDescriptor" );
 
     // Initialize.
     integer = 0;
@@ -2268,7 +2268,7 @@ void CMmStaticUtility::FormOperatorCode
         )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::FormOperatorCode");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_FORMOPERATORCODE, "CMmStaticUtility::FormOperatorCode" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_FORMOPERATORCODE_TD, "CMmStaticUtility::FormOperatorCode" );
 
     TUint16 mnc1 = 0x0F;
     TUint16 mnc2 = 0x0F;
@@ -2381,7 +2381,7 @@ void CMmStaticUtility::GetMccCodes
         )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::GetMccCodes");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GETMCCCODES, "CMmStaticUtility::GetMccCodes" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_GETMCCCODES_TD, "CMmStaticUtility::GetMccCodes" );
 
     // Extract MCC and MNC from aOperatorCode.
     TPtrC8 mcc2_mcc1 = aOperatorCode.Left( 0 );
@@ -2421,7 +2421,7 @@ void CMmStaticUtility::GetMncCodes
         )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::GetMncCodes");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GETMNCCODES, "CMmStaticUtility::GetMncCodes" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_GETMNCCODES_TD, "CMmStaticUtility::GetMncCodes" );
 
     // Extract MCC and MNC from aOperatorCode.
     TPtrC8 mnc3_mcc3 = aOperatorCode.Mid( 1,1 );
@@ -2468,7 +2468,7 @@ void CMmStaticUtility::CalculateMccMncNumbers
         )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::CalculateMccMncNumbers");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CALCULATEMCCMNCNUMBERS, "CMmStaticUtility::CalculateMccMncNumbers" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_CALCULATEMCCMNCNUMBERS_TD, "CMmStaticUtility::CalculateMccMncNumbers" );
 
     // Mcc is always three digits
     // If mcc is bigger than 10, code is invalid
@@ -2525,7 +2525,7 @@ OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CALCULATEMCCMNCNUMBERS, "CMmStaticUtil
 TBool CMmStaticUtility::IsOperinfoApac()
     {
 TFLOGSTRING("TSY: CMmStaticUtility::IsOperinfoApac");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_ISOPERINFOAPAC, "CMmStaticUtility::IsOperinfoApac" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_ISOPERINFOAPAC_TD, "CMmStaticUtility::IsOperinfoApac" );
 
 #ifdef __WINSCW__
     return apacInfoToBeReturned;
@@ -2539,14 +2539,14 @@ OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_ISOPERINFOAPAC, "CMmStaticUtility::IsO
         case ELangPrcChinese:
             {
 TFLOGSTRING("TSY: CMmStaticUtility::IsOperinfoApac, Eastern");
-OstTrace0( TRACE_NORMAL, DUP1_CMMSTATICUTILITY_ISOPERINFOAPAC, "CMmStaticUtility::IsOperinfoApac, Eastern" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMSTATICUTILITY_ISOPERINFOAPAC_TD, "CMmStaticUtility::IsOperinfoApac, Eastern" );
             ret = ETrue;
             break;
             }
         default:
             {
 TFLOGSTRING("TSY: CMmStaticUtility::IsOperinfoApac, Western");
-OstTrace0( TRACE_NORMAL, DUP2_CMMSTATICUTILITY_ISOPERINFOAPAC, "CMmStaticUtility::IsOperinfoApac, Western" );
+OstTrace0( TRACE_NORMAL,  DUP2_CMMSTATICUTILITY_ISOPERINFOAPAC_TD, "CMmStaticUtility::IsOperinfoApac, Western" );
             // already set to ret = EFalse;
             break;
             }
@@ -2656,7 +2656,7 @@ EXPORT_C void CMmStaticUtility::SetOperinfoApac
         )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::SetOperinfoApac");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_SETOPERINFOAPAC, "CMmStaticUtility::SetOperinfoApac" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_SETOPERINFOAPAC_TD, "CMmStaticUtility::SetOperinfoApac" );
     apacInfoToBeReturned = aApac;
     }
 
@@ -2674,7 +2674,7 @@ void CMmStaticUtility::ConvertGsmDataToUcs2(
     TDes8& aUcs2String )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::ConvertGsmDataToUcs2");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTGSMDATATOUCS2, "CMmStaticUtility::ConvertGsmDataToUcs2" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_CONVERTGSMDATATOUCS2_TD, "CMmStaticUtility::ConvertGsmDataToUcs2" );
 
     TInt i( 0 );
     TInt j( 0 );
@@ -2797,7 +2797,7 @@ OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTGSMDATATOUCS2, "CMmStaticUtilit
 TUint16 CMmStaticUtility::GetUnicodeGsm( TUint8 aCharacter)
     {
 TFLOGSTRING("TSY: CMmStaticUtility::GetUnicodeGsm");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GETUNICODEGSM, "CMmStaticUtility::GetUnicodeGsm" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_GETUNICODEGSM_TD, "CMmStaticUtility::GetUnicodeGsm" );
 
     TUint16 ret( 0 );
 
@@ -3514,7 +3514,7 @@ void CMmStaticUtility::ConvertUcs2To7BitCodedData(
     TDes8& aGsmDataString )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::ConvertUcs2To7BitCodedData");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTUCS2TO7BITCODEDDATA, "CMmStaticUtility::ConvertUcs2To7BitCodedData" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_CONVERTUCS2TO7BITCODEDDATA_TD, "CMmStaticUtility::ConvertUcs2To7BitCodedData" );
 
     if ( 0 < aInputString.Length() )
         {
@@ -3546,7 +3546,7 @@ void CMmStaticUtility::ConvertUcs2ToGsmUcs2Data(
     TDes8& aGsmDataString )
     {
 TFLOGSTRING("TSY: CMmStaticUtility::ConvertUcs2ToGsmData");
-OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTUCS2TOGSMDATA, "CMmStaticUtility::ConvertUcs2ToGsmData" );
+OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_CONVERTUCS2TOGSMDATA_TD, "CMmStaticUtility::ConvertUcs2ToGsmData" );
 
     if ( 0 < aInputString.Length() )
         {
@@ -3591,7 +3591,7 @@ OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_CONVERTUCS2TOGSMDATA, "CMmStaticUtilit
 TBool CMmStaticUtility::GetCodingScheme( TDesC16& aInputString )
     {
     TFLOGSTRING("TSY: CMmStaticUtility::GetCodingScheme");
-    OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GETCODINGSCHEME, "CMmStaticUtility::GetCodingScheme" );
+    OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_GETCODINGSCHEME_TD, "CMmStaticUtility::GetCodingScheme" );
     TInt ret ( ETrue );
     TInt count(0);
     
@@ -4322,7 +4322,7 @@ TInt CMmStaticUtility::Get16Bit
     )
  {
  TFLOGSTRING("TSY: CMmStaticUtility::Get16bit");
- OstTrace0( TRACE_NORMAL, CMMSTATICUTILITY_GET16BIT, "CMmStaticUtility::Get16Bit" );
+ OstTrace0( TRACE_NORMAL,  CMMSTATICUTILITY_GET16BIT_TD, "CMmStaticUtility::Get16Bit" );
 
  TInt target( 0 );
 

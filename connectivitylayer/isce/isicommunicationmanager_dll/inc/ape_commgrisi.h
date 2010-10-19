@@ -21,6 +21,10 @@
 #define APE_COMMUNICATION_MANAGER_SERVER_ISI_VERSION_Z	 0
 #define APE_COMMUNICATION_MANAGER_SERVER_ISI_VERSION_Y	 1
 
+#ifndef PN_APE_COMMGR
+#define PN_APE_COMMGR 0x11 // remove when defined in pn_const.h
+#endif
+
 
 //TABLES
 

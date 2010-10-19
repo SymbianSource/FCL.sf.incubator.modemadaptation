@@ -427,6 +427,10 @@ TInt CDpDataConfig::SetConfig(
 
                 // Send messages
                 TInt result = iDataPort.Mif().SendMessage(
+#ifdef PIPECAMP_DATAPORT_PNS_PEP_STATUS_IND_PHONET_ADDRESS_FROM_PNS_PEP_CTRL_REQ // 20100523_1300
+       							iDataPort.Pif().GetPipeControllerDeviceIdentifier(),
+       							iDataPort.Pif().GetPipeControllerObjectIdentifier(),
+#endif                
                     PN_PIPE,
                     iDataPort.CreateTransactionId(),
                     PNS_PEP_STATUS_IND,
@@ -687,6 +691,43 @@ TInt CDpDataConfig::MapSignalsCmt2Epoc(
 
             signalsC32 &= ~KSignalDCD;
             signalsC32 |= KDCDChanged;
+            }
+        else
+            {
+            // No signals has changed
+            noSignalChanged = ETrue;
+            }
+        }
+    else if ( PEP_COMM_SIGNAL_DSR_ON == pepParam.new_state )
+        {
+        LOG(" PEP_COMM_SIGNAL_DSR_ON");
+        OstTrace0( TRACE_NORMAL, DUP7_CDPDATACONFIG_MAPSIGNALSCMT2EPOC, "CDpDataConfig:: PEP_COMM_SIGNAL_DSR_ON" );
+
+        if ( ( signalsC32 & KSignalDSR ) != KSignalDSR )
+            {
+            LOG("DSR_ON");
+            OstTrace0( TRACE_NORMAL, DUP8_CDPDATACONFIG_MAPSIGNALSCMT2EPOC, "CDpDataConfig:: DSR_ON" );
+
+            signalsC32 |= KSignalDSR | KDSRChanged;
+            }
+        else
+            {
+            // No signals has changed
+            noSignalChanged = ETrue;
+            }
+        }
+    else if ( PEP_COMM_SIGNAL_DSR_OFF == pepParam.new_state )
+        {
+        LOG(" PEP_COMM_SIGNAL_DSR_OFF");
+        OstTrace0( TRACE_NORMAL, DUP9_CDPDATACONFIG_MAPSIGNALSCMT2EPOC, "CDpDataConfig:: PEP_COMM_SIGNAL_DSR_OFF" );
+
+        if ( ( signalsC32 & KSignalDSR ) == KSignalDSR )
+            {
+            LOG("DSR_OFF");
+            OstTrace0( TRACE_NORMAL, DUP10_CDPDATACONFIG_MAPSIGNALSCMT2EPOC, "CDpDataConfig:: DSR_OFF" );
+
+            signalsC32 &= ~KSignalDSR;
+            signalsC32 |= KDSRChanged;
             }
         else
             {

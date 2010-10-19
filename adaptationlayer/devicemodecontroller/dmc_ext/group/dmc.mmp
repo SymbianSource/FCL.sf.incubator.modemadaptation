@@ -50,6 +50,7 @@ NON_FOUNDATION_ADAPT_LAYER_SYSTEMINCLUDE
 
 SOURCEPATH      ../src
 SOURCE          dmc_extension.cpp
+SOURCE          dmc_kernel_if.cpp
 SOURCE          dmc_logical_channel.cpp
 SOURCE          dmc_logical_device.cpp
 SOURCE          dmc_event_handler_ape_cent.cpp

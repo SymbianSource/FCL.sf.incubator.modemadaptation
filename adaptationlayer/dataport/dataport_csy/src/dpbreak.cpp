@@ -191,6 +191,10 @@ TInt CDpBreak::SendBreak()
     TInt ret =
 #endif
     iDataPort.Mif().SendMessage(
+#ifdef PIPECAMP_DATAPORT_PNS_PEP_STATUS_IND_PHONET_ADDRESS_FROM_PNS_PEP_CTRL_REQ // 20100523_1300
+       iDataPort.Pif().GetPipeControllerDeviceIdentifier(),
+       iDataPort.Pif().GetPipeControllerObjectIdentifier(),
+#endif    
         PN_PIPE,
         iDataPort.CreateTransactionId(),
         PNS_PEP_STATUS_IND,

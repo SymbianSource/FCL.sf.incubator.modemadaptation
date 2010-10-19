@@ -97,7 +97,7 @@ EXPORT_C CMmMessageRouter* CMmMessageRouter::NewL
         )
     {
 TFLOGSTRING("TSY: CMmMessageRouter::NewL");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_NEWL, "CMmMessageRouter::NewL" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_NEWL_TD, "CMmMessageRouter::NewL" );
 
     CMmMessageRouter* messageRouter = NULL;
 
@@ -117,7 +117,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_NEWL, "CMmMessageRouter::NewL" );
 CMmMessageRouter::~CMmMessageRouter()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::~CMmMessageRouter");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_CMMMESSAGEROUTER, "CMmMessageRouter::~CMmMessageRouter" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_CMMMESSAGEROUTER_TD, "CMmMessageRouter::~CMmMessageRouter" );
 
     delete iMmPhoneMessHandler;
     delete iMmCallMessHandler;
@@ -150,7 +150,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_CMMMESSAGEROUTER, "CMmMessageRouter::~
 //
 CMmMessageRouter::CMmMessageRouter()
     {
-OstTrace0( TRACE_NORMAL, DUP1_CMMMESSAGEROUTER_CMMMESSAGEROUTER, "CMmMessageRouter::CMmMessageRouter" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMMESSAGEROUTER_CMMMESSAGEROUTER_TD, "CMmMessageRouter::CMmMessageRouter" );
     // none
     }
 
@@ -173,7 +173,7 @@ void CMmMessageRouter::ConstructL
     {
     //PRINT VERSION STRING TO LOG
 TFLOGSTRING(NOKIATSY_RELEASE_STR);
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_CONSTRUCTL, NOKIATSY_RELEASE_STR );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_CONSTRUCTL_TD, NOKIATSY_RELEASE_STR );
 
     //INIT PHONET
     /**************************************************************/
@@ -181,7 +181,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_CONSTRUCTL, NOKIATSY_RELEASE_STR );
     // Creation of PhoNet objects.
 
 TFLOGSTRING("TSY: CMmMessageRouter::ConstructL -- initializing ISC API");
-OstTrace0( TRACE_NORMAL, DUP1_CMMMESSAGEROUTER_CONSTRUCTL, "CMmMessageRouter::ConstructL, initializing ISC API" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMMESSAGEROUTER_CONSTRUCTL_TD, "CMmMessageRouter::ConstructL, initializing ISC API" );
 
     // Only for server information, which is defined with one byte.
     TBuf8<1> resource;
@@ -205,7 +205,7 @@ OstTrace1( TRACE_NORMAL, DUP2_CMMMESSAGEROUTER_CONSTRUCTL, "CMmMessageRouter::Co
 
 
 TFLOGSTRING("TSY: CMmMessageRouter::ConstructL -- initializing done");
-OstTrace0( TRACE_NORMAL, DUP3_CMMMESSAGEROUTER_CONSTRUCTL, "CMmMessageRouter::ConstructL, initializing done" );
+OstTrace0( TRACE_NORMAL,  DUP3_CMMMESSAGEROUTER_CONSTRUCTL_TD, "CMmMessageRouter::ConstructL, initializing done" );
 
     //END INIT PHONET
     /**************************************************************/
@@ -320,7 +320,7 @@ void CMmMessageRouter::Complete(
     TInt aResult )
     {
 TFLOGSTRING3("NTSY: CMmMessageRouter::Complete. without data package. IPC = %d, result: %d", aIpc, aResult);
-OstTraceExt2( TRACE_NORMAL, CMMMESSAGEROUTER_COMPLETE, "CMmMessageRouter::Complete;aIpc=%d;aResult=%d", aIpc, aResult );
+OstTraceExt2( TRACE_NORMAL,  CMMMESSAGEROUTER_COMPLETE_TD, "CMmMessageRouter::Complete;aIpc=%d;aResult=%d", aIpc, aResult );
     CMmDataPackage emptyDataPackage;
     Complete( aIpc, &emptyDataPackage, aResult );
     return;
@@ -338,7 +338,7 @@ void CMmMessageRouter::Complete(
     TInt aResult )
     {
 TFLOGSTRING3("NTSY: CMmMessageRouter::Complete. IPC = %d, result: %d", aIpc, aResult);
-OstTraceExt2( TRACE_NORMAL, DUP1_CMMMESSAGEROUTER_COMPLETE, "CMmMessageRouter::Complete;aIpc=%d;aResult=%d", aIpc, aResult );
+OstTraceExt2( TRACE_NORMAL,  DUP1_CMMMESSAGEROUTER_COMPLETE_TD, "CMmMessageRouter::Complete;aIpc=%d;aResult=%d", aIpc, aResult );
 
     // Read Operator Name String (ONS Name) when SIM is ready.
     // Read Operator PLMN List (OPL) rules when SIM is ready.
@@ -372,7 +372,7 @@ MMmMessHandlerBase* CMmMessageRouter::RouteRequest
         )
     {
 TFLOGSTRING2("TSY: CMmMessageRouter::RouteRequest. IPC:%d",aIpc);
-OstTrace1( TRACE_NORMAL, CMMMESSAGEROUTER_ROUTEREQUEST, "CMmMessageRouter::RouteRequest;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMMESSAGEROUTER_ROUTEREQUEST_TD, "CMmMessageRouter::RouteRequest;aIpc=%d", aIpc );
 
     MMmMessHandlerBase* messHandler = NULL;
 
@@ -679,7 +679,7 @@ OstTrace1( TRACE_NORMAL, CMMMESSAGEROUTER_ROUTEREQUEST, "CMmMessageRouter::Route
             default:
                 {
 TFLOGSTRING("TSY: CMmMessageRouter::RouteRequest. Switch aIpc case Default");
-OstTrace0( TRACE_NORMAL, DUP1_CMMMESSAGEROUTER_ROUTEREQUEST, "CMmMessageRouter::RouteRequest, Switch aIpc case Default" );
+OstTrace0( TRACE_NORMAL,  DUP1_CMMMESSAGEROUTER_ROUTEREQUEST_TD, "CMmMessageRouter::RouteRequest, Switch aIpc case Default" );
                 messHandler = NULL;
                 }
             }
@@ -695,7 +695,7 @@ OstTrace0( TRACE_NORMAL, DUP1_CMMMESSAGEROUTER_ROUTEREQUEST, "CMmMessageRouter::
 TInt CMmMessageRouter::ExtFuncL( TInt aIpc, const CMmDataPackage* aDataPackage )
     {
 TFLOGSTRING2("TSY: CMmMessageRouter::ExtFuncL. IPC = %d", aIpc);
-OstTrace1( TRACE_NORMAL, CMMMESSAGEROUTER_EXTFUNCL, "CMmMessageRouter::ExtFuncL;aIpc=%d", aIpc );
+OstTrace1( TRACE_NORMAL,  CMMMESSAGEROUTER_EXTFUNCL_TD, "CMmMessageRouter::ExtFuncL;aIpc=%d", aIpc );
 
     TInt ret ( KErrNone );
 
@@ -722,7 +722,7 @@ OstTrace1( TRACE_NORMAL, CMMMESSAGEROUTER_EXTFUNCL, "CMmMessageRouter::ExtFuncL;
 EXPORT_C CMmPhoNetSender* CMmMessageRouter::GetPhoNetSender()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::GetPhoNetSender");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETPHONETSENDER, "CMmMessageRouter::GetPhoNetSender" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_GETPHONETSENDER_TD, "CMmMessageRouter::GetPhoNetSender" );
     return iPhoNetSender;
     }
 
@@ -734,7 +734,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETPHONETSENDER, "CMmMessageRouter::Ge
 EXPORT_C CMmPhoNetReceiver* CMmMessageRouter::GetPhoNetReceiver()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::GetPhoNetReceiver");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETPHONETRECEIVER, "CMmMessageRouter::GetPhoNetReceiver" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_GETPHONETRECEIVER_TD, "CMmMessageRouter::GetPhoNetReceiver" );
     return iPhoNetReceiver;
     }
 
@@ -746,7 +746,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETPHONETRECEIVER, "CMmMessageRouter::
 CMmCallMessHandler* CMmMessageRouter::GetCallMessHandler()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::GetCallMessHandler");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETCALLMESSHANDLER, "CMmMessageRouter::GetCallMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_GETCALLMESSHANDLER_TD, "CMmMessageRouter::GetCallMessHandler" );
     return iMmCallMessHandler;
     }
 
@@ -758,7 +758,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETCALLMESSHANDLER, "CMmMessageRouter:
 CMmPhoneMessHandler* CMmMessageRouter::GetPhoneMessHandler()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::GetPhoneMessHandler");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETPHONEMESSHANDLER, "CMmMessageRouter::GetPhoneMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_GETPHONEMESSHANDLER_TD, "CMmMessageRouter::GetPhoneMessHandler" );
     return iMmPhoneMessHandler;
     }
 
@@ -770,7 +770,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETPHONEMESSHANDLER, "CMmMessageRouter
 CMmPacketServiceMessHandler* CMmMessageRouter::GetPacketServiceMessHandler()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::GetPacketServiceMessHandler");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETPACKETSERVICEMESSHANDLER, "CMmMessageRouter::GetPacketServiceMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_GETPACKETSERVICEMESSHANDLER_TD, "CMmMessageRouter::GetPacketServiceMessHandler" );
     return iMmPacketServiceMessHandler;
     }
 
@@ -782,7 +782,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETPACKETSERVICEMESSHANDLER, "CMmMessa
 CMmCustomMessHandler* CMmMessageRouter::GetCustomMessHandler()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::GetCustomMessHandler");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETCUSTOMMESSHANDLER, "CMmMessageRouter::GetCustomMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_GETCUSTOMMESSHANDLER_TD, "CMmMessageRouter::GetCustomMessHandler" );
     return iMmCustomMessHandler;
     }
 
@@ -794,7 +794,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETCUSTOMMESSHANDLER, "CMmMessageRoute
 CMmSmsMessHandler* CMmMessageRouter::GetSmsMessHandler()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::GetSmsMessHandler");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETSMSMESSHANDLER, "CMmMessageRouter::GetSmsMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_GETSMSMESSHANDLER_TD, "CMmMessageRouter::GetSmsMessHandler" );
     return iMmSmsMessHandler;
     }
 
@@ -806,7 +806,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETSMSMESSHANDLER, "CMmMessageRouter::
 CMmSupplServMessHandler* CMmMessageRouter::GetSupplServHandler()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::GetSupplServHandler");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETSUPPLSERVHANDLER, "CMmMessageRouter::GetSupplServHandler" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_GETSUPPLSERVHANDLER_TD, "CMmMessageRouter::GetSupplServHandler" );
     return iMmSupplServMessHandler;
     }
 
@@ -818,7 +818,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETSUPPLSERVHANDLER, "CMmMessageRouter
 CMmPhoneBookStoreMessHandler* CMmMessageRouter::PhoneBookStoreMessHandler()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::PhoneBookStoreMessHandler");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_PHONEBOOKSTOREMESSHANDLER, "CMmMessageRouter::PhoneBookStoreMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_PHONEBOOKSTOREMESSHANDLER_TD, "CMmMessageRouter::PhoneBookStoreMessHandler" );
     return iMmPhoneBookStoreMessHandler;
     }
 
@@ -830,7 +830,7 @@ OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_PHONEBOOKSTOREMESSHANDLER, "CMmMessage
 CMmNetMessHandler* CMmMessageRouter::GetNetMessHandler()
     {
 TFLOGSTRING("TSY: CMmMessageRouter::GetNetMessHandler");
-OstTrace0( TRACE_NORMAL, CMMMESSAGEROUTER_GETNETMESSHANDLER, "CMmMessageRouter::GetNetMessHandler" );
+OstTrace0( TRACE_NORMAL,  CMMMESSAGEROUTER_GETNETMESSHANDLER_TD, "CMmMessageRouter::GetNetMessHandler" );
     return iMmNetMessHandler;
     }
 

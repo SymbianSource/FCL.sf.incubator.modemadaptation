@@ -34,6 +34,7 @@ enum TISIFaultClassCategories
     EDISIKernelChannelId,
     EDISIThreadContainerTraceId,
     EDISICLTransceiverTraceId,
+    EDIsiRouterServiceTraceId,
     };
 
 const TUint8 KClassIdentifierShift( 8 );
@@ -48,12 +49,22 @@ const TUint8 KExtraInfoShift( 24 );
 
 #ifdef _DEBUG
     #if defined COMPONENT_TRACE_FLAG
-        #define C_TRACE(a) __TRACE_PRINTF(a)
+        #define C_TRACE( a ) __TRACE_PRINTF( a )
     #else
         #define C_TRACE(a) 
     #endif // COMPONENT_TRACE_FLAG
+    #if defined ISIMESSAGE_TRACE_FLAG
+        /*
+        * Trace function introduction.
+        */
+        void PrintIsiMessageTrace( TDes8& aMessage );    
+        #define ISIMESSAGE_TRACE( a ) PrintIsiMessageTrace( a )
+    #else
+        #define ISIMESSAGE_TRACE( a ) 
+    #endif // COMPONENT_TRACE_FLAG
 #else
     #define C_TRACE(a)
+    #define ISIMESSAGE_TRACE( a )
 #endif // _DEBUG
 
 // Resets are made both in UDEB and UREL (traces only in udeb)

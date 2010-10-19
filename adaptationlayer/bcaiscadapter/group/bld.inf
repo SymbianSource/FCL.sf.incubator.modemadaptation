@@ -25,6 +25,7 @@ BASEDEFAULT
 
 PRJ_EXPORTS
 ../rom/bcaiscadapter.iby                          NON_FOUNDATION_CORE_ADAPT_LAYER_IBY_EXPORT_PATH(bcaiscadapter.iby)
+../bcatoisc_dll/inc/pep_bca_types.h               NON_FOUNDATION_ADAPT_LAYER_EXPORT_PATH(pep_bca_types.h)
 
 PRJ_MMPFILES
 ../bcatoisc_dll/group/bcatoisc.mmp

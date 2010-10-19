@@ -60,9 +60,9 @@ class CMmUiccMessHandler;
 *  @since 2.6
 */
 class CMmSecurityMessHandler
-        : public CBase, 
-          public MMmMessHandlerBase, 
-          public MMmMessageReceiver, 
+        : public CBase,
+          public MMmMessHandlerBase,
+          public MMmMessageReceiver,
           public MUiccOperationBase
     {
 
@@ -239,26 +239,6 @@ class CMmSecurityMessHandler
         */
         void MceModemStateInd( const TIsiReceiveC& aIsiMessage );
 #endif /* INTERNAL_TESTING_OLD_IMPLEMENTATION_FOR_UICC_TESTING */
-
-        /**
-        * Forms UICC_REQ ISI message
-        * return Error code
-        */
-        TInt UiccReq() const;
-
-        /**
-        * Response to UICC_REQ
-        * @param aIsiMessage Received ISI message
-        * @return void
-        */
-        void UiccResp( const TIsiReceiveC& aIsiMessage );
-
-        /**
-        * Handles UICC_IND
-        * @param aIsiMessage Received ISI message
-        * @return void
-        */
-        void UiccInd( const TIsiReceiveC& aIsiMessage );
 
         /**
         * Handles UICC_CARD_IND
@@ -443,7 +423,7 @@ class CMmSecurityMessHandler
         * @return void
         */
         void WriteEfEstResp( const TInt aStatus );
-        
+
         /**
         * Handles INVALIDATE/REHABILITATE command response
         * in case of ICC card
@@ -487,6 +467,13 @@ class CMmSecurityMessHandler
             TInt aStatus,
             const TDesC8& aFileData );
 
+        /**
+        * Sends pin verified event notification to upper level.
+        * @param aStatus Status
+        * @return void
+        */
+        void CompleteIfCodeVerified( const TUint8 aStatus );
+
     protected:
 
         /**
@@ -495,6 +482,9 @@ class CMmSecurityMessHandler
         CMmSecurityMessHandler();
 
     private:    // Data
+
+        //keep record of security code type when verify it
+        RMobilePhone::TMobilePhoneSecurityCode iSecurityCode;
 
         //Pointer to the Message Router
         CMmMessageRouter* iMessageRouter;
@@ -545,7 +535,7 @@ class CMmSecurityMessHandler
 
         // Security code type
         RMobilePhone::TMobilePhoneSecurityCode iCodeType;
-        
+
         // variable to store FDN state which is going
         // to be set
         RMobilePhone::TMobilePhoneFdnSetting iFdnSetting;

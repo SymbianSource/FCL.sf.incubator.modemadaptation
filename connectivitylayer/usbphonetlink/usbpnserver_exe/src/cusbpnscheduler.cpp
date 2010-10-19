@@ -102,7 +102,7 @@ CUsbPnScheduler::~CUsbPnScheduler()
 
 TInt CUsbPnScheduler::ThreadStart( )
     {
-    OstTrace0( TRACE_API, CUSBPNSCHEDULER_THREADSTART_ENTRY, "CUsbPnScheduler::ThreadStart" );
+    OstTrace0( TRACE_BORDER, CUSBPNSCHEDULER_THREADSTART_ENTRY, "CUsbPnScheduler::ThreadStart" );
     A_TRACE(_T("CUsbPnScheduler::ThreadStart()"));
     TInt err(KErrNone);
 
@@ -125,7 +125,7 @@ TInt CUsbPnScheduler::ThreadStart( )
         }
 
 
-    OstTrace1( TRACE_API, CUSBPNSCHEDULER_THREADSTART_EXIT, "CUsbPnScheduler::ThreadStart - return %d", err );
+    OstTrace1( TRACE_BORDER, CUSBPNSCHEDULER_THREADSTART_EXIT, "CUsbPnScheduler::ThreadStart - return %d", err );
     A_TRACE((_T("CUsbPnScheduler::ThreadStart() - return %d"), err));
     return err;
     }

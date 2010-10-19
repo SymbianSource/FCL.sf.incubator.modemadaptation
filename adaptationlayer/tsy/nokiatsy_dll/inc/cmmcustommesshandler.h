@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -95,8 +95,7 @@ const TUint8 KLengthOfHzCzTag = 13;
 const TUint8 KHomeZoneActiveBit = 0x01;
 const TUint8 KCityZoneActiveBit = 0x02;
 
-const TUint8 KSimNumberOfCbMsgIds = 15;
-const TUint KUnusedCbMsgId = 0xffff;
+const TUint16 KUnusedCbMsgId = 0xffff;
 
 const TUint8 KCustomTransId = 6;
 
@@ -212,7 +211,7 @@ class CMmCustomMessHandler :
         */
         ~CMmCustomMessHandler();
 
-   public: // New Functions
+    public: // New Functions
 
         /**
         * Creates CallReleaseReq ISI message and sends it to Phonet.
@@ -415,7 +414,7 @@ class CMmCustomMessHandler :
         * @param aFileData File data
         * @return void
         */
-        void UiccReadFieldResp( TInt aStatus, const TDesC8& aFileData );
+        void UiccReadFieldResp( TUint8 aStatus, const TDesC8& aFileData );
 
         /**
         * Read ciphering indicator status from SIM/USIM
@@ -448,7 +447,7 @@ class CMmCustomMessHandler :
         * @param aFileData File data
         * @return none
         */
-        void UiccOperatorResp( TInt aStatus, const TDesC8& aFileData );
+        void UiccOperatorResp( TUint8 aStatus, const TDesC8& aFileData );
 
         /**
         * Disconnects UICC server from smartcard and
@@ -563,7 +562,7 @@ class CMmCustomMessHandler :
         * @return void
         */
         void UiccReadCbMsgIdsResp(
-            TInt aStatus,
+            TUint8 aStatus,
             TInt aTraId,
             const TDesC8& aFileData );
 
@@ -572,7 +571,7 @@ class CMmCustomMessHandler :
         * @param aStatus Status
         * @return void
         */
-        void UiccDeleteCbMsgIdResp( TInt aStatus );
+        void UiccDeleteCbMsgIdResp( TUint8 aStatus );
 
         /**
         * Read home zone parameters from UICC
@@ -587,7 +586,7 @@ class CMmCustomMessHandler :
         * @return void
         */
         void UiccReadViagHomeZoneParametersResp(
-            TInt aStatus,
+            TUint8 aStatus,
             const TDesC8& aFileData );
 
         /**
@@ -605,7 +604,7 @@ class CMmCustomMessHandler :
         * @return void
         */
         void UiccReadViagHomeZoneCacheResp(
-            TInt aStatus,
+            TUint8 aStatus,
             const TDesC8& aFileData );
 
         /**
@@ -621,7 +620,7 @@ class CMmCustomMessHandler :
          * @param aStatus Status
          * @return void
          */
-        void UiccWriteViagHomeZoneUhziueSettingsResp( TInt aStatus );
+        void UiccWriteViagHomeZoneUhziueSettingsResp( TUint8 aStatus );
 
         /**
         * Write Viag Home Zone cache from UICC
@@ -638,9 +637,9 @@ class CMmCustomMessHandler :
         * @param aStatus Status
         * @return void
         */
-        void UiccWriteViagHomeZoneCacheResp( TInt aStatus );
+        void UiccWriteViagHomeZoneCacheResp( TUint8 aStatus );
 
-   public: // Functions from base classes
+    public: // Functions from base classes
 
         /**
         * ISI message for CustomMessageHandler received
@@ -1355,6 +1354,14 @@ class CMmCustomMessHandler :
         */
         void UiccHandleIsimActivationResp( TInt aStatus );
 
+        /**
+         * Collects cellbroadcast topic IDs into array. Leaves if nothig found
+         * @param aFileData elementary file data
+         * @return array with topic IDs
+         */
+        CArrayFixFlat<RMmCustomAPI::TSimCbTopic>* CollectCbTopicIdsL(
+                const TDesC16& aTopicIds ) const;
+
     protected: // Data
 
         // Pointer to the PhonetSender
@@ -1420,7 +1427,7 @@ class CMmCustomMessHandler :
         TInt iCbMsgIdsMaxCount;
 
         // Saves the SIM CB topic number for deletion
-        TUint iSimCBTopicToBeDeleted;
+        TUint16 iSimCBTopicToBeDeleted;
 
         // Is the SIM topic is being deleted (ETrue ) or not (EFalse)
         TBool iTopicInSimMemoryDelete;

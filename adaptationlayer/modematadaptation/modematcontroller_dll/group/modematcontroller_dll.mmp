@@ -41,7 +41,7 @@ SOURCE                  ccommandmodereq.cpp
 
 USERINCLUDE             ../inc
 USERINCLUDE             ../../modematcontroller_exe/inc
-
+USERINCLUDE             ../traces
 
 OS_LAYER_SYSTEMINCLUDE
 
